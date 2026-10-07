@@ -2,6 +2,8 @@
 exclude:
   - CLAUDE.md
   - README.md
+  - PRODUCT.md
+  - DESIGN.md
   - package.json
   - package-lock.json
   - playwright.config.js
