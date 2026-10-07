@@ -31,9 +31,13 @@ try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;
 if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('intro-on')}catch(e){}})();
 </script>
 <script src="model.js" defer></script>
+<script src="site.js" defer></script>
 </head>
 <body class="no-js home">
-<div class="curtain" aria-hidden="true"><div class="in"><span class="n" id="introN">001</span><span class="bar"><i id="introBar"></i></span><span class="w">Centamont</span></div></div>
+<div class="curtain" aria-hidden="true">
+  <div class="half l"></div><div class="half r"></div><i class="split"></i>
+  <div class="in"><span class="n" id="introN">001</span><span class="bar"><i id="introBar"></i></span><span class="w">Centamont</span></div>
+</div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site over top">
   <div class="wrap bar">
@@ -52,7 +56,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
     </nav>
     <div class="tools">
     <button class="theme" id="themeBtn" type="button" aria-label="Switch between day and night"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor"/><path d="M8 .8v2M8 13.2v2M.8 8h2M13.2 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M2.9 13.1l1.4-1.4M11.7 4.3l1.4-1.4" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 10.4A6 6 0 0 1 5.6 2.4a6 6 0 1 0 8 8z" fill="none" stroke="currentColor"/></svg></button>
-    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mainNav">Menu</button>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Menu</button>
     </div>
   </div>
 </header>
@@ -61,27 +65,27 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <div class="hero" id="top">
   <canvas id="heroModel" aria-hidden="true"></canvas>
   <div class="wrap">
-    <h1>The finest new buildings, sold <em>with intent.</em></h1>
+    <h1><span class="ln"><span>The finest new</span></span> <span class="ln"><span>buildings, sold</span></span> <span class="ln"><span><em>with intent.</em></span></span></h1>
     <p class="lede">We help developers sell new buildings faster, with a sales strategy written for each one, from the first sketch to the last closing. And we represent a small circle of buyers at the very top of the market.</p>
     <div class="row">
       <a class="btn solid" href="#developers">For developers<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
       <a class="btn" href="#clients">Private clients</a>
     </div>
   </div>
-  <p class="coords" aria-hidden="true"><b>Miami</b><span>25.76° N · 80.19° W</span><span>Massing study, illustrative</span></p>
+  <p class="coords" aria-hidden="true"><b>Miami</b><span id="clock">25.76° N · 80.19° W</span><span>Massing study, illustrative</span></p>
   <span class="scrollcue" aria-hidden="true"></span>
 </div>
 
 <section id="services">
   <div class="wrap">
     <div class="head">
-      <h2>One firm, from the first sketch to the last closing.</h2>
+      <h2>One firm, from the first sketch to the last&nbsp;closing.</h2>
       <p class="intro">Most new buildings are sold from a template. We write a strategy for each one, put a founder on every account, and run sales like a data business: measured, reported weekly, improved every week.</p>
     </div>
     <div class="practices">
-      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><rect x="4.5" y="4.5" width="47" height="47"/><path d="M4.5 26.5h18M30.5 4.5v18h21M30.5 32.5v19M22.5 26.5a8 8 0 0 1 8-8"/></g><rect class="b" x="36" y="36" width="10" height="10"/></svg><h3><small>Layer I</small>Development advisory</h3><p>Before the design is final: pricing, unit mix, floor plans, amenities, buyer profile and launch strategy, shaped around the people who will actually buy.</p><a class="more" href="#developers">How it works</a></div>
-      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><rect class="b" x="18" y="39" width="20" height="12"/><g fill="none" stroke="currentColor" stroke-width="1"><path d="M18.5 51.5v-44h19v44M2 51.5h52M18.5 15.5h19M18.5 23.5h19M18.5 31.5h19M18.5 39.5h19M22.5 7.5v-4h11v4"/></g></svg><h3><small>Layer II</small>Sales &amp; marketing</h3><p>The full sales operation for a building: gallery, sales team, campaigns, a dedicated project website and a hand-picked group of top brokers.</p><a class="more" href="#developers">How it works</a></div>
-      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M14.5 51.5v-32a13.5 13.5 0 0 1 27 0v32M8 51.5h40M20.5 51.5v-30a7.5 7.5 0 0 1 15 0v30"/></g><circle class="b" cx="31" cy="38" r="2"/></svg><h3><small>Layer III</small>Private brokerage</h3><p>A small, invitation-only team representing buyers at the very top of the market, with early access to new developments before they launch.</p><a class="more" href="#clients">Private clients</a></div>
+      <div class="pr"><span class="num" aria-hidden="true">I</span><h3>Development advisory</h3><p>Before the design is final: pricing, unit mix, floor plans, amenities, buyer profile and launch strategy, shaped around the people who will actually buy.</p><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><rect x="4.5" y="4.5" width="47" height="47"/><path d="M4.5 26.5h18M30.5 4.5v18h21M30.5 32.5v19M22.5 26.5a8 8 0 0 1 8-8"/></g><rect class="b" x="36" y="36" width="10" height="10"/></svg><a class="more" href="#developers">From the first sketch</a></div>
+      <div class="pr"><span class="num" aria-hidden="true">II</span><h3>Sales &amp; marketing</h3><p>The full sales operation for a building: gallery, sales team, campaigns, a dedicated project website and a hand-picked group of top brokers.</p><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><rect class="b" x="18" y="39" width="20" height="12"/><g fill="none" stroke="currentColor" stroke-width="1"><path d="M18.5 51.5v-44h19v44M2 51.5h52M18.5 15.5h19M18.5 23.5h19M18.5 31.5h19M18.5 39.5h19M22.5 7.5v-4h11v4"/></g></svg><a class="more" href="#steps">Launch to last closing</a></div>
+      <div class="pr"><span class="num" aria-hidden="true">III</span><h3>Private brokerage</h3><p>A small, invitation-only team representing buyers at the very top of the market, with early access to new developments before they launch.</p><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M14.5 51.5v-32a13.5 13.5 0 0 1 27 0v32M8 51.5h40M20.5 51.5v-30a7.5 7.5 0 0 1 15 0v30"/></g><circle class="b" cx="31" cy="38" r="2"/></svg><a class="more" href="#clients">Private clients</a></div>
     </div>
   </div>
 </section>
@@ -89,49 +93,50 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <section id="developers">
   <div class="wrap">
     <div class="head">
-      <h2>Your building, sold like it is the only one we have.</h2>
+      <h2>Your building, sold like it is the only one we&nbsp;have.</h2>
       <p class="intro">Large firms juggle dozens of projects. We take on few, and a founder stays on every one of them. Here is how a building comes to market with us beside it.</p>
     </div>
 
     <div class="rise">
       <figure class="elev" aria-hidden="true">
         <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+        <div class="gauge"><span>Levels framed <b id="gB">00</b><i>/22</i></span><span>Levels sold <b id="gS">00</b><i>/22</i></span></div>
         <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
       </figure>
 
       <ol class="steps" id="steps">
         <li class="step" data-built="0" data-sold="0" data-name="First sketch">
-          <h3>We arrive while the building is still a sketch.</h3>
+          <h3>We arrive while the building is still a&nbsp;sketch.</h3>
           <p>Advisory begins before the design is final, so the building is shaped around the buyer who will actually live there.</p>
           <ul><li>Pricing and unit mix</li><li>Floor plans and amenities</li><li>Buyer profile and launch strategy</li></ul>
         </li>
         <li class="step" data-built="0" data-sold="0" data-name="Strategy">
-          <h3>A strategy written for this building alone.</h3>
+          <h3>A strategy written for this building&nbsp;alone.</h3>
           <p>No template. Positioning, buyer targets and campaigns are designed around your project. A founder sits on your account from the first meeting to the final closing, with no hand-off to juniors after signing.</p>
         </li>
         <li class="step" data-built="3" data-sold="0" data-name="Launch">
-          <h3>Launch day, with everything already running.</h3>
+          <h3>Launch day, with everything already&nbsp;running.</h3>
           <p>The project website, search, journal and market updates, social and business media are live before the first reservation.</p>
           <p>A small team of top brokers works the launch, each owning a buyer segment, under one set of rules and one stream of data.</p>
         </li>
         <li class="step" data-built="11" data-sold="4" data-name="Selling">
-          <h3>The numbers, every week.</h3>
+          <h3>The numbers, every&nbsp;week.</h3>
           <p>Leads, tours, reservations, contracts and pricing moves arrive in one weekly report. You always know where the building stands and what we are changing next.</p>
         </li>
         <li class="step" data-built="22" data-sold="13" data-name="Top-off">
-          <h3>Topped off, and still a step ahead.</h3>
+          <h3>Topped off, and still a step&nbsp;ahead.</h3>
           <p>As the structure rises, pricing and releases move with demand, so the last floors sell as well as the first.</p>
         </li>
         <li class="step" data-built="22" data-sold="22" data-name="Last closing">
-          <h3>The last closing is not the last of us.</h3>
+          <h3>The last closing is not the last of&nbsp;us.</h3>
           <p>We are paid as the project succeeds. And every buyer we meet stays with the firm, so the next building sells faster than this one.</p>
         </li>
       </ol>
     </div>
 
     <div class="begin">
-      <h3>How an engagement begins.</h3>
+      <h3>How an engagement&nbsp;begins.</h3>
       <div>
         <ol>
           <li><b>A first conversation with the partners.</b><span>Tell us about the site, the timeline and where design stands.</span></li>
@@ -139,8 +144,8 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
           <li><b>A written proposal for your building.</b><span>The strategy, the team and the milestones we will report against.</span></li>
         </ol>
         <div class="close">
-          <p>Case studies will be published here, each with its developer's written approval, showing sales pace against plan, price achieved and time to sellout.</p>
-          <a class="btn solid" href="#contact" style="justify-self:start">Write to the partners</a>
+          <p>Every engagement is reported against its plan, every week. Case studies appear here only with each developer's written approval.</p>
+          <a class="btn solid" href="#contact">Write to the partners<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
         </div>
       </div>
     </div>
@@ -150,54 +155,64 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <section class="band door-band" id="clients">
   <div class="wrap door">
     <div>
-      <h2>Residences that never reach the open market.</h2>
+      <h2>Residences that never reach the open&nbsp;market.</h2>
       <p class="big">Send a private message to @centamont on Instagram or LinkedIn with your market and price range. A partner replies personally.</p>
       <div class="row">
         <a class="btn" href="https://www.instagram.com/centamont" target="_blank" rel="noopener">Instagram</a>
         <a class="btn" href="https://www.linkedin.com/company/centamont" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </div>
+    <div class="doorway" data-draw>
+    <svg class="arch" viewBox="0 0 400 600" preserveAspectRatio="none" aria-hidden="true"><path d="M.5 600V200a199.5 199.5 0 0 1 399 0v400"/><path class="in2" d="M22 600V206a178 178 0 0 1 356 0v394"/></svg>
     <div class="terms">
       <p><b>Before anyone else</b>New developments, shown before public launch.</p>
       <p><b>Off the market</b>Residences that are never listed.</p>
       <p><b>One advisor</b>Someone who knows your brief, from first viewing to closing.</p>
+    </div>
     </div>
   </div>
 </section>
 
 <section id="markets">
   <div class="wrap">
-    <div class="head">
-      <h2>Miami first. Then, one market at a time.</h2>
+    <div class="head wide">
+      <h2>Miami first. Then, one market at a&nbsp;time.</h2>
       <p class="intro">We open a new market only when the last one stands on its own. Each has its own team, its own rules and its own research.</p>
     </div>
     <div class="chart" id="chart">
-      <svg viewBox="0 0 720 330" role="img" aria-label="Chart of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, and later international.">
+      <figure class="map">
+      <svg viewBox="0 0 720 330" role="img" aria-label="Map of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, and later international.">
         <g class="grid">
           <line x1="0" y1="72" x2="720" y2="72"/><line x1="0" y1="135" x2="720" y2="135"/><line x1="0" y1="197" x2="720" y2="197"/><line x1="0" y1="260" x2="720" y2="260"/>
           <line x1="137" y1="0" x2="137" y2="330"/><line x1="262" y1="0" x2="262" y2="330"/><line x1="387" y1="0" x2="387" y2="330"/><line x1="512" y1="0" x2="512" y2="330"/><line x1="637" y1="0" x2="637" y2="330"/>
         </g>
-        <text class="gl" x="8" y="68">40° N</text><text class="gl" x="8" y="193">30° N</text><text class="gl" x="141" y="322">115° W</text><text class="gl" x="391" y="322">95° W</text><text class="gl" x="641" y="322">75° W</text>
-        <path class="arc" d="M572 250 Q665 170 649 63"/>
-        <path class="arc" d="M572 250 Q480 190 364 162"/>
-        <path class="arc" d="M572 250 Q330 30 97 146"/>
-        <path class="arc later" d="M572 250 Q660 285 716 238"/>
+        <g class="coast">
+          <path d="M20.8 47.0 L19.5 67.0 L28.2 85.8 L43.2 99.5 L50.7 114.5 L59.5 127.0 L68.9 141.4 L89.5 147.0 L95.8 150.7 L107.0 157.0 L110.8 165.8 L115.7 173.3 L124.5 190.8 L138.2 209.5 L135.8 223.9 L154.5 240.8 L173.3 264.5 L187.0 277.0 L200.7 285.8 L195.8 270.8 L183.3 253.2 L170.8 230.8 L154.5 204.5 L139.5 184.5 L142.0 175.8 L155.8 180.8 L168.2 202.0 L188.2 223.3 L211.4 252.0 L229.5 269.5 L244.5 282.0 L258.2 303.2 L259.5 314.5 L270.8 333.9"/>
+          <path d="M373.3 332.0 L357.0 309.5 L351.4 294.5 L352.6 274.5 L360.1 247.6 L357.0 224.5 L374.5 214.5 L389.5 205.8 L400.7 200.8 L427.0 203.2 L459.5 209.5 L454.5 197.0 L460.8 192.6 L473.3 193.9 L484.5 192.6 L503.2 195.1 L507.6 201.1 L513.2 200.8 L522.0 196.4 L537.0 208.2 L540.1 227.0 L549.5 240.8 L552.0 245.8 L560.8 258.2 L570.1 254.5 L572.9 249.9 L573.2 245.5 L574.1 238.2 L572.0 232.0 L569.9 227.0 L567.2 217.0 L562.0 207.0 L558.2 198.3 L557.0 192.0 L563.9 172.0 L575.8 162.6 L588.2 150.7 L600.1 148.9 L618.2 139.5 L630.8 132.0 L630.1 124.5 L624.9 111.4 L636.0 92.9 L638.2 85.4 L644.2 80.0 L648.2 75.1 L649.5 66.4 L651.4 64.8 L662.0 63.2 L676.2 58.6 L682.0 53.9 L692.0 55.8"/>
+        </g>
+        <text class="gl" x="8" y="68">40° N</text><text class="gl" x="8" y="193">30° N</text><text class="gl" x="141" y="322">115° W</text><text class="gl" x="391" y="322">95° W</text>
+        <path class="arc" data-m="ny" d="M572 250 Q560 140 649 63"/>
+        <path class="arc" data-m="ladal" d="M572 250 Q470 110 364 162"/>
+        <path class="arc" data-m="ladal" d="M572 250 Q330 30 97 146"/>
+        <path class="arc later" data-m="intl" d="M572 250 Q640 300 716 290"/>
         <circle class="ring" cx="572" cy="250" r="5"/>
-        <circle class="pt now" cx="572" cy="250" r="5"/>
-        <circle class="pt" cx="574" cy="240" r="3.5"/><circle class="pt" cx="649" cy="63" r="4"/><circle class="pt" cx="672" cy="60" r="3.5"/><circle class="pt" cx="364" cy="162" r="4"/><circle class="pt" cx="97" cy="146" r="4"/>
-        <text class="lb now" x="560" y="274" text-anchor="end">Miami</text>
-        <text class="lb" x="562" y="234" text-anchor="end">Broward &amp; Palm Beach</text>
-        <text class="lb" x="638" y="58" text-anchor="end">New York</text><text class="lb" x="712" y="88" text-anchor="end">Hamptons</text>
-        <text class="lb" x="364" y="188" text-anchor="middle">Dallas</text><text class="lb" x="97" y="172" text-anchor="middle">Los Angeles</text>
-        <text class="lb" x="712" y="300" text-anchor="end">International</text>
+        <circle class="pt now" data-m="miami" cx="572" cy="250" r="5"/>
+        <circle class="pt" data-m="bpb" cx="574" cy="240" r="3.5"/><circle class="pt" data-m="ny" cx="649" cy="63" r="4"/><circle class="pt" data-m="ny" cx="672" cy="60" r="3.5"/><circle class="pt" data-m="ladal" cx="364" cy="162" r="4"/><circle class="pt" data-m="ladal" cx="97" cy="146" r="4"/>
+        <text class="lb now" data-m="miami" x="552" y="280" text-anchor="end">Miami</text>
+        <text class="lb" data-m="bpb" x="590" y="228">Broward &amp;</text><text class="lb" data-m="bpb" x="590" y="246">Palm Beach</text>
+        <text class="lb" data-m="ny" x="638" y="72" text-anchor="end">New York</text><text class="lb" data-m="ny" x="716" y="44" text-anchor="end">Hamptons</text>
+        <text class="lb" data-m="ladal" x="364" y="188" text-anchor="middle">Dallas</text><text class="lb" data-m="ladal" x="97" y="174" text-anchor="middle">Los Angeles</text>
+        <text class="lb" data-m="intl" x="712" y="316" text-anchor="end">International</text>
       </svg>
+      <figcaption>Coastline simplified. Equirectangular projection.</figcaption>
+      </figure>
       <div class="levels">
-      <div class="lv now"><span class="when">Now</span><h3>Miami</h3><p>Brickell, Edgewater, Miami Beach, Sunny Isles and the waterfront corridor.</p></div>
-      <div class="lv"><span class="when">Next</span><h3>Broward &amp; Palm Beach</h3><p>Fort Lauderdale to Palm Beach along the coast.</p></div>
-      <div class="lv"><span class="when">Planned</span><h3>New York &amp; the Hamptons</h3><p>Manhattan new development and the East End.</p></div>
-      <div class="lv"><span class="when">Planned</span><h3>Los Angeles &amp; Dallas</h3><p>The Westside and Dallas–Fort Worth.</p></div>
-      <div class="lv"><span class="when">Later</span><h3>International</h3><p>Through licensed local partners.</p></div>
-    </div>
+      <div class="lv now" data-m="miami"><span class="when">Now</span><h3>Miami</h3><p>Brickell, Edgewater, Miami Beach, Sunny Isles and the waterfront corridor.</p></div>
+      <div class="lv" data-m="bpb"><span class="when">Next</span><h3>Broward &amp; Palm Beach</h3><p>Fort Lauderdale to Palm Beach along the coast.</p></div>
+      <div class="lv" data-m="ny"><span class="when">Planned</span><h3>New York &amp; the Hamptons</h3><p>Manhattan new development and the East End.</p></div>
+      <div class="lv" data-m="ladal"><span class="when">Planned</span><h3>Los Angeles &amp; Dallas</h3><p>The Westside and Dallas–Fort Worth.</p></div>
+      <div class="lv" data-m="intl"><span class="when">Later</span><h3>International</h3><p>Through licensed local partners.</p></div>
+      </div>
     </div>
   </div>
 </section>
@@ -205,22 +220,44 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <section id="journal">
   <div class="wrap">
     <div class="head">
-      <h2>Notes on new development.</h2>
+      <h2>Notes on new&nbsp;development.</h2>
       <p class="intro">Market updates, buyer guides and neighborhood notes on how great buildings come to market.</p>
     </div>
-    <div class="notes">
-      <article><a class="read" href="journal/buying-pre-construction-florida.html"><p class="kind">Buyer guide</p><h3>Buying pre-construction in Florida</h3></a><p>Deposits, escrow, the fifteen-day window to cancel, and what to ask a developer before you reserve.</p><a class="more" href="journal/buying-pre-construction-florida.html">Read the guide</a></article>
-      <article><p class="kind">Market update, coming next</p><h3>Miami pre-construction, quarter by quarter</h3><p class="soon">A recurring read on launches, reservations and absorption across Miami's new buildings.</p></article>
-      <article><p class="kind">Neighborhood, coming next</p><h3>Edgewater, block by block</h3><p class="soon">The first in a series of neighborhood guides for buyers new to Miami.</p></article>
-    </div>
+    <article class="feature">
+      <div class="txt">
+        <h3><a class="read" href="journal/buying-pre-construction-florida.html">Buying pre-construction in Florida</a></h3>
+        <p>Deposits, escrow, the fifteen-day window to cancel, and what to ask a developer before you reserve.</p>
+        <p class="meta-line">Buyer guide · October 2026 · 4 minute read</p>
+        <a class="more" href="journal/buying-pre-construction-florida.html">Read the guide</a>
+      </div>
+      <figure class="deposit" data-draw aria-label="Illustrative deposit schedule: the first 10 percent of the price is held in escrow until closing; deposits above 10 percent may fund construction if the contract allows; the balance is due at closing.">
+        <div class="dbar"><span class="s esc" style="--w:10;--d:0"></span><span class="s con" style="--w:20;--d:1"></span><span class="s often" style="--w:20;--d:2"></span><span class="s bal" style="--w:50;--d:3"></span></div>
+        <div class="dscale" aria-hidden="true"><span style="--at:0">0</span><span style="--at:10">10%</span><span style="--at:30">30%</span><span style="--at:50">50%</span><span style="--at:100">100% of price</span></div>
+        <dl class="dkey">
+          <div><dt><i class="sw esc"></i>First 10%</dt><dd>Held in escrow until closing</dd></div>
+          <div><dt><i class="sw con"></i>Above 10%</dt><dd>May fund construction, if the contract allows</dd></div>
+          <div><dt><i class="sw bal"></i>The balance</dt><dd>Due at closing</dd></div>
+        </dl>
+        <figcaption>An illustrative Miami deposit schedule. Deposits often reach 30 to 50 percent before completion.</figcaption>
+      </figure>
+    </article>
   </div>
 </section>
 
 <section id="people">
   <div class="wrap people">
     <div class="head">
-      <h2>A seat here is earned, and re-earned.</h2>
+      <h2>A seat here is earned, and&nbsp;re&#8209;earned.</h2>
       <p class="intro">No more than ten advisors per market at launch, never more than twenty. Each one owns a buyer segment and meets a standard a step above the industry.</p>
+      <figure class="table" data-draw aria-hidden="true">
+        <svg viewBox="0 0 520 180">
+          <rect class="tbl" x="110" y="66" width="300" height="48"/>
+          <g class="seat on"><rect x="128" y="40" width="26" height="18"/><rect x="186" y="40" width="26" height="18"/><rect x="244" y="40" width="26" height="18"/><rect x="302" y="40" width="26" height="18"/><rect x="360" y="40" width="26" height="18"/><rect x="128" y="122" width="26" height="18"/><rect x="186" y="122" width="26" height="18"/><rect x="244" y="122" width="26" height="18"/><rect x="302" y="122" width="26" height="18"/><rect x="360" y="122" width="26" height="18"/></g>
+          <rect class="tbl ext" x="20" y="66" width="90" height="48"/><rect class="tbl ext" x="410" y="66" width="90" height="48"/>
+          <g class="seat off"><rect x="38" y="40" width="26" height="18"/><rect x="70" y="40" width="26" height="18"/><rect x="424" y="40" width="26" height="18"/><rect x="456" y="40" width="26" height="18"/><rect x="38" y="122" width="26" height="18"/><rect x="70" y="122" width="26" height="18"/><rect x="424" y="122" width="26" height="18"/><rect x="456" y="122" width="26" height="18"/><rect x="2" y="78" width="14" height="24"/><rect x="504" y="78" width="14" height="24"/></g>
+        </svg>
+        <figcaption><span><b>10</b> seats per market at launch</span><span><b>20</b> at most, ever</span></figcaption>
+      </figure>
     </div>
     <div class="col">
       <p class="big">We don't post openings. Advisors join by invitation or referral.</p>
@@ -229,7 +266,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
         <li>An interview with both partners</li>
         <li>A live sales plan for a real project</li>
       </ul>
-      <p>If you are a top producer in your niche and want to be considered, write to the partners.</p>
+      <p>If you are a top producer in your niche and want to be considered, <a class="ul" href="#contact">write to the partners</a>.</p>
     </div>
   </div>
 </section>
@@ -237,8 +274,9 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <section class="band name" id="house">
   <div class="wrap">
     <p class="cut" id="cut"><span class="ln"><span>Centum, a hundred.</span></span><span class="ln"><span>Mont, a mountain.</span></span><span class="ln"><span><i>The hundredth blow.</i></span></span></p>
+    <svg class="ruler" id="ruler" viewBox="0 0 1000 96" aria-hidden="true"><line class="base" x1="0" y1="70.5" x2="1000" y2="70.5"/><line x1="6.0" y1="70" x2="6.0" y2="57" style="--i:0"/><line x1="15.88" y1="70" x2="15.88" y2="57" style="--i:1"/><line x1="25.76" y1="70" x2="25.76" y2="57" style="--i:2"/><line x1="35.64" y1="70" x2="35.64" y2="57" style="--i:3"/><line x1="45.52" y1="70" x2="45.52" y2="57" style="--i:4"/><line x1="55.4" y1="70" x2="55.4" y2="57" style="--i:5"/><line x1="65.28" y1="70" x2="65.28" y2="57" style="--i:6"/><line x1="75.16" y1="70" x2="75.16" y2="57" style="--i:7"/><line x1="85.04" y1="70" x2="85.04" y2="57" style="--i:8"/><line x1="94.92" y1="70" x2="94.92" y2="44" style="--i:9"/><line x1="104.8" y1="70" x2="104.8" y2="57" style="--i:10"/><line x1="114.68" y1="70" x2="114.68" y2="57" style="--i:11"/><line x1="124.56" y1="70" x2="124.56" y2="57" style="--i:12"/><line x1="134.44" y1="70" x2="134.44" y2="57" style="--i:13"/><line x1="144.32" y1="70" x2="144.32" y2="57" style="--i:14"/><line x1="154.2" y1="70" x2="154.2" y2="57" style="--i:15"/><line x1="164.08" y1="70" x2="164.08" y2="57" style="--i:16"/><line x1="173.96" y1="70" x2="173.96" y2="57" style="--i:17"/><line x1="183.84" y1="70" x2="183.84" y2="57" style="--i:18"/><line x1="193.72" y1="70" x2="193.72" y2="44" style="--i:19"/><line x1="203.6" y1="70" x2="203.6" y2="57" style="--i:20"/><line x1="213.48" y1="70" x2="213.48" y2="57" style="--i:21"/><line x1="223.36" y1="70" x2="223.36" y2="57" style="--i:22"/><line x1="233.24" y1="70" x2="233.24" y2="57" style="--i:23"/><line x1="243.12" y1="70" x2="243.12" y2="57" style="--i:24"/><line x1="253.0" y1="70" x2="253.0" y2="57" style="--i:25"/><line x1="262.88" y1="70" x2="262.88" y2="57" style="--i:26"/><line x1="272.76" y1="70" x2="272.76" y2="57" style="--i:27"/><line x1="282.64" y1="70" x2="282.64" y2="57" style="--i:28"/><line x1="292.52" y1="70" x2="292.52" y2="44" style="--i:29"/><line x1="302.4" y1="70" x2="302.4" y2="57" style="--i:30"/><line x1="312.28" y1="70" x2="312.28" y2="57" style="--i:31"/><line x1="322.16" y1="70" x2="322.16" y2="57" style="--i:32"/><line x1="332.04" y1="70" x2="332.04" y2="57" style="--i:33"/><line x1="341.92" y1="70" x2="341.92" y2="57" style="--i:34"/><line x1="351.8" y1="70" x2="351.8" y2="57" style="--i:35"/><line x1="361.68" y1="70" x2="361.68" y2="57" style="--i:36"/><line x1="371.56" y1="70" x2="371.56" y2="57" style="--i:37"/><line x1="381.44" y1="70" x2="381.44" y2="57" style="--i:38"/><line x1="391.32" y1="70" x2="391.32" y2="44" style="--i:39"/><line x1="401.2" y1="70" x2="401.2" y2="57" style="--i:40"/><line x1="411.08" y1="70" x2="411.08" y2="57" style="--i:41"/><line x1="420.96" y1="70" x2="420.96" y2="57" style="--i:42"/><line x1="430.84" y1="70" x2="430.84" y2="57" style="--i:43"/><line x1="440.72" y1="70" x2="440.72" y2="57" style="--i:44"/><line x1="450.6" y1="70" x2="450.6" y2="57" style="--i:45"/><line x1="460.48" y1="70" x2="460.48" y2="57" style="--i:46"/><line x1="470.36" y1="70" x2="470.36" y2="57" style="--i:47"/><line x1="480.24" y1="70" x2="480.24" y2="57" style="--i:48"/><line x1="490.12" y1="70" x2="490.12" y2="44" style="--i:49"/><line x1="500.0" y1="70" x2="500.0" y2="57" style="--i:50"/><line x1="509.88" y1="70" x2="509.88" y2="57" style="--i:51"/><line x1="519.76" y1="70" x2="519.76" y2="57" style="--i:52"/><line x1="529.64" y1="70" x2="529.64" y2="57" style="--i:53"/><line x1="539.52" y1="70" x2="539.52" y2="57" style="--i:54"/><line x1="549.4" y1="70" x2="549.4" y2="57" style="--i:55"/><line x1="559.28" y1="70" x2="559.28" y2="57" style="--i:56"/><line x1="569.16" y1="70" x2="569.16" y2="57" style="--i:57"/><line x1="579.04" y1="70" x2="579.04" y2="57" style="--i:58"/><line x1="588.92" y1="70" x2="588.92" y2="44" style="--i:59"/><line x1="598.8" y1="70" x2="598.8" y2="57" style="--i:60"/><line x1="608.68" y1="70" x2="608.68" y2="57" style="--i:61"/><line x1="618.56" y1="70" x2="618.56" y2="57" style="--i:62"/><line x1="628.44" y1="70" x2="628.44" y2="57" style="--i:63"/><line x1="638.32" y1="70" x2="638.32" y2="57" style="--i:64"/><line x1="648.2" y1="70" x2="648.2" y2="57" style="--i:65"/><line x1="658.08" y1="70" x2="658.08" y2="57" style="--i:66"/><line x1="667.96" y1="70" x2="667.96" y2="57" style="--i:67"/><line x1="677.84" y1="70" x2="677.84" y2="57" style="--i:68"/><line x1="687.72" y1="70" x2="687.72" y2="44" style="--i:69"/><line x1="697.6" y1="70" x2="697.6" y2="57" style="--i:70"/><line x1="707.48" y1="70" x2="707.48" y2="57" style="--i:71"/><line x1="717.36" y1="70" x2="717.36" y2="57" style="--i:72"/><line x1="727.24" y1="70" x2="727.24" y2="57" style="--i:73"/><line x1="737.12" y1="70" x2="737.12" y2="57" style="--i:74"/><line x1="747.0" y1="70" x2="747.0" y2="57" style="--i:75"/><line x1="756.88" y1="70" x2="756.88" y2="57" style="--i:76"/><line x1="766.76" y1="70" x2="766.76" y2="57" style="--i:77"/><line x1="776.64" y1="70" x2="776.64" y2="57" style="--i:78"/><line x1="786.52" y1="70" x2="786.52" y2="44" style="--i:79"/><line x1="796.4" y1="70" x2="796.4" y2="57" style="--i:80"/><line x1="806.28" y1="70" x2="806.28" y2="57" style="--i:81"/><line x1="816.16" y1="70" x2="816.16" y2="57" style="--i:82"/><line x1="826.04" y1="70" x2="826.04" y2="57" style="--i:83"/><line x1="835.92" y1="70" x2="835.92" y2="57" style="--i:84"/><line x1="845.8" y1="70" x2="845.8" y2="57" style="--i:85"/><line x1="855.68" y1="70" x2="855.68" y2="57" style="--i:86"/><line x1="865.56" y1="70" x2="865.56" y2="57" style="--i:87"/><line x1="875.44" y1="70" x2="875.44" y2="57" style="--i:88"/><line x1="885.32" y1="70" x2="885.32" y2="44" style="--i:89"/><line x1="895.2" y1="70" x2="895.2" y2="57" style="--i:90"/><line x1="905.08" y1="70" x2="905.08" y2="57" style="--i:91"/><line x1="914.96" y1="70" x2="914.96" y2="57" style="--i:92"/><line x1="924.84" y1="70" x2="924.84" y2="57" style="--i:93"/><line x1="934.72" y1="70" x2="934.72" y2="57" style="--i:94"/><line x1="944.6" y1="70" x2="944.6" y2="57" style="--i:95"/><line x1="954.48" y1="70" x2="954.48" y2="57" style="--i:96"/><line x1="964.36" y1="70" x2="964.36" y2="57" style="--i:97"/><line x1="974.24" y1="70" x2="974.24" y2="57" style="--i:98"/><path class="crack" style="--i:99" d="M984.12 70 L984.12 52 L979.12 40 L987.12 28 L981.12 14 L986.12 2"/><text x="6" y="92">1</text><text x="503" y="92" text-anchor="middle">50</text><text x="984.12" y="92" text-anchor="end">100</text></svg>
     <div class="cols">
-      <h2>Quiet by design. Exacting in every detail.</h2>
+      <h2>Quiet by design. Exacting in every&nbsp;detail.</h2>
       <div>
         <p class="big">A stone splits on the hundredth blow, but only because of the ninety-nine before it. We build the same way: patiently, in layers, to last.</p>
         <p>The best houses in any field are recognized without being loud. We hold ourselves to that standard in every detail a developer or buyer touches: the advice, the materials, the response time and the proof behind every claim. Centamont is one name across our brokerage, our advisory work and our technology.</p>
@@ -249,19 +287,16 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 
 <section class="contact" id="contact">
   <div class="wrap">
-    <div class="head">
-      <h2>Write to the partners.</h2>
+    <h2 class="display">Write to the partners.</h2>
+    <div class="reach">
       <p class="intro">Send a private message to @centamont. A partner reads every one and replies personally.</p>
+      <a class="handle" href="https://www.instagram.com/centamont" target="_blank" rel="noopener"><span>@centamont</span><svg viewBox="0 0 36 16" aria-hidden="true"><path d="M0 8h34M27 1l7 7-7 7" fill="none" stroke="currentColor"/></svg></a>
+      <p class="also">Also on <a class="ul" href="https://www.linkedin.com/company/centamont" target="_blank" rel="noopener">LinkedIn</a> and <a class="ul" href="https://x.com/centamont" target="_blank" rel="noopener">X</a></p>
     </div>
     <div class="who">
       <div><h3>Developers</h3><p>The site, the timeline and where design stands.</p></div>
       <div><h3>Buyers</h3><p>Your market, your price range and when you hope to move.</p></div>
       <div><h3>Advisors</h3><p>Your niche, your closed production and who referred you.</p></div>
-    </div>
-    <div class="row">
-      <a class="btn solid" href="https://www.instagram.com/centamont" target="_blank" rel="noopener">Instagram</a>
-      <a class="btn" href="https://www.linkedin.com/company/centamont" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn" href="https://x.com/centamont" target="_blank" rel="noopener">X</a>
     </div>
   </div>
 </section>
@@ -280,7 +315,6 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
         <li><a href="https://www.youtube.com/@centamont" target="_blank" rel="noopener">YouTube</a></li>
         <li><a href="https://x.com/centamont" target="_blank" rel="noopener">X</a></li>
       </ul></div>
-      <div><small>Sheet</small><span class="num">1 of 1</span></div>
     </div>
     <div class="legal"><span>© 2026 Centamont. Miami, Florida.</span><span><a href="privacy.html">Privacy &amp; accessibility</a> · Equal Housing Opportunity</span></div>
   </div>
@@ -288,25 +322,8 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 
 <script>
 document.addEventListener('DOMContentLoaded',function(){
-  document.body.classList.remove('no-js');
   const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const header=document.querySelector('header.site');
-  const nav=document.getElementById('mainNav'),btn=document.getElementById('menuBtn');
-  btn.addEventListener('click',()=>{const o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(o))});
-  const close=()=>{nav.classList.remove('open');btn.setAttribute('aria-expanded','false')};
-  nav.addEventListener('click',e=>{if(e.target.closest('a'))close()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav.classList.contains('open')){close();btn.focus()}});
-  document.addEventListener('click',e=>{if(nav.classList.contains('open')&&!e.target.closest('header.site'))close()});
-
-  // Day and night
-  const models=[];
-  document.getElementById('themeBtn').addEventListener('click',()=>{
-    const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-    root.dataset.theme=dark?'light':'dark';
-    try{localStorage.setItem('cm-theme',root.dataset.theme)}catch(e){}
-    models.forEach(m=>m.colors());
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>models.forEach(m=>m.colors()));
+  const header=document.querySelector('header.site'),nav=document.getElementById('mainNav');
 
   // Mark the nav item for the section in view.
   const links=[...nav.querySelectorAll('a')];
@@ -321,56 +338,73 @@ document.addEventListener('DOMContentLoaded',function(){
   new IntersectionObserver(([e])=>header.classList.toggle('over',e.isIntersecting),{rootMargin:'-64px 0px 0px 0px'}).observe(hero);
   const atTop=()=>header.classList.toggle('top',scrollY<8);addEventListener('scroll',atTop,{passive:true});atTop();
 
-  // Models
-  const Model=window.CentamontModel;
-  let heroM=null,towerM=null;
-  if(Model){
-    const narrow=innerWidth<820;
-    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2});
-    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.24,dist:narrow?46:42,ty:12,scale:1.2});
-    models.push(heroM,towerM);
-    addEventListener('pointermove',e=>{if(e.pointerType==='mouse')heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
-  }
+  // Local time in Miami, set into the hero's survey note.
+  const clock=document.getElementById('clock');
+  const tick=()=>{try{clock.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date())+' in Miami · 25.76° N'}catch(e){}};
+  tick();setInterval(tick,30000);
 
-  // Intro: a hundred blows, then the curtain lifts and the hero tower rises.
-  const intro=document.querySelector('.curtain');
-  const startHero=()=>{if(heroM)heroM.set(22,4,false)};
+  // Models
+  const Model=window.CentamontModel,models=[];
+  let heroM=null,towerM=null;
+  const narrow=innerWidth<820;
+  if(Model){
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2,labels:true});
+    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.22,dist:narrow?44:40,ty:13,scale:1.18,labels:true});
+    models.push(heroM,towerM);
+    addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
+  }
+  document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
+
+  // Intro: a hundred blows. On the hundredth the stone splits and the halves part.
+  const curtain=document.querySelector('.curtain');
+  const startHero=()=>{if(heroM)heroM.set(22,4,false);hero.classList.add('lit')};
   if(root.classList.contains('intro-on')){
     try{sessionStorage.setItem('cm-intro','1')}catch(e){}
-    const n=document.getElementById('introN'),bar=document.getElementById('introBar'),t0=performance.now(),D=1100;
-    const tick=t=>{const p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3);n.textContent=String(Math.max(1,Math.round(e*100))).padStart(3,'0');bar.style.transform='scaleX('+e+')';
-      if(p<1)requestAnimationFrame(tick);else{intro.classList.add('lift');setTimeout(startHero,250);setTimeout(()=>root.classList.remove('intro-on'),1100)}};
-    requestAnimationFrame(tick);
+    const n=document.getElementById('introN'),bar=document.getElementById('introBar'),t0=performance.now(),D=1000;
+    let done=false;
+    const finish=(fast)=>{if(done)return;done=true;n.textContent='100';bar.style.transform='scaleX(1)';
+      curtain.classList.add('split-on');setTimeout(()=>curtain.classList.add('part'),fast?0:260);
+      setTimeout(startHero,fast?100:420);setTimeout(()=>root.classList.remove('intro-on'),fast?700:1300)};
+    const step=t=>{if(done)return;const p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3);n.textContent=String(Math.max(1,Math.round(e*100))).padStart(3,'0');bar.style.transform='scaleX('+e+')';
+      if(p<1)requestAnimationFrame(step);else finish(false)};
+    requestAnimationFrame(step);
+    ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>addEventListener(ev,()=>finish(true),{once:true,passive:true}));
   } else startHero();
 
   // Hero camera eases down as the page scrolls away.
-  if(heroM&&!reduce)addEventListener('scroll',()=>{const p=Math.min(1,scrollY/innerHeight);heroM.phi=0.16+p*0.22;heroM.kick()},{passive:true});
+  if(heroM&&!reduce)addEventListener('scroll',()=>{const p=Math.min(1,scrollY/innerHeight);heroM.phi=0.16+p*0.22;heroM.touch()},{passive:true});
 
-  // The building rises with the developer story.
+  // The building rises with the developer story; the gauge counts with it.
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
-  const views=[[-0.7,0.24],[-0.9,0.3],[-0.55,0.18],[-0.3,0.14],[-0.1,0.2],[0.25,0.26]];
-  let cur=-1;
+  const gB=document.getElementById('gB'),gS=document.getElementById('gS');
+  const views=[[-0.7,0.22],[-0.95,0.3],[-0.55,0.18],[-0.3,0.14],[-0.1,0.2],[0.25,0.26]];
+  let cur=-1,shown=[0,0];
+  const count=(to)=>{const from=shown.slice(),t0=performance.now(),D=reduce?0:900;
+    const go=t=>{const p=D?Math.min(1,(t-t0)/D):1,e=1-Math.pow(1-p,3);
+      gB.textContent=String(Math.round(from[0]+(to[0]-from[0])*e)).padStart(2,'0');gS.textContent=String(Math.round(from[1]+(to[1]-from[1])*e)).padStart(2,'0');
+      if(p<1)requestAnimationFrame(go)};requestAnimationFrame(go);shown=to};
   function stage(n){
     if(n===cur)return;cur=n;
-    const s=steps[n];
-    if(towerM){towerM.set(+s.dataset.built,+s.dataset.sold,+s.dataset.built>0&&n<steps.length-1);
+    const s=steps[n],b=+s.dataset.built,sd=+s.dataset.sold;
+    if(towerM){towerM.set(b,sd,b>0&&n<steps.length-1);
       if(!reduce){const [th,ph]=views[n];const from=[towerM.theta,towerM.phi],t0=performance.now();
-        const go=t=>{const p=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-p,4);towerM.theta=from[0]+(th-from[0])*e;towerM.phi=from[1]+(ph-from[1])*e;towerM.kick();if(p<1)requestAnimationFrame(go)};requestAnimationFrame(go)}}
+        const go=t=>{const p=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-p,4);towerM.theta=from[0]+(th-from[0])*e;towerM.phi=from[1]+(ph-from[1])*e;towerM.touch();if(p<1)requestAnimationFrame(go)};requestAnimationFrame(go)}}
+    count([b,sd]);
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));
     name.textContent=s.dataset.name;
   }
   stage(0);
-  const stepIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)stage(steps.indexOf(e.target))}),{rootMargin:'-48% 0px -48% 0px'});
+  const stepIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)stage(steps.indexOf(e.target))}),{rootMargin:narrow?'-62% 0px -36% 0px':'-48% 0px -48% 0px'});
   steps.forEach(s=>stepIO.observe(s));
 
-  // The private client door opens as it arrives.
-  const door=document.getElementById('clients');
-  if(!reduce){const op=()=>{const r=door.getBoundingClientRect(),p=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)));door.style.setProperty('--o',p.toFixed(3))};addEventListener('scroll',op,{passive:true});op()}
+  // Markets: routes draw out from Miami; a row in the list lights its place on the map.
+  const chart=document.getElementById('chart');
+  chart.querySelectorAll('.arc').forEach(p=>p.style.setProperty('--len',Math.ceil(p.getTotalLength())));
+  chart.querySelectorAll('.lv').forEach(r=>{r.addEventListener('mouseenter',()=>chart.dataset.hl=r.dataset.m);r.addEventListener('mouseleave',()=>delete chart.dataset.hl)});
 
-  // Markets chart draws its routes; the name is cut line by line.
-  document.querySelectorAll('#chart .arc').forEach(p=>p.style.setProperty('--len',Math.ceil(p.getTotalLength())));
+  // The name is cut line by line; the ruler counts its hundred blows.
   const inIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');inIO.unobserve(e.target)}}),{threshold:.3});
-  ['chart','cut'].forEach(id=>inIO.observe(document.getElementById(id)));
+  ['chart','cut','ruler'].forEach(id=>inIO.observe(document.getElementById(id)));
 });
 </script>
 </body>

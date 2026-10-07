@@ -59,7 +59,9 @@ test('old page links land on their section', async ({ page }) => {
   for (const [id, heading] of sections) {
     await page.goto("about:blank");
     await page.goto(`/#${id}`);
-    await expect(page.locator(`#${id} h2`).first()).toBeInViewport();
+    // The section's top lands at the top of the screen.
+    await expect.poll(() => page.evaluate((s) => Math.round(document.getElementById(s).getBoundingClientRect().top), id)).toBeLessThan(120);
+    await expect(page.locator(`#${id}`)).toBeInViewport();
     await expect(page.locator(`#${id} h2`).first()).toContainText(heading);
   }
 });
@@ -172,4 +174,22 @@ test('fonts are served from the site', async ({ page }) => {
   await page.evaluate(() => document.fonts.ready);
   expect(await page.evaluate(() => document.fonts.check('300 40px "Cormorant Garamond"'))).toBe(true);
   expect(outside).toEqual([]);
+});
+
+test('a click skips the intro', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveClass(/intro-on/);
+  await page.mouse.click(10, 10);
+  await expect(page.locator('html')).not.toHaveClass(/intro-on/, { timeout: 1500 });
+});
+
+test('the drawings arrive and say what they show', async ({ page }) => {
+  await page.goto('/');
+  for (const sel of ['.doorway', '#chart', '.deposit', '.table', '#ruler']) {
+    await page.locator(sel).scrollIntoViewIfNeeded();
+    await expect(page.locator(sel)).toHaveClass(/\bin\b/);
+  }
+  await expect(page.locator('.deposit figcaption')).toContainText('illustrative');
+  await expect(page.locator('#chart figcaption')).toContainText('simplified');
 });

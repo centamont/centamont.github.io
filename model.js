@@ -21,7 +21,7 @@
     constructor(canvas, opts) {
       this.c = canvas;
       this.ctx = canvas.getContext('2d');
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; // animated built and sold levels
@@ -31,7 +31,7 @@
       this.visible = true;
       this.colors();
       this.size();
-      new ResizeObserver(() => { this.size(); this.kick(); }).observe(canvas);
+      new ResizeObserver(() => { this.size(); this.touch(); }).observe(canvas);
       new IntersectionObserver((es) => { this.visible = es[0].isIntersecting; if (this.visible) this.kick(); }).observe(canvas);
     }
 
@@ -39,7 +39,7 @@
       const cs = getComputedStyle(this.c);
       this.line = rgb(cs.getPropertyValue('--line') || '#14161A');
       this.sold = rgb(cs.getPropertyValue('--sold') || '#B8976A');
-      this.kick();
+      this.touch();
     }
 
     size() {
@@ -60,6 +60,9 @@
 
     pointer(x, y) { this.mx = x; this.my = y; this.kick(); }
 
+    // Force a full redraw on the next frame (camera moves, colors, size).
+    touch() { this.dirty = true; this.kick(); }
+
     kick() {
       if (this.raf || !this.w) return;
       this.raf = requestAnimationFrame(() => { this.raf = 0; this.frame(); });
@@ -73,8 +76,12 @@
       if (!reduce && this.o.orbit) this.theta += this.o.orbit;
       this.tx = ease(this.tx || 0, this.mx * 0.12, 0.05);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 0.05);
-      this.draw();
-      const moving = this.L !== this.B || this.S !== this.Sold || this.crane !== this.craneT || (!reduce && this.o.orbit) || Math.abs(this.tx - this.mx * 0.12) > 0.001;
+      // A slow idle orbit only needs half the frames; anything else draws every frame.
+      const settled = this.L === this.B && this.S === this.Sold && this.crane === this.craneT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
+      this.odd = !this.odd;
+      if (!(settled && this.o.orbit && this.odd) || this.dirty) this.draw();
+      this.dirty = false;
+      const moving = !settled || (!reduce && this.o.orbit);
       if (moving && this.visible) this.kick();
     }
 
@@ -114,7 +121,7 @@
       }
 
       // Envelope of floors not yet built: a dashed first sketch
-      g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink(0.22);
+      g.setLineDash([3, 4]); g.lineWidth = 0.9; g.strokeStyle = ink(0.42);
       g.beginPath();
       for (let i = Math.floor(this.L); i < FLOORS; i++) {
         const [x0, x1, z0, z1] = plate(i), y0 = i, y1 = i + 1;
@@ -200,6 +207,10 @@
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
       for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-11, i, 6), q = this.P(-11.7, i, 6); seg(p, q); }
       g.stroke();
+      if (this.o.labels && w > 280) {
+        g.fillStyle = bronze(0.95); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-12.3, i, 6); g.fillText('L' + String(i).padStart(2, '0'), p[0], p[1]); }
+      }
     }
   }
 
