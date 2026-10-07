@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded',function(){
   let heroM=null,towerM=null;
   const narrow=innerWidth<820;
   if(Model){
-    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?1.1:(innerWidth>1600?1.3:1.2),offsetX:narrow?0.08:(innerWidth>1600?0.26:innerWidth<1180?0.28:0.2),labels:true,palms:false});
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?1.1:(innerWidth>1600?1.3:1.2),offsetX:narrow?0.08:(innerWidth>1600?0.26:innerWidth<1180?0.28:0.2),labels:true,palms:false,north:false});
     towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.22,dist:40,ty:narrow?10.5:13,scale:narrow?1.45:1.18,labels:true,palms:false});
     models.push(heroM,towerM);
     addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});

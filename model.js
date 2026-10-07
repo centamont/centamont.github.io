@@ -225,6 +225,29 @@
           for (const v of i ? [i, -i] : [0]) { seg(this.P(v, 0, -30), this.P(v, 0, 30)); seg(this.P(-30, 0, v), this.P(30, 0, v)); }
           g.stroke();
         }
+        if (this.o.site !== false) {
+          // the street in front of the entrance, with kerbs and a centre line
+          g.strokeStyle = ink(dark ? 0.24 : 0.2); g.lineWidth = 0.8; g.beginPath();
+          for (const z of [-10.2, -14.2]) seg(this.P(-28, 0, z), this.P(28, 0, z));
+          g.stroke(); g.setLineDash([6, 7]); g.strokeStyle = ink(dark ? 0.16 : 0.13); g.beginPath(); seg(this.P(-28, 0, -12.2), this.P(28, 0, -12.2)); g.stroke(); g.setLineDash([]);
+          // trees drawn the way a site plan draws them: a canopy circle and its trunk
+          g.strokeStyle = ink(dark ? 0.3 : 0.26); g.lineWidth = 0.7; g.beginPath();
+          for (const [x, z, hh] of PALMS) {
+            const r = 0.55 + hh * 0.18;
+            for (let i = 0; i <= 24; i++) { const a = TAU * i / 24, q = this.P(x + Math.cos(a) * r, 0, z + Math.sin(a) * r); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
+            seg(this.P(x - 0.18, 0, z), this.P(x + 0.18, 0, z)); seg(this.P(x, 0, z - 0.18), this.P(x, 0, z + 0.18));
+          }
+          for (const x of [-20, -15, 15, 20, 25, -25]) { const z = -9.2; for (let i = 0; i <= 20; i++) { const a = TAU * i / 20, q = this.P(x + Math.cos(a) * 0.9, 0, z + Math.sin(a) * 0.9); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); } }
+          g.stroke();
+          // north point, only where the view looks down enough to read it
+          if (this.o.north !== false) {
+          const nc = [12.5, 9.5];
+          g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath();
+          for (let i = 0; i <= 28; i++) { const a = TAU * i / 28, q = this.P(nc[0] + Math.cos(a) * 1, 0, nc[1] + Math.sin(a) * 1); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
+          g.stroke(); poly([this.P(nc[0], 0, nc[1] + 1.35), this.P(nc[0] - 0.32, 0, nc[1] - 0.5), this.P(nc[0], 0, nc[1] - 0.2), this.P(nc[0] + 0.32, 0, nc[1] - 0.5)]); g.fillStyle = bronze(0.75); g.fill();
+          if (this.o.labels && w > 280) { const t = this.P(nc[0], 0, nc[1] + 1.9); g.fillStyle = bronze(0.9); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', t[0], t[1]); }
+          }
+        }
         g.setLineDash([4, 5]); g.strokeStyle = bronze(0.55);
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
         if (L > 0.01) {
@@ -242,6 +265,11 @@
         if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
         poly(hull(sh).map(([x, z]) => this.P(x, 0, z)));
         g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
+        // contact shadow: the ground darkens where the building meets it
+        for (const o of [1.1, 0.6, 0.25]) {
+          poly(PLANS[0].slab.map((p) => this.P(p.x + p.nx * o, 0, p.z + p.nz * o)));
+          g.fillStyle = dark ? 'rgba(0,0,0,0.16)' : ink(0.035); g.fill();
+        }
       }
 
       const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [], figs = [];
@@ -406,6 +434,18 @@
           g.stroke();
           this.beacon(this.P(0, y1 + 0.5, 0), now);
         }
+      }
+
+      // Profile line: the outline of the finished building, drawn heavier than anything inside it
+      const clad = Math.min(Math.floor(C + 0.001), FLOORS);
+      if (clad >= 1) {
+        const left = [], right = [];
+        const ext = (pl, y) => { let lo = null, hi = null; for (const p of pl) { const q = this.P(p.x, y, p.z); if (!lo || q[0] < lo[0]) lo = q; if (!hi || q[0] > hi[0]) hi = q; } left.push(lo); right.push(hi); };
+        for (let k = 0; k < clad; k++) { ext(slabPlan(k), k); ext(slabPlan(k), k + SLAB); ext(PLANS[k].glass, k + SLAB); ext(PLANS[k].glass, k + 1); }
+        ext(slabPlan(clad), clad); ext(slabPlan(clad), clad + SLAB);
+        g.strokeStyle = dark ? ink(0.62) : ink(w < 600 ? 0.72 : 0.88); g.lineWidth = w < 600 ? 1 : 1.3; g.lineJoin = 'round'; g.beginPath();
+        for (const side of [left, right]) side.forEach((q, j) => (j ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])));
+        g.stroke(); g.lineJoin = 'miter';
       }
 
       if (craneOn && !craneBehind) this.drawCrane();
