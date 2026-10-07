@@ -193,3 +193,27 @@ test('the drawings arrive and say what they show', async ({ page }) => {
   await expect(page.locator('.deposit figcaption')).toContainText('illustrative');
   await expect(page.locator('#chart figcaption')).toContainText('simplified');
 });
+
+test('the sales curve answers the launch price, and says it is illustrative', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#curve').scrollIntoViewIfNeeded();
+  const before = await page.locator('#cvMonth').textContent();
+  await page.locator('#cvPrice').fill('8');
+  await expect(page.locator('#cvPriceOut')).toHaveText('8% above');
+  await expect(page.locator('#cvMonth')).not.toHaveText(before || '');
+  await expect(page.locator('#cvSay')).toContainText('8 percent more');
+  await expect(page.locator('.cv-fig figcaption')).toContainText('illustrative');
+});
+
+test('the letter turns the fields into a message to copy', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
+  await page.goto('/');
+  await page.locator('#letter').scrollIntoViewIfNeeded();
+  await page.locator('#letter label', { hasText: 'A buyer' }).click();
+  await expect(page.locator('#letter [data-for="buy"]')).toBeVisible();
+  await expect(page.locator('#letter [data-for="dev"]')).toBeHidden();
+  await page.locator('#letter input[name="area"]').fill('Miami Beach');
+  page.on('popup', (p) => p.close().catch(() => {}));
+  await page.locator('#letter button[data-to="ig"]').click();
+  await expect(page.locator('#letterNote')).not.toBeEmpty();
+});

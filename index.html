@@ -32,6 +32,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 </script>
 <script src="model.js" defer></script>
 <script src="site.js" defer></script>
+<script src="instrument.js" defer></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -133,6 +134,31 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
           <p>We are paid as the project succeeds. And every buyer we meet stays with the firm, so the next building sells faster than this one.</p>
         </li>
       </ol>
+    </div>
+
+
+    <div class="curve" id="curve">
+      <div class="cv-txt">
+        <h3>Sales against the&nbsp;schedule.</h3>
+        <p>Every pricing decision moves two dates: when the lender's pre-sale threshold is met, and how many residences are still unsold when the building is finished. Move the launch price and watch both.</p>
+        <div class="cv-ctl">
+          <label for="cvPrice"><span>Launch price against comparable buildings</span><output id="cvPriceOut" for="cvPrice">At par</output></label>
+          <input type="range" id="cvPrice" min="-10" max="10" step="1" value="0">
+          <label for="cvLoan"><span>Pre-sales the lender asks for</span><output id="cvLoanOut" for="cvLoan">50%</output></label>
+          <input type="range" id="cvLoan" min="30" max="70" step="5" value="50">
+        </div>
+        <dl class="cv-read" aria-live="polite">
+          <div><dt>Threshold met</dt><dd id="cvMonth">Month 12</dd></div>
+          <div><dt>Sold by completion</dt><dd id="cvDone">74%</dd></div>
+          <div><dt>Price per residence</dt><dd id="cvPer">At par</dd></div>
+        </dl>
+        <p class="cv-say" id="cvSay"></p>
+      </div>
+      <figure class="cv-fig" data-draw>
+        <svg id="cvSvg" viewBox="0 0 640 330" role="img" aria-label="Illustrative sales curve"></svg>
+        <ul class="cv-key" aria-hidden="true"><li><i class="k-line"></i>Contracts signed</li><li><i class="k-par"></i>At par</li><li><i class="k-build"></i>Construction</li></ul>
+        <figcaption>An illustrative model with assumed sales rates. It is not a forecast or a promise of results.</figcaption>
+      </figure>
     </div>
 
     <div class="begin">
@@ -302,11 +328,27 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
       <a class="handle" href="https://www.instagram.com/centamont" target="_blank" rel="noopener"><span>@centamont</span><svg viewBox="0 0 36 16" aria-hidden="true"><path d="M0 8h34M27 1l7 7-7 7" fill="none" stroke="currentColor"/></svg></a>
       <p class="also">Also on <a class="ul" href="https://www.linkedin.com/company/centamont" target="_blank" rel="noopener">LinkedIn</a> and <a class="ul" href="https://x.com/centamont" target="_blank" rel="noopener">X</a></p>
     </div>
-    <div class="who">
-      <div><h3>Developers</h3><p>The site, the timeline and where design stands.</p></div>
-      <div><h3>Buyers</h3><p>Your market, your price range and when you hope to move.</p></div>
-      <div><h3>Advisors</h3><p>Your niche, your closed production and who referred you.</p></div>
-    </div>
+    <form class="letter" id="letter" novalidate>
+      <fieldset class="as">
+        <legend>Writing as</legend>
+        <label><input type="radio" name="as" value="dev" checked><span>A developer</span></label>
+        <label><input type="radio" name="as" value="buy"><span>A buyer</span></label>
+        <label><input type="radio" name="as" value="adv"><span>An advisor</span></label>
+      </fieldset>
+      <div class="sheet">
+        <p class="salute">Dear partners,</p>
+        <p class="body" data-for="dev">We are developing a building in <input name="where" aria-label="Neighborhood" placeholder="Edgewater" size="11"> with about <input name="units" aria-label="Number of residences" inputmode="numeric" placeholder="60" size="3"> residences. Design is <select name="stage" aria-label="Design stage"><option>still a sketch</option><option>in schematic design</option><option>permitted</option><option>under construction</option></select>, and we hope to launch sales <select name="when" aria-label="Launch timing"><option>this year</option><option>next year</option><option>after that</option></select>.</p>
+        <p class="body" data-for="buy" hidden>I am looking for a residence in <input name="area" aria-label="Area" placeholder="Miami Beach" size="11">, at around <select name="price" aria-label="Price range"><option>$2 to 5 million</option><option>$5 to 10 million</option><option>$10 to 20 million</option><option>over $20 million</option></select>, and hope to move <select name="move" aria-label="Timing"><option>within six months</option><option>within a year</option><option>when the right home appears</option></select>.</p>
+        <p class="body" data-for="adv" hidden>I am an advisor in <input name="mkt" aria-label="Market" placeholder="Miami" size="9"> and focus on <input name="niche" aria-label="Niche" placeholder="new development" size="14">. Last year I closed about <input name="prod" aria-label="Closed production" placeholder="$40 million" size="10"> in sales, and I was referred by <input name="ref" aria-label="Referred by" placeholder="name" size="10">.</p>
+        <p class="sign">With regards,<br><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18"></p>
+      </div>
+      <div class="send">
+        <button type="submit" class="btn solid" data-to="ig">Copy and open Instagram<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
+        <button type="submit" class="btn" data-to="li">Copy and open LinkedIn</button>
+      </div>
+      <p class="note" id="letterNote" role="status" aria-live="polite"></p>
+      <p class="fine">Nothing is sent from this page. Your letter is copied, and you send it yourself.</p>
+    </form>
   </div>
 </section>
 </main>
