@@ -100,7 +100,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
     <div class="rise">
       <figure class="elev" aria-hidden="true">
         <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
-        <div class="gauge"><span>Levels framed <b id="gB">00</b><i>/22</i></span><span>Levels sold <b id="gS">00</b><i>/22</i></span></div>
+        <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/22</i></span><span><em>Levels sold</em> <b id="gS">00</b><i>/22</i></span></div>
         <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
       </figure>
@@ -181,6 +181,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
     </div>
     <div class="chart" id="chart">
       <figure class="map">
+      <div class="scroll" tabindex="0" aria-label="Markets map, scrolls sideways on small screens">
       <svg viewBox="0 0 720 330" role="img" aria-label="Map of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, and later international.">
         <g class="grid">
           <line x1="0" y1="72" x2="720" y2="72"/><line x1="0" y1="135" x2="720" y2="135"/><line x1="0" y1="197" x2="720" y2="197"/><line x1="0" y1="260" x2="720" y2="260"/>
@@ -204,6 +205,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
         <text class="lb" data-m="ladal" x="364" y="188" text-anchor="middle">Dallas</text><text class="lb" data-m="ladal" x="97" y="174" text-anchor="middle">Los Angeles</text>
         <text class="lb" data-m="intl" x="712" y="316" text-anchor="end">International</text>
       </svg>
+      </div>
       <figcaption>Coastline simplified. Equirectangular projection.</figcaption>
       </figure>
       <div class="levels">
@@ -225,9 +227,9 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
     </div>
     <article class="feature">
       <div class="txt">
-        <h3><a class="read" href="journal/buying-pre-construction-florida.html">Buying pre-construction in Florida</a></h3>
+        <h3><a class="read" href="journal/buying-pre-construction-florida.html">Buying <span class="nw">pre-construction</span> in Florida</a></h3>
         <p>Deposits, escrow, the fifteen-day window to cancel, and what to ask a developer before you reserve.</p>
-        <p class="meta-line">Buyer guide · October 2026 · 4 minute read</p>
+        <p class="meta-line">Buyer guide · October 2026 · 4&nbsp;minute read</p>
         <a class="more" href="journal/buying-pre-construction-florida.html">Read the guide</a>
       </div>
       <figure class="deposit" data-draw aria-label="Illustrative deposit schedule: the first 10 percent of the price is held in escrow until closing; deposits above 10 percent may fund construction if the contract allows; the balance is due at closing.">
@@ -247,7 +249,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <section id="people">
   <div class="wrap people">
     <div class="head">
-      <h2>A seat here is earned, and&nbsp;re&#8209;earned.</h2>
+      <h2>A seat here is earned, and&nbsp;<span class="nw">re-earned</span>.</h2>
       <p class="intro">No more than ten advisors per market at launch, never more than twenty. Each one owns a buyer segment and meets a standard a step above the industry.</p>
       <figure class="table" data-draw aria-hidden="true">
         <svg viewBox="0 0 520 180">
@@ -348,8 +350,8 @@ document.addEventListener('DOMContentLoaded',function(){
   let heroM=null,towerM=null;
   const narrow=innerWidth<820;
   if(Model){
-    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2,labels:true});
-    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.22,dist:narrow?44:40,ty:13,scale:1.18,labels:true});
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?.95:(innerWidth>1600?1.1:1),offsetX:narrow?0.08:(innerWidth>1600?0.26:0.2),labels:true});
+    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.22,dist:40,ty:13,scale:narrow?1.45:1.18,labels:!narrow});
     models.push(heroM,towerM);
     addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
   }
@@ -399,6 +401,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   // Markets: routes draw out from Miami; a row in the list lights its place on the map.
   const chart=document.getElementById('chart');
+  const sc=chart.querySelector('.scroll');if(sc&&sc.scrollWidth>sc.clientWidth)sc.scrollLeft=sc.scrollWidth-sc.clientWidth;
   chart.querySelectorAll('.arc').forEach(p=>p.style.setProperty('--len',Math.ceil(p.getTotalLength())));
   chart.querySelectorAll('.lv').forEach(r=>{r.addEventListener('mouseenter',()=>chart.dataset.hl=r.dataset.m);r.addEventListener('mouseleave',()=>delete chart.dataset.hl)});
 

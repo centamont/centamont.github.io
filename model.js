@@ -21,7 +21,7 @@
     constructor(canvas, opts) {
       this.c = canvas;
       this.ctx = canvas.getContext('2d');
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 11, envelope: true }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; // animated built and sold levels
@@ -123,7 +123,7 @@
       // Envelope of floors not yet built: a dashed first sketch
       g.setLineDash([3, 4]); g.lineWidth = 0.9; g.strokeStyle = ink(0.42);
       g.beginPath();
-      for (let i = Math.floor(this.L); i < FLOORS; i++) {
+      for (let i = Math.floor(this.L); this.o.envelope && i < FLOORS; i++) {
         const [x0, x1, z0, z1] = plate(i), y0 = i, y1 = i + 1;
         const c = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
         for (let k = 0; k < 4; k++) {
@@ -203,13 +203,14 @@
       }
 
       // Dimension line with level ticks
+      if (!this.o.envelope && this.L < 0.01) return;
       const d0 = this.P(-11, 0, 6), d1 = this.P(-11, FLOORS, 6);
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
       for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-11, i, 6), q = this.P(-11.7, i, 6); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
-        g.fillStyle = bronze(0.95); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
-        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-12.3, i, 6); g.fillText('L' + String(i).padStart(2, '0'), p[0], p[1]); }
+        g.fillStyle = bronze(0.95); g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-13.2, i, 6); g.fillText('L' + String(i).padStart(2, '0'), p[0], p[1]); }
       }
     }
   }

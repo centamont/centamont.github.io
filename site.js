@@ -6,8 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // Menu
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
   if (nav && btn) {
-    const close = () => { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
-    btn.addEventListener('click', () => { const o = nav.classList.toggle('open'); btn.setAttribute('aria-expanded', String(o)); });
+    const label = btn.querySelector('span') || btn, word = label.textContent;
+    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; };
+    const close = () => show(false);
+    btn.addEventListener('click', () => show(!nav.classList.contains('open')));
     nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')) { close(); btn.focus(); } });
     document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !e.target.closest('header.site')) close(); });
