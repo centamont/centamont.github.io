@@ -156,7 +156,7 @@
     touch() { this.dirty = true; this.kick(); }
 
     kick() {
-      if (this.raf || !this.w) return;
+      if (this.raf || !this.w || this.visible === false) return;
       this.raf = requestAnimationFrame(() => { this.raf = 0; this.frame(); });
     }
 

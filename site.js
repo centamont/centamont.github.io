@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Day and night, remembered per visitor. Pages listen for 'cm-theme' to recolor drawings.
   const themeBtn = document.getElementById('themeBtn');
   const changed = () => document.dispatchEvent(new CustomEvent('cm-theme'));
+  if (themeBtn) themeBtn.setAttribute('aria-pressed', String(root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches));
   if (themeBtn) themeBtn.addEventListener('click', () => {
     const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     root.dataset.theme = dark ? 'light' : 'dark';

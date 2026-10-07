@@ -215,5 +215,9 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
   await page.locator('#letter input[name="area"]').fill('Miami Beach');
   page.on('popup', (p) => p.close().catch(() => {}));
   await page.locator('#letter button[data-to="ig"]').click();
-  await expect(page.locator('#letterNote')).not.toBeEmpty();
+  await expect(page.locator('#letterNote')).toContainText('Fill in the underlined blank');
+  await expect(page.locator('#letter input[name="name"]')).toBeFocused();
+  await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+  await page.locator('#letter button[data-to="ig"]').click();
+  await expect(page.locator('#letterNote')).toContainText('Instagram');
 });

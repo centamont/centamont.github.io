@@ -49,30 +49,35 @@ document.addEventListener('DOMContentLoaded', function () {
       const p = +price.value, T = +loan.value / 100, s = model(p);
       out('cvPriceOut').textContent = fmt(p);
       out('cvLoanOut').textContent = loan.value + '%';
+      price.setAttribute('aria-valuetext', fmt(p)); loan.setAttribute('aria-valuetext', loan.value + ' percent');
       par.setAttribute('d', p ? parPath : '');
       line.setAttribute('d', path(s));
       area.setAttribute('d', path(s) + ` L${x(M)} ${Y1} L${x(0)} ${Y1} Z`);
       lim.setAttribute('x1', X0); lim.setAttribute('x2', X1); lim.setAttribute('y1', y(T)); lim.setAttribute('y2', y(T));
-      limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = 'Lender threshold';
+      limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = 'Pre-sale threshold';
       const hit = s.findIndex((f) => f >= T), done = s[DONE], base = model(0), baseHit = base.findIndex((f) => f >= T);
-      if (hit > -1) { dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.setAttribute('x', x(hit) + 10); dotT.setAttribute('y', y(T) + 20); dotT.textContent = 'Month ' + hit; }
+      if (hit > -1) { const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.setAttribute('x', right ? x(hit) - 10 : x(hit) + 10); dotT.setAttribute('text-anchor', right ? 'end' : 'start'); dotT.setAttribute('y', y(T) + 22); dotT.textContent = 'Month ' + hit; }
       else { dot.style.display = 'none'; dotT.textContent = ''; }
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not by month ' + M;
       out('cvDone').textContent = Math.round(done * 100) + '%';
       out('cvPer').textContent = p === 0 ? 'At par' : (p > 0 ? '+' : '−') + Math.abs(p) + '%';
       let say;
+      const unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - base[DONE]) * 100);
       if (p === 0) say = 'At par, about ' + Math.round(done * 100) + ' percent of the building is under contract by completion.';
       else {
-        const d = hit - baseHit, left = Math.round((1 - done) * 100) - Math.round((1 - base[DONE]) * 100);
+        const d = hit - baseHit;
         const when = hit < 0 ? 'the threshold is not met in this window' : d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
         say = p > 0
-          ? 'Each residence earns ' + p + ' percent more, but ' + when + ', and ' + Math.abs(left) + ' percent more of the building is still for sale at completion.'
-          : 'Each residence earns ' + -p + ' percent less, ' + when + ', and ' + Math.abs(left) + ' percent less of the building is left at completion.';
+          ? 'Each residence earns ' + p + ' percent more, but ' + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' at par.'
+          : 'Each residence earns ' + -p + ' percent less, ' + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' at par.';
       }
       out('cvSay').textContent = say;
       svg.setAttribute('aria-label', 'Illustrative sales curve. ' + say);
     }
-    price.addEventListener('input', draw); loan.addEventListener('input', draw);
+    // the sentence is a live region; announce it once the slider settles, not on every step
+    const sayEl = out('cvSay'); let quiet;
+    const onInput = () => { sayEl.setAttribute('aria-live', 'off'); draw(); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
+    price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
     draw();
   }
 
@@ -83,8 +88,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const paras = [...form.querySelectorAll('.body')];
     const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); };
     form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', show));
+    show(); addEventListener('pageshow', show);
+    // Enter in a blank should not send the letter
+    form.querySelectorAll('.sheet input').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); }));
     // inputs grow with what is typed, so the letter reads as prose
-    form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.style.width = Math.max(i.placeholder.length, i.value.length, 3) + 1 + 'ch'; }; i.addEventListener('input', fit); fit(); });
+    form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; i.classList.remove('miss'); }; i.addEventListener('input', fit); fit(); });
     form.querySelectorAll('.sheet select').forEach((s) => { const fit = () => { s.style.width = s.options[s.selectedIndex].text.length * 0.42 + 1.5 + 'em'; }; s.addEventListener('change', fit); fit(); });
     const text = () => {
       const p = paras.find((x) => !x.hidden), c = p.cloneNode(true);
@@ -92,17 +100,37 @@ document.addEventListener('DOMContentLoaded', function () {
       const name = form.querySelector('input[name="name"]').value.trim();
       return 'Dear partners,\n\n' + c.textContent.replace(/\s+/g, ' ').trim() + '\n\nWith regards,\n' + (name || '');
     };
-    form.addEventListener('submit', async (e) => {
+    const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
+    const say = (html) => { note.textContent = ''; requestAnimationFrame(() => { note.innerHTML = html; }); };
+    let busy = false;
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (busy) return;
+      const p = paras.find((x) => !x.hidden);
+      const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim());
+      if (empty.length) {
+        empty.forEach((i) => i.classList.add('miss'));
+        empty[0].focus();
+        say('Fill in the underlined ' + (empty.length === 1 ? 'blank' : 'blanks') + ' first, so the partners know who is writing and why.');
+        return;
+      }
       const to = (e.submitter && e.submitter.dataset.to) || 'ig';
       const url = to === 'li' ? 'https://www.linkedin.com/company/centamont' : 'https://ig.me/m/centamont';
+      const where = to === 'li' ? 'LinkedIn' : 'Instagram';
       const t = text();
-      let copied = false;
-      try { await navigator.clipboard.writeText(t); copied = true; } catch (err) {}
-      window.open(url, '_blank', 'noopener');
-      note.textContent = copied
-        ? 'Your letter is copied. Paste it into the message, and a partner will reply personally.'
-        : 'Your browser did not allow copying. Select the letter above, copy it, and paste it into the message.';
+      // open the tab inside the click, before anything asynchronous, so browsers do not block it
+      const w = window.open('', '_blank');
+      if (w) { try { w.opener = null; } catch (err) {} }
+      busy = true; setTimeout(() => { busy = false; }, 1200);
+      const link = '<a class="ul" href="' + url + '" target="_blank" rel="noopener">' + where + '</a>';
+      const go = (copied) => {
+        if (w) w.location.href = url;
+        box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
+        say(copied
+          ? 'Your letter is copied. Paste it into the message on ' + link + ', and a partner will reply personally.'
+          : 'Your browser did not allow copying. Copy the letter below and paste it into the message on ' + link + '.');
+      };
+      (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => go(true), () => go(false));
     });
   }
 });

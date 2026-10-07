@@ -81,7 +81,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
   <div class="wrap">
     <div class="head">
       <h2>One firm, from the first sketch to the last&nbsp;closing.</h2>
-      <p class="intro">Most new buildings are sold from a template. We write a strategy for each one, put a founder on every account, and run sales like a data business: measured, reported weekly, improved every week.</p>
+      <p class="intro">We write a strategy for each one, put a founder on every account, and run sales like a data business: measured, reported weekly, improved every week.</p>
     </div>
     <div class="practices">
       <div class="pr"><span class="num" aria-hidden="true">I</span><h3>Development advisory</h3><p>Before the design is final: pricing, unit mix, floor plans, amenities, buyer profile and launch strategy, shaped around the people who will actually buy.</p><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><rect x="4.5" y="4.5" width="47" height="47"/><path d="M4.5 26.5h18M30.5 4.5v18h21M30.5 32.5v19M22.5 26.5a8 8 0 0 1 8-8"/></g><rect class="b" x="36" y="36" width="10" height="10"/></svg><a class="more" href="#developers">From the first sketch</a></div>
@@ -95,7 +95,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
   <div class="wrap">
     <div class="head">
       <h2>Your building, sold like it is the only one we&nbsp;have.</h2>
-      <p class="intro">Large firms juggle dozens of projects. We take on few, and a founder stays on every one of them. Here is how a building comes to market with us beside it.</p>
+      <p class="intro">We take on few projects, and a founder stays on every one of them. Here is how a building comes to market with us beside it.</p>
     </div>
 
     <div class="rise">
@@ -131,7 +131,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
         </li>
         <li class="step" data-built="22" data-sold="22" data-name="Last closing">
           <h3>The last closing is not the last of&nbsp;us.</h3>
-          <p>We are paid as the project succeeds. And every buyer we meet stays with the firm, so the next building sells faster than this one.</p>
+          <p>Every buyer we meet stays with the firm, so the next building sells faster than this one.</p>
         </li>
       </ol>
     </div>
@@ -142,17 +142,17 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
         <h3>Sales against the&nbsp;schedule.</h3>
         <p>Every pricing decision moves two dates: when the lender's pre-sale threshold is met, and how many residences are still unsold when the building is finished. Move the launch price and watch both.</p>
         <div class="cv-ctl">
-          <label for="cvPrice"><span>Launch price against comparable buildings</span><output id="cvPriceOut" for="cvPrice">At par</output></label>
-          <input type="range" id="cvPrice" min="-10" max="10" step="1" value="0">
-          <label for="cvLoan"><span>Pre-sales the lender asks for</span><output id="cvLoanOut" for="cvLoan">50%</output></label>
-          <input type="range" id="cvLoan" min="30" max="70" step="5" value="50">
+          <div class="lab"><label for="cvPrice" id="cvPriceL">Launch price against comparable buildings</label><output id="cvPriceOut" for="cvPrice" aria-hidden="true">At par</output></div>
+          <input type="range" id="cvPrice" min="-10" max="10" step="1" value="0" aria-valuetext="At par">
+          <div class="lab"><label for="cvLoan" id="cvLoanL">Pre-sales the lender asks for</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
+          <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 percent">
         </div>
-        <dl class="cv-read" aria-live="polite">
-          <div><dt>Threshold met</dt><dd id="cvMonth">Month 12</dd></div>
+        <dl class="cv-read">
+          <div><dt>Threshold met</dt><dd id="cvMonth">Month 14</dd></div>
           <div><dt>Sold by completion</dt><dd id="cvDone">74%</dd></div>
           <div><dt>Price per residence</dt><dd id="cvPer">At par</dd></div>
         </dl>
-        <p class="cv-say" id="cvSay"></p>
+        <p class="cv-say" id="cvSay" aria-live="polite"></p>
       </div>
       <figure class="cv-fig" data-draw>
         <svg id="cvSvg" viewBox="0 0 640 330" role="img" aria-label="Illustrative sales curve"></svg>
@@ -262,7 +262,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
       <div class="txt">
         <h3><a class="read" href="journal/buying-pre-construction-florida.html">Buying <span class="nw">pre-construction</span> in Florida</a></h3>
         <p>Deposits, escrow, the fifteen-day window to cancel, and what to ask a developer before you reserve.</p>
-        <p class="meta-line">Buyer guide · October 2026 · 4&nbsp;minute read</p>
+        <p class="meta-line">Buyer guide · October 2026 · 4-minute read</p>
         <a class="more" href="journal/buying-pre-construction-florida.html">Read the guide</a>
       </div>
       <figure class="deposit" data-draw aria-label="Illustrative deposit schedule: the first 10 percent of the price is held in escrow until closing; deposits above 10 percent may fund construction if the contract allows; the balance is due at closing.">
@@ -283,7 +283,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
   <div class="wrap people">
     <div class="head">
       <h2>A seat here is earned, and&nbsp;<span class="nw">re-earned</span>.</h2>
-      <p class="intro">No more than ten advisors per market at launch, never more than twenty. Each one owns a buyer segment and meets a standard a step above the&nbsp;industry.</p>
+      <p class="intro">No more than ten advisors per market at launch, never more than twenty. Each one owns a buyer segment and meets a written standard, reviewed every&nbsp;quarter.</p>
       <figure class="table" data-draw aria-hidden="true">
         <svg viewBox="0 0 520 180">
           <rect class="tbl" x="110" y="66" width="300" height="48"/>
@@ -338,15 +338,16 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
       <div class="sheet">
         <p class="salute">Dear partners,</p>
         <p class="body" data-for="dev">We are developing a building in <input name="where" aria-label="Neighborhood" placeholder="Edgewater" size="11"> with about <input name="units" aria-label="Number of residences" inputmode="numeric" placeholder="60" size="3"> residences. Design is <select name="stage" aria-label="Design stage"><option>still a sketch</option><option>in schematic design</option><option>permitted</option><option>under construction</option></select>, and we hope to launch sales <select name="when" aria-label="Launch timing"><option>this year</option><option>next year</option><option>after that</option></select>.</p>
-        <p class="body" data-for="buy" hidden>I am looking for a residence in <input name="area" aria-label="Area" placeholder="Miami Beach" size="11">, at around <select name="price" aria-label="Price range"><option>$2 to 5 million</option><option>$5 to 10 million</option><option>$10 to 20 million</option><option>over $20 million</option></select>, and hope to move <select name="move" aria-label="Timing"><option>within six months</option><option>within a year</option><option>when the right home appears</option></select>.</p>
-        <p class="body" data-for="adv" hidden>I am an advisor in <input name="mkt" aria-label="Market" placeholder="Miami" size="9"> and focus on <input name="niche" aria-label="Niche" placeholder="new development" size="14">. Last year I closed about <input name="prod" aria-label="Closed production" placeholder="$40 million" size="10"> in sales, and I was referred by <input name="ref" aria-label="Referred by" placeholder="name" size="10">.</p>
-        <p class="sign">With regards,<br><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18"></p>
+        <p class="body" data-for="buy" hidden>I am looking for a residence in <input name="area" aria-label="Area you are looking in" placeholder="Miami Beach" size="11">, at around <select name="price" aria-label="Price range"><option>$2 to 5 million</option><option>$5 to 10 million</option><option>$10 to 20 million</option><option>over $20 million</option></select>, and hope to move <select name="move" aria-label="When you hope to move"><option>within six months</option><option>within a year</option><option>when the right home appears</option></select>.</p>
+        <p class="body" data-for="adv" hidden>I am an advisor in <input name="mkt" aria-label="Your market" placeholder="Miami" size="9"> and focus on <input name="niche" aria-label="What you focus on" placeholder="new development" size="14">. Last year I closed about <input name="prod" aria-label="Closed production" placeholder="$40 million" size="10"> in sales, and I was referred by <input name="ref" aria-label="Referred by" placeholder="name" size="10">.</p>
+        <p class="sign">With regards,<br><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18" required></p>
       </div>
       <div class="send">
         <button type="submit" class="btn solid" data-to="ig">Copy and open Instagram<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
         <button type="submit" class="btn" data-to="li">Copy and open LinkedIn</button>
       </div>
       <p class="note" id="letterNote" role="status" aria-live="polite"></p>
+      <div class="fallback" id="letterCopy" hidden><label for="letterText">Your letter, ready to copy</label><textarea id="letterText" readonly rows="9"></textarea></div>
       <p class="fine">Nothing is sent from this page. Your letter is copied, and you send it yourself.</p>
     </form>
   </div>
