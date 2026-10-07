@@ -20,7 +20,7 @@ Static HTML/CSS/JS in one `index.html`, served by GitHub Pages at centamont.com.
 
 ## Product Purpose
 
-Centamont helps developers sell new buildings faster, with a sales approach built for each development. It advises before launch (pricing, unit mix, floor plans, amenities, buyer profile, launch strategy), runs sales and marketing, and operates a highly selective brokerage at the top end. Success for the site: a developer or qualified buyer starts a private conversation with the partners.
+Centamont helps developers sell new buildings faster, with a sales approach built for each development. It advises before launch (pricing, unit mix, floor plans, amenities, buyer profile, launch strategy), plans sales and marketing, and advises a highly selective circle of buyers at the top end. Until the Florida brokerage is registered, public copy says advisory, never brokerage or representation (Dylan, 2026-10-07). Success for the site: a developer or qualified buyer starts a private conversation with the partners.
 
 ## Positioning
 
