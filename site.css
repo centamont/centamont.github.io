@@ -390,7 +390,7 @@ html.intro-on .curtain{display:grid;position:fixed;inset:0;z-index:100;color:#F4
 /* Markets chart */
 .chart{margin-top:clamp(44px,6vw,80px);display:grid;gap:clamp(28px,4vw,56px)}
 .chart > *{min-width:0}
-.chart .map{margin:0;display:grid;gap:10px}
+.chart .map{margin:0;display:grid;gap:10px;align-self:start}
 .chart .map figcaption{font-size:13px;color:var(--faint);justify-self:end}
 .chart svg{width:100%;height:auto;display:block;border:1px solid var(--rule);background:var(--sheet)}
 .chart .coast path{fill:none;stroke:var(--fg);stroke-width:.8;opacity:.32;stroke-linejoin:round}
@@ -527,40 +527,41 @@ body.no-js .rise .elev,body.no-js .vacant{display:none}
 .cv-txt > p{color:var(--muted)}
 .cv-ctl{display:grid;gap:10px;margin-top:8px}
 .cv-ctl .lab{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:10px}
-.cv-ctl label{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-.cv-ctl output{font-family:var(--display);font-size:24px;color:var(--accent);white-space:nowrap}
-.cv-ctl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0;cursor:pointer}
+.cv-ctl label{text-wrap:balance;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.cv-ctl output{font-family:var(--display);font-size:24px;color:var(--accent);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.cv-ctl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;margin:0;cursor:pointer}
 .cv-ctl input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--fg)}
 .cv-ctl input[type=range]::-moz-range-track{height:1px;background:var(--fg)}
 .cv-ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-10px;border-radius:50%;background:var(--bg);border:1px solid var(--sold);box-shadow:inset 0 0 0 4px var(--bg),inset 0 0 0 10px var(--sold)}
 .cv-ctl input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--sold);border:4px solid var(--bg);outline:1px solid var(--sold)}
 .cv-ctl input[type=range]:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
-.cv-read{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:6px 0 0;border-top:1px solid var(--rule)}
-.cv-read div{padding:14px 14px 0 0}
+.cv-read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:6px 0 0;border-top:1px solid var(--rule)}
+.cv-read div{padding:14px 14px 0 0;display:grid;grid-template-rows:auto 1fr}
+.cv-read dd{align-self:end}
 .cv-read div + div{padding-left:14px;border-left:1px solid var(--rule)}
 .cv-read dt{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .cv-read dd{margin:6px 0 0;font-family:var(--display);font-size:clamp(26px,2.4vw,34px);font-weight:300;line-height:1.1;font-variant-numeric:lining-nums tabular-nums}
 .cv-say{font-family:var(--display);font-style:italic;font-size:21px;line-height:1.45;color:var(--fg);min-height:3em}
 .cv-fig{margin:0;display:grid;gap:10px;position:sticky;top:96px}
 .cv-fig svg{display:block;width:100%;height:auto;background:var(--sheet);border:1px solid var(--rule)}
-.cv-fig figcaption{font-size:14px;color:var(--faint);text-align:right}
+.cv-fig figcaption{font-size:14px;color:var(--faint);text-wrap:pretty}
 .cv-grid line{stroke:var(--rule);stroke-dasharray:2 4}
 .cv-grid .axis{stroke:var(--fg);stroke-dasharray:none}
 .cv-grid .phase{stroke:var(--rule);stroke-dasharray:none}
-.cv-grid text{fill:var(--faint);font:500 11px var(--body);letter-spacing:.1em;font-variant-numeric:lining-nums tabular-nums}
-.cv-grid .ph{text-transform:uppercase}
-.cv-build{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:3 5;opacity:.45}
+.cv-grid text{fill:var(--faint);font:500 12px var(--body);letter-spacing:.1em;font-variant-numeric:lining-nums tabular-nums}
+.cv-grid .ph{text-transform:uppercase;font-size:11px;letter-spacing:.08em;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
+.cv-build{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:1 3;opacity:.5}
 .cv-buildt{fill:var(--faint);font:italic 15px var(--display)}
 .cv-area{fill:var(--sold);opacity:.13}
-.cv-par{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:2 4;opacity:.45}
+.cv-par{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:8 5;opacity:.5}
 .cv-line{fill:none;stroke:var(--sold);stroke-width:2}
 .cv-lim{stroke:var(--fg);stroke-width:1;stroke-dasharray:6 5}
-.cv-limt{fill:var(--fg);font:500 11px var(--body);letter-spacing:.12em;text-transform:uppercase}
+.cv-limt{fill:var(--fg);font:500 12px var(--body);letter-spacing:.12em;text-transform:uppercase;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
 .cv-dot{fill:var(--sold);stroke:var(--sheet);stroke-width:3}
-.cv-dott{fill:var(--fg);font:400 17px var(--display)}
+.cv-dott{fill:var(--fg);font:400 19px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
 .js .cv-fig:not(.in) .cv-line{stroke-dasharray:1400;stroke-dashoffset:1400}
 .cv-fig.in .cv-line{stroke-dasharray:1400;stroke-dashoffset:0;transition:stroke-dashoffset 2.2s var(--ease)}
-@media (max-width:900px){.curve{grid-template-columns:1fr}.cv-fig{position:static;order:-1}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0}}
+@media (max-width:900px){.curve{grid-template-columns:1fr;gap:22px}.cv-txt{display:contents}.cv-fig{position:static;order:3}.cv-read{order:4}.cv-say{order:5}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0}}
 body.no-js .curve,body.no-js .letter{display:none}
 
 /* The letter to the partners */
@@ -576,11 +577,11 @@ body.no-js .curve,body.no-js .letter{display:none}
 .letter .sheet p{max-width:34em}
 .letter .salute{margin-bottom:.6em}
 .letter .sign{margin-top:1.2em}
-.letter .sheet input,.letter .sheet select{font:inherit;color:var(--accent);background:transparent;border:0;border-bottom:1px solid var(--sold);border-radius:0;padding:0 2px;margin:0 2px;line-height:1.2;min-width:3ch;max-width:100%}
-.letter .sheet input::placeholder{color:var(--faint);opacity:.75;font-style:italic}
+.letter .sheet input,.letter .sheet select{font:inherit;color:var(--accent);background:transparent;border:0;border-bottom:1px solid var(--sold);border-radius:0;padding:0 2px;margin:0 2px;line-height:1.2;min-width:3ch;max-width:100%;field-sizing:content}
+.letter .sheet input::placeholder{color:var(--faint);opacity:1;font-style:italic}
 .letter .sheet select{-webkit-appearance:none;appearance:none;padding-right:22px;cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23B8976A'/%3E%3C/svg%3E") right 4px center/10px 6px no-repeat}
 .letter .sheet select option{color:#14161A;background:#F4F0E8}
-.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:1px solid var(--accent);outline-offset:3px;background-color:rgba(184,151,106,.08)}
+.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:0;border-bottom:2px solid var(--accent);background-color:rgba(184,151,106,.16)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
 .letter .note:empty{min-height:0;margin:-1px 0 0}
@@ -593,9 +594,10 @@ body.no-js .curve,body.no-js .letter{display:none}
 @media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter legend{float:none;width:100%;margin-bottom:6px}}
 .cv-txt h3{font-size:clamp(30px,3vw,42px);max-width:14ch}
 .cv-read dd{white-space:nowrap}
-@media (max-width:600px){.cv-grid text{font-size:15px;letter-spacing:.06em}.cv-limt{font-size:15px}.cv-dott{font-size:24px}}
+@media (max-width:520px){.cv-key{font-size:11px;gap:6px 14px}.letter .as{gap:8px 22px}.letter .as label{font-size:22px}.letter .sheet input,.letter .sheet select{padding-block:10px 1px}}
 .cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .cv-key li{display:flex;align-items:center;gap:8px}
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
+.cv-key li[hidden]{display:none}
 .cv-key .k-build{border-top:1px dotted var(--fg);opacity:.6}
