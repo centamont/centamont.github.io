@@ -1,20 +1,84 @@
-// Centamont tower model: a line-drawn 3D massing study rendered on canvas.
-// It is an illustration of a generic tower, never a real project.
+// Centamont tower model: an architectural study of a generic waterfront tower, drawn on canvas.
+// It is an illustration, never a real project. The structure rises floor by floor with its core
+// leading and the glass following behind; sold floors glow bronze.
 (function () {
-  const FLOORS = 22;
+  const FLOORS = 22, SLAB = 0.16, PODIUM = 3, CROWN = 20;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-  // Massing: podium, shaft, setback, crown. [x0, x1, z0, z1] per floor.
-  function plate(i) {
-    if (i < 3) return [-6.4, 6.4, -4.4, 4.4];
-    if (i < 19) return [-3.6, 3.6, -3, 3];
-    return [-3, 3, -2.5, 2.5];
+  // A rounded rectangle traced counterclockwise in plan, with an outward normal at every point.
+  function rrect(hx, hz, r, na, ns) {
+    const pts = [], cx = [1, -1, -1, 1], cz = [1, 1, -1, -1];
+    for (let q = 0; q < 4; q++) {
+      const ox = cx[q] * (hx - r), oz = cz[q] * (hz - r), a0 = q * Math.PI / 2;
+      for (let j = 0; j <= na; j++) {
+        const a = a0 + (j / na) * Math.PI / 2;
+        pts.push({ x: ox + r * Math.cos(a), z: oz + r * Math.sin(a), nx: Math.cos(a), nz: Math.sin(a) });
+      }
+      // straight side to the next corner, subdivided so balconies can undulate along it
+      const a1 = a0 + Math.PI / 2, nq = (q + 1) % 4;
+      const sx = ox + r * Math.cos(a1), sz = oz + r * Math.sin(a1);
+      const ex = cx[nq] * (hx - r) + r * Math.cos(a1), ez = cz[nq] * (hz - r) + r * Math.sin(a1);
+      for (let j = 1; j <= ns; j++) {
+        const t = j / (ns + 1);
+        pts.push({ x: sx + (ex - sx) * t, z: sz + (ez - sz) * t, nx: Math.cos(a1), nz: Math.sin(a1) });
+      }
+    }
+    return pts;
   }
 
+  // Plan of every floor: glass line, slab edge (with balconies), twist.
+  function floorPlan(k) {
+    let glass, off;
+    if (k < PODIUM) {
+      glass = rrect(6.2, 4.2, 1.1, 3, 3); off = () => 0.22;
+    } else if (k < CROWN) {
+      const t = (k - PODIUM) / (CROWN - PODIUM), s = 1 - 0.07 * t;
+      glass = rrect(3.3 * s, 2.7 * s, 1.35, 3, 3);
+      // Balconies swell and recede around the tower, a little further along on every floor.
+      off = (p) => 0.22 + 0.55 * (0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.62));
+    } else {
+      glass = rrect(2.75, 2.25, 1.15, 3, 2); off = () => 0.3;
+    }
+    const rot = k < PODIUM ? 0 : 0.34 * (Math.min(k, FLOORS - 1) - PODIUM) / (FLOORS - 1 - PODIUM);
+    const c = Math.cos(rot), s = Math.sin(rot);
+    const R = (x, z) => [c * x - s * z, s * x + c * z];
+    const g = glass.map((p) => { const [x, z] = R(p.x, p.z), [nx, nz] = R(p.nx, p.nz); return { x, z, nx, nz }; });
+    const e = glass.map((p) => { const o = off(p), [x, z] = R(p.x + p.nx * o, p.z + p.nz * o), [nx, nz] = R(p.nx, p.nz); return { x, z, nx, nz }; });
+    return { glass: g, slab: e, rot };
+  }
+  const PLANS = Array.from({ length: FLOORS }, (_, k) => floorPlan(k));
+  // The slab under floor k is as wide as whatever it carries or roofs over.
+  const slabPlan = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? PLANS[k - 1] : PLANS[k]).slab;
+  const CORE = (() => {
+    const out = [];
+    for (let k = 0; k < FLOORS; k++) {
+      const r = PLANS[k].rot, c = Math.cos(r), s = Math.sin(r);
+      out.push(rrect(1.5, 1.15, 0.12, 1, 0).map((p) => ({ x: c * p.x - s * p.z, z: s * p.x + c * p.z, nx: c * p.nx - s * p.nz, nz: s * p.nx + c * p.nz })));
+    }
+    return out;
+  })();
+  const MAST = [7.6, -5.6]; // tower crane, outside the podium's back corner
+  // [x, z, height, lean, lean direction]
+  const PALMS = [[-8.3, 6.2, 3.9, 0.5, 2.6], [-5.6, 6.6, 3.3, 0.35, 1.2], [-2.6, 6.8, 4.2, 0.45, 2], [8.4, 5.8, 3.7, 0.5, 0.4], [-8.6, -5.4, 3.5, 0.4, 3.6], [5.2, 6.7, 3.2, 0.3, 1.6]];
+
   function rgb(hex) {
-    const h = hex.trim().replace('#', '');
+    const m = String(hex).trim().match(/^rgba?\(([^)]+)\)/);
+    if (m) return m[1].split(',').slice(0, 3).map(Number);
+    const h = String(hex).trim().replace('#', '');
     const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  const lum = (c) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+
+  function hull(pts) {
+    pts = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const p of pts) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+    for (let i = pts.length - 1; i >= 0; i--) { const p = pts[i]; while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
   }
 
   class Model {
@@ -24,7 +88,7 @@
       this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 11, envelope: true }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
-      this.L = 0; this.S = 0; // animated built and sold levels
+      this.L = 0; this.S = 0; this.C = 0; // animated: structure, sold, glass
       this.B = 0; this.Sold = 0; // targets
       this.crane = 0; this.craneT = 0;
       this.mx = 0; this.my = 0;
@@ -36,9 +100,17 @@
     }
 
     colors() {
+      this._cc = null;
       const cs = getComputedStyle(this.c);
       this.line = rgb(cs.getPropertyValue('--line') || '#14161A');
       this.sold = rgb(cs.getPropertyValue('--sold') || '#B8976A');
+      let bg = null;
+      for (let el = this.c; el && !bg; el = el.parentElement) {
+        const b = getComputedStyle(el).backgroundColor, v = rgb(b);
+        if (b && !/rgba\([^)]*,\s*0\)$/.test(b) && b !== 'transparent') bg = v;
+      }
+      this.bg = bg || [244, 240, 232];
+      this.dark = lum(this.line) > lum(this.bg);
       this.touch();
     }
 
@@ -51,10 +123,13 @@
       this.ctx.setTransform(d, 0, 0, d, 0, 0);
     }
 
+    // Glass trails the structure by three floors until the building tops off.
+    cladTarget() { return this.B >= FLOORS ? FLOORS : Math.max(0, this.B - 3); }
+
     set(built, sold, crane, instant) {
       this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
       this.c.dataset.built = built; this.c.dataset.sold = sold;
-      if (instant || reduce) { this.L = built; this.S = sold; this.crane = this.craneT; }
+      if (instant || reduce) { this.L = built; this.S = sold; this.C = this.cladTarget(); this.crane = this.craneT; }
       this.kick();
     }
 
@@ -70,14 +145,16 @@
 
     frame() {
       const ease = (a, b, k) => (Math.abs(b - a) < 0.002 ? b : a + (b - a) * k);
-      this.L = ease(this.L, this.B, 0.045);
+      this.L = ease(this.L, this.B, 0.04);
+      // the glass never overtakes the frame
+      this.C = Math.min(ease(this.C, this.cladTarget(), 0.035), this.L);
       this.S = ease(this.S, this.Sold, 0.05);
       this.crane = ease(this.crane, this.craneT, 0.06);
       if (!reduce && this.o.orbit) this.theta += this.o.orbit;
       this.tx = ease(this.tx || 0, this.mx * 0.12, 0.05);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 0.05);
       // A slow idle orbit only needs half the frames; anything else draws every frame.
-      const settled = this.L === this.B && this.S === this.Sold && this.crane === this.craneT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
+      const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
       this.odd = !this.odd;
       if (!(settled && this.o.orbit && this.odd) || this.dirty) this.draw();
       this.dirty = false;
@@ -85,133 +162,264 @@
       if (moving && this.visible) this.kick();
     }
 
+    camera() {
+      const th = this.theta + (this.tx || 0), ph = this.phi + (this.tyy || 0);
+      this.k = { c: Math.cos(th), s: Math.sin(th), cp: Math.cos(ph), sp: Math.sin(ph), f: Math.min(this.w * 1.15, this.h) * this.o.scale, cx: this.w / 2 + this.o.offsetX * this.w, cy: this.h / 2 };
+      // camera position in world space, for shading and draw order
+      const d = this.o.dist, k = this.k;
+      this.eye = [-d * k.cp * k.s, this.o.ty - d * k.sp, -d * k.cp * k.c];
+    }
+
     // world -> screen
     P(x, y, z) {
-      const th = this.theta + (this.tx || 0), ph = this.phi + (this.tyy || 0);
+      const k = this.k;
       y -= this.o.ty;
-      const c = Math.cos(th), s = Math.sin(th);
-      let X = c * x - s * z, Z = s * x + c * z;
-      const cp = Math.cos(ph), sp = Math.sin(ph);
-      const Y = cp * y - sp * Z; Z = sp * y + cp * Z + this.o.dist;
-      const f = Math.min(this.w * 1.15, this.h) * this.o.scale;
-      return [this.w / 2 + this.o.offsetX * this.w + (f * X) / Z, this.h / 2 - (f * Y) / Z, Z];
+      const X = k.c * x - k.s * z, Zr = k.s * x + k.c * z;
+      const Y = k.cp * y - k.sp * Zr, Z = k.sp * y + k.cp * Zr + this.o.dist;
+      return [k.cx + (k.f * X) / Z, k.cy - (k.f * Y) / Z, Z];
     }
 
     draw() {
-      const g = this.ctx, w = this.w, h = this.h;
+      this.camera();
+      const g = this.ctx, w = this.w, h = this.h, dark = this.dark;
       g.clearRect(0, 0, w, h);
-      const [lr, lg, lb] = this.line, [sr, sg, sb] = this.sold;
+      const [lr, lg, lb] = this.line, [sr, sg, sb] = this.sold, [br, bgg, bb] = this.bg;
       const ink = (a) => `rgba(${lr},${lg},${lb},${a})`;
       const bronze = (a, k = 1) => `rgba(${Math.round(sr * k)},${Math.round(sg * k)},${Math.round(sb * k)},${a})`;
+      const Q = 96, cache = this._cc || (this._cc = new Map());
+      const memo = (key, fn) => { let v = cache.get(key); if (!v) { v = fn(); cache.set(key, v); } return v; };
+      const mix = (t) => { const q = Math.round(clamp(t, 0, 1) * Q); return memo(q, () => { t = q / Q; return `rgb(${Math.round(br + (lr - br) * t)},${Math.round(bgg + (lg - bgg) * t)},${Math.round(bb + (lb - bb) * t)})`; }); };
+      const mixS = (t0, l0) => { const q = Math.round(clamp(t0, 0, 1) * Q), ql = Math.round(clamp(l0, 0, 1) * 32); return memo(1000 + q * 40 + ql, () => { const t = q / Q, lift = ql / 32; const r = br + (sr - br) * t, gg = bgg + (sg - bgg) * t, b = bb + (sb - bb) * t; return `rgb(${Math.round(r + (255 - r) * lift)},${Math.round(gg + (255 - gg) * lift)},${Math.round(b + (255 - b) * lift)})`; }); };
       const seg = (a, b) => { g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); };
+      let batch = null;
+      const queue = (q, col) => { let a = batch.get(col); if (!a) batch.set(col, (a = [])); a.push(q); };
+      const flush = () => { for (const [col, qs] of batch) { g.beginPath(); for (const q of qs) { g.moveTo(q[0][0], q[0][1]); for (let j = 1; j < q.length; j++) g.lineTo(q[j][0], q[j][1]); g.closePath(); } g.fillStyle = col; g.fill(); } batch.clear(); };
+      batch = new Map();
+      const poly = (ps) => { g.beginPath(); ps.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); };
+      const eye = this.eye, L = this.L, C = this.C, S = this.S;
+      const sun = [-0.62, 0.55, -0.56], sunH = Math.hypot(sun[0], sun[2]);
 
-      // Site grid on the ground plane
+      // Ground: survey grid, site line, and the tower's shadow
       if (this.o.grid) {
         g.lineWidth = 1;
-        for (let i = -30; i <= 30; i += 3) {
-          const fade = 1 - Math.abs(i) / 34;
-          g.strokeStyle = ink(0.07 * fade);
-          g.beginPath(); seg(this.P(i, 0, -30), this.P(i, 0, 30)); seg(this.P(-30, 0, i), this.P(30, 0, i)); g.stroke();
+        for (let i = 0; i <= 30; i += 3) {
+          g.strokeStyle = ink(0.07 * (1 - i / 34)); g.beginPath();
+          for (const v of i ? [i, -i] : [0]) { seg(this.P(v, 0, -30), this.P(v, 0, 30)); seg(this.P(-30, 0, v), this.P(30, 0, v)); }
+          g.stroke();
         }
         g.setLineDash([4, 5]); g.strokeStyle = bronze(0.55);
-        g.beginPath();
-        const site = [[-9, -7], [9, -7], [9, 7], [-9, 7], [-9, -7]].map(([x, z]) => this.P(x, 0, z));
-        site.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])));
+        poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
+      }
+      if (L > 0.01) {
+        const sh = [], dx = -sun[0] / sun[1], dz = -sun[2] / sun[1];
+        const add = (pl, y) => pl.forEach((p) => sh.push([p.x + dx * y, p.z + dz * y]));
+        add(PLANS[0].slab, 0); add(PLANS[0].slab, Math.min(L, PODIUM));
+        if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
+        poly(hull(sh).map(([x, z]) => this.P(x, 0, z)));
+        g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
+      }
+
+      const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [];
+      if (this.o.palms !== false && this.o.grid) PALMS.forEach((p) => (this.P(p[0], 2, p[1])[2] > towerZ ? palmsBack : palmsFront).push(p));
+      palmsBack.forEach((p) => this.drawPalm(p));
+
+      // Floors not yet built: the dashed first sketch
+      if (this.o.envelope && L < FLOORS) {
+        g.setLineDash([3, 4]); g.lineWidth = 0.8; g.strokeStyle = ink(dark ? 0.4 : 0.38); g.beginPath();
+        const from = Math.ceil(L - 0.001);
+        for (let k = from; k <= FLOORS; k++) {
+          const pl = slabPlan(k), ps = pl.map((p) => this.P(p.x, k, p.z));
+          ps.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
+        }
+        for (let k = Math.max(0, from - 1); k < FLOORS; k++) {
+          const pl = PLANS[k].glass;
+          for (let j = 0; j < pl.length; j += 4) seg(this.P(pl[j].x, Math.max(k, L), pl[j].z), this.P(pl[j].x, k + 1, pl[j].z));
+        }
         g.stroke(); g.setLineDash([]);
       }
 
-      // Envelope of floors not yet built: a dashed first sketch
-      g.setLineDash([3, 4]); g.lineWidth = 0.9; g.strokeStyle = ink(0.42);
-      g.beginPath();
-      for (let i = Math.floor(this.L); this.o.envelope && i < FLOORS; i++) {
-        const [x0, x1, z0, z1] = plate(i), y0 = i, y1 = i + 1;
-        const c = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
-        for (let k = 0; k < 4; k++) {
-          const a = c[k], b = c[(k + 1) % 4];
-          seg(this.P(a[0], y1, a[1]), this.P(b[0], y1, b[1]));
-          if (i === 0 || plate(i - 1)[0] !== x0) seg(this.P(a[0], y0, a[1]), this.P(b[0], y0, b[1]));
-          seg(this.P(a[0], y0, a[1]), this.P(a[0], y1, a[1]));
-        }
+      // Everything that stands is drawn in horizontal layers, farthest from eye level first.
+      const layers = [];
+      const coreTop = L > 0.01 && C < FLOORS - 0.01 ? Math.min(FLOORS, L + 1.5) : 0;
+      for (let k = 0; k <= FLOORS; k++) {
+        if (L > 0.01 && k <= L + 0.001) layers.push({ lo: k, hi: k + SLAB, kind: 'slab', k });
+        if (k < FLOORS && (k < L || k < coreTop)) layers.push({ lo: k + SLAB, hi: k + 1, kind: 'floor', k });
       }
-      g.stroke(); g.setLineDash([]);
+      if (L >= FLOORS - 0.001) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + 2.2, kind: 'crown' });
+      const ey = eye[1];
+      const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
+      layers.sort((a, b) => far(b) - far(a));
 
-      // Built floors as shaded faces, drawn far to near
-      const light = [-0.55, 0.45, -0.7];
-      const faces = [];
-      for (let i = 0; i < FLOORS; i++) {
-        const b = Math.max(0, Math.min(1, this.L - i));
-        if (!b) continue;
-        const sold = Math.max(0, Math.min(1, this.S - i));
-        const [x0, x1, z0, z1] = plate(i), y0 = i, y1 = i + b;
-        const sides = [
-          [[x0, z1], [x1, z1], [0, 1]], [[x1, z1], [x1, z0], [1, 0]],
-          [[x1, z0], [x0, z0], [0, -1]], [[x0, z0], [x0, z1], [-1, 0]],
-        ];
-        for (const [a, c, n] of sides) {
-          const q = [this.P(a[0], y0, a[1]), this.P(c[0], y0, c[1]), this.P(c[0], y1, c[1]), this.P(a[0], y1, a[1])];
+      // Crane sits behind or in front of the tower depending on the view.
+      const craneOn = this.o.crane && this.crane > 0.01;
+      const craneBehind = this.P(MAST[0], ey, MAST[1])[2] > this.P(0, ey, 0)[2];
+      if (craneOn && craneBehind) this.drawCrane();
+
+      const edge = dark ? `rgba(${br},${bgg},${bb},0.55)` : ink(0.72);
+      const view = (x, y, z) => { const vx = eye[0] - x, vy = eye[1] - y, vz = eye[2] - z, n = Math.hypot(vx, vy, vz); return [vx / n, vy / n, vz / n]; };
+
+      // a vertical band of quads between two rings at heights y0, y1
+      const band = (pl, y0, y1, shade, strokeTop) => {
+        const n = pl.length, bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));
+        const lines = [];
+        for (let j = 0; j < n; j++) {
+          const j2 = (j + 1) % n, q = [bot[j], bot[j2], top[j2], top[j]];
           const area = (q[1][0] - q[0][0]) * (q[2][1] - q[0][1]) - (q[2][0] - q[0][0]) * (q[1][1] - q[0][1]);
-          if (area <= 0) continue;
-          const lam = Math.max(0, n[0] * light[0] + n[1] * light[2]);
-          faces.push({ q, z: (q[0][2] + q[2][2]) / 2, lam, sold, b, a, c, y0, y1, i });
+          if (area >= 0) continue;
+          const a = pl[j], b = pl[j2], nx = (a.nx + b.nx) / 2, nz = (a.nz + b.nz) / 2;
+          queue(q, shade(nx, nz, j, n, (a.x + b.x) / 2, (a.z + b.z) / 2));
+          if (strokeTop) lines.push(j);
         }
-        const nextBuilt = i + 1 < FLOORS && this.L - (i + 1) > 0;
-        if (b < 1 || !nextBuilt || plate(i + 1)[0] !== x0) {
-          const q = [this.P(x0, y1, z0), this.P(x1, y1, z0), this.P(x1, y1, z1), this.P(x0, y1, z1)];
-          faces.push({ q, z: (q[0][2] + q[2][2]) / 2 + 0.01, lam: 1, sold, b: 1, top: true });
-        }
-      }
-      faces.sort((m, n) => n.z - m.z);
-      for (const f of faces) {
-        const k = f.top ? 1.08 : 0.62 + 0.42 * f.lam;
-        g.beginPath(); f.q.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
-        g.fillStyle = f.sold ? bronze(0.25 + 0.65 * f.sold, k) : ink(f.top ? 0.05 : 0.03 + 0.03 * f.lam);
-        g.fill();
-        g.strokeStyle = ink(0.8); g.lineWidth = 0.8; g.stroke();
-        if (!f.top && f.b > 0.6) {
-          // mullions
-          const len = Math.hypot(f.c[0] - f.a[0], f.c[1] - f.a[1]), n = Math.max(2, Math.round(len / 1.3));
-          g.beginPath(); g.strokeStyle = ink(f.sold ? 0.28 : 0.2); g.lineWidth = 0.6;
-          for (let m = 1; m < n; m++) {
-            const t = m / n, x = f.a[0] + (f.c[0] - f.a[0]) * t, z = f.a[1] + (f.c[1] - f.a[1]) * t;
-            seg(this.P(x, f.y0 + 0.12, z), this.P(x, f.y1 - 0.12, z));
+        flush();
+        return { bot, top, lines };
+      };
+      const cap = (pl, y) => pl.map((p) => this.P(p.x, y, p.z));
+
+      for (const l of layers) {
+        if (l.kind === 'slab') {
+          const k = l.k, pl = slabPlan(k), top = ey > l.hi;
+          const y0 = k, y1 = k + SLAB;
+          const shadeSlab = (nx, nz) => { const d = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH); return mix(dark ? 0.6 + 0.3 * d : 0.05 + 0.1 * (1 - d)); };
+          const b = band(pl, y0, y1, shadeSlab, true);
+          const capPts = cap(pl, top ? y1 : y0);
+          poly(capPts); g.fillStyle = mix(dark ? (top ? 0.86 : 0.5) : (top ? 0.03 : 0.16)); g.fill();
+          g.beginPath(); g.strokeStyle = edge; g.lineWidth = 0.7;
+          for (const j of b.lines) { const j2 = (j + 1) % pl.length; seg(b.bot[j], b.bot[j2]); seg(b.top[j], b.top[j2]); }
+          g.stroke();
+          // a pool on the podium terrace
+          if (k === PODIUM && top) {
+            poly([[4.7, -3.1], [6.0, -3.1], [6.0, 3.1], [4.7, 3.1]].map(([x, z]) => this.P(x, y1 + 0.001, z)));
+            g.fillStyle = bronze(dark ? 0.3 : 0.22); g.fill(); g.strokeStyle = bronze(0.85); g.lineWidth = 0.7; g.stroke();
           }
+        } else if (l.kind === 'floor') {
+          const k = l.k, pl = PLANS[k].glass, y0 = l.lo, built = clamp(L - k, 0, 1), y1 = k + SLAB + (1 - SLAB) * built;
+          const glassF = clamp(C - k, 0, 1), soldF = clamp(S - k, 0, 1), hgt = k / FLOORS;
+          // the open frame: columns behind the core, the core, then columns in front
+          const coreH = k < coreTop ? Math.min(k + 1, coreTop) : 0;
+          if (glassF < 1) {
+            const cols = [], core = CORE[k], cz = this.P(0, (y0 + y1) / 2, 0)[2];
+            if (built > 0) for (let j = 0; j < pl.length; j += 2) { const p = pl[j], a = this.P(p.x * 0.97, y0, p.z * 0.97), b = this.P(p.x * 0.97, y1, p.z * 0.97); cols.push([a, b, a[2] > cz]); }
+            const drawCols = (back) => { g.beginPath(); g.strokeStyle = ink(dark ? 0.55 : 0.6); g.lineWidth = 1.1; cols.forEach(([a, b, bk]) => { if (bk === back) seg(a, b); }); g.stroke(); };
+            drawCols(true);
+            if (coreH > y0) {
+              band(core, y0, coreH, (nx, nz) => mix(dark ? 0.32 + 0.22 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH) : 0.22 - 0.1 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH)), false);
+              if (ey > coreH) { poly(cap(core, coreH)); g.fillStyle = mix(dark ? 0.5 : 0.12); g.fill(); }
+            }
+            drawCols(false);
+          }
+          if (glassF > 0 && built > 0) {
+            // glass curtain wall, installed panel by panel around the floor
+            const n = pl.length, lim = Math.round(glassF * n);
+            const shade = (nx, nz, j, nn, mx, mz) => {
+              if (j >= lim) return null;
+              const v = view(mx, (y0 + y1) / 2, mz);
+              const diff = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH);
+              const fres = 1 - Math.abs(nx * v[0] + nz * v[2]);
+              const hx = sun[0] + v[0], hz = sun[2] + v[2], hn = Math.hypot(hx, hz) || 1;
+              const spec = Math.pow(Math.max(0, (nx * hx + nz * hz) / hn), 18);
+              if (j / nn < soldF) return mixS(dark ? 0.5 + 0.32 * diff : 0.62 + 0.3 * diff, 0.25 * spec + 0.06 * fres);
+              return dark ? mix(0.07 + 0.1 * diff + 0.07 * fres + 0.07 * hgt + 0.38 * spec) : mix(0.8 - 0.22 * diff - 0.07 * fres - 0.14 * hgt - 0.5 * spec);
+            };
+            const bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));
+            const mull = [];
+            for (let j = 0; j < n; j++) {
+              const j2 = (j + 1) % n, q = [bot[j], bot[j2], top[j2], top[j]];
+              const area = (q[1][0] - q[0][0]) * (q[2][1] - q[0][1]) - (q[2][0] - q[0][0]) * (q[1][1] - q[0][1]);
+              if (area >= 0) continue;
+              const a = pl[j], b = pl[j2], col = shade((a.nx + b.nx) / 2, (a.nz + b.nz) / 2, j, n, (a.x + b.x) / 2, (a.z + b.z) / 2);
+              if (!col) continue;
+              queue(q, col);
+              mull.push([bot[j], top[j]]);
+              const len = Math.hypot(b.x - a.x, b.z - a.z);
+              if (len > 1.6) { const m = Math.round(len / 1.1); for (let t = 1; t < m; t++) { const u = t / m; mull.push([[bot[j][0] + (bot[j2][0] - bot[j][0]) * u, bot[j][1] + (bot[j2][1] - bot[j][1]) * u], [top[j][0] + (top[j2][0] - top[j][0]) * u, top[j][1] + (top[j2][1] - top[j][1]) * u]]); } }
+            }
+            flush();
+            g.beginPath(); g.strokeStyle = dark ? ink(0.16) : `rgba(${br},${bgg},${bb},0.22)`; g.lineWidth = 0.6;
+            mull.forEach(([a, b]) => seg(a, b)); g.stroke();
+          }
+        } else if (l.kind === 'crown') {
+          // an open frame of fins over the roof
+          const pl = PLANS[FLOORS - 1].glass, y0 = FLOORS + SLAB, y1 = FLOORS + 2.2;
+          g.beginPath(); g.strokeStyle = ink(dark ? 0.6 : 0.62); g.lineWidth = 0.8;
+          pl.forEach((p) => seg(this.P(p.x, y0, p.z), this.P(p.x, y1, p.z)));
+          const ring = pl.map((p) => this.P(p.x, y1, p.z)); ring.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
           g.stroke();
         }
       }
 
-      // Crown, once the structure tops off
-      if (this.L >= FLOORS - 0.02) {
-        g.beginPath(); g.strokeStyle = ink(0.8); g.lineWidth = 0.8;
-        const cr = [[-2, -1.6], [2, -1.6], [2, 1.6], [-2, 1.6]];
-        for (let k = 0; k < 4; k++) {
-          const a = cr[k], b = cr[(k + 1) % 4];
-          seg(this.P(a[0], FLOORS + 1.8, a[1]), this.P(b[0], FLOORS + 1.8, b[1]));
-          seg(this.P(a[0], FLOORS, a[1]), this.P(a[0], FLOORS + 1.8, a[1]));
-        }
-        g.stroke();
-      }
-
-      // Tower crane while the structure rises
-      if (this.o.crane && this.crane > 0.01) {
-        const top = Math.max(6, this.L + 4);
-        g.strokeStyle = bronze(0.75 * this.crane); g.lineWidth = 0.9; g.beginPath();
-        seg(this.P(7.6, 0, -0.5), this.P(7.6, top, -0.5)); seg(this.P(8.4, 0, -0.5), this.P(8.4, top, -0.5));
-        for (let y = 0; y < top - 1; y += 1.4) seg(this.P(7.6, y, -0.5), this.P(8.4, y + 1.4, -0.5));
-        seg(this.P(-5, top, -0.5), this.P(13, top, -0.5)); seg(this.P(8, top + 2.4, -0.5), this.P(-3, top, -0.5)); seg(this.P(8, top + 2.4, -0.5), this.P(13, top, -0.5));
-        seg(this.P(8, top, -0.5), this.P(8, top + 2.4, -0.5)); seg(this.P(0, top, -0.5), this.P(0, top - 3, -0.5));
-        g.stroke();
-      }
+      if (craneOn && !craneBehind) this.drawCrane();
+      palmsFront.forEach((p) => this.drawPalm(p));
 
       // Dimension line with level ticks
-      if (!this.o.envelope && this.L < 0.01) return;
-      const d0 = this.P(-11, 0, 6), d1 = this.P(-11, FLOORS, 6);
+      if (!this.o.envelope && L < 0.01) return;
+      // kept on the viewer's left of the tower whatever the angle
+      const kc = this.k.c, ks = this.k.s, at = (X) => [kc * X, -ks * X];
+      const [ax, az] = at(-10), [tx, tz] = at(-10.7), [lx, lz] = at(-11.9);
+      const d0 = this.P(ax, 0, az), d1 = this.P(ax, FLOORS, az);
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
-      for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-11, i, 6), q = this.P(-11.7, i, 6); seg(p, q); }
+      for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(ax, i, az), q = this.P(tx, i, tz); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
         g.fillStyle = bronze(0.95); g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
-        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(-13.2, i, 6); g.fillText('L' + String(i).padStart(2, '0'), p[0], p[1]); }
+        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
       }
+    }
+
+    // A royal palm in a few strokes: a leaning trunk and drooping fronds.
+    drawPalm([x, z, hgt, lean, turn]) {
+      const g = this.ctx, [lr, lg, lb] = this.line, col = `rgba(${lr},${lg},${lb},${this.dark ? 0.5 : 0.55})`;
+      const tx = x + lean * Math.cos(turn), tz = z + lean * Math.sin(turn);
+      g.strokeStyle = col; g.lineWidth = 1.1; g.beginPath();
+      for (let i = 0; i <= 8; i++) { const t = i / 8, e = t * t, p = this.P(x + (tx - x) * e, hgt * t, z + (tz - z) * e); i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]); }
+      g.stroke(); g.lineWidth = 0.75; g.beginPath();
+      const leaf = [];
+      for (let f = 0; f < 11; f++) {
+        const a = turn + f * TAU / 11 + 0.4 * Math.sin(f * 2.3), len = 1.25 + 0.5 * ((f * 7) % 4) / 3, up = f % 3 === 0 ? 0.9 : 0.5;
+        const pt = (t) => this.P(tx + Math.cos(a) * len * t, hgt + len * (up * t - 1.05 * t * t), tz + Math.sin(a) * len * t);
+        let prev = pt(0); g.moveTo(prev[0], prev[1]);
+        for (let i = 1; i <= 7; i++) { const t = i / 7, p = pt(t); g.lineTo(p[0], p[1]); if (i > 1 && i < 7) leaf.push([p, t]); prev = p; }
+        g.moveTo(prev[0], prev[1]);
+      }
+      g.stroke();
+      // leaflets hang from each frond
+      g.lineWidth = 0.5; g.beginPath();
+      const sc = this.k.f / this.o.dist * 0.16;
+      leaf.forEach(([p, t]) => { const l = sc * (1 - t * 0.6); g.moveTo(p[0], p[1]); g.lineTo(p[0] - l * 0.5, p[1] + l); g.moveTo(p[0], p[1]); g.lineTo(p[0] + l * 0.5, p[1] + l); });
+      g.stroke();
+    }
+
+    // A luffing tower crane in bronze linework; the jib slews as the floors go up.
+    drawCrane() {
+      const g = this.ctx, [sr, sg, sb] = this.sold, a = 0.85 * this.crane;
+      const seg = (p, q) => { g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); };
+      const [mx, mz] = MAST, s = 0.42, top = Math.max(7, this.L + 4.5);
+      const P = (x, y, z) => this.P(mx + x, y, mz + z);
+      g.strokeStyle = `rgba(${sr},${sg},${sb},${a})`; g.lineWidth = 0.8; g.beginPath();
+      const cs = [[-s, -s], [s, -s], [s, s], [-s, s]];
+      cs.forEach(([x, z]) => seg(P(x, 0, z), P(x, top, z)));
+      for (let y = 0; y < top - 0.01; y += 1.1) {
+        const y2 = Math.min(top, y + 1.1);
+        for (let q = 0; q < 4; q++) { const [x0, z0] = cs[q], [x1, z1] = cs[(q + 1) % 4]; seg(P(x0, y, z0), P(x1, y2, z1)); seg(P(x0, y2, z0), P(x1, y2, z1)); }
+      }
+      g.stroke();
+      // slewing jib, counter-jib, A-frame head and pendants
+      const ang = Math.atan2(-mz, -mx) + 0.55 * Math.sin(this.L * 0.38), ca = Math.cos(ang), sa = Math.sin(ang);
+      const J = (d, y, w = 0) => P(ca * d - sa * w, y, sa * d + ca * w);
+      g.lineWidth = 0.8; g.beginPath();
+      seg(J(-4.6, top, -0.3), J(15, top, -0.3)); seg(J(-4.6, top, 0.3), J(15, top, 0.3));
+      seg(J(0, top + 0.7, 0), J(15, top, 0));
+      for (let d = 0; d < 15; d += 1) { seg(J(d, top, -0.3), J(d + 0.5, top + 0.7 * (1 - (d + 0.5) / 15), 0)); seg(J(d + 0.5, top + 0.7 * (1 - (d + 0.5) / 15), 0), J(d + 1, top, 0.3)); }
+      seg(J(0, top, -0.35), J(0, top + 3, 0)); seg(J(0, top, 0.35), J(0, top + 3, 0));
+      seg(J(0, top + 3, 0), J(10, top + 0.4, 0)); seg(J(0, top + 3, 0), J(-4.4, top, 0));
+      // trolley, hook and a load on its way up
+      const tr = 6 + 3 * Math.sin(this.L * 0.9), hy = Math.max(1, top - 5 - 2 * Math.cos(this.L * 0.7));
+      seg(J(tr, top, 0), J(tr, hy, 0));
+      g.stroke();
+      g.fillStyle = `rgba(${sr},${sg},${sb},${a})`;
+      const box = (d, y, w, hh, dd) => { const q = [J(d - dd, y, -w), J(d + dd, y, -w), J(d + dd, y + hh, -w), J(d - dd, y + hh, -w)]; g.beginPath(); q.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); g.fill(); };
+      box(-3.9, top - 0.7, 0.3, 0.7, 0.55); // counterweight
+      box(tr, hy - 0.6, 0.3, 0.6, 0.6); // load
+      box(0.9, top - 0.75, 0.3, 0.75, 0.45); // cab
     }
   }
 
