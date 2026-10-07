@@ -393,7 +393,7 @@ html.intro-on .curtain{display:grid;position:fixed;inset:0;z-index:100;color:#F4
 .chart .coast path{fill:none;stroke:var(--fg);stroke-width:.8;opacity:.32;stroke-linejoin:round}
 .chart [data-m]{transition:opacity .4s var(--ease)}
 .chart[data-hl] svg [data-m]{opacity:.18}
-.chart[data-hl="miami"] [data-m="miami"],.chart[data-hl="bpb"] [data-m="bpb"],.chart[data-hl="ny"] [data-m="ny"],.chart[data-hl="ladal"] [data-m="ladal"],.chart[data-hl="intl"] [data-m="intl"]{opacity:1}
+.chart[data-hl="miami"] [data-m="miami"],.chart[data-hl="bpb"] [data-m="bpb"],.chart[data-hl="ny"] [data-m="ny"],.chart[data-hl="ladal"] [data-m="ladal"],.chart[data-hl="more"] [data-m="more"],.chart[data-hl="intl"] [data-m="intl"]{opacity:1}
 .lv{transition:color .3s}
 .lv h3{transition:color .3s,transform .5s var(--ease)}
 .lv:hover h3{color:var(--accent);transform:translateX(6px)}

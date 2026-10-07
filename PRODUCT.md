@@ -28,7 +28,7 @@ A founder on every account, a strategy written for one building rather than a te
 
 ## Operating Context
 
-Developers evaluate firms through pitches, case studies, weekly sales dashboards, velocity math (what each unsold month costs), and references. Buyers reach out discreetly and expect invitation-only access. Markets in order: Miami, Broward & Palm Beach, NYC & the Hamptons, then Los Angeles and Dallas, then international.
+Developers evaluate firms through pitches, case studies, weekly sales dashboards, velocity math (what each unsold month costs), and references. Buyers reach out discreetly and expect invitation-only access. Markets in order: Miami, Broward & Palm Beach, NYC & the Hamptons, then Los Angeles and Dallas, later Austin, Houston and San Francisco, then international.
 
 ## Capabilities and Constraints
 

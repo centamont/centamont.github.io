@@ -182,7 +182,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
     <div class="chart" id="chart">
       <figure class="map">
       <div class="scroll" tabindex="0" aria-label="Markets map, scrolls sideways on small screens">
-      <svg viewBox="0 0 720 330" role="img" aria-label="Map of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, and later international.">
+      <svg viewBox="0 0 720 330" role="img" aria-label="Map of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, later Austin, Houston and San Francisco, and international.">
         <g class="grid">
           <line x1="0" y1="72" x2="720" y2="72"/><line x1="0" y1="135" x2="720" y2="135"/><line x1="0" y1="197" x2="720" y2="197"/><line x1="0" y1="260" x2="720" y2="260"/>
           <line x1="137" y1="0" x2="137" y2="330"/><line x1="262" y1="0" x2="262" y2="330"/><line x1="387" y1="0" x2="387" y2="330"/><line x1="512" y1="0" x2="512" y2="330"/><line x1="637" y1="0" x2="637" y2="330"/>
@@ -195,15 +195,20 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
         <path class="arc" data-m="ny" d="M572 250 Q560 140 649 63"/>
         <path class="arc" data-m="ladal" d="M572 250 Q470 110 364 162"/>
         <path class="arc" data-m="ladal" d="M572 250 Q330 30 97 146"/>
+        <path class="arc later" data-m="more" d="M572 250 Q462 150 353 194"/>
+        <path class="arc later" data-m="more" d="M572 250 Q480 175 383 200"/>
+        <path class="arc later" data-m="more" d="M572 250 Q300 -20 45 100"/>
         <path class="arc later" data-m="intl" d="M572 250 Q640 300 716 290"/>
         <circle class="ring" cx="572" cy="250" r="5"/>
         <circle class="pt now" data-m="miami" cx="572" cy="250" r="5"/>
         <circle class="pt" data-m="bpb" cx="574" cy="240" r="3.5"/><circle class="pt" data-m="ny" cx="649" cy="63" r="4"/><circle class="pt" data-m="ny" cx="672" cy="60" r="3.5"/><circle class="pt" data-m="ladal" cx="364" cy="162" r="4"/><circle class="pt" data-m="ladal" cx="97" cy="146" r="4"/>
+        <circle class="pt" data-m="more" cx="353" cy="194" r="3.5"/><circle class="pt" data-m="more" cx="383" cy="200" r="3.5"/><circle class="pt" data-m="more" cx="45" cy="100" r="3.5"/>
         <text class="lb now" data-m="miami" x="552" y="280" text-anchor="end">Miami</text>
         <text class="lb" data-m="bpb" x="590" y="228">Broward &amp;</text><text class="lb" data-m="bpb" x="590" y="246">Palm Beach</text>
         <text class="lb" data-m="ny" x="638" y="72" text-anchor="end">New York</text><text class="lb" data-m="ny" x="716" y="44" text-anchor="end">Hamptons</text>
-        <text class="lb" data-m="ladal" x="364" y="188" text-anchor="middle">Dallas</text><text class="lb" data-m="ladal" x="97" y="174" text-anchor="middle">Los Angeles</text>
+        <text class="lb" data-m="ladal" x="354" y="160" text-anchor="end">Dallas</text><text class="lb" data-m="ladal" x="97" y="174" text-anchor="middle">Los Angeles</text>
         <text class="lb" data-m="intl" x="712" y="316" text-anchor="end">International</text>
+        <text class="lb" data-m="more" x="343" y="199" text-anchor="end">Austin</text><text class="lb" data-m="more" x="390" y="222">Houston</text><text class="lb" data-m="more" x="52" y="88">San Francisco</text>
       </svg>
       </div>
       <figcaption>Coastline simplified. Equirectangular projection.</figcaption>
@@ -213,6 +218,7 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
       <div class="lv" data-m="bpb"><span class="when">Next</span><h3>Broward &amp; Palm Beach</h3><p>Fort Lauderdale to Palm Beach along the coast.</p></div>
       <div class="lv" data-m="ny"><span class="when">Planned</span><h3>New York &amp; the Hamptons</h3><p>Manhattan new development and the East End.</p></div>
       <div class="lv" data-m="ladal"><span class="when">Planned</span><h3>Los Angeles &amp; Dallas</h3><p>The Westside and Dallas–Fort Worth.</p></div>
+      <div class="lv" data-m="more"><span class="when">Later</span><h3>Austin, Houston &amp; San Francisco</h3><p>Central Texas, the Gulf Coast and the Bay Area.</p></div>
       <div class="lv" data-m="intl"><span class="when">Later</span><h3>International</h3><p>Through licensed local partners.</p></div>
       </div>
     </div>
