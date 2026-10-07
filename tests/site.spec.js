@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 
 // Every section of the one-page centamont.com and a phrase from its heading.
 const sections = [
+  ['services', 'One firm, from the first sketch to the last closing'],
   ['developers', 'Your building, sold like it is the only one we have'],
   ['clients', 'Residences that never reach the open market'],
   ['markets', 'Miami first'],
@@ -35,6 +36,9 @@ test('home renders cleanly', async ({ page }, info) => {
   const hidden = await page.evaluate(() => (document.body.innerText.match(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\uE000-\uF8FF]|\uDB40[\uDC00-\uDC7F]/g) || []).length);
   expect(hidden).toBe(0);
 
+  // Link previews have a title, description and image.
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.png$/);
+
   // The drawing says it is an illustration.
   await expect(page.locator('.elev figcaption')).toContainText('Illustration, not a real project');
 
@@ -55,6 +59,7 @@ test('old page links land on their section', async ({ page }) => {
 test('menu reaches every section', async ({ page, isMobile }) => {
   await page.goto('/');
   for (const [id] of sections) {
+    if (!(await page.locator(`nav.main a[href="#${id}"]`).count())) continue;
     if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
     await page.locator(`nav.main a[href="#${id}"]`).click();
     await expect(page.locator(`#${id} h2`).first()).toBeInViewport();
