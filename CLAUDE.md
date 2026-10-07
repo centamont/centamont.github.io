@@ -1,6 +1,6 @@
 # Centamont website
 
-Static site for centamont.com: one hand-written `index.html` (hash-routed pages), served by GitHub Pages from `main`. `CNAME`, `robots.txt` and `sitemap.xml` sit beside it.
+Static site for centamont.com: one hand-written `index.html` (a single scroll page with anchored sections; see DESIGN.md and PRODUCT.md), served by GitHub Pages from `main`. `CNAME`, `robots.txt` and `sitemap.xml` sit beside it.
 
 - Pages builds with Jekyll's defaults, which skip dot-folders, so `.claude/` is never published. Don't add a `.nojekyll` file.
 - Brand: Cormorant Garamond + Jost; ink #14161A, ivory #F4F0E8, bronze #B8976A. Quiet, editorial luxury. These win over any generic suggestion from the `ui-ux-pro-max`, `design-taste-frontend` or `impeccable` skills (for example, it may propose glassmorphism or bright palettes; don't use them).
