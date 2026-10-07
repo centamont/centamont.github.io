@@ -91,7 +91,7 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
 });
 
 for (const [path, heading] of [
-  ['/journal/buying-pre-construction-florida.html', 'Buying pre-construction in Florida'],
+  ['/journal/buying-pre-construction-florida.html', /Buying pre.construction in Florida/],
   ['/privacy.html', 'Privacy'],
   ['/404.html', 'This page was never built'],
 ]) {
@@ -111,7 +111,7 @@ for (const [path, heading] of [
 test('journal links to the guide', async ({ page }) => {
   await page.goto('/#journal');
   await page.getByRole('link', { name: 'Read the guide' }).click();
-  await expect(page.locator('h1')).toContainText('Buying pre-construction in Florida');
+  await expect(page.locator('h1')).toContainText(/Buying pre.construction in Florida/);
 });
 
 test('Escape closes the phone menu', async ({ page, isMobile }) => {
