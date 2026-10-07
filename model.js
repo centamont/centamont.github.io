@@ -61,7 +61,22 @@
   })();
   const MAST = [7.6, -5.6]; // tower crane, outside the podium's back corner
   // [x, z, height, lean, lean direction]
-  const PALMS = [[-8.3, 6.2, 3.9, 0.5, 2.6], [-5.6, 6.6, 3.3, 0.35, 1.2], [-2.6, 6.8, 4.2, 0.45, 2], [8.4, 5.8, 3.7, 0.5, 0.4], [-8.6, -5.4, 3.5, 0.4, 3.6], [5.2, 6.7, 3.2, 0.3, 1.6]];
+  const PALMS = [[-8.3, -6.1, 3.9, 0.5, 3.6], [-6.3, -7.1, 4.2, 0.45, 4.4], [5.0, -7.3, 3.6, 0.4, 5.2], [-8.6, 5.6, 3.5, 0.4, 2.4], [8.4, 5.8, 3.7, 0.5, 0.4], [-0.6, 6.7, 3.3, 0.35, 1.4], [9.0, 0.6, 3.1, 0.3, 0.1]];
+  // People at the entrance, for scale: [x, z, height]
+  const FIGS = [[-1.5, -6.6, 0.56], [-1.15, -6.75, 0.5], [1.2, -6.2, 0.55], [2.5, -7.25, 0.54], [-5.6, -7.25, 0.52], [6.1, -6.8, 0.56]];
+  // A porte-cochère on the entrance side of the podium
+  const CANOPY = rrect(2.6, 0.85, 0.4, 2, 2).map((p) => ({ x: p.x, z: p.z - 5.25, nx: p.nx, nz: p.nz }));
+  const hash = (a, b, c = 0) => { const x = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return x - Math.floor(x); };
+
+  // Sunlight follows the time of day in Miami; after dark the tower is lit from within.
+  function miamiSun() {
+    let hr = 13;
+    try { const p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(new Date()); hr = +p.find((x) => x.type === 'hour').value + +p.find((x) => x.type === 'minute').value / 60; } catch (e) {}
+    const day = hr > 6.8 && hr < 19.6;
+    if (!day) return { v: [-0.55, 0.62, -0.5], night: 1 };
+    const a = Math.PI * (hr - 6.8) / 12.8, el = 0.3 + 0.55 * Math.sin(a);
+    return { v: [Math.cos(a) * 0.9, el, -0.75 * Math.sin(a) - 0.2], night: hr < 7.6 || hr > 18.8 ? 0.5 : 0 };
+  }
 
   function rgb(hex) {
     const m = String(hex).trim().match(/^rgba?\(([^)]+)\)/);
@@ -93,6 +108,8 @@
       this.crane = 0; this.craneT = 0;
       this.mx = 0; this.my = 0;
       this.visible = true;
+      this.sunNow = miamiSun();
+      setInterval(() => { this.sunNow = miamiSun(); this.touch(); }, 300000);
       this.colors();
       this.size();
       new ResizeObserver(() => { this.size(); this.touch(); }).observe(canvas);
@@ -153,10 +170,10 @@
       if (!reduce && this.o.orbit) this.theta += this.o.orbit;
       this.tx = ease(this.tx || 0, this.mx * 0.12, 0.05);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 0.05);
-      // A slow idle orbit only needs half the frames; anything else draws every frame.
+      // A slow idle orbit only needs a third of the frames; anything else draws every frame.
       const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
-      this.odd = !this.odd;
-      if (!(settled && this.o.orbit && this.odd) || this.dirty) this.draw();
+      this.tick = ((this.tick || 0) + 1) % 3;
+      if (!(settled && this.o.orbit && this.tick) || this.dirty) this.draw();
       this.dirty = false;
       const moving = !settled || (!reduce && this.o.orbit);
       if (moving && this.visible) this.kick();
@@ -197,7 +214,8 @@
       batch = new Map();
       const poly = (ps) => { g.beginPath(); ps.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); };
       const eye = this.eye, L = this.L, C = this.C, S = this.S;
-      const sun = [-0.62, 0.55, -0.56], sunH = Math.hypot(sun[0], sun[2]);
+      const sun = this.o.sun || this.sunNow.v, sunH = Math.hypot(sun[0], sun[2]), night = dark ? (this.o.sun ? 0.5 : this.sunNow.night) : 0;
+      const now = performance.now();
 
       // Ground: survey grid, site line, and the tower's shadow
       if (this.o.grid) {
@@ -209,9 +227,16 @@
         }
         g.setLineDash([4, 5]); g.strokeStyle = bronze(0.55);
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
+        if (L > 0.01) {
+          // the drop-off drive under the canopy, and the walk to the street
+          g.strokeStyle = ink(dark ? 0.26 : 0.24); g.lineWidth = 0.8; g.beginPath();
+          for (const rr of [1.4, 2.9]) { for (let i = 0; i <= 18; i++) { const a = Math.PI * i / 18, p = this.P(Math.cos(a) * rr * 1.25, 0, -5.4 - Math.sin(a) * rr); i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]); } }
+          seg(this.P(-3.6, 0, -5.4), this.P(-3.6, 0, -7.5)); seg(this.P(3.6, 0, -5.4), this.P(3.6, 0, -7.5));
+          g.stroke();
+        }
       }
       if (L > 0.01) {
-        const sh = [], dx = -sun[0] / sun[1], dz = -sun[2] / sun[1];
+        const sh = [], sy = Math.max(sun[1], 0.62), dx = -sun[0] / sy, dz = -sun[2] / sy;
         const add = (pl, y) => pl.forEach((p) => sh.push([p.x + dx * y, p.z + dz * y]));
         add(PLANS[0].slab, 0); add(PLANS[0].slab, Math.min(L, PODIUM));
         if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
@@ -219,8 +244,9 @@
         g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
       }
 
-      const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [];
+      const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [], figs = [];
       if (this.o.palms !== false && this.o.grid) PALMS.forEach((p) => (this.P(p[0], 2, p[1])[2] > towerZ ? palmsBack : palmsFront).push(p));
+      if (this.o.palms !== false && this.o.grid && L > PODIUM) FIGS.forEach((f) => figs.push(f));
       palmsBack.forEach((p) => this.drawPalm(p));
 
       // Floors not yet built: the dashed first sketch
@@ -248,7 +274,14 @@
       if (L >= FLOORS - 0.001) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + 2.2, kind: 'crown' });
       const ey = eye[1];
       const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
-      layers.sort((a, b) => far(b) - far(a));
+      layers.forEach((l) => { l.f = far(l); });
+      // Glass balustrades stand in front of their floor whichever way it is seen.
+      if (this.o.rails !== false) for (let k = PODIUM; k < CROWN; k++) if (k <= L - 1) {
+        const f = Math.min(far({ lo: k, hi: k + SLAB }), far({ lo: k + SLAB, hi: k + 1 })) - 0.0001;
+        layers.push({ kind: 'rail', k, f });
+      }
+      if (L >= 1.2) layers.push({ kind: 'canopy', f: far({ lo: 1, hi: 1 + SLAB }) - 0.00005 });
+      layers.sort((a, b) => b.f - a.f);
 
       // Crane sits behind or in front of the tower depending on the view.
       const craneOn = this.o.crane && this.crane > 0.01;
@@ -284,8 +317,9 @@
           const capPts = cap(pl, top ? y1 : y0);
           poly(capPts); g.fillStyle = mix(dark ? (top ? 0.86 : 0.5) : (top ? 0.03 : 0.16)); g.fill();
           g.beginPath(); g.strokeStyle = edge; g.lineWidth = 0.7;
-          for (const j of b.lines) { const j2 = (j + 1) % pl.length; seg(b.bot[j], b.bot[j2]); seg(b.top[j], b.top[j2]); }
+          for (const j of b.lines) { const j2 = (j + 1) % pl.length; seg(b.bot[j], b.bot[j2]); if (!dark) seg(b.top[j], b.top[j2]); }
           g.stroke();
+          if (dark) { g.beginPath(); g.strokeStyle = ink(0.95); g.lineWidth = 0.6; for (const j of b.lines) { const j2 = (j + 1) % pl.length; seg(b.top[j], b.top[j2]); } g.stroke(); }
           // a pool on the podium terrace
           if (k === PODIUM && top) {
             poly([[4.7, -3.1], [6.0, -3.1], [6.0, 3.1], [4.7, 3.1]].map(([x, z]) => this.P(x, y1 + 0.001, z)));
@@ -318,10 +352,12 @@
               const hx = sun[0] + v[0], hz = sun[2] + v[2], hn = Math.hypot(hx, hz) || 1;
               const spec = Math.pow(Math.max(0, (nx * hx + nz * hz) / hn), 18);
               if (j / nn < soldF) return mixS(dark ? 0.5 + 0.32 * diff : 0.62 + 0.3 * diff, 0.25 * spec + 0.06 * fres);
+              // a few rooms lit from inside, more after dark
+              if (dark && hash(k, j) < 0.08 + 0.18 * night) return mix(0.3 + 0.22 * hash(j, k, 3) + 0.06 * Math.sin(now / 2400 + j * 1.7 + k));
               return dark ? mix(0.07 + 0.1 * diff + 0.07 * fres + 0.07 * hgt + 0.38 * spec) : mix(0.8 - 0.22 * diff - 0.07 * fres - 0.14 * hgt - 0.5 * spec);
             };
             const bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));
-            const mull = [];
+            const mull = [], shadowed = [];
             for (let j = 0; j < n; j++) {
               const j2 = (j + 1) % n, q = [bot[j], bot[j2], top[j2], top[j]];
               const area = (q[1][0] - q[0][0]) * (q[2][1] - q[0][1]) - (q[2][0] - q[0][0]) * (q[1][1] - q[0][1]);
@@ -329,6 +365,7 @@
               const a = pl[j], b = pl[j2], col = shade((a.nx + b.nx) / 2, (a.nz + b.nz) / 2, j, n, (a.x + b.x) / 2, (a.z + b.z) / 2);
               if (!col) continue;
               queue(q, col);
+              if (built >= 1) shadowed.push(j);
               mull.push([bot[j], top[j]]);
               const len = Math.hypot(b.x - a.x, b.z - a.z);
               if (len > 1.6) { const m = Math.round(len / 1.1); for (let t = 1; t < m; t++) { const u = t / m; mull.push([[bot[j][0] + (bot[j2][0] - bot[j][0]) * u, bot[j][1] + (bot[j2][1] - bot[j][1]) * u], [top[j][0] + (top[j2][0] - top[j][0]) * u, top[j][1] + (top[j2][1] - top[j][1]) * u]]); } }
@@ -336,7 +373,30 @@
             flush();
             g.beginPath(); g.strokeStyle = dark ? ink(0.16) : `rgba(${br},${bgg},${bb},0.22)`; g.lineWidth = 0.6;
             mull.forEach(([a, b]) => seg(a, b)); g.stroke();
+            // the shadow each slab casts on the glass just below it
+            if (shadowed.length) {
+              const px = Math.abs(top[0][1] - bot[0][1]) * 0.16;
+              g.beginPath(); g.strokeStyle = dark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'; g.lineWidth = px;
+              for (const j of shadowed) { const j2 = (j + 1) % n; g.moveTo(top[j][0], top[j][1] + px / 2); g.lineTo(top[j2][0], top[j2][1] + px / 2); }
+              g.stroke();
+            }
           }
+        } else if (l.kind === 'rail') {
+          // a glass balustrade along the balcony edge
+          const k = l.k, y0 = k + SLAB, y1 = y0 + 0.3;
+          const pl = slabPlan(k).map((p) => ({ x: p.x - p.nx * 0.05, z: p.z - p.nz * 0.05, nx: p.nx, nz: p.nz }));
+          const b = band(pl, y0, y1, () => (dark ? 'rgba(244,240,232,0.08)' : 'rgba(20,22,26,0.06)'), true);
+          g.beginPath(); g.strokeStyle = ink(dark ? 0.42 : 0.42); g.lineWidth = 0.55;
+          for (const j of b.lines) seg(b.top[j], b.top[(j + 1) % pl.length]);
+          g.stroke();
+        } else if (l.kind === 'canopy') {
+          // porte-cochère: two slender columns and a thin floating roof
+          g.beginPath(); g.strokeStyle = ink(dark ? 0.7 : 0.7); g.lineWidth = 1.2;
+          for (const x of [-2.2, 2.2]) seg(this.P(x, 0, -5.85), this.P(x, 1, -5.85));
+          g.stroke();
+          const b = band(CANOPY, 1, 1.1, (nx, nz) => mix(dark ? 0.7 + 0.2 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH) : 0.12), true);
+          poly(cap(CANOPY, ey > 1.1 ? 1.1 : 1)); g.fillStyle = mix(dark ? (ey > 1.1 ? 0.88 : 0.45) : (ey > 1.1 ? 0.03 : 0.2)); g.fill();
+          g.beginPath(); g.strokeStyle = edge; g.lineWidth = 0.6; for (const j of b.lines) { const j2 = (j + 1) % CANOPY.length; seg(b.bot[j], b.bot[j2]); } g.stroke();
         } else if (l.kind === 'crown') {
           // an open frame of fins over the roof
           const pl = PLANS[FLOORS - 1].glass, y0 = FLOORS + SLAB, y1 = FLOORS + 2.2;
@@ -344,11 +404,13 @@
           pl.forEach((p) => seg(this.P(p.x, y0, p.z), this.P(p.x, y1, p.z)));
           const ring = pl.map((p) => this.P(p.x, y1, p.z)); ring.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
           g.stroke();
+          this.beacon(this.P(0, y1 + 0.5, 0), now);
         }
       }
 
       if (craneOn && !craneBehind) this.drawCrane();
       palmsFront.forEach((p) => this.drawPalm(p));
+      figs.forEach((f) => this.drawFigure(f));
 
       // Dimension line with level ticks
       if (!this.o.envelope && L < 0.01) return;
@@ -363,6 +425,26 @@
         g.fillStyle = bronze(0.95); g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
         for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
       }
+    }
+
+    // The aviation light on the roof, breathing slowly.
+    beacon(p, now) {
+      const g = this.ctx, [sr, sg, sb] = this.sold, a = reduce ? 0.8 : 0.55 + 0.45 * Math.sin(now / 900);
+      const r = Math.max(2.5, this.k.f / this.o.dist * 0.35), gr = g.createRadialGradient(p[0], p[1], 0, p[0], p[1], r * 3);
+      gr.addColorStop(0, `rgba(${sr},${sg},${sb},${0.55 * a})`); gr.addColorStop(1, `rgba(${sr},${sg},${sb},0)`);
+      g.fillStyle = gr; g.beginPath(); g.arc(p[0], p[1], r * 3, 0, TAU); g.fill();
+      g.fillStyle = `rgba(${sr},${sg},${sb},${0.6 + 0.4 * a})`; g.beginPath(); g.arc(p[0], p[1], Math.max(1.2, r * 0.35), 0, TAU); g.fill();
+    }
+
+    // A person at architectural scale, so the building reads at its true size.
+    drawFigure([x, z, hh]) {
+      const g = this.ctx, [lr, lg, lb] = this.line, P = (dx, y) => this.P(x + dx, y, z);
+      const f0 = P(-0.05, 0), f1 = P(0.05, 0), hip = P(0, hh * 0.46), neck = P(0, hh * 0.76), head = P(0, hh * 0.9);
+      const px = Math.abs(head[1] - f0[1]);
+      g.strokeStyle = g.fillStyle = `rgba(${lr},${lg},${lb},${this.dark ? 0.78 : 0.72})`; g.lineCap = 'round';
+      g.lineWidth = Math.max(0.8, px * 0.1); g.beginPath(); g.moveTo(f0[0], f0[1]); g.lineTo(hip[0], hip[1]); g.lineTo(f1[0], f1[1]); g.stroke();
+      g.lineWidth = Math.max(1.2, px * 0.2); g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(neck[0], neck[1]); g.stroke(); g.lineCap = 'butt';
+      g.beginPath(); g.arc(head[0], head[1], Math.max(0.9, px * 0.085), 0, TAU); g.fill();
     }
 
     // A royal palm in a few strokes: a leaning trunk and drooping fronds.
