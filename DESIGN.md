@@ -15,12 +15,14 @@ An architect's elevation sheet on ivory vellum. Ink linework, bronze for what ha
 ## Composition
 
 - One scroll page with anchored sections (old hash URLs land on their section). One h1 in the hero; every section opens with an h2 and its intro directly beneath it. Order: hero, three practices, developer story and how an engagement begins, private clients, markets, notes, people, the name, contact.
-- Two ink bands only: private clients (the private door) and the name. Everything else sits on ivory between 1px rules.
+- Three ink grounds: the hero, private clients (the private door) and the name. The footer opens with a full-width CENTAMONT signature. Everything else sits on ivory between 1px rules.
 - Lists are ruled rows, never card grids. No eyebrows above headings.
 
 ## Motion
 
-One authored moment: the tower in the developer story frames floor by floor and fills bronze as steps scroll past (cubic-bezier(.16,1,.3,1), floors staggered 28ms). It is captioned "Illustration, not a real project". Reduced motion turns transitions off; states still change.
+The signature is a line-drawn 3D massing model (`model.js`, canvas 2D, no libraries) of a generic tower, always captioned as an illustration. It appears twice: in the ink hero, rising floor by floor after the intro and orbiting slowly, with a slight tilt that follows the pointer; and in the developer story, where it frames and fills bronze per step while the camera moves between views.
+Supporting moments: a one-time intro per session (a counter from 001 to 100, "the hundredth blow", then the curtain lifts); the private client band opening like a door as it arrives; market routes drawing out from Miami on a latitude and longitude chart; the name cut in line by line.
+Reduced motion: no intro, no orbit, final states shown at once. Day and night toggle in the header, remembered per visitor.
 
 ## Browser surfaces
 

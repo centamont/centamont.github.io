@@ -13,6 +13,11 @@ const sections = [
   ['contact', 'Write to the partners'],
 ];
 
+// Skip the one-time intro so every test starts on the page itself.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('cm-intro', '1'));
+});
+
 test('home renders cleanly', async ({ page }, info) => {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -68,8 +73,8 @@ test('menu reaches every section', async ({ page, isMobile }) => {
 
 test('the building rises as the story scrolls', async ({ page }, info) => {
   await page.goto('/');
-  const built = () => page.locator('#tower .fl.built').count();
-  const sold = () => page.locator('#tower .fl.sold').count();
+  const built = async () => +(await page.locator('#tower').getAttribute('data-built'));
+  const sold = async () => +(await page.locator('#tower').getAttribute('data-sold'));
   expect(await built()).toBe(0);
 
   const steps = page.locator('#steps .step');
@@ -122,4 +127,21 @@ test('Escape closes the phone menu', async ({ page, isMobile }) => {
   await page.keyboard.press('Escape');
   await expect(page.locator('nav.main')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Menu' })).toBeFocused();
+});
+
+test('first visit plays the intro, then reveals the page', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveClass(/intro-on/);
+  await expect(page.locator('html')).not.toHaveClass(/intro-on/, { timeout: 5000 });
+  await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '22');
+});
+
+test('day and night toggle remembers the choice', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Switch between day and night' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });

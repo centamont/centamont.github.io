@@ -18,8 +18,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Centamont wordmark on ink with a line drawing of a tower">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F4F0E8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#14161A">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"Centamont","url":"https://centamont.com/","logo":"https://centamont.com/favicon.svg","description":"New development advisory, sales and marketing, and private brokerage.","areaServed":"Miami, Florida","address":{"@type":"PostalAddress","addressLocality":"Miami","addressRegion":"FL","addressCountry":"US"},"sameAs":["https://www.instagram.com/centamont","https://www.linkedin.com/company/centamont","https://x.com/centamont","https://www.youtube.com/@centamont"]}
 </script>
@@ -27,16 +26,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="site.css">
+<script>
+(function(){var d=document.documentElement;d.classList.add('js');
+try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;
+if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('intro-on')}catch(e){}})();
+</script>
+<script src="model.js" defer></script>
 </head>
-<body class="no-js">
+<body class="no-js home">
+<div class="intro" aria-hidden="true"><div class="in"><span class="n" id="introN">001</span><span class="bar"><i id="introBar"></i></span><span class="w">Centamont</span></div></div>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site">
+<header class="site over">
   <div class="wrap bar">
     <a class="mark" href="#top" aria-label="Centamont, back to top">
       <svg viewBox="0 0 28 28" aria-hidden="true"><rect x=".5" y=".5" width="27" height="27" fill="none" stroke="#B8976A"/><path d="M19 9.2a7 7 0 1 0 0 9.6" fill="none" stroke="#B8976A" stroke-width="1.2"/></svg>
       <span class="word">Centamont</span>
     </a>
-    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mainNav">Menu</button>
     <nav class="main" id="mainNav" aria-label="Sections">
       <a href="#services">What we do</a>
       <a href="#developers">Developers</a>
@@ -46,33 +51,26 @@
       <a href="#people">People</a>
       <a href="#contact">Contact</a>
     </nav>
+    <div class="tools">
+    <button class="theme" id="themeBtn" type="button" aria-label="Switch between day and night"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor"/><path d="M8 .8v2M8 13.2v2M.8 8h2M13.2 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M2.9 13.1l1.4-1.4M11.7 4.3l1.4-1.4" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 10.4A6 6 0 0 1 5.6 2.4a6 6 0 1 0 8 8z" fill="none" stroke="currentColor"/></svg></button>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mainNav">Menu</button>
+    </div>
   </div>
 </header>
 
 <main id="main">
 <div class="hero" id="top">
+  <canvas id="heroModel" aria-hidden="true"></canvas>
   <div class="wrap">
-    <div>
-      <h1>The finest new buildings, sold <em>with intent.</em></h1>
-      <p class="lede">We help developers sell new buildings faster, with a sales strategy written for each one, from the first sketch to the last closing. And we represent a small circle of buyers at the very top of the market.</p>
-      <div class="row">
-        <a class="btn solid" href="#developers">For developers<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
-        <a class="btn" href="#clients">Private clients</a>
-      </div>
-    </div>
-    <div class="sketch" aria-hidden="true">
-      <svg viewBox="0 0 120 400" preserveAspectRatio="xMidYMax meet">
-        <g fill="none" stroke="var(--line)" stroke-width=".8" stroke-dasharray="3 3" stroke-opacity=".55">
-          <path d="M30 380V70h60v310"/>
-          <path d="M38 70V54h44v16"/>
-          <path d="M30 140h60M30 220h60M30 300h60" stroke-opacity=".35"/>
-        </g>
-        <path d="M104 70v310M100 70h8M100 380h8" class="dim" fill="none"/>
-        <path d="M0 380h120" class="ground"/>
-        <g class="hatch"><line x1="6" y1="384" x2="2" y2="390"/><line x1="18" y1="384" x2="14" y2="390"/><line x1="30" y1="384" x2="26" y2="390"/><line x1="42" y1="384" x2="38" y2="390"/><line x1="54" y1="384" x2="50" y2="390"/><line x1="66" y1="384" x2="62" y2="390"/><line x1="78" y1="384" x2="74" y2="390"/><line x1="90" y1="384" x2="86" y2="390"/><line x1="102" y1="384" x2="98" y2="390"/><line x1="114" y1="384" x2="110" y2="390"/></g>
-      </svg>
+    <h1>The finest new buildings, sold <em>with intent.</em></h1>
+    <p class="lede">We help developers sell new buildings faster, with a sales strategy written for each one, from the first sketch to the last closing. And we represent a small circle of buyers at the very top of the market.</p>
+    <div class="row">
+      <a class="btn solid" href="#developers">For developers<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
+      <a class="btn" href="#clients">Private clients</a>
     </div>
   </div>
+  <p class="coords" aria-hidden="true"><b>Miami</b><span>25.76° N · 80.19° W</span><span>Massing study, illustrative</span></p>
+  <span class="scrollcue" aria-hidden="true"></span>
 </div>
 
 <section id="services">
@@ -82,9 +80,9 @@
       <p class="intro">Most new buildings are sold from a template. We write a strategy for each one, put a founder on every account, and run sales like a data business: measured, reported weekly, improved every week.</p>
     </div>
     <div class="practices">
-      <div class="pr"><h3>Development advisory</h3><p>Before the design is final: pricing, unit mix, floor plans, amenities, buyer profile and launch strategy, shaped around the people who will actually buy.</p><a class="more" href="#developers">How it works</a></div>
-      <div class="pr"><h3>Sales &amp; marketing</h3><p>The full sales operation for a building: gallery, sales team, campaigns, a dedicated project website and a hand-picked group of top brokers.</p><a class="more" href="#developers">How it works</a></div>
-      <div class="pr"><h3>Private brokerage</h3><p>A small, invitation-only team representing buyers at the very top of the market, with early access to new developments before they launch.</p><a class="more" href="#clients">Private clients</a></div>
+      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><rect x="4.5" y="4.5" width="47" height="47"/><path d="M4.5 26.5h18M30.5 4.5v18h21M30.5 32.5v19M22.5 26.5a8 8 0 0 1 8-8"/></g><rect class="b" x="36" y="36" width="10" height="10"/></svg><h3><small>Layer I</small>Development advisory</h3><p>Before the design is final: pricing, unit mix, floor plans, amenities, buyer profile and launch strategy, shaped around the people who will actually buy.</p><a class="more" href="#developers">How it works</a></div>
+      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><rect class="b" x="18" y="39" width="20" height="12"/><g fill="none" stroke="currentColor" stroke-width="1"><path d="M18.5 51.5v-44h19v44M2 51.5h52M18.5 15.5h19M18.5 23.5h19M18.5 31.5h19M18.5 39.5h19M22.5 7.5v-4h11v4"/></g></svg><h3><small>Layer II</small>Sales &amp; marketing</h3><p>The full sales operation for a building: gallery, sales team, campaigns, a dedicated project website and a hand-picked group of top brokers.</p><a class="more" href="#developers">How it works</a></div>
+      <div class="pr"><svg class="glyph" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M14.5 51.5v-32a13.5 13.5 0 0 1 27 0v32M8 51.5h40M20.5 51.5v-30a7.5 7.5 0 0 1 15 0v30"/></g><circle class="b" cx="31" cy="38" r="2"/></svg><h3><small>Layer III</small>Private brokerage</h3><p>A small, invitation-only team representing buyers at the very top of the market, with early access to new developments before they launch.</p><a class="more" href="#clients">Private clients</a></div>
     </div>
   </div>
 </section>
@@ -98,7 +96,8 @@
 
     <div class="rise">
       <figure class="elev" aria-hidden="true">
-        <svg id="tower" viewBox="0 0 220 560" preserveAspectRatio="xMidYMax meet"></svg>
+        <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+        <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
       </figure>
 
@@ -149,7 +148,7 @@
   </div>
 </section>
 
-<section class="band" id="clients">
+<section class="band door-band" id="clients">
   <div class="wrap door">
     <div>
       <h2>Residences that never reach the open market.</h2>
@@ -173,12 +172,33 @@
       <h2>Miami first. Then, one market at a time.</h2>
       <p class="intro">We open a new market only when the last one stands on its own. Each has its own team, its own rules and its own research.</p>
     </div>
-    <div class="levels">
+    <div class="chart" id="chart">
+      <svg viewBox="0 0 720 330" role="img" aria-label="Chart of Centamont markets: Miami now, Broward and Palm Beach next, then New York and the Hamptons, Los Angeles and Dallas, and later international.">
+        <g class="grid">
+          <line x1="0" y1="72" x2="720" y2="72"/><line x1="0" y1="135" x2="720" y2="135"/><line x1="0" y1="197" x2="720" y2="197"/><line x1="0" y1="260" x2="720" y2="260"/>
+          <line x1="137" y1="0" x2="137" y2="330"/><line x1="262" y1="0" x2="262" y2="330"/><line x1="387" y1="0" x2="387" y2="330"/><line x1="512" y1="0" x2="512" y2="330"/><line x1="637" y1="0" x2="637" y2="330"/>
+        </g>
+        <text class="gl" x="8" y="68">40° N</text><text class="gl" x="8" y="193">30° N</text><text class="gl" x="141" y="322">115° W</text><text class="gl" x="391" y="322">95° W</text><text class="gl" x="641" y="322">75° W</text>
+        <path class="arc" d="M548 288 Q630 200 625 101"/>
+        <path class="arc" d="M548 288 Q460 210 340 200"/>
+        <path class="arc" d="M548 288 Q300 60 72 184"/>
+        <path class="arc later" d="M548 288 Q650 300 716 250"/>
+        <circle class="ring" cx="548" cy="288" r="5"/>
+        <circle class="pt now" cx="548" cy="288" r="5"/>
+        <circle class="pt" cx="549" cy="276" r="3.5"/><circle class="pt" cx="625" cy="101" r="4"/><circle class="pt" cx="645" cy="99" r="3.5"/><circle class="pt" cx="340" cy="200" r="4"/><circle class="pt" cx="72" cy="184" r="4"/>
+        <text class="lb now" x="530" y="312" text-anchor="end">Miami</text>
+        <text class="lb" x="538" y="268" text-anchor="end">Broward &amp; Palm Beach</text>
+        <text class="lb" x="618" y="84" text-anchor="end">New York</text><text class="lb" x="652" y="118">Hamptons</text>
+        <text class="lb" x="340" y="224" text-anchor="middle">Dallas</text><text class="lb" x="72" y="208" text-anchor="middle">Los Angeles</text>
+        <text class="lb" x="712" y="238" text-anchor="end">International</text>
+      </svg>
+      <div class="levels">
       <div class="lv now"><span class="when">Now</span><h3>Miami</h3><p>Brickell, Edgewater, Miami Beach, Sunny Isles and the waterfront corridor.</p></div>
       <div class="lv"><span class="when">Next</span><h3>Broward &amp; Palm Beach</h3><p>Fort Lauderdale to Palm Beach along the coast.</p></div>
       <div class="lv"><span class="when">Planned</span><h3>New York &amp; the Hamptons</h3><p>Manhattan new development and the East End.</p></div>
       <div class="lv"><span class="when">Planned</span><h3>Los Angeles &amp; Dallas</h3><p>The Westside and Dallas–Fort Worth.</p></div>
       <div class="lv"><span class="when">Later</span><h3>International</h3><p>Through licensed local partners.</p></div>
+    </div>
     </div>
   </div>
 </section>
@@ -217,7 +237,7 @@
 
 <section class="band name" id="house">
   <div class="wrap">
-    <p class="cut">Centum, a hundred.<br>Mont, a mountain.<br><i>The hundredth blow.</i></p>
+    <p class="cut" id="cut"><span class="ln"><span>Centum, a hundred.</span></span><span class="ln"><span>Mont, a mountain.</span></span><span class="ln"><span><i>The hundredth blow.</i></span></span></p>
     <div class="cols">
       <h2>Quiet by design. Exacting in every detail.</h2>
       <div>
@@ -250,8 +270,9 @@
 
 <footer>
   <div class="wrap">
+    <svg class="sig" viewBox="0 0 1000 130" aria-hidden="true"><text x="0" y="118" textLength="1000" lengthAdjust="spacing">CENTAMONT</text></svg>
     <div class="tb">
-      <div><small>Practice</small><span class="word">Centamont</span><span>New development advisory and private brokerage</span></div>
+      <div><small>Practice</small><span>New development advisory, sales and private brokerage</span></div>
       <div><small>Office</small><span>Miami, Florida</span></div>
       <div><small>Work with us</small><ul><li><a href="#developers">Developers</a></li><li><a href="#clients">Private clients</a></li><li><a href="#people">Advisors</a></li></ul></div>
       <div><small>Follow</small><ul>
@@ -267,14 +288,26 @@
 </footer>
 
 <script>
-(function(){
+document.addEventListener('DOMContentLoaded',function(){
   document.body.classList.remove('no-js');
+  const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const header=document.querySelector('header.site');
   const nav=document.getElementById('mainNav'),btn=document.getElementById('menuBtn');
   btn.addEventListener('click',()=>{const o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(o))});
   const close=()=>{nav.classList.remove('open');btn.setAttribute('aria-expanded','false')};
   nav.addEventListener('click',e=>{if(e.target.closest('a'))close()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav.classList.contains('open')){close();btn.focus()}});
   document.addEventListener('click',e=>{if(nav.classList.contains('open')&&!e.target.closest('header.site'))close()});
+
+  // Day and night
+  const models=[];
+  document.getElementById('themeBtn').addEventListener('click',()=>{
+    const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme=dark?'light':'dark';
+    try{localStorage.setItem('cm-theme',root.dataset.theme)}catch(e){}
+    models.forEach(m=>m.colors());
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>models.forEach(m=>m.colors()));
 
   // Mark the nav item for the section in view.
   const links=[...nav.querySelectorAll('a')];
@@ -284,48 +317,61 @@
   }),{rootMargin:'-45% 0px -54% 0px'});
   links.forEach(a=>{const s=document.querySelector(a.getAttribute('href'));if(s)navIO.observe(s)});
 
-  // The building rises: an elevation drawn floor by floor as the developer story scrolls.
-  const svg=document.getElementById('tower');if(!svg)return;
-  const NS='http://www.w3.org/2000/svg',FLOORS=22,G=520,H=19;
-  const el=(t,a,parent=svg)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);parent.appendChild(n);return n};
-  // dimension line and ground
-  el('path',{d:`M14 ${G}V${G-FLOORS*H} M10 ${G}h8 M10 ${G-FLOORS*H}h8`,class:'dim',fill:'none'});
-  el('path',{d:`M0 ${G}H220`,class:'ground'});
-  const hatch=el('g',{class:'hatch'});
-  for(let x=6;x<220;x+=12)el('line',{x1:x,y1:G+4,x2:x-4,y2:G+10},hatch);
-  // crane
-  const crane=el('g',{class:'crane',fill:'none',stroke:'var(--accent)','stroke-width':'.8'});
-  el('path',{d:`M184 ${G}V44 M178 ${G}V44 M178 44h6 M60 52H214 M184 44 L120 52 M184 44 L210 52 M96 52v40`},crane);
-  for(let y=G-12;y>52;y-=16)el('path',{d:`M178 ${y}l6 -8`},crane);
-  el('rect',{x:90,y:92,width:12,height:8},crane);
-  // floors
-  const floors=[],mulls=[];
-  for(let i=0;i<FLOORS;i++){
-    const pod=i<3,x=pod?34:58,w=pod?152:104,y=G-(i+1)*H;
-    const r=el('rect',{x,y,width:w,height:H,class:'fl'});
-    r.style.transitionDelay=(i*28)+'ms';floors.push(r);
-    const g=el('g',{class:'mull'});g.style.transitionDelay=(i*28)+'ms';
-    for(let mx=x+w/(pod?8:5);mx<x+w-1;mx+=w/(pod?8:5))el('line',{x1:mx,y1:y+3,x2:mx,y2:y+H-3},g);
-    mulls.push(g);
+  // Header floats over the ink hero, then settles onto the page.
+  const hero=document.getElementById('top');
+  new IntersectionObserver(([e])=>header.classList.toggle('over',e.isIntersecting),{rootMargin:'-64px 0px 0px 0px'}).observe(hero);
+
+  // Models
+  const Model=window.CentamontModel;
+  let heroM=null,towerM=null;
+  if(Model){
+    const narrow=innerWidth<820;
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:narrow?58:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2});
+    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.24,dist:narrow?46:42,ty:12,scale:1.2});
+    models.push(heroM,towerM);
+    addEventListener('pointermove',e=>{if(e.pointerType==='mouse')heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
   }
-  const top=G-FLOORS*H;
-  const crown=el('path',{d:`M66 ${top}V${top-18}H154V${top} M84 ${top-18}V${top-30}H136V${top-18}`,class:'crown'});
+
+  // Intro: a hundred blows, then the curtain lifts and the hero tower rises.
+  const intro=document.querySelector('.intro');
+  const startHero=()=>{if(heroM)heroM.set(22,4,false)};
+  if(root.classList.contains('intro-on')){
+    try{sessionStorage.setItem('cm-intro','1')}catch(e){}
+    const n=document.getElementById('introN'),bar=document.getElementById('introBar'),t0=performance.now(),D=1100;
+    const tick=t=>{const p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3);n.textContent=String(Math.max(1,Math.round(e*100))).padStart(3,'0');bar.style.transform='scaleX('+e+')';
+      if(p<1)requestAnimationFrame(tick);else{intro.classList.add('lift');setTimeout(startHero,250);setTimeout(()=>root.classList.remove('intro-on'),1100)}};
+    requestAnimationFrame(tick);
+  } else startHero();
+
+  // Hero camera eases down as the page scrolls away.
+  if(heroM&&!reduce)addEventListener('scroll',()=>{const p=Math.min(1,scrollY/innerHeight);heroM.phi=0.16+p*0.22;heroM.kick()},{passive:true});
+
+  // The building rises with the developer story.
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
+  const views=[[-0.7,0.24],[-0.9,0.3],[-0.55,0.18],[-0.3,0.14],[-0.1,0.2],[0.25,0.26]];
   let cur=-1;
   function stage(n){
     if(n===cur)return;cur=n;
-    const s=steps[n],b=+s.dataset.built,sold=+s.dataset.sold;
-    floors.forEach((f,i)=>{f.classList.toggle('built',i<b);f.classList.toggle('sold',i<sold)});
-    mulls.forEach((m,i)=>m.classList.toggle('built',i<b));
-    crown.classList.toggle('built',b>=FLOORS);
-    crane.classList.toggle('up',b>0&&n<steps.length-1);
+    const s=steps[n];
+    if(towerM){towerM.set(+s.dataset.built,+s.dataset.sold,+s.dataset.built>0&&n<steps.length-1);
+      if(!reduce){const [th,ph]=views[n];const from=[towerM.theta,towerM.phi],t0=performance.now();
+        const go=t=>{const p=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-p,4);towerM.theta=from[0]+(th-from[0])*e;towerM.phi=from[1]+(ph-from[1])*e;towerM.kick();if(p<1)requestAnimationFrame(go)};requestAnimationFrame(go)}}
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));
     name.textContent=s.dataset.name;
   }
   stage(0);
   const stepIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)stage(steps.indexOf(e.target))}),{rootMargin:'-48% 0px -48% 0px'});
   steps.forEach(s=>stepIO.observe(s));
-})();
+
+  // The private client door opens as it arrives.
+  const door=document.getElementById('clients');
+  if(!reduce){const op=()=>{const r=door.getBoundingClientRect(),p=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)));door.style.setProperty('--o',p.toFixed(3))};addEventListener('scroll',op,{passive:true});op()}
+
+  // Markets chart draws its routes; the name is cut line by line.
+  document.querySelectorAll('#chart .arc').forEach(p=>p.style.setProperty('--len',Math.ceil(p.getTotalLength())));
+  const inIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');inIO.unobserve(e.target)}}),{threshold:.3});
+  ['chart','cut'].forEach(id=>inIO.observe(document.getElementById(id)));
+});
 </script>
 </body>
 </html>
