@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   document.body.classList.remove('no-js');
   const root = document.documentElement;
+  root.classList.add('js');
 
   // Menu
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
