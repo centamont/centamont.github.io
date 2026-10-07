@@ -1,0 +1,22 @@
+{
+  "name": "centamont.github.io",
+  "version": "1.0.0",
+  "description": "The Centamont.com website. A single static page (`index.html`) served by GitHub Pages.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/centamont/centamont.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/centamont/centamont.github.io/issues"
+  },
+  "homepage": "https://github.com/centamont/centamont.github.io#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4"
+  }
+}

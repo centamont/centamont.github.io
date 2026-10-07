@@ -1,0 +1,9 @@
+# GitHub Pages (Jekyll) settings: publish only the site, not the tooling.
+exclude:
+  - CLAUDE.md
+  - README.md
+  - package.json
+  - package-lock.json
+  - playwright.config.js
+  - tests
+  - node_modules
