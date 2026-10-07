@@ -31,6 +31,10 @@ test('home renders cleanly', async ({ page }, info) => {
   // No leftover placeholders reach the public site.
   await expect(page.locator('body')).not.toContainText(/\[[A-Z][^\]]*\]/);
 
+  // No hidden characters (zero-width, bidi, tag or private-use) in the copy.
+  const hidden = await page.evaluate(() => (document.body.innerText.match(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\uE000-\uF8FF]|\uDB40[\uDC00-\uDC7F]/g) || []).length);
+  expect(hidden).toBe(0);
+
   // The drawing says it is an illustration.
   await expect(page.locator('.elev figcaption')).toContainText('Illustration, not a real project');
 
