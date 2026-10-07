@@ -601,3 +601,22 @@ body.no-js .curve,body.no-js .letter{display:none}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
 .cv-key li[hidden]{display:none}
 .cv-key .k-build{border-top:1px dotted var(--fg);opacity:.6}
+
+/* ---- Atelier: page-to-page transitions and type that arrives */
+@view-transition{navigation:auto}
+header.site{view-transition-name:site-header}
+::view-transition-old(root){animation:vt-out .45s cubic-bezier(.7,0,.84,0) both}
+::view-transition-new(root){animation:vt-in .9s var(--ease) .1s both}
+@keyframes vt-out{to{opacity:0;transform:translateY(-12px)}}
+@keyframes vt-in{from{opacity:0;transform:translateY(18px)}}
+/* Headlines rise word by word from behind a mask; paragraphs follow */
+.js .tx-rise .w{display:inline-block;overflow:clip;overflow-clip-margin:.04em;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em}
+.js .tx-rise .w > i{display:inline-block;font-style:inherit;transform:translateY(105%);transition:transform 1.15s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i,0) * 95ms)}
+.js .tx-rise.in .w > i{transform:none}
+.js .lift{opacity:0;transform:translateY(16px);transition:opacity 1s var(--ease),transform 1.2s var(--ease);transition-delay:var(--d,.18s)}
+.js .lift.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root){animation:none}
+  .js .tx-rise .w > i{transform:none;transition:none}
+  .js .lift{opacity:1;transform:none;transition:none}
+}
