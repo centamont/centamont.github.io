@@ -20,11 +20,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#14161A">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"Centamont","url":"https://centamont.com/","logo":"https://centamont.com/favicon.svg","description":"New development advisory, sales and marketing, and private brokerage.","areaServed":"Miami, Florida","address":{"@type":"PostalAddress","addressLocality":"Miami","addressRegion":"FL","addressCountry":"US"},"sameAs":["https://www.instagram.com/centamont","https://www.linkedin.com/company/centamont","https://x.com/centamont","https://www.youtube.com/@centamont"]}
+{"@context":"https://schema.org","@type":"Organization","name":"Centamont","url":"https://centamont.com/","logo":"https://centamont.com/apple-touch-icon.png","description":"New development advisory, sales and marketing, and private brokerage.","areaServed":"Miami, Florida","address":{"@type":"PostalAddress","addressLocality":"Miami","addressRegion":"FL","addressCountry":"US"},"sameAs":["https://www.instagram.com/centamont","https://www.linkedin.com/company/centamont","https://x.com/centamont","https://www.youtube.com/@centamont"]}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');
@@ -34,9 +33,9 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
 <script src="model.js" defer></script>
 </head>
 <body class="no-js home">
-<div class="intro" aria-hidden="true"><div class="in"><span class="n" id="introN">001</span><span class="bar"><i id="introBar"></i></span><span class="w">Centamont</span></div></div>
+<div class="curtain" aria-hidden="true"><div class="in"><span class="n" id="introN">001</span><span class="bar"><i id="introBar"></i></span><span class="w">Centamont</span></div></div>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site over">
+<header class="site over top">
   <div class="wrap bar">
     <a class="mark" href="#top" aria-label="Centamont, back to top">
       <svg viewBox="0 0 28 28" aria-hidden="true"><rect x=".5" y=".5" width="27" height="27" fill="none" stroke="#B8976A"/><path d="M19 9.2a7 7 0 1 0 0 9.6" fill="none" stroke="#B8976A" stroke-width="1.2"/></svg>
@@ -179,18 +178,18 @@ if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: re
           <line x1="137" y1="0" x2="137" y2="330"/><line x1="262" y1="0" x2="262" y2="330"/><line x1="387" y1="0" x2="387" y2="330"/><line x1="512" y1="0" x2="512" y2="330"/><line x1="637" y1="0" x2="637" y2="330"/>
         </g>
         <text class="gl" x="8" y="68">40° N</text><text class="gl" x="8" y="193">30° N</text><text class="gl" x="141" y="322">115° W</text><text class="gl" x="391" y="322">95° W</text><text class="gl" x="641" y="322">75° W</text>
-        <path class="arc" d="M548 288 Q630 200 625 101"/>
-        <path class="arc" d="M548 288 Q460 210 340 200"/>
-        <path class="arc" d="M548 288 Q300 60 72 184"/>
-        <path class="arc later" d="M548 288 Q650 300 716 250"/>
-        <circle class="ring" cx="548" cy="288" r="5"/>
-        <circle class="pt now" cx="548" cy="288" r="5"/>
-        <circle class="pt" cx="549" cy="276" r="3.5"/><circle class="pt" cx="625" cy="101" r="4"/><circle class="pt" cx="645" cy="99" r="3.5"/><circle class="pt" cx="340" cy="200" r="4"/><circle class="pt" cx="72" cy="184" r="4"/>
-        <text class="lb now" x="530" y="312" text-anchor="end">Miami</text>
-        <text class="lb" x="538" y="268" text-anchor="end">Broward &amp; Palm Beach</text>
-        <text class="lb" x="618" y="84" text-anchor="end">New York</text><text class="lb" x="652" y="118">Hamptons</text>
-        <text class="lb" x="340" y="224" text-anchor="middle">Dallas</text><text class="lb" x="72" y="208" text-anchor="middle">Los Angeles</text>
-        <text class="lb" x="712" y="238" text-anchor="end">International</text>
+        <path class="arc" d="M572 250 Q665 170 649 63"/>
+        <path class="arc" d="M572 250 Q480 190 364 162"/>
+        <path class="arc" d="M572 250 Q330 30 97 146"/>
+        <path class="arc later" d="M572 250 Q660 285 716 238"/>
+        <circle class="ring" cx="572" cy="250" r="5"/>
+        <circle class="pt now" cx="572" cy="250" r="5"/>
+        <circle class="pt" cx="574" cy="240" r="3.5"/><circle class="pt" cx="649" cy="63" r="4"/><circle class="pt" cx="672" cy="60" r="3.5"/><circle class="pt" cx="364" cy="162" r="4"/><circle class="pt" cx="97" cy="146" r="4"/>
+        <text class="lb now" x="560" y="274" text-anchor="end">Miami</text>
+        <text class="lb" x="562" y="234" text-anchor="end">Broward &amp; Palm Beach</text>
+        <text class="lb" x="638" y="58" text-anchor="end">New York</text><text class="lb" x="712" y="88" text-anchor="end">Hamptons</text>
+        <text class="lb" x="364" y="188" text-anchor="middle">Dallas</text><text class="lb" x="97" y="172" text-anchor="middle">Los Angeles</text>
+        <text class="lb" x="712" y="300" text-anchor="end">International</text>
       </svg>
       <div class="levels">
       <div class="lv now"><span class="when">Now</span><h3>Miami</h3><p>Brickell, Edgewater, Miami Beach, Sunny Isles and the waterfront corridor.</p></div>
@@ -320,20 +319,21 @@ document.addEventListener('DOMContentLoaded',function(){
   // Header floats over the ink hero, then settles onto the page.
   const hero=document.getElementById('top');
   new IntersectionObserver(([e])=>header.classList.toggle('over',e.isIntersecting),{rootMargin:'-64px 0px 0px 0px'}).observe(hero);
+  const atTop=()=>header.classList.toggle('top',scrollY<8);addEventListener('scroll',atTop,{passive:true});atTop();
 
   // Models
   const Model=window.CentamontModel;
   let heroM=null,towerM=null;
   if(Model){
     const narrow=innerWidth<820;
-    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:narrow?58:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2});
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?.95:1,offsetX:narrow?0.08:0.2});
     towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:0.24,dist:narrow?46:42,ty:12,scale:1.2});
     models.push(heroM,towerM);
     addEventListener('pointermove',e=>{if(e.pointerType==='mouse')heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
   }
 
   // Intro: a hundred blows, then the curtain lifts and the hero tower rises.
-  const intro=document.querySelector('.intro');
+  const intro=document.querySelector('.curtain');
   const startHero=()=>{if(heroM)heroM.set(22,4,false)};
   if(root.classList.contains('intro-on')){
     try{sessionStorage.setItem('cm-intro','1')}catch(e){}

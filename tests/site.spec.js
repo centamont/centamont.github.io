@@ -30,6 +30,9 @@ test('home renders cleanly', async ({ page }, info) => {
     await expect(page.locator(`#${id} h2`).first()).toContainText(heading);
   }
 
+  // Every section introduction is on screen, not hidden by a stray style.
+  for (const p of await page.locator('.head p.intro').all()) await expect(p).toBeVisible();
+
   // No sideways scrolling at any width.
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
@@ -144,4 +147,29 @@ test('day and night toggle remembers the choice', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('every internal link lands on a real page and section', async ({ page, request }) => {
+  const pages = ['/', '/journal/buying-pre-construction-florida.html', '/privacy.html', '/404.html'];
+  for (const path of pages) {
+    await page.goto(path);
+    const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.href).filter((h) => h.startsWith(location.origin)));
+    for (const href of new Set(hrefs)) {
+      const url = new URL(href);
+      expect((await request.get(url.pathname)).status(), `${path} -> ${href}`).toBe(200);
+      if (url.hash.length > 1) {
+        const ids = await (await request.get(url.pathname)).text();
+        expect(ids, `${path} -> ${href}`).toContain(`id="${url.hash.slice(1)}"`);
+      }
+    }
+  }
+});
+
+test('fonts are served from the site', async ({ page }) => {
+  const outside = [];
+  page.on('request', (r) => { if (!r.url().startsWith('http://127.0.0.1')) outside.push(r.url()); });
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.evaluate(() => document.fonts.check('300 40px "Cormorant Garamond"'))).toBe(true);
+  expect(outside).toEqual([]);
 });
