@@ -89,3 +89,37 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
   });
   await expect.poll(sold).toBe(22);
 });
+
+for (const [path, heading] of [
+  ['/journal/buying-pre-construction-florida.html', 'Buying pre-construction in Florida'],
+  ['/privacy.html', 'Privacy'],
+  ['/404.html', 'This page was never built'],
+]) {
+  test(`${path} renders cleanly`, async ({ page }, info) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+    await page.goto(path);
+    await expect(page.locator('h1')).toContainText(heading);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    expect(errors).toEqual([]);
+    await page.screenshot({ path: info.outputPath('page.png'), fullPage: true });
+  });
+}
+
+test('journal links to the guide', async ({ page }) => {
+  await page.goto('/#journal');
+  await page.getByRole('link', { name: 'Read the guide' }).click();
+  await expect(page.locator('h1')).toContainText('Buying pre-construction in Florida');
+});
+
+test('Escape closes the phone menu', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(page.locator('nav.main')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('nav.main')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Menu' })).toBeFocused();
+});
