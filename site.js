@@ -8,7 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
   if (nav && btn) {
     const label = btn.querySelector('span') || btn, word = label.textContent;
-    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; };
+    // While the menu is open the page behind it is inert, and Tab cycles between the links and Close.
+    const behind = () => document.querySelectorAll('main, footer, .skip');
+    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; behind().forEach((el) => { el.inert = o; }); };
+    nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
+    btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
     btn.addEventListener('click', () => show(!nav.classList.contains('open')));
     nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });

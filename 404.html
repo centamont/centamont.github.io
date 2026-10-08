@@ -62,7 +62,7 @@
 <script>
 document.addEventListener('DOMContentLoaded',function(){
   if(!window.CentamontModel)return;
-  const m=new CentamontModel(document.getElementById('lot'),{orbit:0.0012,theta:-0.6,phi:0.2,dist:44,ty:12,scale:1.15,crane:false,labels:false,envelope:false,palms:false});
+  const m=new CentamontModel(document.getElementById('lot'),{orbit:0.0012,theta:-0.6,phi:-0.32,dist:34,ty:1,scale:1.15,crane:false,labels:false,envelope:false,palms:false});
   m.set(0,0,false,true);
   document.addEventListener('cm-theme',()=>m.colors());
 });
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <li><a href="https://x.com/centamont" target="_blank" rel="noopener">X (Twitter)</a></li>
       </ul></div>
     </div>
-    <div class="legal"><span>© 2026 Centamont. Miami, Florida.</span><span><a href="/privacy.html">Privacy &amp; accessibility</a> · Equal Housing Opportunity · <a href="#top" class="totop">Back to top</a></span></div>
+    <div class="legal"><span>© 2026 Centamont. Miami, Florida.</span><span><a href="/privacy.html">Privacy &amp; accessibility</a> · Equal Housing Opportunity<span class="nw"> · <a href="#top" class="totop">Back to top</a></span></span></div>
   </div>
 </footer>
 </body>

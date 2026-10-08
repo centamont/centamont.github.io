@@ -100,7 +100,7 @@
     constructor(canvas, opts) {
       this.c = canvas;
       this.ctx = canvas.getContext('2d');
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 11, envelope: true }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 12, envelope: true }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; this.C = 0; // animated: structure, sold, glass
@@ -477,7 +477,7 @@
       for (let i = 1; i < FLOORS; i++) if (i % 5) { const p = this.P(ax, i, az), q = this.P(ax + (tx - ax) * 0.5, i, az + (tz - az) * 0.5); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
-        g.fillStyle = bronze(0.95); g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+        g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
         for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
         const r = this.P(lx, FLOORS, lz), d20 = this.P(lx, 20, lz);
         if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', Math.max(r[0], g.measureText('ROOF').width + 4), r[1]);

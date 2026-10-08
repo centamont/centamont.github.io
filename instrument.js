@@ -88,6 +88,18 @@ document.addEventListener('DOMContentLoaded', function () {
       const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T);
       if (hit > -1) { const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.setAttribute('x', right ? x(hit) - 10 : x(hit) + 10); dotT.setAttribute('text-anchor', right ? 'end' : 'start'); dotT.setAttribute('y', y(T) + 22); dotT.textContent = 'Month ' + hit; }
       else { dot.style.display = 'none'; dotT.textContent = ''; }
+      // The threshold label takes the first spot, right or left, above or below the line, that no curve or note runs through.
+      const pts = s.map((f, i) => [x(i), y(f)]).concat(p ? base.map((f, i) => [x(i), y(f)]) : []);
+      const dotB = dotT.textContent ? dotT.getBBox() : null;
+      // Failing a clear spot, the label may cross a curve (its halo keeps it legible) but never the month note.
+      const spots = [[X1, 'end', -8], [X0 + 6, 'start', -8], [X1, 'end', 18], [X0 + 6, 'start', 18]].map(([lx, anchor, dy]) => {
+        limT.setAttribute('x', lx); limT.setAttribute('text-anchor', anchor); limT.setAttribute('y', y(T) + dy);
+        const b = limT.getBBox(), curve = pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
+        const note = !!dotB && !(dotB.x > b.x + b.width || dotB.x + dotB.width < b.x || dotB.y > b.y + b.height || dotB.y + dotB.height < b.y);
+        return { lx, anchor, dy, curve, note };
+      });
+      const pick = spots.find((o) => !o.curve && !o.note) || spots.find((o) => !o.note) || spots[0];
+      limT.setAttribute('x', pick.lx); limT.setAttribute('text-anchor', pick.anchor); limT.setAttribute('y', y(T) + pick.dy);
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
       let say;
