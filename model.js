@@ -252,7 +252,7 @@
       g.stroke();
       // the label sits clear of the drawing, with a halo of the ground colour
       const ly = L.y > this.h * 0.6 ? L.y - L.r - 26 : L.y + L.r + 16;
-      g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
+      g.font = '500 13px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
       g.lineWidth = 4; g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineJoin = 'round'; g.strokeText('STRUCTURE  ×1.7', L.x, ly); g.lineJoin = 'miter';
       g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.fillText('STRUCTURE  ×1.7', L.x, ly);
     }
@@ -477,7 +477,7 @@
               const spec = Math.pow(Math.max(0, (nx * hx + nz * hz) / hn), 36) * (1 - night), day = 1 - 0.85 * night;
               if (j / nn < soldF) return mixS(dark ? 0.46 + 0.3 * diff * day : 0.62 + 0.3 * diff, 0.18 * spec + 0.06 * fres);
               // a few rooms lit from inside, warm, and more of them after dark
-              if (dark && hash(k, j) < 0.05 + 0.07 * night) return night > 0.3 ? mixS(0.42 + 0.16 * hash(j, k, 3), 0.06) : mix(0.26 + 0.16 * hash(j, k, 3));
+              if (dark && hash(k, j) < 0.05 + 0.15 * night) return night > 0.3 ? mixS(0.42 + 0.16 * hash(j, k, 3), 0.06) : mix(0.26 + 0.16 * hash(j, k, 3));
               return dark ? mix(0.06 + (0.1 * diff + 0.22 * spec) * day + 0.09 * fres + 0.07 * hgt) : mix(0.66 - 0.2 * diff - 0.08 * fres - 0.1 * hgt - 0.25 * spec);
             };
             const bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));

@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const sig = document.querySelector('footer .sig');
   if (sig && !stillPage && 'IntersectionObserver' in window) {
     sig.classList.add('eng');
-    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { threshold: 0.5 }).observe(sig);
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -30% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
   }
 
   // Headlines rise word by word, and the paragraph after them lifts in. Words keep their spaces, so text reads and copies normally.
