@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Centamont Journal</title>
+  <subtitle>Notes on new development from Centamont: short guides for buyers and developers, written by the partners.</subtitle>
+  <link href="https://centamont.com/journal/feed.xml" rel="self"/>
+  <link href="https://centamont.com/journal/"/>
+  <id>https://centamont.com/journal/</id>
+  <updated>2026-10-08T00:00:00Z</updated>
+  <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
+  <entry>
+    <title>Buying pre-construction in Florida</title>
+    <link href="https://centamont.com/journal/buying-pre-construction-florida.html"/>
+    <id>https://centamont.com/journal/buying-pre-construction-florida.html</id>
+    <published>2026-10-07T00:00:00Z</published>
+    <updated>2026-10-08T00:00:00Z</updated>
+    <summary>How deposits are protected, the 15-day window to cancel, and the questions to ask a developer before you reserve.</summary>
+  </entry>
+</feed>

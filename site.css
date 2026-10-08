@@ -925,3 +925,25 @@ p,li{text-wrap:pretty}
 @media (max-width:600px){.legal > span:last-child{display:flex;flex-direction:column;align-items:flex-start}.legal .sep{display:none}}
 @media (max-width:600px){.people .table{overflow:hidden}.people .table svg{width:150%;margin-left:-25%}}
 @media (max-width:820px){#markets{padding-bottom:48px}}
+/* Older browsers without :has still show which voice the letter is written in */
+.letter .as input:checked + span{color:var(--fg);border-bottom:1px solid var(--sold)}
+.letter .as input:focus-visible + span{outline:1px solid var(--accent);outline-offset:4px}
+/* Without JavaScript: no dead buttons, and the menu is simply a list of links */
+html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
+@media (max-width:1040px){html:not(.js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}html:not(.js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;gap:2px 18px;padding:0;background:none;overflow:visible}html:not(.js) nav.main a{opacity:1;transform:none;font-family:var(--body);font-size:13px;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}}
+/* Print: ink on paper, no chrome */
+@media print{
+  body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.scrollcue,.letter,.cv-ctl,canvas,.seam{display:none!important}
+  html,body{background:#fff!important;color:#14161A!important}
+  .hero,.band,#services{background:#fff!important;color:#14161A!important;box-shadow:none!important;min-height:0!important;--line:#14161A}
+  .hero h1,.hero .lede,.band h2,.band p,.band .big,.name .cut{color:#14161A!important}
+  .hero>*{translate:none!important;scale:none!important;opacity:1!important}
+  section.band{animation:none!important;clip-path:none!important}
+  .hero .wrap{padding-top:0!important}
+  .chart,.instrument,.deposit,.table,.facade,.ruler{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  h2,h3{break-after:avoid}
+  figure,li,.step{break-inside:avoid}
+  .step{min-height:0!important}
+  .rise .elev{display:none!important}
+  a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
+}
