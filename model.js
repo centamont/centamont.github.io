@@ -3,7 +3,7 @@
 // leading and the glass following behind; sold floors glow bronze.
 (function () {
   const FLOORS = 22, SLAB = 0.16, PODIUM = 3, CROWN = 20;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
   const TAU = Math.PI * 2;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 

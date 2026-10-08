@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !e.target.closest('header.site')) close(); });
   }
 
+  // Motion on or off, remembered per visitor, on top of the system's reduced-motion setting.
+  // The page reloads so every drawing starts again in the chosen mode.
+  const stillPage = matchMedia('(prefers-reduced-motion: reduce)').matches || root.dataset.motion === 'off';
+  const motionBtn = document.getElementById('motionBtn');
+  if (motionBtn) {
+    const off = root.dataset.motion === 'off';
+    motionBtn.setAttribute('aria-pressed', String(off)); motionBtn.setAttribute('aria-label', off ? 'Play motion' : 'Pause motion');
+    motionBtn.addEventListener('click', () => { try { if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off'); } catch (e) {} location.reload(); });
+  }
+
   // Day and night, remembered per visitor. Pages listen for 'cm-theme' to recolor drawings.
   const themeBtn = document.getElementById('themeBtn');
   const changed = () => document.dispatchEvent(new CustomEvent('cm-theme'));
@@ -41,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Headlines rise word by word, and the paragraph after them lifts in. Words keep their spaces, so text reads and copies normally.
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (!stillPage) {
     const split = (el) => {
       let i = 0;
       const walk = (node) => {
@@ -71,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Weighted scrolling for mouse wheels: the page eases to rest instead of stepping. Touch, keys, anchors and the scrollbar stay native.
-  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (matchMedia('(pointer: fine)').matches && !stillPage) {
     let target = scrollY, cur = scrollY, raf = 0;
     const max = () => document.documentElement.scrollHeight - innerHeight;
     const tick = () => {

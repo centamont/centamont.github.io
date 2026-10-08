@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const key = document.querySelector('.cv-key .k-par');
 
     // a small elevation of the tower: four podium floors, then eighteen tapering ones
-    const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
     let lastN = 0;
     if (tw) for (let k = 0; k < 22; k++) {
       const wdt = k < 4 ? 36 : 20 - (k - 4) * 0.22, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
