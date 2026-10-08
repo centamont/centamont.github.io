@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const pick = spots.find((o) => !o.curve && !o.note) || spots.find((o) => !o.note) || spots[0];
       limT.setAttribute('x', pick.lx); limT.setAttribute('text-anchor', pick.anchor); limT.setAttribute('y', y(T) + pick.dy);
+      // On a phone the label is half the plot wide and would cross a curve; the legend names the line instead.
+      if (W < 520) limT.textContent = '';
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
       let say;

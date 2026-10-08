@@ -227,19 +227,21 @@
 
       // Ground: survey grid, site line, and the tower's shadow
       if (this.o.grid) {
+        // seen from above, as a plan, the ground drawing carries the picture, so it is drawn darker
+        const bo = 1 + clamp(-(this.phi + (this.tyy || 0)) * 1.6, 0, 1);
         g.lineWidth = 1;
         for (let i = 0; i <= 30; i += 3) {
-          g.strokeStyle = ink(0.07 * (1 - i / 34)); g.beginPath();
+          g.strokeStyle = ink(0.07 * bo * (1 - i / 34)); g.beginPath();
           for (const v of i ? [i, -i] : [0]) { seg(this.P(v, 0, -30), this.P(v, 0, 30)); seg(this.P(-30, 0, v), this.P(30, 0, v)); }
           g.stroke();
         }
         if (this.o.site !== false) {
           // the street in front of the entrance, with kerbs and a centre line
-          g.strokeStyle = ink(dark ? 0.24 : 0.2); g.lineWidth = 0.8; g.beginPath();
+          g.strokeStyle = ink((dark ? 0.24 : 0.2) * bo); g.lineWidth = 0.8; g.beginPath();
           for (const z of [-10.2, -14.2]) seg(this.P(-28, 0, z), this.P(28, 0, z));
           g.stroke(); g.setLineDash([6, 7]); g.strokeStyle = ink(dark ? 0.16 : 0.13); g.beginPath(); seg(this.P(-28, 0, -12.2), this.P(28, 0, -12.2)); g.stroke(); g.setLineDash([]);
           // trees drawn the way a site plan draws them: a canopy circle and its trunk
-          g.strokeStyle = ink(dark ? 0.3 : 0.26); g.lineWidth = 0.7; g.beginPath();
+          g.strokeStyle = ink((dark ? 0.3 : 0.26) * bo); g.lineWidth = 0.7; g.beginPath();
           for (const [x, z, hh] of PALMS) {
             const r = 0.55 + hh * 0.18;
             for (let i = 0; i <= 24; i++) { const a = TAU * i / 24, q = this.P(x + Math.cos(a) * r, 0, z + Math.sin(a) * r); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
@@ -256,7 +258,7 @@
           if (this.o.labels && w > 280) { const t = this.P(nc[0], 0, nc[1] + 1.9); g.fillStyle = bronze(0.9); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', t[0], t[1]); }
           }
         }
-        g.setLineDash([4, 5]); g.strokeStyle = bronze(0.55);
+        g.setLineDash([4, 5]); g.strokeStyle = bronze(Math.min(0.9, 0.55 * bo));
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
         if (L > 0.01) {
           // the drop-off drive under the canopy, and the walk to the street

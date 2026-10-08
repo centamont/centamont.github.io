@@ -601,6 +601,8 @@ body.no-js .curve,body.no-js .letter{display:none}
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
 .cv-key li[hidden]{display:none}
+.cv-key .k-lim{border-top:1px dashed var(--fg)}.cv-key .k-lim-li{display:none}
+@media (max-width:520px){.cv-key .k-lim-li{display:flex}}
 .cv-key .k-build{border-top:1px dotted var(--fg);opacity:.6}
 
 /* ---- Atelier: page-to-page transitions and type that arrives */
