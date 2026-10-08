@@ -532,7 +532,7 @@
       if (craneOn && !craneBehind) this.drawCrane();
       palmsFront.forEach((p) => this.drawPalm(p));
       figs.forEach((f) => this.drawFigure(f));
-      if (this.o.reflect && !inLens && L > 0.5) this.reflect(now);
+      if (this.o.reflect && !inLens && L > 0.5 && w >= 820) this.reflect(now);
 
       // Dimension line with level ticks
       if (!this.o.envelope && L < 0.01) return;
@@ -564,11 +564,15 @@
       x0 = Math.max(0, Math.floor(x0 - 12)); x1 = Math.min(this.w, Math.ceil(x1 + 12));
       const H = Math.min(yb - yt, this.h - yb - 4), step = this.w < 600 ? 3 : 2;
       if (H < 20 || x1 <= x0) return;
+      // copy the tower once into a scratch canvas, then lay it back down in strips
+      const rc = this.rc || (this.rc = document.createElement('canvas')), rw = Math.ceil((x1 - x0) * d), rh = Math.ceil(H * d);
+      if (rc.width !== rw || rc.height !== rh) { rc.width = rw; rc.height = rh; }
+      const rg = rc.getContext('2d'); rg.clearRect(0, 0, rw, rh); rg.drawImage(this.c, x0 * d, (yb - H) * d, rw, rh, 0, 0, rw, rh);
       g.save();
       for (let r = 0; r < H; r += step) {
         const t = r / H, off = reduce ? 0 : Math.sin(r * 0.19 + now / 650) * (0.6 + t * 5) + Math.sin(r * 0.053 - now / 1300) * t * 3;
         g.globalAlpha = 0.38 * Math.pow(1 - t, 1.5);
-        g.drawImage(this.c, x0 * d, (yb - r - step) * d, (x1 - x0) * d, step * d, x0 + off, yb + r, x1 - x0, step);
+        g.drawImage(rc, 0, (H - r - step) * d, rw, step * d, x0 + off, yb + r, x1 - x0, step);
       }
       g.globalAlpha = 1;
       const [lr, lg, lb] = this.line;
