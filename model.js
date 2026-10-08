@@ -120,6 +120,7 @@
       this.L = 0; this.S = 0; this.C = 0; // animated: structure, sold, glass
       this.B = 0; this.Sold = 0; // targets
       this.crane = 0; this.craneT = 0;
+      this.ex = 0; this.exT = 0; this.dy = 0; // exploded view: 0 assembled, 1 storeys apart
       this.mx = 0; this.my = 0;
       this.visible = true;
       this.sunNow = miamiSun();
@@ -195,11 +196,14 @@
       // the crown rises once the building has topped off
       const crownT = this.L >= FLOORS - 0.001 ? 1 : 0;
       this.G = ease(this.G || 0, crownT, 380);
+      // the storeys part and close at a steady pace; the drawing eases it in and out
+      if (reduce) this.ex = 0;
+      else if (this.ex !== this.exT) this.ex = this.exT > this.ex ? Math.min(this.exT, this.ex + dt / 900) : Math.max(this.exT, this.ex - dt / 900);
       if (!reduce && this.o.orbit) this.theta += this.o.orbit * dt / 16.7;
       this.tx = ease(this.tx || 0, this.mx * 0.12, 330);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 330);
       // A slow idle orbit only needs a third of the frames; anything else draws every frame.
-      const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && this.G === crownT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
+      const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && this.G === crownT && this.ex === this.exT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
       this.tick = ((this.tick || 0) + 1) % 3;
       if (!(settled && this.o.orbit && this.tick) || this.dirty) this.draw();
       this.dirty = false;
@@ -211,17 +215,22 @@
       const th = this.theta + (this.tx || 0), ph = this.phi + (this.tyy || 0);
       // A shift lens, as architectural photographers use: the camera stays level so verticals stay
       // vertical, and the frame slides to put the target where a tilted camera would have put it.
-      const d = this.o.dist, ey = Math.max(0.8, this.o.ty - d * Math.sin(ph)), f = Math.min(this.w * 1.15, this.h) * this.o.scale;
-      this.k = { c: Math.cos(th), s: Math.sin(th), f, ey, cx: this.w / 2 + this.o.offsetX * this.w, cy: this.h / 2 + (f * (this.o.ty - ey)) / d };
+      // an exploded tower is nearly twice as tall: the camera lifts and steps back to keep it framed
+      const xe = this.exE(), ty = this.o.ty + xe * FLOORS * 0.45;
+      const d = this.o.dist, ey = Math.max(0.8, ty - d * Math.sin(ph)), f = Math.min(this.w * 1.15, this.h) * this.o.scale / (1 + 0.8 * xe);
+      this.k = { c: Math.cos(th), s: Math.sin(th), f, ey, cx: this.w / 2 + this.o.offsetX * this.w, cy: this.h / 2 + (f * (ty - ey)) / d };
       // camera position in world space, for shading and draw order
       const k = this.k;
       this.eye = [-d * k.s, ey, -d * k.c];
     }
 
-    // world -> screen
+    // Exploded view, eased: a storey (slab k and floor k) lifts by k * 0.9 * exE().
+    exE() { const e = this.ex || 0; return e * e * (3 - 2 * e); }
+
+    // world -> screen; dy is the lift of the storey being drawn
     P(x, y, z) {
       const k = this.k;
-      const X = k.c * x - k.s * z, Z = k.s * x + k.c * z + this.o.dist, Y = y - k.ey;
+      const X = k.c * x - k.s * z, Z = k.s * x + k.c * z + this.o.dist, Y = y + this.dy - k.ey;
       return [k.cx + (k.f * X) / Z, k.cy - (k.f * Y) / Z, Z];
     }
 
@@ -265,6 +274,7 @@
       const eye = this.eye, L = this.L, C = this.C, S = this.S;
       const sun = this.o.sun || this.sunNow.v, sunH = Math.hypot(sun[0], sun[2]), night = dark ? (this.o.sun ? 0.5 : this.sunNow.night) : 0;
       const now = performance.now();
+      const xe = this.exE(), lift = (k) => k * 0.9 * xe; // the exploded view's lift for storey k
 
       // Ground: survey grid, site line, and the tower's shadow
       if (this.o.grid) {
@@ -356,12 +366,12 @@
         g.setLineDash([3, 4]); g.lineWidth = 0.8; g.strokeStyle = ink(dark ? 0.4 : 0.38); g.beginPath();
         const from = Math.ceil(L - 0.001);
         for (let k = from; k <= FLOORS; k++) {
-          const pl = slabPlan(k), ps = pl.map((p) => this.P(p.x, k, p.z));
+          const pl = slabPlan(k), ps = pl.map((p) => this.P(p.x, k + lift(k), p.z));
           ps.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
         }
         for (let k = Math.max(0, from - 1); k < FLOORS; k++) {
           const pl = PLANS[k].glass;
-          for (let j = 0; j < pl.length; j += 4) seg(this.P(pl[j].x, Math.max(k, L), pl[j].z), this.P(pl[j].x, k + 1, pl[j].z));
+          for (let j = 0; j < pl.length; j += 4) seg(this.P(pl[j].x, Math.max(k, L) + lift(k), pl[j].z), this.P(pl[j].x, k + 1 + lift(k), pl[j].z));
         }
         g.stroke(); g.setLineDash([]);
       }
@@ -376,12 +386,13 @@
       const crownH = SLAB + (2.2 - SLAB) * (this.G || 0);
       if (L >= FLOORS - 0.001 && this.G > 0.01) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + crownH, kind: 'crown' });
       const ey = eye[1];
-      const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
-      layers.forEach((l) => { l.f = far(l); });
+      layers.forEach((l) => { l.dy = l.kind === 'crown' ? lift(FLOORS) : l.kind === 'canopy' ? 0 : lift(l.k); });
+      const far = (l, dy = 0) => (l.lo + dy > ey ? l.lo + dy - ey : ey > l.hi + dy ? ey - l.hi - dy : 0);
+      layers.forEach((l) => { l.f = far(l, l.dy); });
       // Glass balustrades stand in front of their floor whichever way it is seen.
       if (this.o.rails !== false) for (let k = PODIUM; k < CROWN; k++) if (k <= L - 1) {
-        const f = Math.min(far({ lo: k, hi: k + SLAB }), far({ lo: k + SLAB, hi: k + 1 })) - 0.0001;
-        layers.push({ kind: 'rail', k, f });
+        const f = Math.min(far({ lo: k, hi: k + SLAB }, lift(k)), far({ lo: k + SLAB, hi: k + 1 }, lift(k))) - 0.0001;
+        layers.push({ kind: 'rail', k, f, dy: lift(k) });
       }
       if (L >= 1.2) layers.push({ kind: 'canopy', f: far({ lo: 1, hi: 1 + SLAB }) - 0.00005 });
       layers.sort((a, b) => b.f - a.f);
@@ -412,13 +423,14 @@
       const cap = (pl, y) => pl.map((p) => this.P(p.x, y, p.z));
 
       for (const l of layers) {
+        this.dy = l.dy || 0;
         if (this.xray && l.kind !== 'floor') {
           // inside the loupe, slabs are drawn as their edge lines only, in the drawing set's bronze
           if (l.kind === 'slab') { g.strokeStyle = bronze(0.75); g.lineWidth = 0.7; poly(cap(slabPlan(l.k), l.k + SLAB)); g.stroke(); }
           continue;
         }
         if (l.kind === 'slab') {
-          const k = l.k, pl = slabPlan(k), top = ey > l.hi;
+          const k = l.k, pl = slabPlan(k), top = ey > l.hi + this.dy;
           const y0 = k, y1 = k + SLAB;
           const shadeSlab = (nx, nz) => { const d = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH); return mix(dark ? (0.48 + 0.36 * d) * (1 - 0.3 * night) : 0.05 + 0.1 * (1 - d)); };
           const b = band(pl, y0, y1, shadeSlab, true);
@@ -445,7 +457,7 @@
             drawCols(true);
             if (coreH > y0) {
               band(core, y0, coreH, (nx, nz) => mix(dark ? 0.32 + 0.22 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH) : 0.22 - 0.1 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH)), false);
-              if (ey > coreH) { poly(cap(core, coreH)); g.fillStyle = mix(dark ? 0.5 : 0.12); g.fill(); }
+              if (ey > coreH + this.dy) { poly(cap(core, coreH)); g.fillStyle = mix(dark ? 0.5 : 0.12); g.fill(); }
             }
             drawCols(false);
           }
@@ -516,10 +528,12 @@
           if (this.G > 0.98) this.beacon(this.P(0, y1 + 0.5, 0), now, dark);
         }
       }
+      this.dy = 0;
 
       // Profile line: the outline of the finished building, drawn heavier than anything inside it
       const clad = Math.min(Math.floor(C + 0.001), FLOORS);
-      if (clad >= 1) {
+      // (not while the storeys stand apart: there is no single outline then)
+      if (clad >= 1 && xe < 0.01) {
         const left = [], right = [];
         const ext = (pl, y) => { let lo = null, hi = null; for (const p of pl) { const q = this.P(p.x, y, p.z); if (!lo || q[0] < lo[0]) lo = q; if (!hi || q[0] > hi[0]) hi = q; } left.push(lo); right.push(hi); };
         for (let k = 0; k < clad; k++) { ext(slabPlan(k), k); ext(slabPlan(k), k + SLAB); ext(PLANS[k].glass, k + SLAB); ext(PLANS[k].glass, k + 1); }
@@ -539,19 +553,21 @@
       // kept on the viewer's left of the tower whatever the angle
       const kc = this.k.c, ks = this.k.s, at = (X) => [kc * X, -ks * X];
       const [ax, az] = at(-10), [tx, tz] = at(-10.7), [lx, lz] = at(-11.9);
-      const d0 = this.P(ax, 0, az), d1 = this.P(ax, FLOORS, az);
+      // each level mark rides with its storey when the tower is exploded
+      const lv = (i) => i + lift(i);
+      const d0 = this.P(ax, 0, az), d1 = this.P(ax, lv(FLOORS), az);
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
-      for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(ax, i, az), q = this.P(tx, i, tz); seg(p, q); }
-      seg(this.P(ax, FLOORS, az), this.P(tx, FLOORS, tz));
+      for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(ax, lv(i), az), q = this.P(tx, lv(i), tz); seg(p, q); }
+      seg(this.P(ax, lv(FLOORS), az), this.P(tx, lv(FLOORS), tz));
       g.stroke();
       // a short tick at every level between the numbered ones
       g.strokeStyle = bronze(0.4); g.lineWidth = 0.6; g.beginPath();
-      for (let i = 1; i < FLOORS; i++) if (i % 5) { const p = this.P(ax, i, az), q = this.P(ax + (tx - ax) * 0.5, i, az + (tz - az) * 0.5); seg(p, q); }
+      for (let i = 1; i < FLOORS; i++) if (i % 5) { const p = this.P(ax, lv(i), az), q = this.P(ax + (tx - ax) * 0.5, lv(i), az + (tz - az) * 0.5); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
         g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
-        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
-        const r = this.P(lx, FLOORS, lz), d20 = this.P(lx, 20, lz);
+        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, lv(i), lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
+        const r = this.P(lx, lv(FLOORS), lz), d20 = this.P(lx, lv(20), lz);
         if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', Math.max(r[0], g.measureText('ROOF').width + 4), r[1]);
       }
     }
