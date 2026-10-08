@@ -50,6 +50,46 @@ document.addEventListener('DOMContentLoaded', function () {
     addEventListener('scroll', set, { passive: true }); set();
   }
 
+  // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
+  // the crack draws, and once the foot of the band is in view it splits and parts onto Contact.
+  // With motion off, everything is shown struck and parted.
+  const ruler = document.getElementById('ruler'), seam = document.getElementById('seam');
+  if (ruler && seam) {
+    const ticks = [...ruler.querySelectorAll('line:not(.base)')];
+    const hit = new Array(ticks.length).fill(false);
+    let done = false, seamSeen = false, raf = 0;
+    const split = () => { if (done && (seamSeen || stillPage) && !seam.classList.contains('crack')) { seam.classList.add('crack'); setTimeout(() => seam.classList.add('split'), stillPage ? 0 : 650); } };
+    const strike = () => {
+      done = true; ticks.forEach((t) => t.classList.add('hit'));
+      ruler.classList.add('struck');
+      removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll);
+      split();
+    };
+    const frame = () => {
+      raf = 0;
+      const r = ruler.getBoundingClientRect(), vh = innerHeight;
+      // 0 when the ruler's top reaches 85% of the viewport, 1 at 30%
+      const p = Math.max(0, Math.min(1, (vh * 0.85 - r.top) / (vh * 0.55)));
+      const n = Math.floor(p * 100);
+      if (n >= 100) { strike(); return; }
+      for (let i = 0; i < ticks.length; i++) { const on = i < n; if (on !== hit[i]) { hit[i] = on; ticks[i].classList.toggle('hit', on); } }
+    };
+    function onScroll() { if (!raf) raf = requestAnimationFrame(frame); }
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { seamSeen = true; o.disconnect(); split(); } }), { threshold: 0.9 }).observe(seam);
+    if (stillPage) strike();
+    else { addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll(); }
+  }
+
+  // The advisors' table: with motion off, the seats are shown taken.
+  if (stillPage) document.querySelectorAll('.people .table').forEach((t) => t.classList.add('in'));
+
+  // The footer signature is engraved as it arrives: outline first, then the fill.
+  const sig = document.querySelector('footer .sig');
+  if (sig && !stillPage && 'IntersectionObserver' in window) {
+    sig.classList.add('eng');
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { threshold: 0.5 }).observe(sig);
+  }
+
   // Headlines rise word by word, and the paragraph after them lifts in. Words keep their spaces, so text reads and copies normally.
   if (!stillPage) {
     const split = (el) => {
