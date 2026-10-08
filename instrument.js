@@ -74,6 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const fmt = (p) => (p === 0 ? 'At par' : (p > 0 ? p + '% above' : -p + '% below'));
     const key = document.querySelector('.cv-key .k-par');
 
+    // a small elevation of the tower: four podium floors, then eighteen tapering ones
+    const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let lastN = 0;
+    if (tw) for (let k = 0; k < 22; k++) {
+      const wdt = k < 4 ? 36 : 20 - (k - 4) * 0.22, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', (40 - wdt) / 2); r.setAttribute('y', 110 - (k + 1) * 4.9 - (k >= 4 ? 0 : 0)); r.setAttribute('width', wdt); r.setAttribute('height', 4.1); tw.appendChild(r);
+    }
     function draw() {
       const p = +price.value, T = +loan.value / 100, s = model(p), base = model(0);
       out('cvPriceOut').textContent = fmt(p);
@@ -104,6 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (W < 520) limT.textContent = '';
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
+      // the same share of the building, filled floor by floor in a small elevation beside the figure
+      if (tw) { const n = Math.round(done * 22); tw.querySelectorAll('rect').forEach((r, k) => { r.classList.toggle('on', k < n); r.style.transitionDelay = (reduceM ? 0 : Math.abs(k - lastN) * 22) + 'ms'; }); lastN = n; }
       let say;
       const unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - base[DONE]) * 100);
       if (p === 0) say = 'At par, about ' + Math.round(done * 100) + ' percent of the building is under contract by completion' + (hit > -1 ? '.' : ', and the threshold is not met within ' + M + ' months.');

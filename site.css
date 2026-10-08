@@ -596,6 +596,11 @@ body.no-js .curve,body.no-js .letter{display:none}
 @media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter legend{float:none;width:100%;margin-bottom:6px}}
 .cv-txt h3{font-size:clamp(30px,3vw,42px);max-width:14ch}
 .cv-read dd{white-space:nowrap}
+.cv-done dd{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.cv-tower{width:22px;height:60px;flex:none;overflow:visible;margin-bottom:3px}
+.cv-tower rect{fill:none;stroke:var(--faint);stroke-opacity:.45;stroke-width:.8;transition:fill .5s var(--ease),stroke .5s var(--ease)}
+.cv-tower rect.on{fill:var(--sold);stroke:var(--sold);stroke-opacity:1}
+@media (prefers-reduced-motion:reduce){.cv-tower rect{transition:none}}
 @media (max-width:520px){.cv-key{font-size:11px;gap:6px 14px}.letter .as{gap:8px 22px}.letter .as label{font-size:22px}.letter .sheet input,.letter .sheet select{padding-block:10px 1px}}
 .cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .cv-key li{display:flex;align-items:center;gap:8px}
