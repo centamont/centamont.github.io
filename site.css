@@ -948,3 +948,24 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
   a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
 }
 @media (forced-colors:active){body::after{display:none}.table .seat.on rect,.cv-tower rect.on{forced-color-adjust:none;fill:CanvasText}}
+/* Questions: ruled rows that open in place */
+.faq{border-top:1px solid var(--fg);margin-top:clamp(32px,4vw,56px)}
+.faq details{border-bottom:1px solid var(--rule)}
+.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 28px;align-items:center;gap:24px;padding:22px 0;font-family:var(--display);font-weight:400;font-size:clamp(23px,2.2vw,30px);line-height:1.25;color:var(--fg)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";width:13px;height:13px;justify-self:end;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq summary:hover{color:var(--accent)}
+.faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+.faq details p{margin:0 0 26px;max-width:62ch;color:var(--muted)}
+@media (min-width:821px){.faq details p{margin-left:0;padding-right:52px}}
+/* More notes under the featured guide */
+.notes-list{list-style:none;margin:clamp(32px,4vw,48px) 0 0;padding:0;border-top:1px solid var(--rule)}
+.notes-list li{border-bottom:1px solid var(--rule)}
+.notes-list a{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 24px;align-items:baseline;padding:18px 0;text-decoration:none;color:var(--fg)}
+.notes-list .k{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25;transition:color .3s}
+.notes-list a:hover .t{color:var(--accent)}
+@media (max-width:600px){.notes-list a{grid-template-columns:1fr}}
+@media print{.faq details:not([open]) p{display:block}}
+.prose :is(ul,ol) + p{margin-top:1.2em}
