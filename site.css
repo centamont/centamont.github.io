@@ -947,3 +947,4 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
   .rise .elev{display:none!important}
   a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
 }
+@media (forced-colors:active){body::after{display:none}.table .seat.on rect,.cv-tower rect.on{forced-color-adjust:none;fill:CanvasText}}

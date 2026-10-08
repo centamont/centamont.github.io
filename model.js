@@ -142,6 +142,8 @@
         if (b && !/rgba\([^)]*,\s*0\)$/.test(b) && b !== 'transparent') bg = v;
       }
       this.bg = bg || [244, 240, 232];
+      // Windows high contrast: draw in the system's text colour on its background, whatever the theme says
+      if (matchMedia('(forced-colors: active)').matches) { const t = rgb(cs.color); this.line = t; this.sold = t; }
       this.dark = lum(this.line) > lum(this.bg);
       this.touch();
     }
