@@ -221,3 +221,21 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
   await page.locator('#letter button[data-to="ig"]').click();
   await expect(page.locator('#letterNote')).toContainText('Instagram');
 });
+
+// Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
+// Editing an inline script without updating that page's hash would silently switch it off.
+test('every page runs under its security policy with nothing refused', async ({ page }) => {
+  const pages = ['/', '/privacy.html', '/404.html', '/colophon.html', '/private-clients.html', '/report.html',
+    '/journal/', '/journal/buying-pre-construction-florida.html',
+    '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html'];
+  const refused = [];
+  await page.addInitScript(() => document.addEventListener('securitypolicyviolation', (e) => console.error('CSP refused ' + e.violatedDirective + ' ' + e.blockedURI)));
+  page.on('console', (m) => m.text().startsWith('CSP refused') && refused.push(page.url() + ' ' + m.text()));
+  for (const path of pages) {
+    await page.goto(path);
+    await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
+    await page.mouse.wheel(0, 3000);
+    await page.waitForTimeout(300);
+  }
+  expect(refused).toEqual([]);
+});
