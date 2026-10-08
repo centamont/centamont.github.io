@@ -652,9 +652,7 @@ header.site{view-transition-name:site-header}
 :root[data-theme="dark"]{--band:#0D0E11;--band-rule:#2C2F34}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band:#0D0E11;--band-rule:#2C2F34}}
 :root[data-theme="dark"] :is(.band,.hero){background:#0D0E11 url(grain.png)}
-:root[data-theme="dark"] .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.3)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.band,.hero){background:#0D0E11 url(grain.png)}
-  :root:not([data-theme="light"]) .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.3)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.band,.hero){background:#0D0E11 url(grain.png)}}
 /* Ink bands open like a door as they arrive */
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
@@ -820,3 +818,6 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
 @media (max-width:520px){.rp-pace .rp-t{font-size:22px}.rp-pace .rp-t.up:last-child{display:none}}
 @media (max-width:520px){.motion{display:none}}
+/* The practices sheet is laid over the ink: the hero sinks and dims beneath its bronze edge */
+#services{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(184,151,106,.55)}
+.hero>*{translate:0 calc(var(--p,0) * 42vh);scale:calc(1 - var(--p,0) * .04);opacity:calc(1 - var(--p,0) * .5)}

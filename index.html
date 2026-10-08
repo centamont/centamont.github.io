@@ -440,8 +440,8 @@ document.addEventListener('DOMContentLoaded',function(){
   } else startHero();
 
   // Hero camera eases down as the page scrolls away.
-  // Hero camera rides up the façade as the page scrolls away, like a lift.
-  if(heroM&&!reduce){const ty0=heroM.o.ty;let q=0;addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);heroM.o.ty=ty0+p*9;heroM.touch()})},{passive:true})}
+  // Hero camera rides up the façade as the page scrolls away, like a lift, while the next sheet is laid over it.
+  if(heroM&&!reduce){const ty0=heroM.o.ty;let q=0;addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);heroM.o.ty=ty0+p*9;heroM.touch();hero.style.setProperty('--p',p.toFixed(4))})},{passive:true})}
 
   // The building rises with the developer story; the gauge counts with it.
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
