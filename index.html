@@ -111,7 +111,6 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 
     <div class="rise">
       <figure class="elev" aria-hidden="true">
-        <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
         <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/22</i></span><span><em>Levels sold</em> <b id="gS">00</b><i>/22</i></span></div>
         <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
@@ -201,6 +200,9 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
       <a class="more" href="private-clients.html">How private client advisory works</a>
     </div>
     <div class="doorway" data-draw>
+    <div class="glow" aria-hidden="true"></div>
+    <svg class="light" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="doorLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9A877" stop-opacity=".34"/><stop offset=".55" stop-color="#C9A877" stop-opacity=".1"/><stop offset="1" stop-color="#C9A877" stop-opacity="0"/></linearGradient></defs><polygon points="101,0 299,0 352,200 -10,200" fill="url(#doorLight)"/></svg>
+    <div class="leaves" aria-hidden="true"><i class="leaf l"></i><i class="leaf r"></i></div>
     <svg class="arch" viewBox="0 0 400 600" preserveAspectRatio="none" aria-hidden="true"><path d="M.5 600V200a199.5 199.5 0 0 1 399 0v400"/><path class="in2" d="M22 600V206a178 178 0 0 1 356 0v394"/></svg>
     <div class="terms">
       <p><b>Before anyone else</b>New developments, shown before public launch.</p>
@@ -422,7 +424,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const narrow=innerWidth<820;
   if(Model){
     heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:narrow?0.16:0.1,dist:narrow?58:46,ty:narrow?12:13.5,scale:narrow?1.38:(innerWidth>1600?1.5:1.38),offsetX:narrow?0.08:(innerWidth>1600?0.25:innerWidth<1180?0.28:0.22),labels:true,dimSide:1,palms:false,reflect:true,guides:true,rise:true});
-    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:narrow?1.45:1.18,labels:true,palms:false,footprint:true});
+    towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:narrow?1.45:1.5,offsetX:narrow?0:0.06,labels:true,palms:false,footprint:true});
     models.push(heroM,towerM);
     addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
     // A loupe over the tower on desktop: it shows the structure behind the glass.
@@ -459,7 +461,9 @@ document.addEventListener('DOMContentLoaded',function(){
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
   const gB=document.getElementById('gB'),gS=document.getElementById('gS');
   const views=[[-0.7,-0.62,2.5],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
-  let cur=-1,shown=[0,0];
+  let cur=-1,shown=[0,0],exT=0;
+  const TOPOFF=steps.findIndex(s=>s.dataset.name==='Top-off');
+  const motionOff=()=>reduce||root.dataset.motion==='off';
   const count=(to)=>{const from=shown.slice(),t0=performance.now(),D=reduce?0:900;
     const go=t=>{const p=D?Math.min(1,(t-t0)/D):1,e=1-Math.pow(1-p,3);
       gB.textContent=String(Math.round(from[0]+(to[0]-from[0])*e)).padStart(2,'0');gS.textContent=String(Math.round(from[1]+(to[1]-from[1])*e)).padStart(2,'0');
@@ -468,9 +472,13 @@ document.addEventListener('DOMContentLoaded',function(){
     if(n===cur)return;cur=n;
     const s=steps[n],b=+s.dataset.built,sd=+s.dataset.sold;
     if(towerM){towerM.o.envelope=n>0;towerM.set(b,sd,b>0&&n<steps.length-1);
-      if(!reduce){const [th,ph,ty=narrow?10.5:13]=views[n];const from=[towerM.theta,towerM.phi,towerM.o.ty],t0=performance.now();
+      if(!reduce){const [th,ph,ty=narrow?10.5:12]=views[n];const from=[towerM.theta,towerM.phi,towerM.o.ty],t0=performance.now();
         const go=t=>{const p=Math.min(1,(t-t0)/1800),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;towerM.theta=from[0]+(th-from[0])*e;towerM.phi=from[1]+(ph-from[1])*e;towerM.o.ty=from[2]+(ty-from[2])*e;towerM.touch();if(p<1)requestAnimationFrame(go)};requestAnimationFrame(go)}
-      else{const [th,ph,ty=narrow?10.5:13]=views[n];towerM.theta=th;towerM.phi=ph;towerM.o.ty=ty;towerM.touch()}}
+      else{const [th,ph,ty=narrow?10.5:12]=views[n];towerM.theta=th;towerM.phi=ph;towerM.o.ty=ty;towerM.touch()}}
+    // At the top-off the storeys part for a moment, like a watch movement laid open, then close.
+    if(towerM){clearTimeout(exT);towerM.exT=0;
+      if(n===TOPOFF&&!motionOff()){towerM.exT=1;exT=setTimeout(()=>{towerM.exT=0;towerM.touch()},2600)}
+      towerM.touch()}
     count([b,sd]);
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));
     name.textContent=s.dataset.name;
@@ -483,6 +491,18 @@ document.addEventListener('DOMContentLoaded',function(){
   const facade=document.querySelector('.facade');
   const hair=()=>{const w=facade&&facade.getBoundingClientRect().width;if(w)facade.parentNode.style.setProperty('--fu',(1200/w).toFixed(4))};
   hair();addEventListener('resize',hair);
+  // The private door opens as its band scrolls through; light falls out across the floor.
+  const doorBand=document.getElementById('clients'),doorway=doorBand&&doorBand.querySelector('.doorway');
+  if(doorway){
+    if(motionOff())doorway.style.setProperty('--o','1');
+    else{let dr=0;
+      // progress through the band, measured at the door itself: it starts to open as the door's crown
+      // comes into view and stands open before its terms can be read
+      const door=()=>{dr=0;const r=doorway.getBoundingClientRect(),vh=innerHeight,t=Math.max(0,Math.min(1,(vh*.95-r.top)/(vh*.55)));
+        doorway.style.setProperty('--o',(1-Math.pow(1-t,3)).toFixed(4))};
+      const ask=()=>{if(!dr)dr=requestAnimationFrame(door)};
+      addEventListener('scroll',ask,{passive:true});addEventListener('resize',ask);door()}
+  }
 
   // Markets: routes draw out from Miami; a row in the list lights its place on the map.
   // As the reader scrolls, each route draws in the order of the list (a_i = clamp(p*6 - i)), and its row lights as it lands.
