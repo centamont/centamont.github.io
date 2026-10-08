@@ -152,7 +152,7 @@ test('day and night toggle remembers the choice', async ({ page }) => {
 });
 
 test('every internal link lands on a real page and section', async ({ page, request }) => {
-  const pages = ['/', '/journal/buying-pre-construction-florida.html', '/privacy.html', '/404.html'];
+  const pages = ['/', '/journal/', '/journal/buying-pre-construction-florida.html', '/report.html', '/private-clients.html', '/colophon.html', '/privacy.html', '/404.html'];
   for (const path of pages) {
     await page.goto(path);
     const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.href).filter((h) => h.startsWith(location.origin)));

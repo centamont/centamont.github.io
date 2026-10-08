@@ -37,7 +37,7 @@
       const t = (k - PODIUM) / (CROWN - PODIUM), s = 1 - 0.07 * t;
       glass = rrect(3.3 * s, 2.7 * s, 1.35, 3, 3);
       // Balconies swell and recede around the tower, a little further along on every floor.
-      off = (p) => 0.22 + 0.55 * (0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.62));
+      off = (p) => 0.22 + 0.4 * (0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.4));
     } else {
       glass = rrect(2.75, 2.25, 1.15, 3, 2); off = () => 0.3;
     }
@@ -100,7 +100,7 @@
     constructor(canvas, opts) {
       this.c = canvas;
       this.ctx = canvas.getContext('2d');
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 11, envelope: true }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 12, envelope: true }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; this.C = 0; // animated: structure, sold, glass
@@ -133,7 +133,8 @@
 
     size() {
       const r = this.c.getBoundingClientRect();
-      const d = Math.min(devicePixelRatio || 1, 2);
+      // phones get 1.5x: sharp enough for hairlines at half the fill cost of 2x or more
+      const d = Math.min(devicePixelRatio || 1, innerWidth < 820 ? 1.5 : 2);
       this.w = r.width; this.h = r.height;
       this.c.width = Math.max(1, Math.round(r.width * d));
       this.c.height = Math.max(1, Math.round(r.height * d));
@@ -146,7 +147,7 @@
     set(built, sold, crane, instant) {
       this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
       this.c.dataset.built = built; this.c.dataset.sold = sold;
-      if (instant || reduce) { this.L = built; this.S = sold; this.C = this.cladTarget(); this.crane = this.craneT; }
+      if (instant || reduce) { this.L = built; this.S = sold; this.C = this.cladTarget(); this.crane = this.craneT; this.G = built >= FLOORS ? 1 : 0; }
       this.kick();
     }
 
@@ -161,17 +162,23 @@
     }
 
     frame() {
-      const ease = (a, b, k) => (Math.abs(b - a) < 0.002 ? b : a + (b - a) * k);
-      this.L = ease(this.L, this.B, 0.04);
+      // Easing runs on the clock, not the frame count, so a slow phone builds as fast as a desktop.
+      const t = performance.now(), dt = Math.min(100, this.t0 ? t - this.t0 : 16.7);
+      this.t0 = t;
+      const ease = (a, b, tau) => (Math.abs(b - a) < 0.002 ? b : a + (b - a) * (1 - Math.exp(-dt / tau)));
+      this.L = ease(this.L, this.B, 410);
       // the glass never overtakes the frame
-      this.C = Math.min(ease(this.C, this.cladTarget(), 0.035), this.L);
-      this.S = ease(this.S, this.Sold, 0.05);
-      this.crane = ease(this.crane, this.craneT, 0.06);
-      if (!reduce && this.o.orbit) this.theta += this.o.orbit;
-      this.tx = ease(this.tx || 0, this.mx * 0.12, 0.05);
-      this.tyy = ease(this.tyy || 0, this.my * 0.05, 0.05);
+      this.C = Math.min(ease(this.C, this.cladTarget(), 470), this.L);
+      this.S = ease(this.S, this.Sold, 330);
+      this.crane = ease(this.crane, this.craneT, 270);
+      // the crown rises once the building has topped off
+      const crownT = this.L >= FLOORS - 0.001 ? 1 : 0;
+      this.G = ease(this.G || 0, crownT, 380);
+      if (!reduce && this.o.orbit) this.theta += this.o.orbit * dt / 16.7;
+      this.tx = ease(this.tx || 0, this.mx * 0.12, 330);
+      this.tyy = ease(this.tyy || 0, this.my * 0.05, 330);
       // A slow idle orbit only needs a third of the frames; anything else draws every frame.
-      const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
+      const settled = this.L === this.B && this.S === this.Sold && this.C === this.cladTarget() && this.crane === this.craneT && this.G === crownT && Math.abs(this.tx - this.mx * 0.12) <= 0.001;
       this.tick = ((this.tick || 0) + 1) % 3;
       if (!(settled && this.o.orbit && this.tick) || this.dirty) this.draw();
       this.dirty = false;
@@ -181,18 +188,19 @@
 
     camera() {
       const th = this.theta + (this.tx || 0), ph = this.phi + (this.tyy || 0);
-      this.k = { c: Math.cos(th), s: Math.sin(th), cp: Math.cos(ph), sp: Math.sin(ph), f: Math.min(this.w * 1.15, this.h) * this.o.scale, cx: this.w / 2 + this.o.offsetX * this.w, cy: this.h / 2 };
+      // A shift lens, as architectural photographers use: the camera stays level so verticals stay
+      // vertical, and the frame slides to put the target where a tilted camera would have put it.
+      const d = this.o.dist, ey = Math.max(0.8, this.o.ty - d * Math.sin(ph)), f = Math.min(this.w * 1.15, this.h) * this.o.scale;
+      this.k = { c: Math.cos(th), s: Math.sin(th), f, ey, cx: this.w / 2 + this.o.offsetX * this.w, cy: this.h / 2 + (f * (this.o.ty - ey)) / d };
       // camera position in world space, for shading and draw order
-      const d = this.o.dist, k = this.k;
-      this.eye = [-d * k.cp * k.s, this.o.ty - d * k.sp, -d * k.cp * k.c];
+      const k = this.k;
+      this.eye = [-d * k.s, ey, -d * k.c];
     }
 
     // world -> screen
     P(x, y, z) {
       const k = this.k;
-      y -= this.o.ty;
-      const X = k.c * x - k.s * z, Zr = k.s * x + k.c * z;
-      const Y = k.cp * y - k.sp * Zr, Z = k.sp * y + k.cp * Zr + this.o.dist;
+      const X = k.c * x - k.s * z, Z = k.s * x + k.c * z + this.o.dist, Y = y - k.ey;
       return [k.cx + (k.f * X) / Z, k.cy - (k.f * Y) / Z, Z];
     }
 
@@ -225,6 +233,29 @@
           for (const v of i ? [i, -i] : [0]) { seg(this.P(v, 0, -30), this.P(v, 0, 30)); seg(this.P(-30, 0, v), this.P(30, 0, v)); }
           g.stroke();
         }
+        if (this.o.site !== false) {
+          // the street in front of the entrance, with kerbs and a centre line
+          g.strokeStyle = ink(dark ? 0.24 : 0.2); g.lineWidth = 0.8; g.beginPath();
+          for (const z of [-10.2, -14.2]) seg(this.P(-28, 0, z), this.P(28, 0, z));
+          g.stroke(); g.setLineDash([6, 7]); g.strokeStyle = ink(dark ? 0.16 : 0.13); g.beginPath(); seg(this.P(-28, 0, -12.2), this.P(28, 0, -12.2)); g.stroke(); g.setLineDash([]);
+          // trees drawn the way a site plan draws them: a canopy circle and its trunk
+          g.strokeStyle = ink(dark ? 0.3 : 0.26); g.lineWidth = 0.7; g.beginPath();
+          for (const [x, z, hh] of PALMS) {
+            const r = 0.55 + hh * 0.18;
+            for (let i = 0; i <= 24; i++) { const a = TAU * i / 24, q = this.P(x + Math.cos(a) * r, 0, z + Math.sin(a) * r); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
+            seg(this.P(x - 0.18, 0, z), this.P(x + 0.18, 0, z)); seg(this.P(x, 0, z - 0.18), this.P(x, 0, z + 0.18));
+          }
+          for (const x of [-20, -15, 15, 20, 25, -25]) { const z = -9.2; for (let i = 0; i <= 20; i++) { const a = TAU * i / 20, q = this.P(x + Math.cos(a) * 0.9, 0, z + Math.sin(a) * 0.9); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); } }
+          g.stroke();
+          // north point, only where the view looks down enough to read it
+          if (this.o.north) {
+          const nc = [12.5, 9.5];
+          g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath();
+          for (let i = 0; i <= 28; i++) { const a = TAU * i / 28, q = this.P(nc[0] + Math.cos(a) * 1, 0, nc[1] + Math.sin(a) * 1); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
+          g.stroke(); poly([this.P(nc[0], 0, nc[1] + 1.35), this.P(nc[0] - 0.32, 0, nc[1] - 0.5), this.P(nc[0], 0, nc[1] - 0.2), this.P(nc[0] + 0.32, 0, nc[1] - 0.5)]); g.fillStyle = bronze(0.75); g.fill();
+          if (this.o.labels && w > 280) { const t = this.P(nc[0], 0, nc[1] + 1.9); g.fillStyle = bronze(0.9); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', t[0], t[1]); }
+          }
+        }
         g.setLineDash([4, 5]); g.strokeStyle = bronze(0.55);
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
         if (L > 0.01) {
@@ -236,12 +267,17 @@
         }
       }
       if (L > 0.01) {
-        const sh = [], sy = Math.max(sun[1], 0.62), dx = -sun[0] / sy, dz = -sun[2] / sy;
+        const sh = [], sy = Math.max(sun[1], 0.42), dx = -sun[0] / sy, dz = -sun[2] / sy;
         const add = (pl, y) => pl.forEach((p) => sh.push([p.x + dx * y, p.z + dz * y]));
         add(PLANS[0].slab, 0); add(PLANS[0].slab, Math.min(L, PODIUM));
         if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
         poly(hull(sh).map(([x, z]) => this.P(x, 0, z)));
         g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
+        // contact shadow: the ground darkens where the building meets it
+        for (const o of [1.1, 0.6, 0.25]) {
+          poly(PLANS[0].slab.map((p) => this.P(p.x + p.nx * o, 0, p.z + p.nz * o)));
+          g.fillStyle = dark ? 'rgba(0,0,0,0.16)' : ink(0.035); g.fill();
+        }
       }
 
       const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [], figs = [];
@@ -249,6 +285,12 @@
       if (this.o.palms !== false && this.o.grid && L > PODIUM) FIGS.forEach((f) => figs.push(f));
       palmsBack.forEach((p) => this.drawPalm(p));
 
+      // Before the envelope exists, only the footprint: podium and tower drawn on the ground
+      if (this.o.footprint && !this.o.envelope && L < 0.01) {
+        g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink(dark ? 0.6 : 0.62);
+        for (const pl of [PLANS[0].slab, PLANS[PODIUM].glass]) { poly(pl.map((p) => this.P(p.x, 0.01, p.z))); g.stroke(); }
+        g.setLineDash([]);
+      }
       // Floors not yet built: the dashed first sketch
       if (this.o.envelope && L < FLOORS) {
         g.setLineDash([3, 4]); g.lineWidth = 0.8; g.strokeStyle = ink(dark ? 0.4 : 0.38); g.beginPath();
@@ -271,7 +313,8 @@
         if (L > 0.01 && k <= L + 0.001) layers.push({ lo: k, hi: k + SLAB, kind: 'slab', k });
         if (k < FLOORS && (k < L || k < coreTop)) layers.push({ lo: k + SLAB, hi: k + 1, kind: 'floor', k });
       }
-      if (L >= FLOORS - 0.001) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + 2.2, kind: 'crown' });
+      const crownH = SLAB + (2.2 - SLAB) * (this.G || 0);
+      if (L >= FLOORS - 0.001 && this.G > 0.01) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + crownH, kind: 'crown' });
       const ey = eye[1];
       const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
       layers.forEach((l) => { l.f = far(l); });
@@ -312,7 +355,7 @@
         if (l.kind === 'slab') {
           const k = l.k, pl = slabPlan(k), top = ey > l.hi;
           const y0 = k, y1 = k + SLAB;
-          const shadeSlab = (nx, nz) => { const d = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH); return mix(dark ? 0.6 + 0.3 * d : 0.05 + 0.1 * (1 - d)); };
+          const shadeSlab = (nx, nz) => { const d = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH); return mix(dark ? (0.48 + 0.36 * d) * (1 - 0.3 * night) : 0.05 + 0.1 * (1 - d)); };
           const b = band(pl, y0, y1, shadeSlab, true);
           const capPts = cap(pl, top ? y1 : y0);
           poly(capPts); g.fillStyle = mix(dark ? (top ? 0.86 : 0.5) : (top ? 0.03 : 0.16)); g.fill();
@@ -350,11 +393,12 @@
               const diff = Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH);
               const fres = 1 - Math.abs(nx * v[0] + nz * v[2]);
               const hx = sun[0] + v[0], hz = sun[2] + v[2], hn = Math.hypot(hx, hz) || 1;
-              const spec = Math.pow(Math.max(0, (nx * hx + nz * hz) / hn), 18);
-              if (j / nn < soldF) return mixS(dark ? 0.5 + 0.32 * diff : 0.62 + 0.3 * diff, 0.25 * spec + 0.06 * fres);
-              // a few rooms lit from inside, more after dark
-              if (dark && hash(k, j) < 0.08 + 0.18 * night) return mix(0.3 + 0.22 * hash(j, k, 3) + 0.06 * Math.sin(now / 2400 + j * 1.7 + k));
-              return dark ? mix(0.07 + 0.1 * diff + 0.07 * fres + 0.07 * hgt + 0.38 * spec) : mix(0.8 - 0.22 * diff - 0.07 * fres - 0.14 * hgt - 0.5 * spec);
+              // a tight highlight, and none at all once the sun is down
+              const spec = Math.pow(Math.max(0, (nx * hx + nz * hz) / hn), 36) * (1 - night), day = 1 - 0.85 * night;
+              if (j / nn < soldF) return mixS(dark ? 0.46 + 0.3 * diff * day : 0.62 + 0.3 * diff, 0.18 * spec + 0.06 * fres);
+              // a few rooms lit from inside, warm, and more of them after dark
+              if (dark && hash(k, j) < 0.05 + 0.07 * night) return night > 0.3 ? mixS(0.42 + 0.16 * hash(j, k, 3), 0.06) : mix(0.26 + 0.16 * hash(j, k, 3));
+              return dark ? mix(0.06 + (0.1 * diff + 0.22 * spec) * day + 0.09 * fres + 0.07 * hgt) : mix(0.66 - 0.2 * diff - 0.08 * fres - 0.1 * hgt - 0.25 * spec);
             };
             const bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));
             const mull = [], shadowed = [];
@@ -399,13 +443,25 @@
           g.beginPath(); g.strokeStyle = edge; g.lineWidth = 0.6; for (const j of b.lines) { const j2 = (j + 1) % CANOPY.length; seg(b.bot[j], b.bot[j2]); } g.stroke();
         } else if (l.kind === 'crown') {
           // an open frame of fins over the roof
-          const pl = PLANS[FLOORS - 1].glass, y0 = FLOORS + SLAB, y1 = FLOORS + 2.2;
+          const pl = PLANS[FLOORS - 1].glass, y0 = FLOORS + SLAB, y1 = FLOORS + crownH;
           g.beginPath(); g.strokeStyle = ink(dark ? 0.6 : 0.62); g.lineWidth = 0.8;
           pl.forEach((p) => seg(this.P(p.x, y0, p.z), this.P(p.x, y1, p.z)));
           const ring = pl.map((p) => this.P(p.x, y1, p.z)); ring.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
           g.stroke();
-          this.beacon(this.P(0, y1 + 0.5, 0), now);
+          if (this.G > 0.98) this.beacon(this.P(0, y1 + 0.5, 0), now, dark);
         }
+      }
+
+      // Profile line: the outline of the finished building, drawn heavier than anything inside it
+      const clad = Math.min(Math.floor(C + 0.001), FLOORS);
+      if (clad >= 1) {
+        const left = [], right = [];
+        const ext = (pl, y) => { let lo = null, hi = null; for (const p of pl) { const q = this.P(p.x, y, p.z); if (!lo || q[0] < lo[0]) lo = q; if (!hi || q[0] > hi[0]) hi = q; } left.push(lo); right.push(hi); };
+        for (let k = 0; k < clad; k++) { ext(slabPlan(k), k); ext(slabPlan(k), k + SLAB); ext(PLANS[k].glass, k + SLAB); ext(PLANS[k].glass, k + 1); }
+        ext(slabPlan(clad), clad); ext(slabPlan(clad), clad + SLAB);
+        g.strokeStyle = dark ? ink(0.62) : ink(w < 600 ? 0.72 : 0.88); g.lineWidth = w < 600 ? 1 : 1.3; g.lineJoin = 'round'; g.beginPath();
+        for (const side of [left, right]) side.forEach((q, j) => (j ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])));
+        g.stroke(); g.lineJoin = 'miter';
       }
 
       if (craneOn && !craneBehind) this.drawCrane();
@@ -420,17 +476,26 @@
       const d0 = this.P(ax, 0, az), d1 = this.P(ax, FLOORS, az);
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
       for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(ax, i, az), q = this.P(tx, i, tz); seg(p, q); }
+      seg(this.P(ax, FLOORS, az), this.P(tx, FLOORS, tz));
+      g.stroke();
+      // a short tick at every level between the numbered ones
+      g.strokeStyle = bronze(0.4); g.lineWidth = 0.6; g.beginPath();
+      for (let i = 1; i < FLOORS; i++) if (i % 5) { const p = this.P(ax, i, az), q = this.P(ax + (tx - ax) * 0.5, i, az + (tz - az) * 0.5); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
-        g.fillStyle = bronze(0.95); g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+        g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
         for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
+        const r = this.P(lx, FLOORS, lz), d20 = this.P(lx, 20, lz);
+        if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', Math.max(r[0], g.measureText('ROOF').width + 4), r[1]);
       }
     }
 
     // The aviation light on the roof, breathing slowly.
-    beacon(p, now) {
+    beacon(p, now, dark) {
       const g = this.ctx, [sr, sg, sb] = this.sold, a = reduce ? 0.8 : 0.55 + 0.45 * Math.sin(now / 900);
-      const r = Math.max(2.5, this.k.f / this.o.dist * 0.35), gr = g.createRadialGradient(p[0], p[1], 0, p[0], p[1], r * 3);
+      const r = Math.max(2.5, this.k.f / this.o.dist * 0.35);
+      if (!dark) { g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`; g.beginPath(); g.arc(p[0], p[1], 1.5, 0, TAU); g.fill(); return; }
+      const gr = g.createRadialGradient(p[0], p[1], 0, p[0], p[1], r * 3);
       gr.addColorStop(0, `rgba(${sr},${sg},${sb},${0.55 * a})`); gr.addColorStop(1, `rgba(${sr},${sg},${sb},0)`);
       g.fillStyle = gr; g.beginPath(); g.arc(p[0], p[1], r * 3, 0, TAU); g.fill();
       g.fillStyle = `rgba(${sr},${sg},${sb},${0.6 + 0.4 * a})`; g.beginPath(); g.arc(p[0], p[1], Math.max(1.2, r * 0.35), 0, TAU); g.fill();
@@ -472,11 +537,11 @@
 
     // A luffing tower crane in bronze linework; the jib slews as the floors go up.
     drawCrane() {
-      const g = this.ctx, [sr, sg, sb] = this.sold, a = 0.85 * this.crane;
+      const g = this.ctx, [sr, sg, sb] = this.line, a = (this.dark ? 0.5 : 0.55) * this.crane;
       const seg = (p, q) => { g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); };
-      const [mx, mz] = MAST, s = 0.42, top = Math.max(7, this.L + 4.5);
+      const [mx, mz] = MAST, s = 0.42, top = Math.max(7, this.L + 3.2);
       const P = (x, y, z) => this.P(mx + x, y, mz + z);
-      g.strokeStyle = `rgba(${sr},${sg},${sb},${a})`; g.lineWidth = 0.8; g.beginPath();
+      g.strokeStyle = `rgba(${sr},${sg},${sb},${a})`; g.lineWidth = 0.6; g.beginPath();
       const cs = [[-s, -s], [s, -s], [s, s], [-s, s]];
       cs.forEach(([x, z]) => seg(P(x, 0, z), P(x, top, z)));
       for (let y = 0; y < top - 0.01; y += 1.1) {
@@ -487,14 +552,15 @@
       // slewing jib, counter-jib, A-frame head and pendants
       const ang = Math.atan2(-mz, -mx) + 0.55 * Math.sin(this.L * 0.38), ca = Math.cos(ang), sa = Math.sin(ang);
       const J = (d, y, w = 0) => P(ca * d - sa * w, y, sa * d + ca * w);
-      g.lineWidth = 0.8; g.beginPath();
-      seg(J(-4.6, top, -0.3), J(15, top, -0.3)); seg(J(-4.6, top, 0.3), J(15, top, 0.3));
-      seg(J(0, top + 0.7, 0), J(15, top, 0));
-      for (let d = 0; d < 15; d += 1) { seg(J(d, top, -0.3), J(d + 0.5, top + 0.7 * (1 - (d + 0.5) / 15), 0)); seg(J(d + 0.5, top + 0.7 * (1 - (d + 0.5) / 15), 0), J(d + 1, top, 0.3)); }
+      g.beginPath();
+      const JL = 12;
+      seg(J(-4.6, top, -0.3), J(JL, top, -0.3)); seg(J(-4.6, top, 0.3), J(JL, top, 0.3));
+      seg(J(0, top + 0.7, 0), J(JL, top, 0));
+      for (let d = 0; d < JL; d += 1.5) { seg(J(d, top, -0.3), J(d + 0.75, top + 0.7 * (1 - (d + 0.75) / JL), 0)); seg(J(d + 0.75, top + 0.7 * (1 - (d + 0.75) / JL), 0), J(d + 1.5, top, 0.3)); }
       seg(J(0, top, -0.35), J(0, top + 3, 0)); seg(J(0, top, 0.35), J(0, top + 3, 0));
-      seg(J(0, top + 3, 0), J(10, top + 0.4, 0)); seg(J(0, top + 3, 0), J(-4.4, top, 0));
+      seg(J(0, top + 3, 0), J(8, top + 0.4, 0)); seg(J(0, top + 3, 0), J(-4.4, top, 0));
       // trolley, hook and a load on its way up
-      const tr = 6 + 3 * Math.sin(this.L * 0.9), hy = Math.max(1, top - 5 - 2 * Math.cos(this.L * 0.7));
+      const tr = 5.5 + 2.5 * Math.sin(this.L * 0.9), hy = Math.max(1, top - 5 - 2 * Math.cos(this.L * 0.7));
       seg(J(tr, top, 0), J(tr, hy, 0));
       g.stroke();
       g.fillStyle = `rgba(${sr},${sg},${sb},${a})`;

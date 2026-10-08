@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let build, area, par, line, lim, limT, dot, dotT;
     function sheet() {
       W = Math.max(300, Math.round(svg.clientWidth || 640));
-      H = Math.round(Math.max(280, Math.min(380, W * 0.52)));
+      H = Math.round(W >= 520 ? Math.min(500, W * 0.76) : Math.max(280, Math.min(380, W * 0.52)));
       X0 = 46; X1 = W - 14;
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       svg.textContent = '';
@@ -88,6 +88,18 @@ document.addEventListener('DOMContentLoaded', function () {
       const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T);
       if (hit > -1) { const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.setAttribute('x', right ? x(hit) - 10 : x(hit) + 10); dotT.setAttribute('text-anchor', right ? 'end' : 'start'); dotT.setAttribute('y', y(T) + 22); dotT.textContent = 'Month ' + hit; }
       else { dot.style.display = 'none'; dotT.textContent = ''; }
+      // The threshold label takes the first spot, right or left, above or below the line, that no curve or note runs through.
+      const pts = s.map((f, i) => [x(i), y(f)]).concat(p ? base.map((f, i) => [x(i), y(f)]) : []);
+      const dotB = dotT.textContent ? dotT.getBBox() : null;
+      // Failing a clear spot, the label may cross a curve (its halo keeps it legible) but never the month note.
+      const spots = [[X1, 'end', -8], [X0 + 6, 'start', -8], [X1, 'end', 18], [X0 + 6, 'start', 18]].map(([lx, anchor, dy]) => {
+        limT.setAttribute('x', lx); limT.setAttribute('text-anchor', anchor); limT.setAttribute('y', y(T) + dy);
+        const b = limT.getBBox(), curve = pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
+        const note = !!dotB && !(dotB.x > b.x + b.width || dotB.x + dotB.width < b.x || dotB.y > b.y + b.height || dotB.y + dotB.height < b.y);
+        return { lx, anchor, dy, curve, note };
+      });
+      const pick = spots.find((o) => !o.curve && !o.note) || spots.find((o) => !o.note) || spots[0];
+      limT.setAttribute('x', pick.lx); limT.setAttribute('text-anchor', pick.anchor); limT.setAttribute('y', y(T) + pick.dy);
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
       let say;
@@ -101,14 +113,33 @@ document.addEventListener('DOMContentLoaded', function () {
       out('cvSay').textContent = say;
       svg.setAttribute('aria-label', 'Illustrative sales curve. ' + say);
     }
-    const redraw = () => { sheet(); draw(); };
+    // a hairline that reads the curve under the pointer
+    let hair, hairT, hdot, last = null;
+    const read = (m) => {
+      if (m === null) { if (hair) { hair.remove(); hairT.remove(); hdot.remove(); hair = null; } return; }
+      const s = model(+price.value), f = s[m];
+      if (!hair) { hair = el('line', { class: 'cv-hair' }); hdot = el('circle', { class: 'cv-hdot', r: 3.5 }); hairT = el('text', { class: 'cv-hairt' }); }
+      hair.setAttribute('x1', x(m)); hair.setAttribute('x2', x(m)); hair.setAttribute('y1', y(1)); hair.setAttribute('y2', Y1);
+      hdot.setAttribute('cx', x(m)); hdot.setAttribute('cy', y(f));
+      const right = x(m) > (X0 + X1) / 2;
+      hairT.setAttribute('x', right ? x(m) - 10 : x(m) + 10); hairT.setAttribute('text-anchor', right ? 'end' : 'start'); hairT.setAttribute('y', y(1) + 14);
+      hairT.textContent = 'Month ' + m + ' \u00b7 ' + Math.round(f * 100) + '%';
+    };
+    svg.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const r = svg.getBoundingClientRect(), u = (e.clientX - r.left) * W / r.width;
+      const m = Math.round((u - X0) / (X1 - X0) * M);
+      last = m < 0 || m > M ? null : m; read(last);
+    });
+    svg.addEventListener('pointerleave', () => { last = null; read(null); });
+    const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
     redraw();
     let lastW = W;
     new ResizeObserver(() => { if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } }).observe(svg);
 
     // the sentence is a live region; announce it once the slider settles, not on every step
     const sayEl = out('cvSay'); let quiet;
-    const onInput = () => { sayEl.setAttribute('aria-live', 'off'); draw(); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
+    const onInput = () => { sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
   }
 
