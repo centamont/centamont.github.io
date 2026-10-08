@@ -550,6 +550,8 @@
       palmsFront.forEach((p) => this.drawPalm(p));
       figs.forEach((f) => this.drawFigure(f));
       if (this.o.reflect && !inLens && L > 0.5 && w >= 820) this.reflect(now);
+      // Today's path of the sun over Miami, an arc laid over the drawing like a sundial: solid where it has been, dotted where it is going
+      if (this.o.sunPath && !inLens && this.drawnAt && w >= 820) this.sunPath(now, dark);
 
       // Dimension line with level ticks
       if (!this.o.envelope && L < 0.01) return;
@@ -574,6 +576,61 @@
         const r = this.P(lx, lv(FLOORS), lz), d20 = this.P(lx, lv(20), lz);
         if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', fx(r[0], 'ROOF'), r[1]);
       }
+    }
+
+    sunPath(now, dark) {
+      const g = this.ctx, t = Date.now(), R = this.o.sunPath === true ? 15 : this.o.sunPath;
+      if (!this.sp || t - this.sp.at > 300000) {
+        // sample the next and last day in ten-minute steps; keep the daylight arc that holds now, or the next one
+        const pts = [];
+        for (let m = -24 * 60; m <= 24 * 60; m += 10) { const d = new Date(t + m * 6e4), { el, az } = solar(d); pts.push({ m, el, az, d }); }
+        let seg = [], best = null;
+        for (const q of pts) {
+          if (q.el > -0.8) seg.push(q);
+          else if (seg.length) { if (!best && seg[seg.length - 1].m >= 0) best = seg; seg = []; }
+        }
+        if (!best && seg.length) best = seg;
+        const fmt = (d) => d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+        this.sp = { at: t, arc: best || [], rise: best ? fmt(best[0].d) : '', set: best ? fmt(best[best.length - 1].d) : '' };
+      }
+      const arc = this.sp.arc; if (arc.length < 3) return;
+      // drawn as an architect's sun-path elevation in the open corner above the levels: time across, height up
+      const w = this.w, H = 54, base = 100 + H;
+      // it sits clear of the crown, between the tower and the edge of the page
+      let xr = -1e9; for (const p of PLANS[PLANS.length - 1].slab) xr = Math.max(xr, this.P(p.x * 1.1, FLOORS + 2.6, p.z * 1.1)[0]);
+      const x0 = Math.max(xr + 48, w * 0.55), x1 = Math.min(w - 28, x0 + 230), W = x1 - x0;
+      if (W < 150) return;
+      const m0 = arc[0].m, m1 = arc[arc.length - 1].m, top = Math.max(...arc.map((q) => q.el)), [sr, sg, sb] = this.sold, [lr, lg, lb] = this.line;
+      const X = (m) => x0 + ((m - m0) / (m1 - m0)) * W, Y = (el) => base - (Math.max(el, 0) / top) * H;
+      g.save(); g.lineWidth = 1;
+      g.strokeStyle = `rgba(${lr},${lg},${lb},0.22)`; g.beginPath(); g.moveTo(x0 - 8, base + 0.5); g.lineTo(x1 + 8, base + 0.5); g.stroke();
+      for (const past of [true, false]) {
+        g.setLineDash(past ? [] : [1.5, 3.5]); g.strokeStyle = `rgba(${sr},${sg},${sb},${past ? 0.85 : 0.6})`; g.beginPath();
+        let on = false; arc.forEach((q) => { if ((q.m <= 0) !== past && !(past === false && q.m === 0)) return; const x = X(q.m), y = Y(q.el); on ? g.lineTo(x, y) : g.moveTo(x, y); on = true; });
+        g.stroke();
+      }
+      g.setLineDash([]);
+      // hour ticks on the horizon line
+      g.strokeStyle = `rgba(${lr},${lg},${lb},0.28)`; g.beginPath();
+      arc.forEach((q) => { if (q.d.getUTCMinutes() < 10) { const x = X(q.m); g.moveTo(x, base); g.lineTo(x, base + 4); } });
+      g.stroke();
+      const nowQ = arc.find((q) => q.m === 0);
+      if (nowQ && nowQ.el > 0) {
+        const x = X(0), y = Y(nowQ.el), pulse = reduce ? 1 : 0.8 + 0.2 * Math.sin(now / 1200);
+        const gr = g.createRadialGradient(x, y, 0, x, y, 14);
+        gr.addColorStop(0, `rgba(${sr},${sg},${sb},${0.4 * pulse})`); gr.addColorStop(1, `rgba(${sr},${sg},${sb},0)`);
+        g.fillStyle = gr; g.beginPath(); g.arc(x, y, 14, 0, TAU); g.fill();
+        g.fillStyle = `rgb(${sr},${sg},${sb})`; g.beginPath(); g.arc(x, y, 3.2, 0, TAU); g.fill();
+        g.strokeStyle = `rgba(${sr},${sg},${sb},0.35)`; g.setLineDash([1, 3]); g.beginPath(); g.moveTo(x, y + 5); g.lineTo(x, base); g.stroke(); g.setLineDash([]);
+      }
+      // sunrise and sunset under the horizon line, the peak height over the arc
+      g.font = '500 12px Jost, sans-serif'; g.textBaseline = 'top'; g.fillStyle = `rgba(${lr},${lg},${lb},0.62)`;
+      g.textAlign = 'left'; g.fillText('SUNRISE ' + this.sp.rise.toUpperCase(), x0 - 8, base + 9);
+      g.textAlign = 'right'; g.fillText('SUNSET ' + this.sp.set.toUpperCase(), x1 + 8, base + 9);
+      const pk = arc.reduce((a, q) => (q.el > a.el ? q : a), arc[0]);
+      g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
+      g.fillText(Math.round(pk.el) + '°', X(pk.m), base - H - 6);
+      g.restore();
     }
 
     // The tower mirrored in the bay, broken into slow ripples; the water is ruled in faint lines.
