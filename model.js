@@ -68,15 +68,29 @@
   const CANOPY = rrect(2.6, 0.85, 0.4, 2, 2).map((p) => ({ x: p.x, z: p.z - 5.25, nx: p.nx, nz: p.nz }));
   const hash = (a, b, c = 0) => { const x = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return x - Math.floor(x); };
 
-  // Sunlight follows the time of day in Miami; after dark the tower is lit from within.
-  function miamiSun() {
-    let hr = 13;
-    try { const p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(new Date()); hr = +p.find((x) => x.type === 'hour').value + +p.find((x) => x.type === 'minute').value / 60; } catch (e) {}
-    const day = hr > 6.8 && hr < 19.6;
-    if (!day) return { v: [-0.55, 0.62, -0.5], night: 1 };
-    const a = Math.PI * (hr - 6.8) / 12.8, el = 0.3 + 0.55 * Math.sin(a);
-    return { v: [Math.cos(a) * 0.9, el, -0.75 * Math.sin(a) - 0.2], night: hr < 7.6 || hr > 18.8 ? 0.5 : 0 };
+  // Sunlight is the real sun over Miami at this minute (a compact form of the NOAA solar position);
+  // the tower's north is +z, east is +x. After dark the tower is lit from within.
+  const LAT = 25.7617, LON = -80.1918, RAD = Math.PI / 180;
+  function solar(date) {
+    const d = date.getTime() / 864e5 - 10957.5; // days since J2000.0
+    const g = (357.529 + 0.98560028 * d) * RAD, q = 280.459 + 0.98564736 * d;
+    const L = (q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * RAD, e = (23.439 - 3.6e-7 * d) * RAD;
+    const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+    const gmst = (18.697374558 + 24.06570982441908 * d) % 24;
+    const ha = (gmst * 15 + LON) * RAD - ra, lat = LAT * RAD;
+    const el = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha));
+    let az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(lat) - Math.sin(lat) * Math.cos(ha));
+    if (az < 0) az += 2 * Math.PI;
+    return { el: el / RAD, az: az / RAD };
   }
+  function miamiSun(date = new Date()) {
+    const { el, az } = solar(date);
+    const night = el < -4 ? 1 : el < 4 ? 0.5 : 0;
+    if (el < 0) return { v: [-0.55, 0.62, -0.5], night, el, az };
+    const E = el * RAD, A = az * RAD;
+    return { v: [Math.cos(E) * Math.sin(A), Math.sin(E), Math.cos(E) * Math.cos(A)], night, el, az };
+  }
+  window.CentamontSun = miamiSun;
 
   function rgb(hex) {
     const m = String(hex).trim().match(/^rgba?\(([^)]+)\)/);
@@ -138,18 +152,22 @@
       this.w = r.width; this.h = r.height;
       this.c.width = Math.max(1, Math.round(r.width * d));
       this.c.height = Math.max(1, Math.round(r.height * d));
-      this.ctx.setTransform(d, 0, 0, d, 0, 0);
+      this.ctx.setTransform(d, 0, 0, d, 0, 0); this.dpr = d;
     }
 
     // Glass trails the structure by three floors until the building tops off.
     cladTarget() { return this.B >= FLOORS ? FLOORS : Math.max(0, this.B - 3); }
 
     set(built, sold, crane, instant) {
+      if (built && !this.B && !this.drawnAt) this.drawnAt = performance.now();
       this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
       this.c.dataset.built = built; this.c.dataset.sold = sold;
       if (instant || reduce) { this.L = built; this.S = sold; this.C = this.cladTarget(); this.crane = this.craneT; this.G = built >= FLOORS ? 1 : 0; }
       this.kick();
     }
+
+    // Start the draughtsman's construction lines ahead of the ink.
+    sketch() { this.drawnAt = performance.now(); this.touch(); }
 
     pointer(x, y) { this.mx = x; this.my = y; this.kick(); }
 
@@ -166,7 +184,10 @@
       const t = performance.now(), dt = Math.min(100, this.t0 ? t - this.t0 : 16.7);
       this.t0 = t;
       const ease = (a, b, tau) => (Math.abs(b - a) < 0.002 ? b : a + (b - a) * (1 - Math.exp(-dt / tau)));
-      this.L = ease(this.L, this.B, 410);
+      // The hero's tower rises at a steady pace, a floor at a time, and slows for its last floors;
+      // everything else eases.
+      if (this.o.rise && this.B > this.L) this.L = Math.min(this.B, this.L + (dt / 1000) * 9 * (0.3 + 0.7 * Math.min(1, (this.B - this.L) / 3)) + 0.0005);
+      else this.L = ease(this.L, this.B, 410);
       // the glass never overtakes the frame
       this.C = Math.min(ease(this.C, this.cladTarget(), 470), this.L);
       this.S = ease(this.S, this.Sold, 330);
@@ -205,9 +226,29 @@
     }
 
     draw() {
-      this.camera();
+      this.scene();
+      const L = this.lens;
+      if (!L || this.L < 1) return;
+      // The loupe: a magnified look through the glass at the structure inside, as the drawing set has it
+      const g = this.ctx, [br, bgg, bb] = this.bg, [sr, sg, sb] = this.sold, C0 = this.C, mag = 1.7;
+      g.save(); g.beginPath(); g.arc(L.x, L.y, L.r, 0, TAU); g.clip();
+      g.fillStyle = `rgb(${br},${bgg},${bb})`; g.fillRect(L.x - L.r, L.y - L.r, L.r * 2, L.r * 2);
+      g.translate(L.x, L.y); g.scale(mag, mag); g.translate(-L.x, -L.y);
+      this.C = 0; this.xray = true; this.scene(true); this.C = C0; this.xray = false;
+      g.restore();
+      // the bezel: a hairline bronze ring with a fine graduation
+      g.strokeStyle = `rgba(${sr},${sg},${sb},0.9)`; g.lineWidth = 1.2; g.beginPath(); g.arc(L.x, L.y, L.r, 0, TAU); g.stroke();
+      g.lineWidth = 0.8; g.beginPath();
+      for (let i = 0; i < 60; i++) { const a = i * TAU / 60, t = i % 5 ? 4 : 8; g.moveTo(L.x + Math.cos(a) * (L.r + 2), L.y + Math.sin(a) * (L.r + 2)); g.lineTo(L.x + Math.cos(a) * (L.r + 2 + t), L.y + Math.sin(a) * (L.r + 2 + t)); }
+      g.stroke();
+      g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
+      g.fillText('STRUCTURE  ×1.7', L.x, L.y + L.r + 16);
+    }
+
+    scene(inLens) {
+      if (!inLens) this.camera();
       const g = this.ctx, w = this.w, h = this.h, dark = this.dark;
-      g.clearRect(0, 0, w, h);
+      if (!inLens) g.clearRect(0, 0, w, h);
       const [lr, lg, lb] = this.line, [sr, sg, sb] = this.sold, [br, bgg, bb] = this.bg;
       const ink = (a) => `rgba(${lr},${lg},${lb},${a})`;
       const bronze = (a, k = 1) => `rgba(${Math.round(sr * k)},${Math.round(sg * k)},${Math.round(sb * k)},${a})`;
@@ -275,6 +316,12 @@
         if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
         poly(hull(sh).map(([x, z]) => this.P(x, 0, z)));
         g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
+        // and hatched, the way a sun study is drawn: the shadow's length and bearing are this minute's
+        if (this.sunNow.el > 0 && !this.o.sun) {
+          g.save(); g.clip(); g.beginPath(); g.strokeStyle = dark ? bronze(0.22) : ink(0.16); g.lineWidth = 0.6;
+          for (let x = -h; x < w; x += 5) { g.moveTo(x, h); g.lineTo(x + h, 0); }
+          g.stroke(); g.restore();
+        }
         // contact shadow: the ground darkens where the building meets it
         for (const o of [1.1, 0.6, 0.25]) {
           poly(PLANS[0].slab.map((p) => this.P(p.x + p.nx * o, 0, p.z + p.nz * o)));
@@ -287,6 +334,17 @@
       if (this.o.palms !== false && this.o.grid && L > PODIUM) FIGS.forEach((f) => figs.push(f));
       palmsBack.forEach((p) => this.drawPalm(p));
 
+      // Construction lines: a draughtsman's pencil guides, laid down before the ink and left faintly behind it
+      if (this.o.guides && this.drawnAt && !inLens) {
+        const age = reduce ? 9 : (now - this.drawnAt) / 1000, kc = this.k.c, ks = this.k.s, at = (X, y) => this.P(kc * X, y, -ks * X);
+        const a = (dark ? 0.3 : 0.26) * (age < 2.5 ? 1 : Math.max(0.35, 1 - (age - 2.5) / 3));
+        g.strokeStyle = ink(a); g.lineWidth = 0.5; g.beginPath();
+        const lines = [];
+        for (const y of [0, PODIUM, 10, 16, FLOORS, FLOORS + 2.2]) lines.push([-13, y, 13, y]);
+        for (const X of [-6.6, -3.7, 3.7, 6.6]) lines.push([X, -1.5, X, FLOORS + 4]);
+        lines.forEach(([xa, ya, xb, yb], i) => { const p = clamp((age - i * 0.07) / 0.9, 0, 1); if (!p) return; const e = 1 - Math.pow(1 - p, 3), A = at(xa, ya), B = at(xa + (xb - xa) * e, ya + (yb - ya) * e); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); });
+        g.stroke();
+      }
       // Before the envelope exists, only the footprint: podium and tower drawn on the ground
       if (this.o.footprint && !this.o.envelope && L < 0.01) {
         g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink(dark ? 0.6 : 0.62);
@@ -354,6 +412,11 @@
       const cap = (pl, y) => pl.map((p) => this.P(p.x, y, p.z));
 
       for (const l of layers) {
+        if (this.xray && l.kind !== 'floor') {
+          // inside the loupe, slabs are drawn as their edge lines only, in the drawing set's bronze
+          if (l.kind === 'slab') { g.strokeStyle = bronze(0.75); g.lineWidth = 0.7; poly(cap(slabPlan(l.k), l.k + SLAB)); g.stroke(); }
+          continue;
+        }
         if (l.kind === 'slab') {
           const k = l.k, pl = slabPlan(k), top = ey > l.hi;
           const y0 = k, y1 = k + SLAB;
@@ -378,7 +441,7 @@
           if (glassF < 1) {
             const cols = [], core = CORE[k], cz = this.P(0, (y0 + y1) / 2, 0)[2];
             if (built > 0) for (let j = 0; j < pl.length; j += 2) { const p = pl[j], a = this.P(p.x * 0.97, y0, p.z * 0.97), b = this.P(p.x * 0.97, y1, p.z * 0.97); cols.push([a, b, a[2] > cz]); }
-            const drawCols = (back) => { g.beginPath(); g.strokeStyle = ink(dark ? 0.55 : 0.6); g.lineWidth = 1.1; cols.forEach(([a, b, bk]) => { if (bk === back) seg(a, b); }); g.stroke(); };
+            const drawCols = (back) => { g.beginPath(); g.strokeStyle = this.xray ? bronze(0.9) : ink(dark ? 0.55 : 0.6); g.lineWidth = this.xray ? 0.8 : 1.1; cols.forEach(([a, b, bk]) => { if (bk === back) seg(a, b); }); g.stroke(); };
             drawCols(true);
             if (coreH > y0) {
               band(core, y0, coreH, (nx, nz) => mix(dark ? 0.32 + 0.22 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH) : 0.22 - 0.1 * Math.max(0, (nx * sun[0] + nz * sun[2]) / sunH)), false);
@@ -469,6 +532,7 @@
       if (craneOn && !craneBehind) this.drawCrane();
       palmsFront.forEach((p) => this.drawPalm(p));
       figs.forEach((f) => this.drawFigure(f));
+      if (this.o.reflect && !inLens && L > 0.5) this.reflect(now);
 
       // Dimension line with level ticks
       if (!this.o.envelope && L < 0.01) return;
@@ -490,6 +554,27 @@
         const r = this.P(lx, FLOORS, lz), d20 = this.P(lx, 20, lz);
         if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', Math.max(r[0], g.measureText('ROOF').width + 4), r[1]);
       }
+    }
+
+    // The tower mirrored in the bay, broken into slow ripples; the water is ruled in faint lines.
+    reflect(now) {
+      const g = this.ctx, d = this.dpr || 1;
+      let x0 = 1e9, x1 = -1e9, yb = -1e9, yt = 1e9;
+      for (const p of PLANS[0].slab) { const a = this.P(p.x * 1.15, 0, p.z * 1.15), b = this.P(p.x, FLOORS + 2.6, p.z); x0 = Math.min(x0, a[0], b[0]); x1 = Math.max(x1, a[0], b[0]); yb = Math.max(yb, a[1]); yt = Math.min(yt, b[1]); }
+      x0 = Math.max(0, Math.floor(x0 - 12)); x1 = Math.min(this.w, Math.ceil(x1 + 12));
+      const H = Math.min(yb - yt, this.h - yb - 4), step = this.w < 600 ? 3 : 2;
+      if (H < 20 || x1 <= x0) return;
+      g.save();
+      for (let r = 0; r < H; r += step) {
+        const t = r / H, off = reduce ? 0 : Math.sin(r * 0.19 + now / 650) * (0.6 + t * 5) + Math.sin(r * 0.053 - now / 1300) * t * 3;
+        g.globalAlpha = 0.38 * Math.pow(1 - t, 1.5);
+        g.drawImage(this.c, x0 * d, (yb - r - step) * d, (x1 - x0) * d, step * d, x0 + off, yb + r, x1 - x0, step);
+      }
+      g.globalAlpha = 1;
+      const [lr, lg, lb] = this.line;
+      g.strokeStyle = `rgba(${lr},${lg},${lb},0.07)`; g.lineWidth = 0.6; g.beginPath();
+      for (let i = 1; i < 9; i++) { const y = yb + i * i * 3.2, ph = reduce ? 0 : now / 3000 + i; for (let x = x0 - 40 + ((i * 37) % 23); x < x1 + 40; x += 34 + (i % 3) * 9) { const dx = Math.sin(ph + x * 0.01) * 4; g.moveTo(x + dx, y); g.lineTo(x + dx + 14 + (i % 4) * 4, y); } }
+      g.stroke(); g.restore();
     }
 
     // The aviation light on the roof, breathing slowly.

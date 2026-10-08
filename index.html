@@ -73,7 +73,7 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
       <a class="btn" href="#clients">Private clients</a>
     </div>
   </div>
-  <p class="coords" aria-hidden="true"><b>Miami</b><span id="clock">25.76° N · 80.19° W</span><span>Massing study, illustrative</span></p>
+  <p class="coords" aria-hidden="true"><b>Miami</b><span id="clock">25.76° N · 80.19° W</span><span id="sunline"></span><span>Massing study, illustrative</span></p>
 </div>
 
 <section id="services">
@@ -397,7 +397,10 @@ document.addEventListener('DOMContentLoaded',function(){
 
   // Local time in Miami, set into the hero's survey note.
   const clock=document.getElementById('clock');
-  const tick=()=>{try{clock.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date())+' in Miami · 25.76° N'}catch(e){}};
+  const sunline=document.getElementById('sunline'),pts=['N','NE','E','SE','S','SW','W','NW'];
+  const tick=()=>{try{clock.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(new Date())+' in Miami'}catch(e){}
+    // the sun the drawing is lit by, stated the way a sun study states it
+    if(window.CentamontSun&&sunline){const s=CentamontSun();sunline.textContent=s.el>0?'Sun '+Math.round(s.el)+'° up, '+pts[Math.round(s.az/45)%8]:'Sun below the horizon'}};
   tick();setInterval(tick,30000);
 
   // Models
@@ -405,16 +408,23 @@ document.addEventListener('DOMContentLoaded',function(){
   let heroM=null,towerM=null;
   const narrow=innerWidth<820;
   if(Model){
-    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?1.38:(innerWidth>1600?1.3:1.2),offsetX:narrow?0.08:(innerWidth>1600?0.26:innerWidth<1180?0.28:0.2),labels:true,palms:false});
+    heroM=new Model(document.getElementById('heroModel'),{orbit:0.0009,theta:-0.5,phi:0.16,dist:58,ty:12,scale:narrow?1.38:(innerWidth>1600?1.26:1.14),offsetX:narrow?0.08:(innerWidth>1600?0.26:innerWidth<1180?0.28:0.2),labels:true,palms:false,reflect:true,guides:true,rise:true});
     towerM=new Model(document.getElementById('tower'),{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:narrow?1.45:1.18,labels:true,palms:false,footprint:true});
     models.push(heroM,towerM);
     addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
+    // A loupe over the tower on desktop: it shows the structure behind the glass.
+    const heroEl=document.querySelector('.hero');
+    if(heroEl&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!narrow){
+      heroEl.addEventListener('pointermove',e=>{const r=heroEl.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+        const on=x>r.width*.52&&!e.target.closest('a,button');heroM.lens=on?{x,y,r:Math.min(96,r.width*.07)}:null;heroEl.classList.toggle('loupe',on);heroM.touch()},{passive:true});
+      heroEl.addEventListener('pointerleave',()=>{heroM.lens=null;heroEl.classList.remove('loupe');heroM.touch()});
+    }
   }
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows. On the hundredth the stone splits and the halves part.
   const curtain=document.querySelector('.curtain');
-  const startHero=()=>{if(heroM)heroM.set(22,4,false);hero.classList.add('lit')};
+  const startHero=()=>{if(heroM){heroM.sketch();setTimeout(()=>heroM.set(22,4,false),reduce?0:900)}hero.classList.add('lit')};
   if(root.classList.contains('intro-on')){
     try{sessionStorage.setItem('cm-intro','1');localStorage.setItem('cm-intro','1')}catch(e){}
     const n=document.getElementById('introN'),bar=document.getElementById('introBar'),t0=performance.now(),D=700;
