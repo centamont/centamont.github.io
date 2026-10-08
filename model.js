@@ -241,8 +241,11 @@
       g.lineWidth = 0.8; g.beginPath();
       for (let i = 0; i < 60; i++) { const a = i * TAU / 60, t = i % 5 ? 4 : 8; g.moveTo(L.x + Math.cos(a) * (L.r + 2), L.y + Math.sin(a) * (L.r + 2)); g.lineTo(L.x + Math.cos(a) * (L.r + 2 + t), L.y + Math.sin(a) * (L.r + 2 + t)); }
       g.stroke();
-      g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
-      g.fillText('STRUCTURE  ×1.7', L.x, L.y + L.r + 16);
+      // the label sits clear of the drawing, with a halo of the ground colour
+      const ly = L.y > this.h * 0.6 ? L.y - L.r - 26 : L.y + L.r + 16;
+      g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
+      g.lineWidth = 4; g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineJoin = 'round'; g.strokeText('STRUCTURE  ×1.7', L.x, ly); g.lineJoin = 'miter';
+      g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.fillText('STRUCTURE  ×1.7', L.x, ly);
     }
 
     scene(inLens) {
@@ -310,16 +313,16 @@
         }
       }
       if (L > 0.01) {
-        const sh = [], sy = Math.max(sun[1], 0.42), dx = -sun[0] / sy, dz = -sun[2] / sy;
+        const sh = [], sy = Math.max(sun[1], 0.3), dx = -sun[0] / sy, dz = -sun[2] / sy;
         const add = (pl, y) => pl.forEach((p) => sh.push([p.x + dx * y, p.z + dz * y]));
         add(PLANS[0].slab, 0); add(PLANS[0].slab, Math.min(L, PODIUM));
         if (L > PODIUM) { add(PLANS[Math.min(FLOORS - 1, Math.floor(L))].slab, L); add(PLANS[PODIUM].slab, PODIUM); }
         poly(hull(sh).map(([x, z]) => this.P(x, 0, z)));
-        g.fillStyle = dark ? 'rgba(0,0,0,0.32)' : ink(0.07); g.fill();
+        g.fillStyle = dark ? (this.sunNow.el > 0 && !this.o.sun ? bronze(0.07) : 'rgba(0,0,0,0.32)') : ink(0.07); g.fill();
         // and hatched, the way a sun study is drawn: the shadow's length and bearing are this minute's
         if (this.sunNow.el > 0 && !this.o.sun) {
-          g.save(); g.clip(); g.beginPath(); g.strokeStyle = dark ? bronze(0.22) : ink(0.16); g.lineWidth = 0.6;
-          for (let x = -h; x < w; x += 5) { g.moveTo(x, h); g.lineTo(x + h, 0); }
+          g.save(); g.clip(); g.beginPath(); g.strokeStyle = dark ? bronze(0.5) : ink(0.22); g.lineWidth = 0.75;
+          for (let x = -h; x < w; x += 6) { g.moveTo(x, h); g.lineTo(x + h, 0); }
           g.stroke(); g.restore();
         }
         // contact shadow: the ground darkens where the building meets it
@@ -536,8 +539,8 @@
 
       // Dimension line with level ticks
       if (!this.o.envelope && L < 0.01) return;
-      // kept on the viewer's left of the tower whatever the angle
-      const kc = this.k.c, ks = this.k.s, at = (X) => [kc * X, -ks * X];
+      // kept on one side of the tower whatever the angle (the viewer's left unless dimSide is 1)
+      const kc = this.k.c, ks = this.k.s, sd = this.o.dimSide === 1 ? -1 : 1, at = (X) => [kc * X * sd, -ks * X * sd];
       const [ax, az] = at(-10), [tx, tz] = at(-10.7), [lx, lz] = at(-11.9);
       const d0 = this.P(ax, 0, az), d1 = this.P(ax, FLOORS, az);
       g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath(); seg(d0, d1);
@@ -549,10 +552,11 @@
       for (let i = 1; i < FLOORS; i++) if (i % 5) { const p = this.P(ax, i, az), q = this.P(ax + (tx - ax) * 0.5, i, az + (tz - az) * 0.5); seg(p, q); }
       g.stroke();
       if (this.o.labels && w > 280) {
-        g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
-        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, Math.max(p[0], g.measureText(t).width + 4), p[1]); }
+        g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
+        const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4);
+        for (let i = 0; i <= FLOORS; i += 5) { const p = this.P(lx, i, lz), t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(p[0], t), p[1]); }
         const r = this.P(lx, FLOORS, lz), d20 = this.P(lx, 20, lz);
-        if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', Math.max(r[0], g.measureText('ROOF').width + 4), r[1]);
+        if (Math.abs(r[1] - d20[1]) > this.o.labelSize * 1.4) g.fillText('ROOF', fx(r[0], 'ROOF'), r[1]);
       }
     }
 

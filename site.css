@@ -359,7 +359,7 @@ html.intro-on .hero:not(.lit) :is(.lede,.row,.coords){transform:translateY(14px)
 .hero .btn{--fill:#F4F0E8;--on:#14161A;border-color:rgba(244,240,232,.6);color:#F4F0E8}
 .hero .btn:hover{border-color:#F4F0E8}
 .hero .btn.solid{--fill:#14161A;--on:#F4F0E8;background-color:#F4F0E8;color:#14161A;border-color:#F4F0E8}
-.hero .coords{position:absolute;right:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:grid;gap:6px;text-align:right;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,240,232,.62);font-variant-numeric:tabular-nums}
+.hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,240,232,.62);font-variant-numeric:tabular-nums}
 .hero .coords b{font-weight:500;color:#C9A877}
 .scrollcue{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));bottom:0;width:1px;height:clamp(32px,6vh,56px);background:rgba(244,240,232,.18);overflow:hidden}
 .scrollcue::after{content:"";position:absolute;left:0;top:-50%;width:1px;height:50%;background:#C9A877;animation:cue 2.4s var(--ease) infinite}
