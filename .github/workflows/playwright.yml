@@ -1,13 +1,16 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ '**' ]
   pull_request:
     branches: [ main, master ]
 permissions:
   contents: read
 jobs:
   test:
+    # The check is named after the workflow so the "Protect main" ruleset can require it.
+    # It runs on every branch, so a commit is already green when it is pushed to main.
+    name: Playwright Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
