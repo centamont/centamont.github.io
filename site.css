@@ -905,18 +905,17 @@ nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
 }
 .chart .gl,.cv-dott{paint-order:stroke;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round}
 .cv-dott{stroke-width:4px}
-h2,h3,.jl-title{text-wrap:balance}
+h2,h3,.jl-title,.ji-t{text-wrap:balance}
 p,li{text-wrap:pretty}
-.skip:focus{top:72px;background:var(--ink);color:var(--ivory);outline:1px solid var(--bronze);outline-offset:2px}
+.skip:focus{top:auto;bottom:24px;position:fixed;background:var(--ink);color:var(--ivory);outline:1px solid var(--bronze);outline-offset:2px}
 .links{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0}
 #services,#markets{padding-bottom:clamp(64px,7vw,96px)}
 @media (min-width:821px){.begin h3{position:sticky;top:120px;align-self:start}}
 @media (min-width:901px){.tb > .c2 + .c3{grid-column:span 2}.tb > .c3:nth-child(4){grid-column:span 2}.tb > .c2:nth-child(2){grid-column:span 4}}
 /* The signature is engraved left to right, so a half-cut state still reads as an inscription */
-.sig.eng text{stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;fill-opacity:0}
-.sig.eng{clip-path:inset(0 100% 0 0)}
-.sig.eng.in{clip-path:inset(0 0 0 0);transition:clip-path 2.4s cubic-bezier(.65,0,.35,1)}
-.sig.eng.in text{fill-opacity:1;stroke-opacity:0;transition:fill-opacity 1.2s var(--ease) 1.6s,stroke-opacity 1.2s var(--ease) 2s}
+.sig.eng text{stroke:none;fill-opacity:1;transition:none}
+.sig.eng{-webkit-mask:linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat;mask:linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat}
+.sig.eng.in{-webkit-mask-position:0 0;mask-position:0 0;transition:mask-position 1.7s cubic-bezier(.65,0,.35,1),-webkit-mask-position 1.7s cubic-bezier(.65,0,.35,1)}
 /* Night: the ink rooms stand clear of the graphite page */
 :root[data-theme="dark"]{--bg:#1B1E23;--sheet:#21252A}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1B1E23;--sheet:#21252A}}
@@ -925,3 +924,4 @@ p,li{text-wrap:pretty}
 .legal .sep{font-style:normal}
 @media (max-width:600px){.legal > span:last-child{display:flex;flex-direction:column;align-items:flex-start}.legal .sep{display:none}}
 @media (max-width:600px){.people .table{overflow:hidden}.people .table svg{width:150%;margin-left:-25%}}
+@media (max-width:820px){#markets{padding-bottom:48px}}
