@@ -565,7 +565,7 @@ body.no-js .rise .elev,body.no-js .vacant{display:none}
 body.no-js .curve,body.no-js .letter{display:none}
 
 /* The letter to the partners */
-.letter{margin-top:clamp(56px,7vw,96px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;gap:clamp(22px,3vw,32px)}
+.letter{margin-top:clamp(56px,7vw,96px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(22px,3vw,32px)}.letter > *{min-width:0}
 .letter .as{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 34px;align-items:baseline}
 .letter legend{float:left;margin-right:34px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
 .letter .as label{position:relative;cursor:pointer;font-family:var(--display);font-size:clamp(24px,2.4vw,30px);color:var(--faint);padding-bottom:4px;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
@@ -573,7 +573,7 @@ body.no-js .curve,body.no-js .letter{display:none}
 .letter .as label:has(input:checked){color:var(--fg);border-color:var(--sold)}
 .letter .as label:has(input:focus-visible){outline:1px solid var(--accent);outline-offset:4px}
 .letter .as label:hover{color:var(--fg)}
-.letter .sheet{background:var(--sheet);border:1px solid var(--rule);padding:clamp(26px,4.5vw,64px);font-family:var(--display);font-size:clamp(22px,2.3vw,30px);line-height:1.75;font-weight:300;color:var(--fg)}
+.letter .sheet{background:var(--sheet);border:1px solid var(--rule);padding:clamp(26px,4.5vw,64px);font-family:var(--display);font-size:clamp(22px,2.3vw,30px);line-height:1.75;font-weight:300;color:var(--fg);overflow-wrap:anywhere}
 .letter .sheet p{max-width:34em}
 .letter .salute{margin-bottom:.6em}
 .letter .sign{margin-top:1.2em}
