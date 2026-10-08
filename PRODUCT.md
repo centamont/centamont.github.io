@@ -32,7 +32,7 @@ Developers evaluate firms through pitches, case studies, weekly sales dashboards
 
 ## Capabilities and Constraints
 
-- Contact today is a private message to @centamont on Instagram or LinkedIn. No company email or form backend yet (open).
+- Contact today is a private message to @centamont on Instagram (LinkedIn left off until it is a company page, Dylan 2026-10-08). No company email or form backend yet (open).
 - No partner names or bios on the site until Dylan confirms (open).
 - No brokerage license line until the Florida brokerage is registered (open).
 - Static hosting only; forms need a backend before they can return.

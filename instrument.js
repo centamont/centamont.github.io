@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
   }
 
-  // ---- The letter: composed here, copied, and sent by the writer through Instagram or LinkedIn
+  // ---- The letter: composed here, copied, and sent by the writer through Instagram
   const form = document.getElementById('letter');
   if (form) {
     const note = document.getElementById('letterNote');
@@ -189,9 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         say('Fill in the underlined ' + (empty.length === 1 ? 'blank' : 'blanks') + ' first, so the partners know who is writing and why.');
         return;
       }
-      const to = (e.submitter && e.submitter.dataset.to) || 'ig';
-      const url = to === 'li' ? 'https://www.linkedin.com/company/centamont' : 'https://ig.me/m/centamont';
-      const where = to === 'li' ? 'LinkedIn' : 'Instagram';
+            const url = 'https://ig.me/m/centamont', where = 'Instagram';
       const t = text();
       // open the tab inside the click, before anything asynchronous, so browsers do not block it
       const w = window.open('', '_blank');
