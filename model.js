@@ -285,6 +285,12 @@
       if (this.o.palms !== false && this.o.grid && L > PODIUM) FIGS.forEach((f) => figs.push(f));
       palmsBack.forEach((p) => this.drawPalm(p));
 
+      // Before the envelope exists, only the footprint: podium and tower drawn on the ground
+      if (this.o.footprint && !this.o.envelope && L < 0.01) {
+        g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink(dark ? 0.6 : 0.62);
+        for (const pl of [PLANS[0].slab, PLANS[PODIUM].glass]) { poly(pl.map((p) => this.P(p.x, 0.01, p.z))); g.stroke(); }
+        g.setLineDash([]);
+      }
       // Floors not yet built: the dashed first sketch
       if (this.o.envelope && L < FLOORS) {
         g.setLineDash([3, 4]); g.lineWidth = 0.8; g.strokeStyle = ink(dark ? 0.4 : 0.38); g.beginPath();
@@ -392,7 +398,7 @@
               if (j / nn < soldF) return mixS(dark ? 0.46 + 0.3 * diff * day : 0.62 + 0.3 * diff, 0.18 * spec + 0.06 * fres);
               // a few rooms lit from inside, warm, and more of them after dark
               if (dark && hash(k, j) < 0.05 + 0.07 * night) return night > 0.3 ? mixS(0.42 + 0.16 * hash(j, k, 3), 0.06) : mix(0.26 + 0.16 * hash(j, k, 3));
-              return dark ? mix(0.06 + (0.1 * diff + 0.22 * spec) * day + 0.09 * fres + 0.07 * hgt) : mix(0.8 - 0.22 * diff - 0.09 * fres - 0.14 * hgt - 0.3 * spec);
+              return dark ? mix(0.06 + (0.1 * diff + 0.22 * spec) * day + 0.09 * fres + 0.07 * hgt) : mix(0.66 - 0.2 * diff - 0.08 * fres - 0.1 * hgt - 0.25 * spec);
             };
             const bot = pl.map((p) => this.P(p.x, y0, p.z)), top = pl.map((p) => this.P(p.x, y1, p.z));
             const mull = [], shadowed = [];
