@@ -439,3 +439,93 @@ test.describe('printing without the script', () => {
     for (const [row, summary] of rows) expect(row).toBeGreaterThan(summary + 20);
   });
 });
+
+// Every published page, read from sitemap.xml so a new page is covered the day it is listed, plus the 404.
+test.describe('every page in the sitemap', () => {
+  const pages = [...readFileSync('sitemap.xml', 'utf8').matchAll(/<loc>https:\/\/centamont\.com(\/[^<]*)<\/loc>/g)]
+    .map((m) => m[1]).concat('/404.html');
+
+  for (const path of pages) {
+    test(`${path} renders cleanly`, async ({ page }) => {
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+      await page.goto(path);
+      await expect(page.locator('h1')).toHaveCount(1);
+      await expect(page.locator('h1')).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+      await expect(page.locator('body')).not.toContainText(/\[[A-Z][^\]]*\]/);
+      expect(await page.evaluate(() => (document.body.innerText.match(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\uE000-\uF8FF]|\uDB40[\uDC00-\uDC7F]/g) || []).length)).toBe(0);
+      // a drawing of a building always says it is an illustration
+      for (const cap of await page.locator('figure.elev figcaption').all()) await expect(cap).toContainText('Illustration, not a real project');
+      await page.mouse.wheel(0, 4000);
+      await page.waitForTimeout(300);
+      expect(errors).toEqual([]);
+    });
+  }
+
+  test('every internal link on every page lands on a real page and section', async ({ page, request }, info) => {
+    test.skip(info.project.name !== 'desktop', 'the same links on every device, so once');
+    const bodies = new Map();
+    const get = async (p) => { if (!bodies.has(p)) { const r = await request.get(p); bodies.set(p, [r.status(), await r.text()]); } return bodies.get(p); };
+    for (const path of pages) {
+      await page.goto(path);
+      const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.href).filter((h) => h.startsWith(location.origin)));
+      for (const href of new Set(hrefs)) {
+        const url = new URL(href);
+        const [status, html] = await get(url.pathname);
+        expect(status, `${path} -> ${href}`).toBe(200);
+        if (url.hash.length > 1) expect(html, `${path} -> ${href}`).toContain(`id="${url.hash.slice(1)}"`);
+      }
+    }
+  });
+
+  // The smallest phones in use are 320 wide, and a short screen is where sticky drawings and bars run out of room.
+  test('no page scrolls sideways on a 320 x 640 phone', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone only');
+    await page.setViewportSize({ width: 320, height: 640 });
+    for (const path of pages) {
+      await page.goto(path);
+      await page.mouse.wheel(0, 2000);
+      await page.waitForTimeout(200);
+      const r = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, menu: document.querySelector('.menu-btn').getBoundingClientRect().right }));
+      expect(r.over, path).toBeLessThanOrEqual(0);
+      expect(r.menu, path).toBeLessThanOrEqual(320);
+    }
+  });
+
+  // With motion reduced the story's drawing changes stage without animating; a jump from past the story back to
+  // its start must still bring the first stage back, not leave the last one beside step 01.
+  test('a jump back to the story shows its first stage with reduced motion', async ({ page, isMobile }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const [y0, y1] = await page.evaluate(() => [document.getElementById('developers').offsetTop, document.getElementById('markets').offsetTop]);
+    for (let y = y0; y <= y1; y += 160) { await page.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), y); await page.waitForTimeout(25); }
+    await expect(page.locator('#stageName')).not.toHaveText('First sketch');
+    if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+    await page.locator('nav.main a[href="#developers"]').click();
+    await expect(page.locator('#stageName')).toHaveText('First sketch');
+  });
+
+  test('the empty lot on the 404 stays inside its cell', async ({ page }) => {
+    await page.goto('/404.html');
+    const [fig, cell] = await page.evaluate(() => [document.querySelector('.vacant'), document.querySelector('.lot .wrap')].map((e) => { const r = e.getBoundingClientRect(); return { top: r.top + scrollY, bottom: r.bottom + scrollY }; }));
+    expect(fig.top).toBeGreaterThanOrEqual(cell.top - 1);
+    expect(fig.bottom).toBeLessThanOrEqual(cell.bottom + 1);
+  });
+
+  // A larger browser text size (and text-only zoom) folds the sections into the menu instead of pushing the header
+  // controls off the screen, and the hidden skip link stays wholly above it.
+  test('larger default text folds the nav into the menu', async ({ page, browserName }, info) => {
+    test.skip(browserName !== 'chromium' || info.project.name !== 'desktop', 'sets the default text size through Chromium');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Page.enable');
+    await cdp.send('Page.setFontSizes', { fontSizes: { standard: 32 } });
+    await page.goto('/report.html');
+    await expect(page.getByRole('button', { name: 'Menu' })).toBeVisible();
+    const [over, skipBottom] = await page.evaluate(() => [document.documentElement.scrollWidth - innerWidth, document.querySelector('.skip').getBoundingClientRect().bottom]);
+    expect(over).toBe(0);
+    expect(skipBottom).toBeLessThan(0);
+  });
+});

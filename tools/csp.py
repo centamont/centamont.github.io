@@ -13,6 +13,10 @@ for f in pages:
          "object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests")
     tag=f'<meta http-equiv="Content-Security-Policy" content="{csp}">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n'
     t=re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n<meta name="referrer"[^>]*>\n','',t)
+    # styles from the stylesheet only, unless the page's markup carries style attributes (the home page's drawing
+    # indices, the report's bar widths, the deposit schedule): those pages keep 'unsafe-inline' for them.
+    # Scripts set styles through the CSSOM (el.style), which the policy does not govern.
+    if not re.search(r'<[a-zA-Z][^>]*\sstyle=|<style[\s>]',t): tag=tag.replace(" 'unsafe-inline'",'')
     m=re.search(r'<meta charset="utf-8">\n',t,re.I); assert m,f
     t=t[:m.end()]+tag+t[m.end():]
     open(f,'w').write(t); print(f,len(hs))

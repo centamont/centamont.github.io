@@ -193,7 +193,7 @@
   class Model {
     constructor(canvas, opts) {
       this.c = canvas;
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 12, envelope: true, rate: 9, slow: 3, soldRate: 6, presale: 0.5, rest: 45000 }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 13, envelope: true, rate: 9, slow: 3, soldRate: 6, presale: 0.5, rest: 45000 }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; this.C = 0; this.G = 0; // shown: levels framed, levels sold (in levels' worth of residences), levels glazed, crown
@@ -578,10 +578,19 @@
       if (this.o.grid) {
         // seen from above, as a plan, the ground drawing carries the picture, so it is drawn darker
         const bo = 1 + clamp(-(this.phi + (this.tyy || 0)) * 1.6, 0, 1);
+        // a ground line is cut where it passes behind the eye (a close camera, as on the empty lot, can stand inside the
+        // grid), so no part of it is ever projected upside down into the sky
+        const gseg = (x0, z0, x1, z1) => {
+          const k = this.k, n = 0.5, a = k.s * x0 + k.c * z0 + k.d, b = k.s * x1 + k.c * z1 + k.d;
+          if (a < n && b < n) return;
+          if (a < n) { const t = (n - a) / (b - a); x0 += (x1 - x0) * t; z0 += (z1 - z0) * t; }
+          else if (b < n) { const t = (n - b) / (a - b); x1 += (x0 - x1) * t; z1 += (z0 - z1) * t; }
+          seg(this.P(x0, 0, z0), this.P(x1, 0, z1));
+        };
         g.lineWidth = 1;
         for (let i = 0; i <= 30; i += 3) {
           g.strokeStyle = ink(0.07 * bo * (1 - i / 34)); g.beginPath();
-          for (const v of i ? [i, -i] : [0]) { seg(this.P(v, 0, -30), this.P(v, 0, 30)); seg(this.P(-30, 0, v), this.P(30, 0, v)); }
+          for (const v of i ? [i, -i] : [0]) { gseg(v, -30, v, 30); gseg(-30, v, 30, v); }
           g.stroke();
         }
         if (this.o.site !== false) {
@@ -1085,7 +1094,7 @@
         g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4);
         for (let i = 0; i <= FLOORS; i += 5) { const t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(xl, t), ys[i]); }
-        if (Math.abs(ys[FLOORS] - ys[20]) > this.o.labelSize * 1.4) g.fillText('ROOF', fx(xl, 'ROOF'), ys[FLOORS]);
+        if (Math.abs(ys[FLOORS] - ys[20]) > this.o.labelSize * 1.3) g.fillText('ROOF', fx(xl, 'ROOF'), ys[FLOORS]);
         g.globalAlpha = 1;
       }
     }
@@ -1208,13 +1217,17 @@
         g.strokeStyle = `rgba(${sr},${sg},${sb},0.35)`; g.setLineDash([1, 3]); g.beginPath(); g.moveTo(x, y + 5); g.lineTo(x, base); g.stroke(); g.setLineDash([]);
       }
       // sunrise and sunset under the horizon line, the peak height over the arc
-      g.font = '500 12px Jost, sans-serif'; g.textBaseline = 'top'; g.fillStyle = `rgba(${lr},${lg},${lb},0.62)`;
+      g.textBaseline = 'top'; g.fillStyle = `rgba(${lr},${lg},${lb},0.62)`;
       const tr = 'SUNRISE ' + this.sp.rise.toUpperCase(), ts = 'SUNSET ' + this.sp.set.toUpperCase();
-      // both times, when they fit side by side without touching
-      if (g.measureText(tr).width + g.measureText(ts).width + 16 < W + 16) {
+      // both times, when they fit side by side without touching: at the drawing's 13px, or a pixel smaller in a tight corner
+      for (const px of [13, 12]) {
+        g.font = '500 ' + px + 'px Jost, sans-serif';
+        if (g.measureText(tr).width + g.measureText(ts).width + 16 >= W + 16) continue;
         g.textAlign = 'left'; g.fillText(tr, x0 - 8, base + 9);
         g.textAlign = 'right'; g.fillText(ts, x1 + 8, base + 9);
+        break;
       }
+      g.font = '500 13px Jost, sans-serif';
       const pk = arc.reduce((a, q) => (q.el > a.el ? q : a), arc[0]);
       g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
       g.fillText(Math.round(pk.el) + '°', X(pk.m), base - H - 6);

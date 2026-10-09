@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
-    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1180px) closes the drawer,
+    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1180px or 73.75em) closes the drawer,
     // so the page is never left frozen behind a menu that no longer shows.
-    const wide = matchMedia('(max-width:1180px)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
+    const wide = matchMedia('(max-width:1180px),(max-width:73.75em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
     wide.addEventListener ? wide.addEventListener('change', onWide) : wide.addListener(onWide);
     btn.addEventListener('click', () => show(!nav.classList.contains('open')));
     nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
@@ -114,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Headlines rise word by word, and the paragraph after them lifts in. Words keep their spaces, so text reads and copies normally.
   if (!stillPage) {
     const split = (el) => {
-      let i = 0;
       const walk = (node) => {
         [...node.childNodes].forEach((n) => {
           if (n.nodeType === 3) {
@@ -123,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
               if (!part) return;
               if (/^[ \t\n\r]+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
               const w = document.createElement('span'); w.className = 'w';
-              const inner = document.createElement('i'); inner.textContent = part; inner.style.setProperty('--i', i++);
+              const inner = document.createElement('i'); inner.textContent = part;
               w.appendChild(inner); frag.appendChild(w);
             });
             n.replaceWith(frag);
@@ -131,41 +130,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       };
       walk(el); el.classList.add('tx-rise');
-      // stagger by line rather than by word: words on the same line rise together
-      let top = null, line = -1;
-      el.querySelectorAll('.w > i').forEach((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } w.style.setProperty('--i', line); });
     };
-    document.querySelectorAll('main h2, .page h1, .feature h3, .cv-txt h3').forEach(split);
+    const heads = [...document.querySelectorAll('main h2, .page h1, .feature h3, .cv-txt h3')];
+    heads.forEach(split);
+    // stagger by line rather than by word: words on the same line rise together. Every heading is measured in one
+    // pass and marked in a second, so the page is laid out once rather than once a word.
+    const lines = heads.map((el) => { let top = null, line = -1; return [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }); });
+    lines.forEach((ws) => ws.forEach(([w, line]) => w.style.setProperty('--i', line)));
     document.querySelectorAll('main .head .intro, main .head + p, .page .lead-in').forEach((p) => p.classList.add('lift'));
     const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
     document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
-  }
-
-  // Weighted scrolling for mouse wheels: the page eases to rest instead of stepping. Touch, keys, anchors and the scrollbar stay native.
-  if (matchMedia('(pointer: fine)').matches && !stillPage) {
-    let target = scrollY, cur = scrollY, raf = 0;
-    const max = () => document.documentElement.scrollHeight - innerHeight;
-    const tick = () => {
-      cur += (target - cur) * 0.12;
-      if (Math.abs(target - cur) < 0.5) cur = target;
-      scrollTo({ top: cur, behavior: 'instant' });
-      raf = cur === target ? 0 : requestAnimationFrame(tick);
-    };
-    addEventListener('wheel', (e) => {
-      if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || root.classList.contains('menu-open')) return;
-      for (let n = e.target; n && n !== document.body; n = n.parentElement) {
-        if (n.nodeType === 1 && n.scrollHeight > n.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(n).overflowY)) return;
-      }
-      e.preventDefault();
-      if (!raf) cur = target = scrollY;
-      const d = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
-      target = Math.max(0, Math.min(max(), target + d));
-      if (!raf) raf = requestAnimationFrame(tick);
-    }, { passive: false });
-    // anything else that moves the page (keys, anchors, the scrollbar) takes over from the easing
-    addEventListener('scroll', () => { if (!raf) cur = target = scrollY; }, { passive: true });
-    addEventListener('keydown', () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } });
-    document.addEventListener('click', (e) => { if (raf && e.target.closest('a[href^="#"]')) { cancelAnimationFrame(raf); raf = 0; } });
   }
 
   // Drawings that draw themselves once they arrive.

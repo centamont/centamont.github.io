@@ -27,11 +27,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     let build, area, par, line, lim, limT, dot, dotT;
-    function sheet() {
+    function size() {
       W = Math.max(300, Math.round(svg.clientWidth || 640));
       H = Math.round(W >= 520 ? Math.min(500, W * 0.76) : Math.max(280, Math.min(380, W * 0.52)));
-      X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    }
+    function sheet() {
+      size();
+      X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
       // phase names along the top, each beside its line
@@ -154,20 +157,30 @@ document.addEventListener('DOMContentLoaded', function () {
       hairT.textContent = 'Month ' + m + ' \u00b7 ' + Math.round(f * 100) + '%';
     };
     svg.addEventListener('pointermove', (e) => {
-      if (e.pointerType !== 'mouse') return;
+      if (e.pointerType !== 'mouse' || !lastW) return;
       const r = svg.getBoundingClientRect(), u = (e.clientX - r.left) * W / r.width;
       const m = Math.round((u - X0) / (X1 - X0) * M);
       last = m < 0 || m > M ? null : m; read(last);
     });
     svg.addEventListener('pointerleave', () => { last = null; read(null); });
     const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
-    redraw();
-    let lastW = W;
-    new ResizeObserver(() => { if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } }).observe(svg);
+    // The figure sits well down the page, so it is drawn just after the page has loaded rather than while it loads
+    // (measuring its labels lays the page out several times); a hand on the sliders before then draws it at once.
+    // Its height is set now, though (one measure, no labels), so nothing below it moves when it draws.
+    // The legend's 'At par' row shows only when the price is off par; settle it now too, so the legend keeps its
+    // height (and a link to a section further down still lands under the header) when the figure draws.
+    let lastW = 0;
+    size();
+    if (key) key.parentNode.hidden = +price.value === 0;
+    // The sentence below the figure is a live region: filled after load it would be read out away from its figure,
+    // so the first draw fills it quietly, as the sliders do between steps.
+    const first = () => { if (lastW) return; const s = out('cvSay'); s.setAttribute('aria-live', 'off'); redraw(); lastW = W; setTimeout(() => s.setAttribute('aria-live', 'polite'), 600); };
+    if (window.requestIdleCallback) requestIdleCallback(first, { timeout: 1000 }); else setTimeout(first, 200);
+    new ResizeObserver(() => { if (lastW && Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } }).observe(svg);
 
     // the sentence is a live region; announce it once the slider settles, not on every step
     const sayEl = out('cvSay'); let quiet;
-    const onInput = () => { sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
+    const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
   }
 

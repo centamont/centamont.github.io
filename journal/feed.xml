@@ -5,6 +5,8 @@
   <link href="https://centamont.com/journal/feed.xml" rel="self"/>
   <link href="https://centamont.com/journal/"/>
   <id>https://centamont.com/journal/</id>
+  <icon>https://centamont.com/apple-touch-icon.png</icon>
+  <logo>https://centamont.com/og.png</logo>
   <updated>2026-10-09T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <rights>© 2026 Centamont</rights>
