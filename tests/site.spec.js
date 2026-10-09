@@ -1,5 +1,7 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 // Every section of the one-page centamont.com and a phrase from its heading.
 const sections = [
@@ -215,11 +217,36 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
   await page.locator('#letter input[name="area"]').fill('Miami Beach');
   page.on('popup', (p) => p.close().catch(() => {}));
   await page.locator('#letter button[data-to="ig"]').click();
-  await expect(page.locator('#letterNote')).toContainText('Fill in the underlined blank');
+  // the reminder names the blank that is missing, and the field says it is invalid
+  await expect(page.locator('#letterNote')).toContainText('Fill in your name first');
   await expect(page.locator('#letter input[name="name"]')).toBeFocused();
+  await expect(page.locator('#letter input[name="name"]')).toHaveAttribute('aria-invalid', 'true');
   await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+  await expect(page.locator('#letter input[name="name"]')).not.toHaveAttribute('aria-invalid', /.*/);
   await page.locator('#letter button[data-to="ig"]').click();
   await expect(page.locator('#letterNote')).toContainText('Instagram');
+});
+
+// No clipboard permission granted in advance, as for a first-time visitor. Chrome and Edge only allow the copy while
+// the click still counts as the visitor's own, so the copy must start before the Instagram tab opens.
+test('the letter copies and opens Instagram without a clipboard permission', async ({ page, context, browserName }) => {
+  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
+  await page.goto('/');
+  await page.locator('#letter').scrollIntoViewIfNeeded();
+  await page.locator('#letter input[name="where"]').fill('Edgewater');
+  await page.locator('#letter input[name="units"]').fill('60');
+  await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+  const popup = page.waitForEvent('popup');
+  await page.locator('#letter button[data-to="ig"]').click();
+  // the copy settles at once (copied, or the letter shown to copy by hand), never left waiting on a prompt
+  await expect(page.locator('#letterNote')).toContainText('Instagram', { timeout: 2000 });
+  // and the new tab goes straight to the message
+  await (await popup).waitForURL(/^https:\/\/ig\.me\/m\/centamont/, { timeout: 2000 });
+  if (browserName === 'chromium') {
+    await expect(page.locator('#letterNote')).toContainText('Your letter is copied');
+    await context.grantPermissions(['clipboard-read']);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is still a sketch, and we hope to launch sales this year.\n\nWith regards,\nAna Ruiz');
+  }
 });
 
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
@@ -238,4 +265,83 @@ test('every page runs under its security policy with nothing refused', async ({ 
     await page.waitForTimeout(300);
   }
   expect(refused).toEqual([]);
+});
+
+// The report sheet is about 3,000px tall, so on a short phone screen it can never be a quarter in view:
+// each chart list draws its own bars as it arrives.
+test('the report bars draw on a short phone screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 664 });
+  await page.goto('/report.html');
+  for (const sel of ['.rp-funnel', '.rp-src']) {
+    await page.locator(sel).scrollIntoViewIfNeeded();
+    await expect(page.locator(sel)).toHaveClass(/\bin\b/);
+  }
+  await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.rp-funnel .bar i, .rp-src .bar i')].every((i) => getComputedStyle(i).transform === 'none'))).toBe(true);
+});
+
+// Stylesheet and scripts are linked with one shared ?v= token taken from their contents (tools/version.py), so a
+// returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
+test('assets carry the current version', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js'];
+  const h = createHash('sha256');
+  for (const a of assets) h.update(readFileSync(a));
+  const token = h.digest('hex').slice(0, 8);
+  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'journal/index.html',
+    'journal/buying-pre-construction-florida.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html'];
+  let refs = 0;
+  for (const p of pages) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|site\.js|model\.js|instrument\.js)(\?v=[0-9a-f]*)?"/g)) {
+      refs++;
+      expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
+    }
+  }
+  expect(refs).toBeGreaterThanOrEqual(23);
+});
+
+// Opening the menu on a tablet and then widening the window (or turning the tablet) must not leave the page frozen.
+test('the menu lets go when the window widens past it', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'resizes a desktop window');
+  await page.setViewportSize({ width: 1000, height: 1300 });
+  await page.goto('/privacy.html');
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(page.locator('html')).toHaveClass(/menu-open/);
+  await page.setViewportSize({ width: 1300, height: 1000 });
+  await expect(page.locator('html')).not.toHaveClass(/menu-open/);
+  expect(await page.evaluate(() => document.querySelector('main').inert)).toBe(false);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
+});
+
+// WCAG 2.2.2: the hero tower orbits on its own, so phones need the pause switch too. It waits in the open menu.
+test('phones can pause the motion from the menu', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  await page.goto('/');
+  await expect(page.locator('#motionBtn')).toBeHidden();
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(page.getByRole('button', { name: 'Pause motion' })).toBeVisible();
+  // it sits in the menu's keyboard loop: from the last link, Tab reaches it
+  await page.locator('nav.main a').last().focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#motionBtn')).toBeFocused();
+  await page.locator('#motionBtn').click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'true');
+});
+
+// Reduced motion: final states at once. Nothing on the page keeps animating (the scroll-linked reading bar aside).
+test('reduced motion leaves nothing running', async ({ page, isMobile }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  for (const sel of ['.facade', '#chart']) {
+    await page.locator(sel).scrollIntoViewIfNeeded();
+    await expect(page.locator(sel)).toHaveClass(/\bin\b/);
+  }
+  // On a phone the motion switch fades in at the foot of the open menu, so open it too.
+  if (isMobile) {
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(page.locator('#motionBtn')).toBeVisible();
+  }
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').map((a) => a.animationName || a.constructor.name))).toEqual([]);
 });

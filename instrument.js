@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function sheet() {
       W = Math.max(300, Math.round(svg.clientWidth || 640));
       H = Math.round(W >= 520 ? Math.min(500, W * 0.76) : Math.max(280, Math.min(380, W * 0.52)));
-      X0 = 46; X1 = W - 14;
+      X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // inputs grow with what is typed, so the letter reads as prose
     // where the browser can size a field to its text, let it; otherwise estimate
     const native = window.CSS && CSS.supports('field-sizing', 'content');
-    form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.classList.remove('miss'); if (native) return; i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; }; i.addEventListener('input', fit); fit(); });
+    form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); if (native) return; i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; }; i.addEventListener('input', fit); fit(); });
     form.querySelectorAll('.sheet select').forEach((s) => { const fit = () => { if (native) return; s.style.width = s.options[s.selectedIndex].text.length * 0.42 + 1.5 + 'em'; }; s.addEventListener('change', fit); fit(); });
     const text = () => {
       const p = paras.find((x) => !x.hidden), c = p.cloneNode(true), src = [...p.querySelectorAll('input, select')];
@@ -196,10 +196,26 @@ document.addEventListener('DOMContentLoaded', function () {
       c.querySelectorAll('input, select').forEach((f, k) => { f.replaceWith(document.createTextNode(src[k].value.trim() || '…')); });
       c.querySelectorAll('[data-drop]').forEach((o) => o.remove());
       const name = form.querySelector('input[name="name"]').value.trim();
-      return 'Dear partners,\n\n' + c.textContent.replace(/\s+/g, ' ').trim() + '\n\nWith regards,\n' + (name || '');
+      // a dropped clause takes its sentence's full stop with it, so put one back
+      let body = c.textContent.replace(/\s+/g, ' ').trim();
+      if (!/[.!?…]$/.test(body)) body += '.';
+      return 'Dear partners,\n\n' + body + '\n\nWith regards,\n' + (name || '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
     const say = (html) => { note.textContent = ''; requestAnimationFrame(() => { note.innerHTML = html; }); };
+    // what each blank asks for, so a reminder can name the ones left empty
+    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
+    const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
+    // Where the browser has no clipboard API, copy through a selected text field, still inside the click.
+    const legacyCopy = (t) => {
+      const a = document.createElement('textarea'), was = document.activeElement;
+      a.value = t; a.readOnly = true; a.style.position = 'fixed'; a.style.top = '0'; a.style.left = '0'; a.style.opacity = '0';
+      document.body.appendChild(a); a.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (err) {}
+      a.remove(); if (was && was.focus) was.focus();
+      return ok;
+    };
     let busy = false;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -207,26 +223,31 @@ document.addEventListener('DOMContentLoaded', function () {
       const p = paras.find((x) => !x.hidden);
       const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim() && !i.closest('[data-opt]'));
       if (empty.length) {
-        empty.forEach((i) => i.classList.add('miss'));
+        empty.forEach((i) => { i.classList.add('miss'); i.setAttribute('aria-invalid', 'true'); });
         empty[0].focus();
-        say('Fill in the underlined ' + (empty.length === 1 ? 'blank' : 'blanks') + ' first, so the partners know who is writing and why.');
+        say('Fill in ' + list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())) + ' first, so the partners know who is writing and why.');
         return;
       }
       const url = 'https://ig.me/m/centamont', where = 'Instagram';
       const t = text();
-      // open the tab inside the click, before anything asynchronous, so browsers do not block it
-      const w = window.open('', '_blank');
+      // Copy first, while the click still counts as the writer's own. Opening a tab first spends that click in
+      // Chrome and Edge, and the copy then waits on a permission prompt in a tab that is now behind the new one.
+      let copying;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try { copying = navigator.clipboard.writeText(t); } catch (err) { copying = Promise.reject(err); }
+      } else copying = legacyCopy(t) ? Promise.resolve() : Promise.reject(new Error('copy'));
+      // then open Instagram, still inside the same click, so browsers do not block the tab
+      const w = window.open(url, '_blank');
       if (w) { try { w.opener = null; } catch (err) {} }
       busy = true; setTimeout(() => { busy = false; }, 1200);
       const link = '<a class="ul" href="' + url + '" target="_blank" rel="noopener">' + where + '</a>';
       const go = (copied) => {
-        if (w) w.location.href = url;
         box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
         say(copied
           ? 'Your letter is copied. Paste it into the message on ' + link + ', and a partner will reply personally.'
           : 'Your browser did not allow copying. Copy the letter below and paste it into the message on ' + link + '.');
       };
-      (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => go(true), () => go(false));
+      copying.then(() => go(true), () => go(false));
     });
   }
 });

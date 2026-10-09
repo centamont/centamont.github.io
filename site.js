@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
+    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1180px) closes the drawer,
+    // so the page is never left frozen behind a menu that no longer shows.
+    const wide = matchMedia('(max-width:1180px)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
+    wide.addEventListener ? wide.addEventListener('change', onWide) : wide.addListener(onWide);
     btn.addEventListener('click', () => show(!nav.classList.contains('open')));
     nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')) { close(); btn.focus(); } });
@@ -150,4 +154,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // Drawings that draw themselves once they arrive.
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
+
+  // On paper, everything is drawn and every answer is open, wherever the reader had scrolled to. Answers the reader
+  // had closed close again afterwards.
+  let opened = [];
+  addEventListener('beforeprint', () => {
+    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut').forEach((el) => el.classList.add('in'));
+    opened = [...document.querySelectorAll('.faq details:not([open])')];
+    opened.forEach((d) => { d.open = true; });
+  });
+  addEventListener('afterprint', () => { opened.forEach((d) => { d.open = false; }); opened = []; });
 });
