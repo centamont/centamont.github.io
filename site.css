@@ -12,6 +12,8 @@
 :root{
   --ink:#14161A; --ivory:#F4F0E8; --bronze:#B8976A;
   --bg:#F4F0E8; --sheet:#FAF7F1; --fg:#14161A; --muted:#4A463F; --faint:#6E675D; --rule:#D6CDBB;
+  /* a drawing's gridlines and tracks: the rule by day; at night a step lighter, so they keep the same faint presence on the dark sheet */
+  --grid:#D6CDBB;
   --accent:#7A5F3A; --seal:#14161A; --sold:#B8976A; --line:#14161A;
   --band:#14161A; --band-fg:#F4F0E8; --band-muted:#CFC8BA; --band-rule:#34363A;
   /* the hero's ink as channels, so its gradients, the header over it and the intro curtain all match it by day and by night */
@@ -23,11 +25,11 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236;
+  --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
   --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC;
   --band:#0B0C0E; --band-rule:#2A2D31; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236;
+  --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
   --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC;
   --band:#0B0C0E; --band-rule:#2A2D31; color-scheme:dark}
 
@@ -417,7 +419,8 @@ footer{border-top:1px solid var(--fg);font-size:15px;color:var(--muted)}
 .tb ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .tb a{display:inline-block;padding-block:3px}
 .tb a:hover{color:var(--fg)}
-@media (max-width:820px){.tb a{padding-block:10px}.legal a{display:inline-block;padding-block:12px}}
+/* the taller touch targets keep their underline under the word, not under the padding */
+@media (max-width:820px){.tb a{padding-block:10px}.legal a{display:inline-block;padding-block:12px}.tb a,.legal a{background-origin:content-box}}
 /* the display numerals take a tight line, so their baseline meets the plain values beside them */
 .tb .num{font-variant-numeric:lining-nums tabular-nums;font-family:var(--display);font-size:21px;line-height:1;color:var(--fg)}
 .legal{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px;padding-block:20px 28px;font-size:13px}
@@ -540,7 +543,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .lv{transition:color .3s}
 .lv h3{transition:color .3s,transform .5s var(--ease)}
 @media (hover:hover){.lv:hover h3{color:var(--accent);transform:translateX(6px)}}
-.chart .grid line{stroke:var(--rule);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
+.chart .grid line{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
 .chart .gl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.12em}
 .chart .arc{fill:none;stroke:var(--accent);stroke-width:calc(1.25px * var(--u,1));stroke-linecap:round;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .arc.later{stroke-dasharray:calc(3px * var(--u,1)) calc(5px * var(--u,1));stroke-dashoffset:0;stroke-linecap:butt;stroke-opacity:.6}
@@ -591,8 +594,11 @@ html.js .cut.in .ln:nth-child(3) span{transition-delay:.24s}
 .crumbs{font-size:15px;color:var(--faint);margin-bottom:28px}
 .crumbs a{color:var(--accent)}
 .page h1{font-size:clamp(42px,6vw,76px);font-weight:300;letter-spacing:-.02em;line-height:1.04;max-width:18ch}
+/* a note's headline gets three more characters, so 'Buying pre-construction' holds one line, as on the index and its share card */
+.page:has(.prose.lead) h1{max-width:21ch}
 .page .standfirst{font-family:var(--display);font-size:clamp(23px,2.4vw,30px);line-height:1.35;margin-top:26px;max-width:34ch}
-.meta{display:flex;flex-wrap:wrap;gap:6px 24px;margin-top:28px;padding-block:14px;border-block:1px solid var(--rule);font-size:15px;color:var(--faint)}
+/* the date and reading time are set as they are on the journal index and the home page: small uppercase labels */
+.meta{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:28px;padding-block:14px;border-block:1px solid var(--rule);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 /* 31em of 18px Jost: about 70 characters a line, never more than 80 */
 .prose{margin-top:clamp(40px,5vw,64px);max-width:31em}
 /* A two-line initial: its cap height spans line 1's cap line to line 2's baseline (30.6px + Jost's 12.6px caps = Cormorant's
@@ -605,7 +611,7 @@ html.js .cut.in .ln:nth-child(3) span{transition-delay:.24s}
 /* on a wide screen the aside hangs in the empty right margin, so the paragraph beside it keeps its full measure */
 @media (min-width:1024px){.prose .side{margin-right:-258px}}
 .prose .deposit{margin:36px 0 8px}
-.progress{position:fixed;top:63px;left:0;right:0;height:1px;z-index:25;pointer-events:none}
+.progress{position:fixed;top:64px;left:0;right:0;height:1px;z-index:25;pointer-events:none}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 @supports (animation-timeline: scroll()){.progress i{animation:prog linear both;animation-timeline:scroll(root)}}
 @keyframes prog{to{transform:scaleX(1)}}
@@ -614,6 +620,8 @@ html.js .cut.in .ln:nth-child(3) span{transition-delay:.24s}
 .prose p,.prose li{color:var(--muted)}
 .prose p + p{margin-top:18px}
 .prose ul,.prose ol{margin:18px 0 0;padding-left:1.2em}
+/* under a heading a list starts as close as a paragraph does: the first item's 10px folds into the heading's 16px (also when a side note sits between them) */
+.prose h2 + :is(ul,ol),.prose h2 + .side + :is(ul,ol){margin-top:0}
 .prose li{margin-top:10px;padding-left:4px}
 .prose li::marker{color:var(--accent)}
 .prose strong{color:var(--fg);font-weight:500}
@@ -621,6 +629,8 @@ html.js .cut.in .ln:nth-child(3) span{transition-delay:.24s}
 .prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
 @media (min-width:821px){.prose .note{padding-right:2.5em}}
 .page .row{margin-top:48px}
+/* a note closes with its way back to the others */
+.page .row + .links{margin-top:28px}
 .lot .wrap{max-width:var(--max);display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32px,6vw,96px);align-items:center}
 .lot .wrap > *{min-width:0}
 .vacant{position:relative;height:min(56svh,480px)}
@@ -681,7 +691,7 @@ figcaption{text-wrap:pretty}
 .faq summary{text-wrap:balance}
 
 @media (max-width:520px){.hero .row,.page .row{display:grid;grid-template-columns:1fr}.hero .row .btn,.page .row .btn{justify-content:space-between}}
-/* the meta rules end where the prose does (31em of the 18px body; the meta itself is set at 15px) */
+/* the meta rules end where the prose does (31em of the 18px body; the meta itself is set at 13px) */
 .page .meta{max-width:558px}
 @media (max-width:1180px){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
 :root[data-theme="dark"] .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}
@@ -713,9 +723,9 @@ figcaption{text-wrap:pretty}
 .cv-fig{margin:0;display:grid;gap:10px;position:sticky;top:96px}
 .cv-fig svg{display:block;width:100%;height:auto;background:var(--sheet);border:1px solid var(--rule)}
 .cv-fig figcaption{font-size:15px;color:var(--faint);text-wrap:pretty}
-.cv-grid line{stroke:var(--rule);stroke-dasharray:2 4}
+.cv-grid line{stroke:var(--grid);stroke-dasharray:2 4}
 .cv-grid .axis{stroke:var(--fg);stroke-dasharray:none}
-.cv-grid .phase{stroke:var(--rule);stroke-dasharray:none}
+.cv-grid .phase{stroke:var(--grid);stroke-dasharray:none}
 /* numerals take number spacing, not label tracking, so 12 never reads as 1 2 */
 .cv-grid text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
 .cv-grid .ph{text-transform:uppercase;font-size:13px;letter-spacing:.08em;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
@@ -750,7 +760,8 @@ html:not(.js) .curve,html:not(.js) .letter{display:none}
 .letter .sheet input,.letter .sheet select{font:inherit;color:var(--accent);background:transparent;border:0;border-bottom:1px solid var(--sold);border-radius:0;padding:0 2px;margin:0 2px;line-height:1.2;min-width:3ch;max-width:100%;field-sizing:content}
 .letter .sheet input::placeholder{color:var(--faint);opacity:1;font-style:italic}
 .letter .sheet select{-webkit-appearance:none;appearance:none;padding-right:22px;cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23B8976A'/%3E%3C/svg%3E") right 4px center/10px 6px no-repeat}
-.letter .sheet select option{color:#14161A;background:#F4F0E8}
+/* the open list takes the sheet's colors, by day and by night, never the field's bronze */
+.letter .sheet select option{color:var(--fg);background:var(--sheet)}
 .letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:0;border-bottom:2px solid var(--accent);background-color:rgba(184,151,106,.16)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
@@ -864,8 +875,11 @@ header.site{view-transition-name:site-header}
 .page.wide .standfirst{max-width:36ch}
 .rp-after{margin-top:clamp(56px,7vw,104px);padding-top:clamp(28px,3vw,40px);border-top:1px solid var(--fg);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px clamp(32px,6vw,96px);align-items:end}
 .rp-after .big{max-width:26ch}
-.rp-after .row{margin-top:0;display:flex;flex-wrap:wrap;gap:14px;justify-content:flex-end}
-@media (max-width:820px){.rp-after{grid-template-columns:1fr}.rp-after .row{justify-content:flex-start}}
+/* stacked buttons share one width, the widest label's, with their arrows on one edge; on phones they fill the measure */
+.rp-after .row{margin-top:0;display:grid;gap:14px;justify-content:end}
+.rp-after .row .btn{justify-content:space-between}
+@media (max-width:820px){.rp-after{grid-template-columns:1fr}.rp-after .row{justify-content:start}}
+@media (max-width:520px){.rp-after .row{grid-template-columns:minmax(0,1fr)}}
 
 /* The report sheet */
 .sheet-rp{margin-top:clamp(48px,6vw,88px);background:var(--sheet);border:1px solid var(--rule);padding:clamp(20px,3.4vw,48px);display:grid;gap:clamp(28px,3.4vw,48px);position:relative}
@@ -896,7 +910,7 @@ header.site{view-transition-name:site-header}
 .rp-stack{max-width:340px}
 .rp-t{fill:var(--faint);font:500 11px var(--body);letter-spacing:.08em;font-variant-numeric:lining-nums tabular-nums}
 .rp-t.up{text-transform:uppercase}
-.rp-grid{stroke:var(--rule);stroke-dasharray:2 4}
+.rp-grid{stroke:var(--grid);stroke-dasharray:2 4}
 .rp-axis{stroke:var(--fg)}
 .rp-now{stroke:var(--accent);stroke-dasharray:3 3}
 .rp-plan{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:8 5;opacity:.5}
@@ -910,14 +924,15 @@ header.site{view-transition-name:site-header}
 .rp-key{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 .rp-key li{display:flex;align-items:center;gap:8px}
 .rp-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold)}
-.rp-key .k-plan{border-top:1px dashed var(--fg);opacity:.6}
+/* the plan's key is dashed like the plan line itself (8 on, 5 off in the chart), not with the browser's short border dashes */
+.rp-key .k-plan{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 8px,transparent 8px 14px);opacity:.6}
 .rp-key .k-sold{width:14px;height:10px;border:0;background:var(--sold)}
 .rp-key .k-res{width:14px;height:10px;border:1px solid var(--sold);background:repeating-linear-gradient(45deg,var(--sold) 0 1px,transparent 1px 4px)}
 .rp-key .k-open{width:14px;height:10px;border:1px solid var(--fg);opacity:.5}
 .rp-funnel,.rp-src{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .rp-funnel li,.rp-src li{display:grid;grid-template-columns:9em minmax(0,1fr) 3.2em 3.2em;align-items:center;gap:14px;font-size:16px}
 .rp-src li{grid-template-columns:9em minmax(0,1fr) 3.2em}
-.rp-funnel .bar,.rp-src .bar{height:14px;border-bottom:1px solid var(--rule);position:relative}
+.rp-funnel .bar,.rp-src .bar{height:14px;border-bottom:1px solid var(--grid);position:relative}
 .rp-funnel .bar i,.rp-src .bar i{position:absolute;left:0;bottom:0;height:100%;width:var(--w);background:var(--sold);transform-origin:left;transition:transform 1.4s var(--ease)}
 .rp-src .bar i{background:var(--fg);opacity:.75;height:6px}
 /* each list draws its own bars: the sheet is taller than a phone screen can show a quarter of */
@@ -931,23 +946,25 @@ header.site{view-transition-name:site-header}
 .rp-table td:nth-child(3){color:var(--fg);font-family:var(--display);font-size:20px;white-space:nowrap}
 .rp-table td.num{font-family:var(--display);font-size:20px;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;width:4em}
 .rp-next ol{margin:0;padding:0;list-style:none;counter-reset:nx;display:grid;gap:12px}
-.rp-next li{counter-increment:nx;display:grid;grid-template-columns:2.4em minmax(0,1fr);font-family:var(--display);font-size:clamp(21px,1.8vw,25px);line-height:1.35}
-.rp-next li::before{content:counter(nx,decimal-leading-zero);font-family:var(--body);font-size:13px;letter-spacing:.12em;color:var(--accent);padding-top:.5em;font-variant-numeric:tabular-nums}
+.rp-next li{counter-increment:nx;display:grid;grid-template-columns:2.4em minmax(0,1fr);align-items:baseline;font-family:var(--display);font-size:clamp(21px,1.8vw,25px);line-height:1.35}
+/* the counter sits on the baseline of its step's first line */
+.rp-next li::before{content:counter(nx,decimal-leading-zero);font-family:var(--body);font-size:13px;letter-spacing:.12em;color:var(--accent);font-variant-numeric:tabular-nums}
 .rp-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding-top:14px;border-top:1px solid var(--rule);font-size:15px;color:var(--faint)}
 @media (max-width:900px){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
-@media (max-width:520px){.rp-funnel li{grid-template-columns:7.4em minmax(0,1fr) 2.6em 2.8em;gap:10px;font-size:15px}.rp-src li{grid-template-columns:7.4em minmax(0,1fr) 2.8em;gap:10px;font-size:15px}.rp-table thead{display:none}.rp-table tr{display:grid;grid-template-columns:3em minmax(0,1fr);gap:2px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}.rp-table td{border:0;padding:0}.rp-table td:nth-child(n+2){grid-column:2}}
+@media (max-width:520px){.rp-funnel li{grid-template-columns:7.4em minmax(0,1fr) 2.6em 2.8em;gap:10px;font-size:15px}.rp-src li{grid-template-columns:7.4em minmax(0,1fr) 2.8em;gap:10px;font-size:15px}.rp-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.rp-table tr{display:grid;grid-template-columns:3em minmax(0,1fr);gap:2px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}.rp-table td{border:0;padding:0}.rp-table td:nth-child(n+2){grid-column:2}}
 
 /* Private clients */
 .pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(32px,6vw,96px);align-items:end}
 .pc-arch{margin:0;max-width:320px;justify-self:end;width:100%}
 .pc-arch svg{display:block;width:100%;height:auto;overflow:visible}
-.pc-arch path{fill:none;stroke:var(--accent);stroke-width:1;stroke-dasharray:1400;stroke-dashoffset:0;transition:stroke-dashoffset 2.6s var(--ease)}
+/* each arch path is measured as one unit (pathLength="1"), so the line draws across the whole 2.6s instead of finishing early */
+.pc-arch path{fill:none;stroke:var(--accent);stroke-width:1;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset 2.6s var(--ease)}
 .pc-arch .a2{stroke:var(--fg);opacity:.35;transition-delay:.3s}
 .pc-arch .sill{stroke:var(--fg)}
 .pc-arch .knob{fill:var(--accent)}
-.js .pc-arch:not(.in) path{stroke-dashoffset:1400}
+.js .pc-arch:not(.in) path{stroke-dashoffset:1}
 .pc-steps,.pc-terms{margin-top:clamp(64px,8vw,120px);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(24px,3vw,36px)}
-.pc-steps h2,.pc-terms h2{font-size:clamp(30px,3vw,44px);max-width:12ch}
+.pc-steps h2,.pc-terms h2{font-size:clamp(30px,3vw,44px);max-width:none}
 .pc-steps ol{list-style:none;margin:0;padding:0;counter-reset:st}
 .pc-steps li{counter-increment:st;display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:4px 0;padding:20px 0;border-bottom:1px solid var(--rule)}
 .pc-steps li:first-child{padding-top:0}
@@ -957,26 +974,39 @@ header.site{view-transition-name:site-header}
 .pc-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px clamp(20px,3vw,40px)}
 .pc-cols p{color:var(--muted);margin:0;padding-top:14px;border-top:1px solid var(--accent)}
 .pc-cols b{margin-bottom:8px}
+/* beside the terms, the heading starts level with the first term's title, below its bronze rule and padding */
+@media (min-width:821px){.pc-terms h2{padding-top:15px}}
 @media (max-width:820px){.pc-top,.pc-steps,.pc-terms{grid-template-columns:1fr}.pc-arch{justify-self:start;max-width:200px;order:-1}.pc-cols{grid-template-columns:1fr}}
+/* tablets keep the doorway beside the headline, so it never stands alone above an empty measure */
+@media (min-width:641px) and (max-width:820px){.pc-top{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}.pc-arch{order:0;justify-self:end;max-width:320px}}
+/* laptops: three terms side by side would each get about 22 characters a line, so they stack in the wide column */
+@media (min-width:821px) and (max-width:1599px){.pc-cols{grid-template-columns:minmax(0,1fr)}}
 
 /* Colophon */
-.co-row{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:16px clamp(32px,6vw,96px);padding-block:clamp(28px,3.4vw,44px);border-top:1px solid var(--rule)}
+/* each row's head shares the first baseline of its text; the color row, which opens with swatches, aligns their tops */
+.co-row{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:16px clamp(32px,6vw,96px);padding-block:clamp(28px,3.4vw,44px);border-top:1px solid var(--rule);align-items:baseline}
+.co-row:has(.co-sw){align-items:start}
 .co-row:first-of-type{margin-top:clamp(48px,6vw,88px);border-top-color:var(--fg)}
 .co-row h2{font-size:clamp(28px,2.6vw,38px)}
 .co-row > div{display:grid;gap:14px;max-width:40em}
 /* the paragraphs keep the reading measure; the swatch grid and the specimens take the wider column. Zero specificity, so .co-fine keeps its own 34em */
 :where(.co-row > div > p){max-width:31em}
 .co-row p{color:var(--muted);margin:0}
+/* the Latin words take Cormorant's true italic: Jost has no italic here, and the browser would only slant it */
+.co-row p i{font-family:var(--display);font-style:italic;font-size:1.1em;line-height:1}
 .co-spec{color:var(--fg)!important;line-height:1}
 .co-display{font-family:var(--display);font-weight:300;font-size:clamp(48px,6vw,88px);letter-spacing:-.02em}
 .co-body{font-family:var(--body);font-weight:400;font-size:clamp(34px,4vw,56px);letter-spacing:.02em;margin-top:18px!important}
 .co-fine{font-size:15px;color:var(--faint)!important;max-width:34em}
 .co-sw{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.co-sw li{display:grid;gap:4px}
+/* rows never stretch, so a two-line label cannot grow its square past the column */
+.co-sw li{display:grid;gap:4px;align-content:start}
 .co-sw i{display:block;aspect-ratio:1;border:1px solid var(--rule);margin-bottom:8px}
 .co-sw b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
 .co-sw span{font-size:14px;color:var(--faint);letter-spacing:.06em}
-@media (max-width:820px){.co-row{grid-template-columns:1fr}.co-sw{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* four swatches in a row down to phones; two to a row only where four would be too small to read as color */
+@media (max-width:820px){.co-row{grid-template-columns:1fr}}
+@media (max-width:560px){.co-sw{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Journal index */
 .ji{list-style:none;margin:clamp(48px,6vw,88px) 0 0;padding:0;border-top:1px solid var(--fg)}
@@ -985,7 +1015,8 @@ header.site{view-transition-name:site-header}
 .ji-k,.ji-d{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ji-t{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;transition:transform .6s var(--ease)}
 .ji a:hover .ji-t{transform:translateX(8px)}
-@media (max-width:820px){.ji a{grid-template-columns:3em minmax(0,1fr)}.ji-k{grid-column:2}.ji-t{grid-column:2}.ji-d{grid-column:2}}
+/* below 1000px the title column would drop to 160-300px and wrap to four lines, so kind, title and date stack beside the number */
+@media (max-width:1000px){.ji a{grid-template-columns:3em minmax(0,1fr)}.ji-k,.ji-t,.ji-d{grid-column:2}}
 .feature .txt .more + .more{margin-left:0}
 .door .more{margin-top:28px;color:#C9A877}
 .step .more{padding-top:6px;margin-top:20px;align-self:flex-start}
@@ -996,6 +1027,10 @@ header.site{view-transition-name:site-header}
 section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .pc-steps,.pc-terms{padding-bottom:0}
 nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
+/* in the drawer the current row is marked by its bronze words alone, the same on every page; its separator stays a rule */
+@media (max-width:1180px){nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}}
+/* the title block marks the sheet you are on: its link stands underlined, in ink */
+.tb a[aria-current="page"],.legal a[aria-current="page"]{color:var(--fg);background-size:100% 1px}
 /* The pace chart's labels are set in its 560-unit viewBox, so they shrink with the drawing. Each rule follows the chart's
    width in one layout (phones, one column to 900px, beside the stack above that) and keeps every label at 13 to 18px on screen. */
 .rp-pace{overflow:visible}
@@ -1022,6 +1057,8 @@ nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
   .hero .coords > :not(:last-child){display:none}
   .step h3::before{transform:translateY(.12em);margin-left:0}
   .gauge{font-size:13px}
+  /* when a label stacks over its numeral, the numeral starts flush under it; on one line the label keeps the same gap */
+  .gauge b{margin-left:0}.gauge em{margin-right:6px}
 }
 .chart .gl,.cv-dott{paint-order:stroke;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round}
 .cv-dott{stroke-width:4px}
@@ -1060,7 +1097,7 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
 /* Print: ink on paper, no chrome */
 @media print{
   /* ink on white, whichever theme the reader was in */
-  :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:#14161A;--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--accent:#7A5F3A;--seal:#14161A;--sold:#B8976A;--line:#14161A;--band:#fff;--band-fg:#14161A;--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
+  :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:#14161A;--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--grid:#D6CDBB;--accent:#7A5F3A;--seal:#14161A;--sold:#B8976A;--line:#14161A;--band:#fff;--band-fg:#14161A;--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
   body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.scrollcue,.letter,.cv-ctl,canvas,.seam{display:none!important}
   html,body{background:#fff!important;color:#14161A!important}
   /* every headline, paragraph and drawing prints in its final state, wherever the reader had scrolled to */

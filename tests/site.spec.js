@@ -47,7 +47,7 @@ test('home renders cleanly', async ({ page }, info) => {
   expect(hidden).toBe(0);
 
   // Link previews have a title, description and image.
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.png$/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.png(\?v=\d+)?$/);
 
   // The drawing says it is an illustration.
   await expect(page.locator('.elev figcaption')).toContainText('Illustration, not a real project');
@@ -303,6 +303,37 @@ test('assets carry the current version', async ({}, info) => {
     }
   }
   expect(refs).toBeGreaterThanOrEqual(23);
+});
+
+// A note's dates are written in five places. They must agree: the date on the page, the share tags, the structured
+// data and the feed say the same published and revised days, and the sitemap never claims an older change.
+test('journal dates agree everywhere they are written', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const feed = readFileSync('journal/feed.xml', 'utf8');
+  const sitemap = readFileSync('sitemap.xml', 'utf8');
+  const notes = ['buying-pre-construction-florida.html', 'launch-price-and-the-pre-sale-threshold.html', 'what-a-weekly-sales-report-should-measure.html'];
+  for (const n of notes) {
+    const html = readFileSync('journal/' + n, 'utf8');
+    const url = 'https://centamont.com/journal/' + n;
+    const og = (p) => (html.match(new RegExp(`<meta property="article:${p}" content="([^"]+)"`)) || [])[1];
+    const ld = JSON.parse((html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1]);
+    const article = ld['@graph'].find((x) => x['@type'] === 'Article');
+    const meta = (html.match(/<div class="meta">([\s\S]*?)<\/div>/) || [])[1] || '';
+    const times = [...meta.matchAll(/<time datetime="([^"]+)">/g)].map((m) => m[1]);
+    const shownPublished = times[0];
+    const shownRevised = /Revised <time/.test(meta) ? times[times.length - 1] : times[0];
+    const entry = feed.split('<entry>').find((e) => e.includes(`<id>${url}</id>`)) || '';
+    const feedPublished = (entry.match(/<published>(\d{4}-\d\d-\d\d)/) || [])[1];
+    const feedUpdated = (entry.match(/<updated>(\d{4}-\d\d-\d\d)/) || [])[1];
+    const lastmod = (sitemap.match(new RegExp(`<loc>${url.replace(/\./g, '\\.')}</loc><lastmod>([^<]+)</lastmod>`)) || [])[1];
+    expect(shownPublished, `${n}: page date`).toBeTruthy();
+    for (const [where, v] of [['article:published_time', og('published_time')], ['JSON-LD datePublished', article.datePublished], ['feed published', feedPublished]])
+      expect(v, `${n}: ${where}`).toBe(shownPublished);
+    for (const [where, v] of [['article:modified_time', og('modified_time')], ['JSON-LD dateModified', article.dateModified], ['feed updated', feedUpdated]])
+      expect(v, `${n}: ${where}`).toBe(shownRevised);
+    expect(lastmod, `${n}: sitemap lastmod`).toBeTruthy();
+    expect(lastmod >= shownRevised, `${n}: sitemap lastmod ${lastmod} is older than the revision ${shownRevised}`).toBe(true);
+  }
 });
 
 // Opening the menu on a tablet and then widening the window (or turning the tablet) must not leave the page frozen.

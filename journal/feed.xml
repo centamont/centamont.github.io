@@ -7,10 +7,12 @@
   <id>https://centamont.com/journal/</id>
   <updated>2026-10-09T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
+  <rights>© 2026 Centamont</rights>
   <entry>
     <title>What a weekly sales report should measure</title>
     <link href="https://centamont.com/journal/what-a-weekly-sales-report-should-measure.html"/>
     <id>https://centamont.com/journal/what-a-weekly-sales-report-should-measure.html</id>
+    <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
     <updated>2026-10-08T12:00:00Z</updated>
     <summary>The figures that belong on a developer’s weekly sales report, why each is measured against the plan, and how the sheet should end in decisions.</summary>
@@ -19,6 +21,7 @@
     <title>Launch price and the pre-sale threshold</title>
     <link href="https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html"/>
     <id>https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html</id>
+    <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
     <updated>2026-10-09T12:00:00Z</updated>
     <summary>How a launch price moves two numbers: the month the lender’s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
@@ -27,8 +30,9 @@
     <title>Buying pre-construction in Florida</title>
     <link href="https://centamont.com/journal/buying-pre-construction-florida.html"/>
     <id>https://centamont.com/journal/buying-pre-construction-florida.html</id>
-    <published>2026-10-07T00:00:00Z</published>
-    <updated>2026-10-08T00:00:00Z</updated>
+    <category term="Buyer guide"/>
+    <published>2026-10-07T12:00:00Z</published>
+    <updated>2026-10-08T12:00:00Z</updated>
     <summary>How deposits are protected, the 15-day window to cancel, and the questions to ask a developer before you reserve.</summary>
   </entry>
 </feed>
