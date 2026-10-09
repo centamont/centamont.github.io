@@ -87,11 +87,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const fmt = (p) => (p === 0 ? 'At par' : (p > 0 ? p + '% above' : -p + '% below'));
     const key = document.querySelector('.cv-key .k-par');
 
-    // a small elevation of the tower: four podium floors, then eighteen tapering ones
+    // a small elevation of the tower, as in the story above: three podium floors, seventeen tapering residential ones
+    // and a two-floor crown. Only residences sell, from the top down, so the podium and the crown never fill.
     const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
+    const POD = 3, RES = 17;
     let lastN = 0;
     if (tw) for (let k = 0; k < 22; k++) {
-      const wdt = k < 4 ? 36 : 20 - (k - 4) * 0.22, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const wdt = k < POD ? 36 : k < POD + RES ? 20 - (k - POD) * 0.22 : 14, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       r.setAttribute('x', (40 - wdt) / 2); r.setAttribute('y', 110 - (k + 1) * 4.9 - (k >= 4 ? 0 : 0)); r.setAttribute('width', wdt); r.setAttribute('height', 4.1); tw.appendChild(r);
     }
     function draw() {
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
       // the same share of the building, filled floor by floor in a small elevation beside the figure
-      if (tw) { const n = Math.round(done * 22); tw.querySelectorAll('rect').forEach((r, k) => { r.classList.toggle('on', k < n); r.style.transitionDelay = (reduceM ? 0 : Math.abs(k - lastN) * 22) + 'ms'; }); lastN = n; }
+      if (tw) { const n = Math.round(done * RES); tw.querySelectorAll('rect').forEach((r, k) => { const d = POD + RES - 1 - k; r.classList.toggle('on', k >= POD && d >= 0 && d < n); r.style.transitionDelay = (reduceM || k < POD || d < 0 ? 0 : Math.abs(d - lastN) * 22) + 'ms'; }); lastN = n; }
       let say;
       const unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - base[DONE]) * 100);
       if (p === 0) say = 'At par, about ' + Math.round(done * 100) + ' percent of the building is under contract by completion' + (hit > -1 ? '.' : ', and the threshold is not met within ' + M + ' months.');
