@@ -208,11 +208,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // what each blank asks for, so a reminder can name the ones left empty
     const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
     const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
-    // Where the browser has no clipboard API, copy through a selected text field, still inside the click.
-    const legacyCopy = (t) => {
+    // Copy through a selected text field. It finishes inside the click, before anything else can take the focus,
+    // in every browser. (16px type, so iOS does not zoom on the field.)
+    const syncCopy = (t) => {
       const a = document.createElement('textarea'), was = document.activeElement;
-      a.value = t; a.readOnly = true; a.style.position = 'fixed'; a.style.top = '0'; a.style.left = '0'; a.style.opacity = '0';
-      document.body.appendChild(a); a.select();
+      a.value = t; a.readOnly = true; a.style.position = 'fixed'; a.style.top = '0'; a.style.left = '0'; a.style.opacity = '0'; a.style.fontSize = '16px';
+      document.body.appendChild(a); a.select(); a.setSelectionRange(0, t.length);
       let ok = false;
       try { ok = document.execCommand('copy'); } catch (err) {}
       a.remove(); if (was && was.focus) was.focus();
@@ -232,12 +233,14 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       const url = 'https://ig.me/m/centamont', where = 'Instagram';
       const t = text();
-      // Copy first, while the click still counts as the writer's own. Opening a tab first spends that click in
-      // Chrome and Edge, and the copy then waits on a permission prompt in a tab that is now behind the new one.
+      // Copy first, while the click still counts as the writer's own and this tab still has the focus. Opening a tab
+      // first spends that click in Chrome and Edge, and an asynchronous copy can lose the focus to the new tab before
+      // it lands, so the synchronous copy goes first and the clipboard API is only the second try.
       let copying;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
+      if (syncCopy(t)) copying = Promise.resolve();
+      else if (navigator.clipboard && navigator.clipboard.writeText) {
         try { copying = navigator.clipboard.writeText(t); } catch (err) { copying = Promise.reject(err); }
-      } else copying = legacyCopy(t) ? Promise.resolve() : Promise.reject(new Error('copy'));
+      } else copying = Promise.reject(new Error('copy'));
       // then open Instagram, still inside the same click, so browsers do not block the tab
       const w = window.open(url, '_blank');
       if (w) { try { w.opener = null; } catch (err) {} }
