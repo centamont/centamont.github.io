@@ -34,27 +34,40 @@ document.addEventListener('DOMContentLoaded', function () {
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
-      // phase names along the top, moved to a second row when they would touch
-      const rows = [[], [], []];
+      // phase names along the top, each beside its line
       const phases = [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
       const tl = [];
       phases.forEach(([m, t]) => { const e = el('text', { class: 'ph', 'text-anchor': 'start' }, g, t); tl.push([m, e, e.getComputedTextLength() || t.length * 8]); });
-      let two = 0;
-      // leave room past the plot for the last phase name, so every name sits to the right of its line
+      // leave room past the plot for the last phase name, so every name can sit to the right of its line
       const wLast = tl[tl.length - 1][2];
       X1 = Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE));
       const X1p = X1;
-      tl.forEach(([m, e, w]) => {
-        const sx = X0 + (X1p - X0) * m / M;
-        let a = sx + 6, anchor = 'start';
-        if (a + w > W - 4) { a = sx - 6; anchor = 'end'; }
-        const l = anchor === 'start' ? a : a - w, r = anchor === 'start' ? a + w : a;
-        let row = rows.findIndex((rw) => !rw.some(([pl, pr]) => l < pr + 12 && r > pl - 12));
-        if (row < 0) row = rows.length - 1;
-        if (row) two = Math.max(two, row);
-        rows[row].push([l, r]);
-        e.dataset.row = row; e.setAttribute('x', a); e.setAttribute('text-anchor', anchor);
+      // Every place a name could go: right or left of its line, on one of three rows. A line starts at its own
+      // name's row, so a name may span another phase's line only when that line starts on a lower row.
+      const opts = tl.map(([m, , w]) => {
+        const sx = X0 + (X1p - X0) * m / M, o = [];
+        for (let row = 0; row < 3; row++) for (const anchor of ['start', 'end']) {
+          const a = anchor === 'start' ? sx + 6 : sx - 6, l = anchor === 'start' ? a : a - w, r = l + w;
+          if (l >= 2 && r <= W - 4) o.push({ row, anchor, a, l, r, sx });
+        }
+        return o;
       });
+      const clear = (o, c) => (c.row !== o.row || o.l >= c.r + 12 || o.r <= c.l - 12) &&
+        !(o.l - 4 < c.sx && c.sx < o.r + 4 && c.row <= o.row) && !(c.l - 4 < o.sx && o.sx < c.r + 4 && o.row <= c.row);
+      // the best set uses the fewest rows (the plot keeps its height), then keeps names to the right of their lines
+      let best = null, bestCost = Infinity;
+      const place = (i, chosen) => {
+        if (i === opts.length) {
+          const cost = 100 * Math.max(...chosen.map((c) => c.row)) + 120 * chosen.filter((c) => c.anchor === 'end').length + 5 * chosen.reduce((n, c) => n + c.row, 0);
+          if (cost < bestCost) { bestCost = cost; best = chosen.slice(); }
+          return;
+        }
+        opts[i].forEach((o) => { if (chosen.every((c) => clear(o, c))) { chosen.push(o); place(i + 1, chosen); chosen.pop(); } });
+      };
+      place(0, []);
+      if (!best) best = opts.map((o, i) => o.find((c) => c.row === Math.min(i, 2)) || o[0] || { row: 0, anchor: 'start', a: 0 });
+      let two = 0;
+      tl.forEach(([, e], i) => { const c = best[i]; two = Math.max(two, c.row); e.dataset.row = c.row; e.setAttribute('x', c.a); e.setAttribute('text-anchor', c.anchor); });
       Y0 = 34 + 16 * two; Y1 = H - 52;
       tl.forEach(([m, e]) => e.setAttribute('y', 18 + 16 * +e.dataset.row));
       [0.25, 0.5, 0.75, 1].forEach((f) => { el('line', { x1: X0, x2: X1, y1: y(f), y2: y(f) }, g); el('text', { x: X0 - 8, y: y(f) + 4, 'text-anchor': 'end' }, g, Math.round(f * 100) + '%'); });
@@ -119,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
       else {
         const d = hit - baseHit;
         const when = hit < 0 ? 'the threshold is not met within ' + M + ' months' : d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
-        say = 'Each residence earns ' + Math.abs(p) + (p > 0 ? ' percent more, but ' : ' percent less, ') + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' at par.';
+        say = 'Each residence sells for ' + Math.abs(p) + (p > 0 ? ' percent more, but ' : ' percent less, ') + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' at par.';
       }
       out('cvSay').textContent = say;
       svg.setAttribute('aria-label', 'Illustrative sales curve. ' + say);
@@ -162,6 +175,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); };
     form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', show));
     show(); addEventListener('pageshow', show);
+    // A link can choose who is writing: ?as=buy from another page, data-as on a link within this one.
+    const preset = (v) => { if (!['dev', 'buy', 'adv'].includes(v)) return; form.querySelector('input[name="as"][value="' + v + '"]').checked = true; show(); };
+    try {
+      const q = new URLSearchParams(location.search), v = q.get('as');
+      if (v) { preset(v); q.delete('as'); history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); }
+    } catch (e) {}
+    document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
     // Enter in a blank should not send the letter
     form.querySelectorAll('.sheet input').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); }));
     // inputs grow with what is typed, so the letter reads as prose
@@ -170,8 +190,11 @@ document.addEventListener('DOMContentLoaded', function () {
     form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.classList.remove('miss'); if (native) return; i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; }; i.addEventListener('input', fit); fit(); });
     form.querySelectorAll('.sheet select').forEach((s) => { const fit = () => { if (native) return; s.style.width = s.options[s.selectedIndex].text.length * 0.42 + 1.5 + 'em'; }; s.addEventListener('change', fit); fit(); });
     const text = () => {
-      const p = paras.find((x) => !x.hidden), c = p.cloneNode(true);
-      c.querySelectorAll('input, select').forEach((f, k) => { const src = p.querySelectorAll('input, select')[k]; f.replaceWith(document.createTextNode(src.value.trim() || '…')); });
+      const p = paras.find((x) => !x.hidden), c = p.cloneNode(true), src = [...p.querySelectorAll('input, select')];
+      // an optional clause left blank stays out of the letter
+      p.querySelectorAll('[data-opt]').forEach((o, k) => { if (![...o.querySelectorAll('input')].some((i) => i.value.trim())) c.querySelectorAll('[data-opt]')[k].dataset.drop = ''; });
+      c.querySelectorAll('input, select').forEach((f, k) => { f.replaceWith(document.createTextNode(src[k].value.trim() || '…')); });
+      c.querySelectorAll('[data-drop]').forEach((o) => o.remove());
       const name = form.querySelector('input[name="name"]').value.trim();
       return 'Dear partners,\n\n' + c.textContent.replace(/\s+/g, ' ').trim() + '\n\nWith regards,\n' + (name || '');
     };
@@ -182,14 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       if (busy) return;
       const p = paras.find((x) => !x.hidden);
-      const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim());
+      const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim() && !i.closest('[data-opt]'));
       if (empty.length) {
         empty.forEach((i) => i.classList.add('miss'));
         empty[0].focus();
         say('Fill in the underlined ' + (empty.length === 1 ? 'blank' : 'blanks') + ' first, so the partners know who is writing and why.');
         return;
       }
-            const url = 'https://ig.me/m/centamont', where = 'Instagram';
+      const url = 'https://ig.me/m/centamont', where = 'Instagram';
       const t = text();
       // open the tab inside the click, before anything asynchronous, so browsers do not block it
       const w = window.open('', '_blank');

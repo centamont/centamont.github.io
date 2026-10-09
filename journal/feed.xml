@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Centamont Journal</title>
-  <subtitle>Notes on new development from Centamont: short guides for buyers and developers, written by the partners.</subtitle>
+  <subtitle>Notes on new development from Centamont: short guides for buyers and developers from the partners.</subtitle>
   <link href="https://centamont.com/journal/feed.xml" rel="self"/>
   <link href="https://centamont.com/journal/"/>
   <id>https://centamont.com/journal/</id>
-  <updated>2026-10-08T12:00:00Z</updated>
+  <updated>2026-10-09T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <entry>
     <title>What a weekly sales report should measure</title>
@@ -20,8 +20,8 @@
     <link href="https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html"/>
     <id>https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html</id>
     <published>2026-10-08T12:00:00Z</published>
-    <updated>2026-10-08T12:00:00Z</updated>
-    <summary>How a launch price moves two dates: when the lender&#39;s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
+    <updated>2026-10-09T12:00:00Z</updated>
+    <summary>How a launch price moves two numbers: the month the lender&#39;s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
   </entry>
   <entry>
     <title>Buying pre-construction in Florida</title>
