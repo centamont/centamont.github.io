@@ -294,8 +294,9 @@ section.band + section,section + section.band{border-top:0}
 }
 @media (max-width:820px){
   .door{grid-template-columns:1fr;gap:clamp(48px,12vw,72px)}
-  /* the door stands under the text's left edge; its terms keep clear of the open leaves at the jambs */
-  .doorway{aspect-ratio:auto;min-height:70svh;max-width:420px;justify-self:start;padding:0 clamp(52px,14vw,62px) 28px;margin-bottom:0}
+  /* the door stands under the text's left edge; its terms keep clear of the open leaves at the jambs,
+     and stand at least two fifths of the door's width below its top, so on short screens the door grows to keep them under the crown */
+  .doorway{aspect-ratio:auto;min-height:70svh;max-width:420px;justify-self:start;padding:min(40%,168px) clamp(52px,14vw,62px) 28px;margin-bottom:0}
   .door .terms b{font-size:24px}
   .door .terms p{padding:14px 0;font-size:17px}
 }
@@ -953,17 +954,22 @@ header.site{view-transition-name:site-header}
 .rp-dot{fill:var(--sold);stroke:var(--sheet);stroke-width:3}
 .rp-c{stroke:var(--fg);stroke-width:.8;fill:transparent}
 .rp-c.sold{fill:var(--sold);stroke:var(--sold)}
-.rp-c.res{stroke:var(--sold)}
+/* reserved cells take their hatch here, since the rule above outranks the cell's own fill attribute */
+.rp-c.res{stroke:var(--sold);fill:url(#hatch)}
 .rp-hatch{stroke:var(--sold);stroke-width:1.2}
-.rp-c.open{opacity:.45}
+.rp-c:is(.open,.later){opacity:.45}
+/* not yet released: drawn in dashes, as a drawing shows what is still to come */
+.rp-c.later{stroke-dasharray:2 2}
 .rp-key{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .rp-key li{display:flex;align-items:center;gap:8px}
 .rp-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold)}
 /* the plan's key is dashed like the plan line itself (8 on, 5 off in the chart), not with the browser's short border dashes */
 .rp-key .k-plan{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 8px,transparent 8px 14px);opacity:.6}
 .rp-key .k-sold{width:14px;height:10px;border:0;background:var(--sold)}
-.rp-key .k-res{width:14px;height:10px;border:1px solid var(--sold);background:repeating-linear-gradient(45deg,var(--sold) 0 1px,transparent 1px 4px)}
-.rp-key .k-open{width:14px;height:10px;border:1px solid var(--fg);opacity:.5}
+.rp-key .k-res{width:14px;height:10px;border:1px solid var(--sold);background:repeating-linear-gradient(135deg,var(--sold) 0 1px,transparent 1px 4px)}
+.rp-key :is(.k-open,.k-later){width:14px;height:10px;border:1px solid var(--fg);opacity:.5}
+/* its key is dashed like the cells, 2 on and 2 off, so each side starts and ends on a dash (the browser's dashed border breaks the corners) */
+.rp-key .k-later{border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 2px,transparent 2px 4px) 0 0/100% 1px no-repeat,repeating-linear-gradient(90deg,var(--fg) 0 2px,transparent 2px 4px) 0 100%/100% 1px no-repeat,repeating-linear-gradient(180deg,var(--fg) 0 2px,transparent 2px 4px) 0 0/1px 100% no-repeat,repeating-linear-gradient(180deg,var(--fg) 0 2px,transparent 2px 4px) 100% 0/1px 100% no-repeat}
 .rp-funnel,.rp-src{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .rp-funnel li,.rp-src li{display:grid;grid-template-columns:9em minmax(0,1fr) 3.2em 3.2em;align-items:center;gap:14px;font-size:16px}
 .rp-src li{grid-template-columns:9em minmax(0,1fr) 3.2em}
@@ -986,7 +992,20 @@ header.site{view-transition-name:site-header}
 .rp-next li::before{content:counter(nx,decimal-leading-zero);font-family:var(--body);font-size:13px;letter-spacing:.12em;color:var(--accent);font-variant-numeric:tabular-nums}
 .rp-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding-top:14px;border-top:1px solid var(--rule);font-size:15px;color:var(--faint)}
 @media (max-width:900px){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
-@media (max-width:520px){.rp-funnel li{grid-template-columns:7.4em minmax(0,1fr) 2.6em 2.8em;gap:10px;font-size:15px}.rp-src li{grid-template-columns:7.4em minmax(0,1fr) 2.8em;gap:10px;font-size:15px}.rp-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.rp-table tr{display:grid;grid-template-columns:3em minmax(0,1fr);gap:2px 12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.rp-table td{border:0;padding:0}.rp-table td:nth-child(n+2){grid-column:2}}
+/* phones: each bar takes the sheet's full width on its own line, under its label and figures, rather than a stub between them;
+   the table's header is hidden, so each week number carries a small WEEK label (silent to screen readers, which still hear the column header) */
+@media (max-width:520px){.rp-funnel,.rp-src{gap:16px}.rp-funnel li{grid-template-columns:minmax(0,1fr) 2.6em 2.8em;gap:4px 10px;font-size:15px}.rp-src li{grid-template-columns:minmax(0,1fr) 2.8em;gap:4px 10px;font-size:15px}.rp-funnel .bar,.rp-src .bar{grid-row:2;grid-column:1/-1}.rp-funnel .bar{height:10px}.rp-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.rp-table tr{display:grid;grid-template-columns:3em minmax(0,1fr);gap:2px 12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.rp-table td{border:0;padding:0}.rp-table td:nth-child(n+2){grid-column:2}.rp-table td.num{grid-row:span 3}.rp-table td.num::before{content:"Week";content:"Week" / "";display:block;font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);line-height:28px}}
+
+/* High contrast removes painted backgrounds, which would leave the report's bars, its keys and the deposit schedule blank:
+   they keep their fills and hatches, drawn in the system's text colours */
+@media (forced-colors:active){
+  .rp-funnel .bar i,.rp-src .bar i,.rp-key .k-sold,.dbar .s.esc,.sw.esc{forced-color-adjust:none;background:CanvasText;border-color:CanvasText}
+  .rp-key .k-res{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,CanvasText 0 1px,transparent 1px 4px)}
+  .dbar .s.con,.sw.con{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,CanvasText 0 1px,transparent 1px 7px)}
+  .dbar .s.often,.sw.often{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,GrayText 0 1px,transparent 1px 7px)}
+  .rp-key .k-plan{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 8px,transparent 8px 14px)}
+  .rp-key .k-later{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 0/100% 1px no-repeat,repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 100%/100% 1px no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 0 0/1px 100% no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 100% 0/1px 100% no-repeat}
+}
 
 /* Private clients */
 .pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(32px,6vw,96px);align-items:end}
@@ -1005,7 +1024,8 @@ header.site{view-transition-name:site-header}
 .pc-steps li:first-child{padding-top:0}
 .pc-steps li::before{content:counter(st,upper-roman);grid-row:span 2;font-family:var(--display);font-size:28px;line-height:1.1;color:var(--accent)}
 .pc-steps b,.pc-cols b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
-.pc-steps span{color:var(--muted)}
+/* the step's description only (the heading's words are spans too), held to a reading measure on wide screens */
+.pc-steps li > span{color:var(--muted);max-width:34em}
 .pc-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px clamp(20px,3vw,40px)}
 .pc-cols p{color:var(--muted);margin:0;padding-top:14px;border-top:1px solid var(--accent)}
 .pc-cols b{margin-bottom:8px}
@@ -1014,6 +1034,8 @@ header.site{view-transition-name:site-header}
 @media (max-width:820px){.pc-top,.pc-steps,.pc-terms{grid-template-columns:1fr}.pc-arch{justify-self:start;max-width:200px;order:-1}.pc-cols{grid-template-columns:1fr}}
 /* tablets keep the doorway beside the headline, so it never stands alone above an empty measure */
 @media (min-width:641px) and (max-width:820px){.pc-top{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}.pc-arch{order:0;justify-self:end;max-width:320px}}
+/* phones on their side: the doorway is no taller than the screen below the breadcrumb allows, so the headline stands whole in the first view */
+@media (min-width:641px) and (max-height:500px) and (orientation:landscape){.pc-arch{max-width:min(320px,calc((100svh - 150px) * 5 / 7))}}
 /* laptops: three terms side by side would each get about 22 characters a line, so they stack in the wide column */
 @media (min-width:821px) and (max-width:1599px){.pc-cols{grid-template-columns:minmax(0,1fr)}}
 
