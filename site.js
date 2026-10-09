@@ -25,27 +25,44 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Motion on or off, remembered per visitor, on top of the system's reduced-motion setting.
-  // The page reloads so every drawing starts again in the chosen mode.
+  // The page reloads so every drawing starts again in the chosen mode. The switch keeps one name, "Pause motion",
+  // and says whether it is pressed. Where the browser keeps no site data, the choice rides in the address instead
+  // (?motion=off, read by each page's head script), so the pause still holds on this page.
   const stillPage = matchMedia('(prefers-reduced-motion: reduce)').matches || root.dataset.motion === 'off';
   const motionBtn = document.getElementById('motionBtn');
   if (motionBtn) {
     const off = root.dataset.motion === 'off';
-    motionBtn.setAttribute('aria-pressed', String(off)); motionBtn.setAttribute('aria-label', off ? 'Play motion' : 'Pause motion');
-    motionBtn.addEventListener('click', () => { try { if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off'); } catch (e) {} location.reload(); });
+    motionBtn.setAttribute('aria-pressed', String(off));
+    motionBtn.addEventListener('click', (e) => {
+      let kept = false;
+      try {
+        if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off');
+        kept = true;
+        // pressed from the keyboard, the focus comes back to the switch after the reload
+        if (e.detail === 0) sessionStorage.setItem('cm-focus', 'motion');
+      } catch (err) {}
+      const u = new URL(location.href);
+      if (!off && !kept) u.searchParams.set('motion', 'off'); else u.searchParams.delete('motion');
+      if (u.href === location.href) location.reload(); else location.replace(u.href);
+    });
+    try { if (sessionStorage.getItem('cm-focus') === 'motion') { sessionStorage.removeItem('cm-focus'); motionBtn.focus({ preventScroll: true }); } } catch (e) {}
   }
 
-  // Day and night, remembered per visitor. Pages listen for 'cm-theme' to recolor drawings.
+  // Day and night, remembered per visitor. The switch is "Night mode", pressed while the page is at night, whether the
+  // visitor chose it or the system did. Pages listen for 'cm-theme' to recolor drawings.
   const themeBtn = document.getElementById('themeBtn');
+  const scheme = matchMedia('(prefers-color-scheme: dark)');
+  const night = () => (root.dataset.theme ? root.dataset.theme === 'dark' : scheme.matches);
+  const pressed = () => { if (themeBtn) themeBtn.setAttribute('aria-pressed', String(night())); };
   const changed = () => document.dispatchEvent(new CustomEvent('cm-theme'));
-  if (themeBtn) themeBtn.setAttribute('aria-pressed', String(root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches));
+  pressed();
   if (themeBtn) themeBtn.addEventListener('click', () => {
-    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    root.dataset.theme = dark ? 'light' : 'dark';
-    themeBtn.setAttribute('aria-pressed', String(!dark));
+    root.dataset.theme = night() ? 'light' : 'dark';
+    pressed();
     try { localStorage.setItem('cm-theme', root.dataset.theme); } catch (e) {}
     changed();
   });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', changed);
+  scheme.addEventListener('change', () => { pressed(); changed(); });
 
   // Reading progress on journal notes, where the browser cannot draw it with CSS alone.
   const bar = document.querySelector('.progress i');

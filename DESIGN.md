@@ -25,7 +25,7 @@ An architect's elevation sheet on ivory vellum. Ink linework, bronze for what ha
 ## Motion
 
 The signature is a line-drawn 3D massing model (`model.js`, canvas 2D, no libraries) of a generic tower, always captioned as an illustration. It appears twice: in the ink hero, rising floor by floor after the intro and orbiting slowly, with a slight tilt that follows the pointer; and in the developer story, where it frames and fills bronze per step while the camera moves between views.
-Supporting moments: a one-time intro per session (a counter from 001 to 100; on the hundredth a bronze hairline splits the stone and the halves part; any click, key or scroll skips it); the hero headline rising line by line as the curtain parts; the doorway drawing itself around the private-client terms; market routes drawing out from Miami on a latitude and longitude chart; the name cut in line by line.
+Supporting moments: a one-time intro per visitor, remembered on the device (a counter from 001 to 100; on the hundredth a bronze hairline splits the stone and the halves part; any click, key or scroll skips it); the hero headline rising line by line as the curtain parts; the doorway drawing itself around the private-client terms; market routes drawing out from Miami on a latitude and longitude chart; the name cut in line by line.
 Reduced motion: no intro, no orbit, final states shown at once. Day and night toggle in the header, remembered per visitor.
 
 ## Browser surfaces

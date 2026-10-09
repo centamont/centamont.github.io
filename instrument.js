@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastN = 0;
     if (tw) for (let k = 0; k < 22; k++) {
       const wdt = k < POD ? 36 : k < POD + RES ? 20 - (k - POD) * 0.22 : 14, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      r.setAttribute('x', (40 - wdt) / 2); r.setAttribute('y', 110 - (k + 1) * 4.9 - (k >= 4 ? 0 : 0)); r.setAttribute('width', wdt); r.setAttribute('height', 4.1); tw.appendChild(r);
+      r.setAttribute('x', (40 - wdt) / 2); r.setAttribute('y', 110 - (k + 1) * 4.9); r.setAttribute('width', wdt); r.setAttribute('height', 4.1); tw.appendChild(r);
     }
     function draw() {
       const p = +price.value, T = +loan.value / 100, s = model(p), base = model(0);
@@ -134,7 +134,9 @@ document.addEventListener('DOMContentLoaded', function () {
       else {
         const d = hit - baseHit;
         const when = hit < 0 ? 'the threshold is not met within ' + M + ' months' : d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
-        say = 'Each residence sells for ' + Math.abs(p) + (p > 0 ? ' percent more, but ' : ' percent less, ') + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' at par.';
+        // "but" only where the threshold pays for the higher price; otherwise the two clauses are simply set side by side
+        const join = p > 0 && (hit < 0 || d > 0) ? ', but ' : '; ';
+        say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' percent at par.';
       }
       out('cvSay').textContent = say;
       svg.setAttribute('aria-label', 'Illustrative sales curve. ' + say);
@@ -204,7 +206,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return 'Dear partners,\n\n' + body + '\n\nWith regards,\n' + (name || '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
-    const say = (html) => { note.textContent = ''; requestAnimationFrame(() => { note.innerHTML = html; }); };
+    // The status note is built from text and, where it names Instagram, one link: nothing is ever parsed as HTML.
+    // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
+    const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
     const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
     const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
@@ -245,12 +249,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const w = window.open(url, '_blank');
       if (w) { try { w.opener = null; } catch (err) {} }
       busy = true; setTimeout(() => { busy = false; }, 1200);
-      const link = '<a class="ul" href="' + url + '" target="_blank" rel="noopener">' + where + '</a>';
+      const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = where; return a; };
       const go = (copied) => {
         box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-        say(copied
-          ? 'Your letter is copied. Paste it into the message on ' + link + ', and a partner will reply personally.'
-          : 'Your browser did not allow copying. Copy the letter below and paste it into the message on ' + link + '.');
+        if (copied) say('Your letter is copied. Paste it into the message on ', link(), ', and a partner will reply personally.');
+        else say('Your browser did not allow copying. Copy the letter below and paste it into the message on ', link(), '.');
       };
       copying.then(() => go(true), () => go(false));
     });

@@ -153,7 +153,7 @@ test('first visit plays the intro, then reveals the page', async ({ page }) => {
 test('day and night toggle remembers the choice', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Switch between day and night' }).click();
+  await page.getByRole('button', { name: 'Night mode' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -381,4 +381,61 @@ test('reduced motion leaves nothing running', async ({ page, isMobile }) => {
   }
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').map((a) => a.animationName || a.constructor.name))).toEqual([]);
+});
+
+// Header switches, scrolling and the page's own script hygiene (batch 4 details).
+test.describe('switches and script hygiene', () => {
+  // The night-mode switch keeps one name and reports its state; with no choice stored it follows the system.
+  test('night mode reports its state and follows the system', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/privacy.html');
+    const night = page.getByRole('button', { name: 'Night mode' });
+    await expect(night).toHaveAttribute('aria-pressed', 'false');
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(night).toHaveAttribute('aria-pressed', 'true');
+    await night.click();
+    await expect(night).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  });
+
+  // Pausing motion also stops smooth scrolling, and a keyboard press lands back on the switch after the reload.
+  test('pausing motion makes scrolling instant and keeps focus', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'the switch sits in the menu on phones; covered above');
+    await page.goto('/privacy.html');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('smooth');
+    await page.locator('#motionBtn').focus();
+    await Promise.all([page.waitForEvent('load'), page.keyboard.press('Enter')]);
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+    await expect(page.locator('#motionBtn')).toBeFocused();
+    await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#motionBtn')).toHaveAttribute('aria-label', 'Pause motion');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('auto');
+  });
+
+  // Trusted Types are enforced: no page script may hand a string to the HTML parser.
+  test('the HTML parser only takes markup from the page itself', async ({ page }) => {
+    const violations = [];
+    page.on('console', (m) => /Trusted Type|Content Security Policy/i.test(m.text()) && violations.push(m.text()));
+    await page.goto('/');
+    expect(await page.evaluate(() => { try { document.createElement('div').innerHTML = '<b>x</b>'; return 'parsed'; } catch (e) { return e.name; } })).toBe('TypeError');
+    // the curve's sentence is set as text; moving the slider leaves no markup behind
+    await page.locator('#cvPrice').scrollIntoViewIfNeeded();
+    await page.locator('#cvPrice').focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#cvSay')).toContainText('percent at par');
+    expect(await page.locator('#cvSay *').count()).toBe(0);
+    expect(violations).toEqual([]);
+  });
+});
+
+// Print shows every answer from the stylesheet alone, before (or without) the script opening them.
+test.describe('printing without the script', () => {
+  test.use({ javaScriptEnabled: false });
+  test('every question prints with its answer', async ({ page }) => {
+    await page.goto('/');
+    await page.emulateMedia({ media: 'print', reducedMotion: 'no-preference' });
+    const rows = await page.$$eval('.faq details', (ds) => ds.map((d) => [d.getBoundingClientRect().height, d.querySelector('summary').getBoundingClientRect().height]));
+    expect(rows.length).toBeGreaterThan(0);
+    for (const [row, summary] of rows) expect(row).toBeGreaterThan(summary + 20);
+  });
 });
