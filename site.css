@@ -155,7 +155,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .gauge .fill{position:absolute;left:0;right:0;top:-.5px;height:2px;background:var(--sold);transform:scaleX(0);transform-origin:0 50%}
 .gauge .lim{position:absolute;left:50%;top:-4px;width:1px;height:9px}
 .gauge .lim::before{content:'';position:absolute;inset:0;background:var(--sold)}
-.gauge .lim small{position:absolute;top:13px;left:0;transform:translateX(-50%);font-size:11px;line-height:1;letter-spacing:.14em;white-space:nowrap;color:var(--faint);transition:color .6s var(--ease)}
+.gauge .lim small{position:absolute;top:13px;left:0;transform:translateX(-50%);font-size:13px;line-height:1;letter-spacing:.14em;white-space:nowrap;color:var(--faint);transition:color .6s var(--ease)}
 .gauge.met .lim small{color:var(--accent)}
 .gauge.pulse .lim::before{animation:lim 1.1s var(--ease)}
 @keyframes lim{30%{transform:scaleY(2.2)}}
@@ -179,7 +179,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .elev{top:64px;height:42svh;z-index:2;padding:8px var(--gutter);margin-inline:calc(var(--gutter) * -1);background:var(--bg);gap:6px}
   /* the figure grows by the meter's line, so the tower keeps its size */
   .rise .elev{height:calc(42svh + 22px)}
-  .gauge{font-size:11px;justify-content:space-between;padding-bottom:24px}.gauge b{font-size:24px;margin-left:6px}.gauge .meter{bottom:-9px}.gauge .lim small{top:11px}
+  .gauge{font-size:11px;justify-content:space-between;padding-bottom:24px}.gauge b{font-size:24px;margin-left:6px}.gauge .meter{bottom:-9px}.gauge .lim small{top:11px;font-size:11px}
   .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:32px;background:linear-gradient(var(--bg),transparent);pointer-events:none}
   .elev figcaption{font-size:13px;padding-top:6px}
   .step{min-height:auto;padding-block:40px 44px;gap:14px}
@@ -590,6 +590,8 @@ body.no-js .rise .elev,body.no-js .vacant{display:none}
   .rise{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:32px}
   .rise{--bleed:0px}
   .rise .elev{position:sticky;top:72px;height:calc(100svh - 88px);margin-inline:0;padding-block:8px}
+  /* a compact gauge, so the short figure keeps its tower: the meter and its threshold tick stay, the label goes */
+  .gauge{padding-bottom:12px}.gauge b{font-size:24px}.gauge em{margin-bottom:2px}.gauge .meter{bottom:-7px}.gauge .lim small{display:none}
   .rise .elev::after{display:none}
   .elev figcaption span{display:none}
   .hero .coords{display:none}

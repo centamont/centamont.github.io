@@ -312,9 +312,9 @@
       const toward = (v, to, up, down) => (v === to ? to : to > v ? Math.min(to, v + s * up) : Math.max(to, v - s * down));
       const envT = this.o.envelope ? 1 : 0;
       // Sales lead construction: ground breaks (frame and crane) only once the pre-sale threshold is sold, and going
-      // back the frame comes down before the sales fall under it. Holds however fast the targets change.
-      const lim = LEVELS * this.o.presale, open = this.L > 0.001 || this.S >= lim - 0.001;
-      const bT = open ? this.B : 0, cT = open ? this.craneT : 0, sT = this.L > 0.001 && this.Sold < lim ? Math.max(this.Sold, Math.min(this.S, lim)) : this.Sold;
+      // back the frame and the crane come down before the sales fall under it. Holds however fast the targets change.
+      const lim = LEVELS * this.o.presale, open = this.L > 0.001 || this.S >= lim - 0.001, site = this.L > 0.001 || this.crane > 0.001;
+      const bT = open ? this.B : 0, cT = open ? this.craneT : 0, sT = site && this.Sold < lim ? Math.max(this.Sold, Math.min(this.S, lim)) : this.Sold;
       if (reduce) { if (this.L !== this.B || this.S !== this.Sold || this.E !== envT || this.crane !== this.craneT) this.snap(); }
       else {
         // The frame rises at a steady pace, a floor at a time, slowing over its last floors; it comes down faster.
@@ -347,7 +347,8 @@
       // When nobody has moved, scrolled or changed anything for a while (45 s) it slows to rest, and the drawing
       // stands still until someone does.
       if (!reduce && this.o.orbit) {
-        const rest = this.G > 0.98 && t - this.woke > this.o.rest;
+        // (an empty lot, with nothing to build, rests the same way)
+        const rest = (this.G > 0.98 || (!this.B && !this.Sold && !this.drawnAt)) && t - this.woke > this.o.rest;
         const want = rest ? 0 : this.G > 0.98 && this.o.orbitIdle != null ? this.o.orbitIdle : this.o.orbit;
         this.orb = this.orb == null ? want : this.orb + (want - this.orb) * (1 - Math.exp(-dt / 1500));
         if (rest && this.orb < 1e-5) this.orb = 0;
@@ -756,10 +757,10 @@
           g.beginPath(); g.strokeStyle = ink((dark ? 0.5 : 0.42) * (0.5 + 0.5 * fine)); g.lineWidth = hair;
           for (const j of b.lines) seg(crs[j], crs[(j + 1) % n]);
           g.stroke();
-          // a pool on the podium terrace
+          // a pool on the podium terrace, in ink: the podium is never sold, and bronze only ever means sold
           if (k === PODIUM && top) {
             poly([[4.7, -3.1], [6.0, -3.1], [6.0, 3.1], [4.7, 3.1]].map(([x, z]) => this.P(x, y1 + 0.001, z)));
-            g.fillStyle = bronze(dark ? 0.3 : 0.22); g.fill(); g.strokeStyle = bronze(0.85); g.lineWidth = 0.7; g.stroke();
+            g.fillStyle = ink(dark ? 0.1 : 0.07); g.fill(); g.strokeStyle = ink(dark ? 0.5 : 0.45); g.lineWidth = 0.7; g.stroke();
           }
         } else if (l.kind === 'floor') {
           // level 1 is the upper half of the double-height lobby: its glass runs down to the lobby's, with no slab between
