@@ -29,23 +29,54 @@
   }
 
   // The header takes the ground beneath it: over an ink ground (the hero, the private door, the name, the private-clients
-  // threshold) it is drawn in that ink, and on the sheet in ivory. It watches one line, the row of pixels just under its
-  // own foot, so it changes when the ground at its edge does, at once, with no tween. While the menu is open it keeps the
-  // colours it opened with.
-  const header = document.querySelector('header.site'), grounds = document.querySelectorAll('.hero, .band');
-  if (header && grounds.length && 'IntersectionObserver' in window) {
-    const under = new Set();
-    let gio = null, held = null, rw = 0;
-    const set = (o) => { if (root.classList.contains('menu-open')) { held = o; return; } held = null; header.classList.toggle('over', o); };
-    const watch = () => {
-      if (gio) gio.disconnect();
-      under.clear();
-      gio = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) under.add(e.target); else under.delete(e.target); }); set(under.size > 0); }, { rootMargin: '-64px 0px ' + -Math.max(0, innerHeight - 65) + 'px 0px' });
-      grounds.forEach((g) => gio.observe(g));
+  // threshold) it is drawn in that ink, and on the sheet in ivory. The ink is a layer of its own (site.css,
+  // header.site.lk::before). Over the hero it is cut each frame to the part of the bar that stands over the hero, so the
+  // hero's foot passes through the bar in step with the page beneath it; the type and marks change at once, with no tween,
+  // as that edge crosses the bar's middle, and the foot rule as it crosses the foot. A band takes the bar whole, at once,
+  // while it stands at the row under the bar's foot, so the bar always lands on the ground of the place it lands on: a jump
+  // to the private door lands under its ink, and a jump to the place after a band under the sheet.
+  // While the menu is open it keeps the colours it opened with.
+  const header = document.querySelector('header.site'), grounds = [...document.querySelectorAll('.hero, .band')];
+  let ground = () => {};
+  if (header && grounds.length) {
+    let raf = 0, key = '', lead = [];
+    const sym = header.querySelector('.mark .sym');
+    header.classList.add('lk');
+    // (a ground that starts at the header's foot as the page opens, as on private-clients.html, runs up under it: the bar
+    // stands in its ink from the start, and lets it go only at the ground's foot)
+    const leads = () => { const F = header.offsetHeight + 1; lead = grounds.map((g) => g.getBoundingClientRect().top + scrollY <= F); };
+    leads();
+    // the mark, buttons and links take their new colours in the same frame as the ink, never through a tween
+    const swap = (cls, on) => { if (header.classList.contains(cls) === on) return; header.classList.add('swap'); header.classList.toggle(cls, on); requestAnimationFrame(() => requestAnimationFrame(() => header.classList.remove('swap'))); };
+    ground = () => {
+      raf = 0;
+      if (root.classList.contains('menu-open') || (nav && nav.classList.contains('jump'))) return;
+      const y0 = header.getBoundingClientRect().top, H = header.clientHeight, F = header.offsetHeight, m = H / 2;
+      let a = H, b = 0, over = false, foot = false;
+      grounds.forEach((g, i) => {
+        const r = g.getBoundingClientRect(), t = lead[i] ? -1e9 : r.top - y0, u = r.bottom - y0;
+        // (the row under the bar's foot rule decides: a jump lands a place's top at the bar's foot to within half a pixel,
+        // so the ground above it, ending there too, never holds the bar)
+        if (!g.classList.contains('hero')) { if (t <= F && u > F) { a = 0; b = H; over = true; foot = true; } return; }
+        if (u > 0 && t < H) { a = Math.min(a, Math.max(0, t)); b = Math.max(b, Math.min(H, u)); }
+        if (t <= m && u > m) over = true;
+        if (t <= F && u > F) foot = true;
+      });
+      // (an edge never stands across the bar's type: from just above the mark's peaks to 12px past the middle it steps over
+      // the type at once, with the type's colour, so the mark and the links are always whole on one ground)
+      const s = sym && sym.getBoundingClientRect(), lo = Math.min(m - 12, s ? s.top - y0 - 2 : m), hi = Math.max(m + 12, s ? s.bottom - y0 + 2 : m);
+      if (b > lo && b < hi) b = over ? hi : lo;
+      if (a > lo && a < hi) a = over ? lo : hi;
+      const k = b > a ? Math.round(a) + 'px ' + Math.round(b) + 'px' : '0px 0px';
+      if (k !== key) { key = k; const [ka, kb] = k.split(' '); header.style.setProperty('--ka', ka); header.style.setProperty('--kb', kb); }
+      swap('over', over); swap('ink-foot', foot);
     };
-    watch();
-    addEventListener('resize', () => { clearTimeout(rw); rw = setTimeout(watch, 120); });
-    new MutationObserver(() => { if (held !== null && !root.classList.contains('menu-open')) set(held); }).observe(root, { attributes: true, attributeFilter: ['class'] });
+    const req = () => { if (!raf) raf = requestAnimationFrame(ground); };
+    let rz = 0;
+    addEventListener('scroll', req, { passive: true }); addEventListener('resize', () => { req(); clearTimeout(rz); rz = setTimeout(() => { leads(); req(); }, 120); });
+    // (and once the open menu lets go, the bar catches up with wherever the page now stands)
+    new MutationObserver(req).observe(root, { attributes: true, attributeFilter: ['class'] });
+    ground();
   }
 
   // Motion on or off, remembered per visitor, on top of the system's reduced-motion setting.
@@ -131,7 +162,7 @@
     const ticks = [...ruler.querySelectorAll('line:not(.base)')];
     const hit = new Array(ticks.length).fill(false);
     let done = false, seamSeen = false, raf = 0;
-    const split = () => { if (done && (seamSeen || stillPage) && !seam.classList.contains('crack')) { seam.classList.add('crack'); setTimeout(() => seam.classList.add('split'), stillPage ? 0 : 650); } };
+    const split = () => { if (done && (seamSeen || stillPage) && !seam.classList.contains('crack')) { seam.classList.add('crack'); setTimeout(() => { seam.classList.add('split'); ruler.classList.add('flash'); }, stillPage ? 0 : 650); } };
     const strike = () => {
       done = true; ticks.forEach((t) => t.classList.add('hit'));
       ruler.classList.add('struck');
@@ -163,7 +194,23 @@
     new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -30% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
   }
 
-  // Headlines rise word by word, and the paragraph after them lifts in. Words keep their spaces, so text reads and copies normally.
+  // The short bronze rule over each section's intro draws itself as the intro comes 15% into the screen (site.css keys
+  // it to the section's .in). With motion off it stands drawn.
+  // (A rule or headline the reader can already see stays as it is: on a slow phone this script can run after the first
+  // paint, and hiding something painted only to draw it again reads as a flicker.)
+  const painted = performance.getEntriesByType && performance.getEntriesByType('paint').some((e) => e.name === 'first-contentful-paint');
+  const seen = (el) => { if (!painted) return false; const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
+  const ruled = [...document.querySelectorAll('main .head .intro')].filter((p) => p.closest('section'));
+  const ruleIn = (p) => p.closest('section').classList.add('in');
+  if (stillPage || !('IntersectionObserver' in window)) ruled.forEach(ruleIn);
+  else {
+    const hio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { ruleIn(e.target); hio.unobserve(e.target); } }), { rootMargin: '0px 0px -15% 0px' });
+    ruled.forEach((p) => { if (seen(p)) ruleIn(p); else hio.observe(p); });
+  }
+
+  // Three headlines rise, word by word: the place (Markets), the close (Contact) and a reading page's title, its standfirst
+  // lifting in after it. Every other head stands still, so the drawings inking themselves stay the page's motion.
+  // Words keep their spaces, so text reads and copies normally.
   if (!stillPage) {
     const split = (el) => {
       const walk = (node) => {
@@ -183,17 +230,19 @@
       };
       walk(el); el.classList.add('tx-rise');
     };
-    // A headline the reader can already see stays as it is: on a slow phone this script can run after the first paint,
-    // and hiding a painted headline only to raise it again reads as a flicker. (The journal's note titles are list rows
-    // and never rise, and the name is cut in line by line by the page's own script.)
-    const painted = performance.getEntriesByType && performance.getEntriesByType('paint').some((e) => e.name === 'first-contentful-paint');
-    const seen = (el) => { if (!painted) return false; const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
-    const heads = [...document.querySelectorAll('main h2:not(.ji-t):not(.cut), .page h1, .feature h3, .cv-txt h3')].filter((el) => !seen(el));
+    // (a headline the reader can already see stays as it is, as above)
+    const heads = [...document.querySelectorAll('#markets h2, .contact h2.display, .page h1')].filter((el) => !seen(el));
     heads.forEach(split);
     // stagger by line rather than by word: words on the same line rise together. A heading is measured as it arrives
     // (all its words in one pass, then marked in a second), where the page is already laid out, not while it starts.
     const lines = (el) => { let top = null, line = -1; [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }).forEach(([w, n]) => w.style.setProperty('--i', n)); };
-    document.querySelectorAll('main .head .intro, main .head + p, .page .lead-in').forEach((p) => { if (!seen(p)) p.classList.add('lift'); });
+    // (a standfirst follows only a title that rises, and it waits hidden at once, not fading out first: where the page
+    // was styled before this script ran, its opacity would otherwise ease towards nothing and turn back unseen)
+    document.querySelectorAll('.page .standfirst').forEach((p) => {
+      const h = p.previousElementSibling;
+      if (!h || !h.classList.contains('tx-rise') || seen(p)) return;
+      p.style.transition = 'none'; p.classList.add('lift'); void getComputedStyle(p).opacity; p.style.transition = ''; void getComputedStyle(p).transitionDelay;
+    });
     const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (e.target.classList.contains('tx-rise')) lines(e.target); e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
     document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
   }
@@ -245,14 +294,57 @@
   // (a page come back from the back-forward cache drops the covers it was captured with)
   addEventListener('pageshow', () => document.querySelectorAll('.vt-cover').forEach((c) => c.remove()));
   // Arriving, the new page's own grounds stand behind it as it fades in, ink where its ink is and the sheet elsewhere.
-  const landing = () => {
+  const groundsNow = () => {
     let y = 0; const st = [];
     inkSpans().forEach((q) => { st.push('var(--bg) ' + y + 'px ' + q[0] + 'px', 'rgb(var(--hero-rgb)) ' + q[0] + 'px ' + q[1] + 'px'); y = q[1]; });
     st.push('var(--bg) ' + y + 'px 100%');
-    root.style.setProperty('--vt-ground', 'linear-gradient(' + st.join(', ') + ')');
+    return 'linear-gradient(' + st.join(', ') + ')';
   };
+  const landing = () => root.style.setProperty('--vt-ground', groundsNow());
   addEventListener('pagereveal', (e) => { if (e.viewTransition) landing(); });
   try { if (root.matches(':active-view-transition')) landing(); } catch (err) {}
+
+  // One way to every place on this page (the menu, the title block, Back to top, the hero's buttons, the mark). A place
+  // near at hand is scrolled to. A far one is not flown to through every drawing in between, spending their one-time
+  // arrivals in a blur: a veil of the page's own grounds comes up over it where it stands (180 ms), the page moves under
+  // it, and the veil, now of the grounds where the reader lands, goes (260 ms), with the header held still above it
+  // (site.css, .vt-veil). Ink and ivory are never laid over each other half seen, so nothing passes through grey, and the
+  // turn waits for nothing: however busy the page, the veil is whole while the grounds change under it. Under the open
+  // menu the page simply changes there, and the menu draws up off it. The places passed over keep their arrivals for
+  // when the reader scrolls back. The focus lands on the place's heading, and the address takes its name. With motion
+  // off, every place is reached at once.
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest && e.target.closest('a[href*="#"]');
+    if (!a || a.classList.contains('skip') || a.target || a.hasAttribute('download') || a.origin !== location.origin || a.pathname !== location.pathname || a.search !== location.search) return;
+    let t = null; try { t = a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1))); } catch (err) {}
+    if (!t) return;
+    e.preventDefault();
+    const h = t.matches('h1, h2, h3') ? t : t.querySelector('h1, h2, h3') || t;
+    const land = () => {
+      if (!h.matches('a[href], button, input, select, textarea, summary, [tabindex]')) { h.setAttribute('tabindex', '-1'); h.classList.add('jt'); h.addEventListener('blur', () => { h.removeAttribute('tabindex'); h.classList.remove('jt'); }, { once: true }); }
+      h.focus({ preventScroll: true });
+    };
+    const go = (behavior) => t.scrollIntoView({ behavior, block: 'start' });
+    // (the address first, so going back returns to where the reader was)
+    if (location.hash !== a.hash) history.pushState(history.state, '', a.hash);
+    const far = Math.abs(t.getBoundingClientRect().top - 64) > 1.5 * innerHeight, drawer = !!(nav && nav.classList.contains('open'));
+    // (the menu closes after this, on its own click; the page behind it takes the focus once it is no longer inert)
+    if (stillPage || !far) { go(stillPage ? 'instant' : 'smooth'); requestAnimationFrame(land); return; }
+    // (the drawer keeps the colours it opened with while it draws up off the new place, and the bar takes its ground after)
+    if (drawer) { nav.classList.add('jump'); go('instant'); setTimeout(() => { nav.classList.remove('jump'); ground(); }, 340); requestAnimationFrame(land); return; }
+    document.querySelectorAll('.vt-veil').forEach((v) => v.remove());
+    const v = document.createElement('div');
+    v.className = 'vt-veil'; v.setAttribute('aria-hidden', 'true'); v.style.background = groundsNow();
+    document.body.appendChild(v); void v.offsetWidth; v.classList.add('on');
+    let turned = false;
+    const turn = () => {
+      if (turned) return; turned = true;
+      go('instant'); ground(); v.style.background = groundsNow(); land();
+      requestAnimationFrame(() => { v.classList.add('off'); setTimeout(() => v.remove(), 400); });
+    };
+    v.addEventListener('transitionend', turn, { once: true }); setTimeout(turn, 300);
+  }, true);
 
   // Drawings that draw themselves once they arrive.
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });
@@ -262,7 +354,7 @@
   // had closed close again afterwards.
   let opened = [];
   addEventListener('beforeprint', () => {
-    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut, .doorway').forEach((el) => el.classList.add('in'));
+    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
     opened = [...document.querySelectorAll('.faq details:not([open])')];
     opened.forEach((d) => { d.open = true; });
   });

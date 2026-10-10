@@ -78,6 +78,49 @@ test('menu reaches every section', async ({ page, isMobile }) => {
   }
 });
 
+// A far jump never flies the page through its drawings: it lands at once, the address takes the section, the focus goes
+// to the section's heading, and the story's drawing shows the stage of where the reader now is.
+test('a far jump lands on its heading with the story in step', async ({ page, isMobile }) => {
+  await page.goto('/');
+  if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+  await page.locator('nav.main a[href="#contact"]').click();
+  await expect(page.locator('#contact h2.display')).toBeFocused();
+  await expect(page.locator('#contact h2.display')).toBeInViewport();
+  expect(new URL(page.url()).hash).toBe('#contact');
+  if (isMobile) {
+    await expect(page.locator('nav.main')).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
+  }
+  await page.locator('nav.main a[href="#developers"]').click();
+  await expect(page.locator('#developers h2')).toBeFocused();
+  await expect(page.locator('#stageName')).toHaveText('First sketch');
+  await page.locator('a.totop').click();
+  await expect(page.locator('.hero h1')).toBeFocused();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+  expect(new URL(page.url()).hash).toBe('#top');
+});
+
+// A jump lands a place's top at the header's foot, and the header takes that place's ground: the private door's ink, and
+// the sheet for the places after the door and the name.
+test('the header lands on the ground of the place it lands on', async ({ page, isMobile }) => {
+  await page.goto('/');
+  for (const [id, ink] of [['clients', true], ['markets', false], ['contact', false]]) {
+    if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
+    await page.locator(`nav.main a[href="#${id}"]`).click();
+    await expect.poll(() => page.evaluate((id) => Math.round(document.getElementById(id).getBoundingClientRect().top), id)).toBe(64);
+    if (ink) await expect(page.locator('header.site')).toHaveClass(/\bover\b/);
+    else await expect(page.locator('header.site')).not.toHaveClass(/\bover\b/);
+  }
+});
+
+// Headlines rise only at the place and the close (the hero's own headline rises with the curtain); every other head stands.
+test('only two section headlines rise on the home page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.tx-rise')).toHaveCount(2);
+  await expect(page.locator('#markets h2')).toHaveClass(/tx-rise/);
+  await expect(page.locator('#contact h2.display')).toHaveClass(/tx-rise/);
+});
+
 test('the building rises as the story scrolls', async ({ page }, info) => {
   await page.goto('/');
   const built = async () => +(await page.locator('#tower').getAttribute('data-built'));
