@@ -4,9 +4,10 @@
 // bronze when it sells, and it can sell before the floor it sits on is built.
 (function () {
   const FLOORS = 22, SLAB = 0.16, PODIUM = 3, CROWN = 20;
-  // Two residences on every level from L03 to L19, one on the bay (east) side and one on the city side.
-  // The podium (lobby, amenities) and the crown levels (club and plant) are never for sale.
-  const RES0 = PODIUM, RES1 = CROWN, LEVELS = RES1 - RES0;
+  // Two residences on every level above the podium, one on the bay (east) side and one on the city side: nineteen
+  // levels and thirty-eight residences, the two penthouse levels set back behind their terraces (from CROWN) included.
+  // The podium (lobby and amenities) and the crown (the plant screen and roof above the top floor) are never for sale.
+  const RES0 = PODIUM, RES1 = FLOORS, LEVELS = RES1 - RES0;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
   const TAU = Math.PI * 2;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -47,7 +48,8 @@
       off = (p) => 0.22 + 0.4 * (0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.4));
     } else {
       // the two penthouse levels step back behind deep terraces, as deep as the balconies below at their fullest
-      glass = rrect(2.75, 2.25, 1.15, 3, 2); off = () => 0.55;
+      // (traced with as many points as a tower floor, so the line between its two residences falls mid-face as below)
+      glass = rrect(2.75, 2.25, 1.15, 3, 3); off = () => 0.55;
     }
     const rot = k < PODIUM ? 0 : 0.34 * (Math.min(k, FLOORS - 1) - PODIUM) / (FLOORS - 1 - PODIUM);
     const c = Math.cos(rot), s = Math.sin(rot);
@@ -68,6 +70,26 @@
   const CORE = (() => {
     const c = Math.cos(CORE_ROT), s = Math.sin(CORE_ROT);
     return rrect(1.5, 1.15, 0.12, 1, 0).map((p) => ({ x: c * p.x - s * p.z, z: s * p.x + c * p.z, nx: c * p.nx - s * p.nz, nz: s * p.nx + c * p.nz }));
+  })();
+  // The columns above the podium stand plumb, one above another from the podium roof to the roof, on a ring set at the
+  // core's own turn and inside every floor's glass however the plates above them twist and taper: fourteen columns
+  // evenly spaced round it, some 4.7 m apart. (Checked against every glass line, penthouses included; were a column ever
+  // to fall outside one, the ring draws in until none does.) The podium below keeps its own grid on its glass line.
+  const COLS = (() => {
+    const ring = rrect(2.6, 2.05, 0.9, 12, 8), n = ring.length, acc = [0];
+    for (let j = 0; j < n; j++) { const a = ring[j], b = ring[(j + 1) % n]; acc.push(acc[j] + Math.hypot(b.x - a.x, b.z - a.z)); }
+    const c = Math.cos(CORE_ROT), s = Math.sin(CORE_ROT), N = 14, pts = [];
+    for (let i = 0, j = 0; i < N; i++) {
+      const d = ((i + 0.5) * acc[n]) / N;
+      while (acc[j + 1] < d) j++;
+      const a = ring[j], b = ring[(j + 1) % n], t = (d - acc[j]) / (acc[j + 1] - acc[j]), x = a.x + (b.x - a.x) * t, z = a.z + (b.z - a.z) * t;
+      pts.push({ x: c * x - s * z, z: s * x + c * z });
+    }
+    // inside a convex ring traced counterclockwise, with a margin of a tenth of a unit
+    const inside = (p, pl) => pl.every((a, j) => { const b = pl[(j + 1) % pl.length], ex = b.x - a.x, ez = b.z - a.z; return (ex * (p.z - a.z) - ez * (p.x - a.x)) / Math.hypot(ex, ez) > 0.1; });
+    let k = 1;
+    for (let i = 0; i < 20 && !pts.every((p) => PLANS.every((pl, f) => f < PODIUM || inside({ x: p.x * k, z: p.z * k }, pl.glass))); i++) k *= 0.98;
+    return pts.map((p) => ({ x: p.x * k, z: p.z * k }));
   })();
   // Glass balustrades just inside each terrace edge, the penthouse terraces and the roof terrace included.
   const RAILS = Array.from({ length: FLOORS + 1 }, (_, k) => (k >= PODIUM ? slabPlan(k).map((p) => ({ x: p.x - p.nx * 0.05, z: p.z - p.nz * 0.05, nx: p.nx, nz: p.nz })) : null)), RAIL_H = 0.3;
@@ -102,6 +124,13 @@
   // A porte-cochère on the entrance side of the podium, its soffit high enough for a coach (about 5.9 m)
   const PORTE = 1.55;
   const CANOPY = rrect(2.6, 0.85, 0.4, 2, 2).map((p) => ({ x: p.x, z: p.z - 5.25, nx: p.nx, nz: p.nz }));
+  // While the building is going up, the sales gallery is the only room in use: the two bays of the lobby behind the
+  // porte-cochère (the facets of its glass nearest the canopy), through both storeys of the lobby.
+  const GALLERY = (() => {
+    const pl = PLANS[0].glass, n = pl.length, d = (j) => { const a = pl[j], b = pl[(j + 1) % n]; return Math.hypot((a.x + b.x) / 2, (a.z + b.z) / 2 + 5.25); };
+    const best = [...pl.keys()].sort((a, b) => d(a) - d(b))[0], next = d((best + 1) % n) < d((best + n - 1) % n) ? (best + 1) % n : (best + n - 1) % n;
+    return new Set([best, next]);
+  })();
   // Lamp light after dark: the brand ivory warmed a touch. It is pale and high in value, a third as saturated as
   // the bronze of a sold residence and far lighter, so a lit room never reads as sold.
   const LAMP = [247, 232, 204];
@@ -109,13 +138,20 @@
   // The split runs through the middle of the north and south faces (points 5 and 19 of a tower plan).
   const SIDE = PLANS.map((pl) => Int8Array.from(pl.glass, (p, j) => (p.lx + pl.glass[(j + 1) % pl.glass.length].lx > 0 ? 0 : 1)));
   const SPLIT = [5, 19];
-  // The order the residences sell in, as a Miami launch sells: the upper floors and the bay side first,
-  // the city side about four floors behind, with a little of the scatter a real stacking plan shows.
+  // The order the residences sell in, as a Miami launch sells: the penthouses and the upper floors first, anchoring the
+  // price ladder, and the bay side ahead of the city side, with a little of the scatter a real stacking plan shows.
+  // The city side runs three and a half to six floors behind, by a lag that changes from floor to floor, so the edge
+  // between sold and unsold reads as a record of sales rather than a rule. Each side keeps its own sale times but takes
+  // them from the top down, so neither side ever has an unsold home above a sold one.
   const RANK = (() => {
     const u = [];
-    for (let k = RES0; k < RES1; k++) for (let s = 0; s < 2; s++) u.push({ k, s, v: RES1 - 1 - k + (s ? 4.5 : 0) + (hash(k, s, 7) - 0.5) * 2.2 });
+    for (let k = RES0; k < RES1; k++) for (let s = 0; s < 2; s++) u.push({ k, s, v: RES1 - 1 - k + (s ? 3.5 + 2.5 * hash(k, 1, 11) : 0) + (hash(k, s, 7) - 0.5) * 2.6 });
+    for (const s of [0, 1]) {
+      const q = u.filter((o) => o.s === s), vs = q.map((o) => o.v).sort((a, b) => a - b);
+      q.sort((a, b) => b.k - a.k).forEach((o, i) => { o.v = vs[i]; });
+    }
     u.sort((a, b) => a.v - b.v);
-    const r = new Float32Array(FLOORS * 2).fill(1e9);
+    const r = new Float32Array((FLOORS + 1) * 2).fill(1e9);
     u.forEach((q, i) => { r[q.k * 2 + q.s] = i; });
     return r;
   })();
@@ -210,12 +246,14 @@
   class Model {
     constructor(canvas, opts) {
       this.c = canvas;
-      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 13, envelope: true, rate: 9, slow: 3, soldRate: 6, presale: 0.5, rest: 45000 }, opts);
+      this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 13, envelope: true, rate: 9, slow: 3, soldRate: 6, presale: 0.5, rest: 45000, facadeLag: 3 }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
       this.L = 0; this.S = 0; this.C = 0; this.G = 0; // shown: levels framed, levels sold (in levels' worth of residences), levels glazed, crown
       this.B = 0; this.Sold = 0; // targets
       this.crane = 0; this.craneT = 0;
+      this.Rd = 0; this.Ra = 0; // the first release's bracket: how far it is drawn, and how strongly
+      this.occ = 0; // the building in use: 1 once it is complete and the crane has gone (people, lit rooms, the lobby's light)
       this.E = this.o.envelope ? 1 : 0; // the dashed envelope, drawn in from the ground up
       this.camT = null; this.camV = [0, 0, 0, 0, 0]; // camera spring: target and velocity of theta, phi, ty, scale, offsetX
       this.mx = 0; this.my = 0;
@@ -299,23 +337,31 @@
       this.ctx.setTransform(d, 0, 0, d, 0, 0); this.dpr = d;
     }
 
-    // Glass trails the frame by three floors until the building tops off.
-    cladFor(L) { return L >= FLOORS - 0.001 ? FLOORS : Math.max(0, L - 3); }
+    // Glass trails the frame (by three floors, o.facadeLag) until the building tops off, and closes over the top storeys
+    // only as the crane leaves: a topped-off frame with its crane still up is a building site, not a finished tower.
+    cladFor(L) { return L >= FLOORS - 0.001 && this.craneT === 0 && this.crane < 0.5 ? FLOORS : Math.max(0, L - this.o.facadeLag); }
+    // The first release, marked beside the level ruler once the envelope is drawn: o.release is its size in levels' worth of
+    // residences (the first that sell, from the top down). The bracket stands until sales go past it or ground breaks.
+    relFor() { return this.o.release > 0 && this.E > 0.999 && this.L < 0.01 && this.S <= this.o.release + 0.01 ? 1 : 0; }
+    release(v, instant) { if (this.dead) return; this.o.release = v; if (instant || reduce) this.Rd = this.Ra = this.relFor(); this.touch(); }
+    // in use only once it is finished: the crown set, the glass closed and the crane gone
+    occFor() { return this.crane < 0.01 && this.G > 0.98 && this.C >= FLOORS - 0.01 ? 1 : 0; }
 
-    // How much of residence s (0 bay side, 1 city side) on level k is sold, 0 to 1. S counts levels' worth.
+    // How much of residence s (0 bay side, 1 city side) on level k is sold, 0 to 1. S counts levels' worth (two
+    // residences to a level), so 2S is the number of residences under contract.
     soldOf(k, s, S = this.S) { return clamp(S * 2 - RANK[k * 2 + s], 0, 1); }
 
     set(built, sold, crane, instant) {
       if (this.dead) return;
       if (built && !this.B && !this.drawnAt) this.drawnAt = performance.now();
       this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
-      this.c.dataset.built = built; this.c.dataset.sold = sold;
+      this.c.dataset.built = built; this.c.dataset.sold = Math.round(sold * 2); // (residences)
       if (instant || reduce) this.snap();
       this.wake();
     }
 
     // Everything straight to where it is going.
-    snap() { this.L = this.B; this.S = this.Sold; this.C = this.cladFor(this.B); this.crane = this.craneT; this.G = this.B >= FLOORS ? 1 : 0; this.E = this.o.envelope ? 1 : 0; this.touch(); }
+    snap() { this.L = this.B; this.S = this.Sold; this.crane = this.craneT; this.C = this.cladFor(this.B); this.G = this.B >= FLOORS ? 1 : 0; this.occ = this.occFor(); this.E = this.o.envelope ? 1 : 0; this.Rd = this.Ra = this.relFor(); this.touch(); }
 
     // Start the draughtsman's construction lines ahead of the ink.
     sketch() { this.drawnAt = performance.now(); this.touch(); }
@@ -370,6 +416,14 @@
       // the crown goes up as soon as the frame tops off, in under half a second
       const crownT = this.L >= FLOORS - 0.01 ? 1 : 0;
       this.G = reduce ? crownT : toward(this.G, crownT, 1 / 0.45, 1 / 0.25);
+      // and only a finished building, its crane gone, is in use: its people and its lamps come in over a third of a second
+      const occT = this.occFor();
+      this.occ = reduce ? occT : toward(this.occ, occT, 1 / 0.3, 1 / 0.2);
+      // the release bracket draws in over 0.4 s and fades out over 0.3 s
+      const relT = this.relFor();
+      if (reduce) this.Rd = this.Ra = relT;
+      else if (relT) { this.Ra = 1; this.Rd = toward(this.Rd, 1, 1 / 0.4, 1); }
+      else { this.Ra = toward(this.Ra, 0, 1, 1 / 0.3); if (!this.Ra) this.Rd = 0; }
       if (this.camT) {
         // exact step of a critically damped spring for each axis (omega 4.2/s: 95% there in about a second)
         const w = this.o.camW || 4.2, e = Math.exp(-w * s), cur = [this.theta, this.phi, this.o.ty, this.o.scale, this.o.offsetX], eps = [2e-4, 2e-4, 2e-3, 2e-4, 2e-4];
@@ -395,7 +449,7 @@
       }
       this.tx = ease(this.tx || 0, this.mx * 0.12, 330);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 330);
-      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.E === envT && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
+      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.occ === occT && this.Ra === relT && this.Rd === relT && this.E === envT && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
       const orbiting = !reduce && !!this.o.orbit && this.orb !== 0;
       // Anything that moves draws every frame (and the frame after it stops). A settled tower on its slow orbit
       // turns about a tenth of a pixel between frames, so it is drawn twelve times a second whatever the display's
@@ -463,8 +517,8 @@
     // on that plane, so every tick meets the slab edge it names.
     nearFace(c, s) {
       let n = 0;
-      for (let k = RES0; k < RES1; k++) { let m = 1e9; for (const p of PLANS[k].slab) m = Math.min(m, s * p.x + c * p.z); n += m; }
-      return -n / LEVELS;
+      for (let k = PODIUM; k < CROWN; k++) { let m = 1e9; for (const p of PLANS[k].slab) m = Math.min(m, s * p.x + c * p.z); n += m; }
+      return -n / (CROWN - PODIUM);
     }
 
     // A view of the tower that keeps everything that matters inside the canvas with a margin: the tower
@@ -603,7 +657,9 @@
         // Before its slab is poured, a sold residence fills its whole storey, so the sold floors stand as one block: a
         // floor line where it sits on another sold home, its outline firm where it meets the sketch.
         if (drop) y0 = k;
-        const pl = PLANS[k].glass, sd = SIDE[k], n = pl.length, fa = dark ? 0.17 : 0.19, edges = [];
+        // (inside the open frame, among slabs and columns, a sold home waiting for its glass is drawn firmer, so the count on
+        // the gauge can be read in the drawing)
+        const pl = PLANS[k].glass, sd = SIDE[k], n = pl.length, fa = drop ? (dark ? 0.17 : 0.19) : (dark ? 0.34 : 0.3), ea = drop ? (dark ? 0.85 : 0.8) : 1, edges = [];
         const below = [this.soldOf(k - 1, 0) > 0.5, this.soldOf(k - 1, 1) > 0.5], above = [this.soldOf(k + 1, 0) > 0.5, this.soldOf(k + 1, 1) > 0.5];
         const ring = [0, 1].map((side) => { const f = fs[side], dy = drop ? (1 - smooth(f)) * 0.35 : 0; return f > 0 ? [this.ring(pl, y0 + dy), this.ring(pl, y1 + dy)] : null; });
         for (let j = from; j < n; j++) {
@@ -622,7 +678,7 @@
         flush();
         g.lineWidth = 0.8;
         const as = new Set(edges.map((e) => (e[0] = Math.round(e[0] * 20) / 20)));
-        for (const a of as) { g.beginPath(); g.strokeStyle = bronze((dark ? 0.85 : 0.8) * a); for (const e of edges) if (e[0] === a) seg(e[1], e[2]); g.stroke(); }
+        for (const a of as) { g.beginPath(); g.strokeStyle = bronze(ea * a); for (const e of edges) if (e[0] === a) seg(e[1], e[2]); g.stroke(); }
       };
 
       // Ground: survey grid, site line, and the tower's shadow
@@ -726,13 +782,13 @@
           poly(PLANS[0].slab.map((p) => this.P(p.x + p.nx * o, 0, p.z + p.nz * o)));
           g.fillStyle = dark ? 'rgba(0,0,0,0.16)' : ink(0.035); g.fill();
         }
-        // after dark the lobby's light falls out across the drive
-        if (dark && night > 0.05 && C >= 2 && !inLens) {
+        // after dark the lobby's light falls out across the drive, once the building is open
+        if (dark && night > 0.05 && this.occ > 0.01 && !inLens) {
           const c = this.P(0, 0, -5.6), e = this.P(3.4, 0, -5.6), f = this.P(0, 0, -8.2), rx = Math.abs(e[0] - c[0]), ry = Math.max(2, Math.abs(f[1] - c[1]));
           if (rx > 2) {
             g.save(); g.translate(c[0], c[1]); g.scale(1, ry / rx);
             const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
-            gr.addColorStop(0, `rgba(${wr},${wg},${wb},${(0.3 * night).toFixed(3)})`); gr.addColorStop(0.5, `rgba(${wr},${wg},${wb},${(0.1 * night).toFixed(3)})`); gr.addColorStop(1, `rgba(${wr},${wg},${wb},0)`);
+            gr.addColorStop(0, `rgba(${wr},${wg},${wb},${(0.3 * night * this.occ).toFixed(3)})`); gr.addColorStop(0.5, `rgba(${wr},${wg},${wb},${(0.1 * night * this.occ).toFixed(3)})`); gr.addColorStop(1, `rgba(${wr},${wg},${wb},0)`);
             g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore();
           }
         }
@@ -740,10 +796,10 @@
 
       const towerZ = this.P(0, this.eye[1], 0)[2], palmsBack = [], palmsFront = [], figsBack = [], figsFront = [];
       if (this.o.palms !== false && this.o.grid) PALMS.forEach((p) => (this.P(p[0], 2, p[1])[2] > towerZ ? palmsBack : palmsFront).push(p));
-      // people at the entrance once the lobby is glazed, so the building reads at its true size
-      if (this.o.figs !== false && this.o.grid && this.o.site !== false && C >= 2 && !inLens) FIGS.forEach((f) => (this.P(f[0], 0.3, f[1])[2] > towerZ ? figsBack : figsFront).push(f));
+      // people at the entrance once the building is open, so it reads at its true size
+      if (this.o.figs !== false && this.o.grid && this.o.site !== false && this.occ > 0.01 && !inLens) FIGS.forEach((f) => (this.P(f[0], 0.3, f[1])[2] > towerZ ? figsBack : figsFront).push(f));
       palmsBack.forEach((p) => this.drawPalm(p));
-      figsBack.forEach((f) => this.drawFigure(f));
+      g.globalAlpha = this.occ; figsBack.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
 
       // Construction lines: a draughtsman's pencil guides, laid down before the ink and left faintly behind it
       if (this.o.guides && this.drawnAt && !inLens) {
@@ -770,7 +826,7 @@
       if (E > 0.001 && L < FLOORS) {
         const from = Math.ceil(L - 0.001), ex = eye[0], ez = eye[2];
         const near = (p, q) => (ex - (p.x + q.x) / 2) * (p.nx + q.nx) + (ez - (p.z + q.z) / 2) * (p.nz + q.nz) > 0;
-        g.setLineDash([3, 4]); g.lineWidth = 0.8; g.strokeStyle = ink((dark ? 0.36 : 0.34) * (0.8 + 0.2 * fine)); g.beginPath();
+        g.setLineDash([3, 4]); g.lineWidth = dark ? 0.8 : 0.9; g.strokeStyle = ink(dark ? 0.5 : 0.45); g.beginPath();
         for (let k = from; k <= FLOORS && k < Ek; k++) {
           const pl = edgePlan(k), ps = this.ring(pl, k), n = pl.length, all = k === FLOORS && eye[1] > FLOORS;
           const sd = k >= RES0 && k < RES1 && pl === PLANS[k].slab ? SIDE[k] : null, sf = sd ? [this.soldOf(k, 0) > 0.5, this.soldOf(k, 1) > 0.5] : null;
@@ -842,12 +898,14 @@
       const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
       layers.forEach((l) => { l.f = far(l); });
       // Glass balustrades stand in front of their floor whichever way it is seen, on every terrace up to the penthouses.
-      if (railsOn) for (let k = PODIUM; k < FLOORS; k++) if (k <= L - 1) {
+      // They go in with the glass of the storey they stand on, so the open frame above it has none.
+      const railK = (k) => (k < FLOORS ? k + 1 <= C + 0.001 : C >= FLOORS - 0.001 && this.G > 0.5);
+      if (railsOn) for (let k = PODIUM; k < FLOORS; k++) if (railK(k)) {
         const f = Math.min(far({ lo: k, hi: k + SLAB }), far({ lo: k + SLAB, hi: k + 1 })) - 0.0001;
         layers.push({ kind: 'rail', k, f });
       }
       // and round the roof terrace once the crown stands, in front of the screen
-      if (railsOn && L >= FLOORS - 0.001 && this.G > 0.5) layers.push({ kind: 'rail', k: FLOORS, f: Math.min(far({ lo: FLOORS, hi: FLOORS + SLAB }), far({ lo: FLOORS + SLAB, hi: FLOORS + SLAB + crownH })) - 0.0001 });
+      if (railsOn && railK(FLOORS)) layers.push({ kind: 'rail', k: FLOORS, f: Math.min(far({ lo: FLOORS, hi: FLOORS + SLAB }), far({ lo: FLOORS + SLAB, hi: FLOORS + SLAB + crownH })) - 0.0001 });
       // the porte-cochère stands clear of the lobby's two storeys of glass, so it is drawn after them
       if (L >= 2) layers.push({ kind: 'canopy', f: far({ lo: 2, hi: 2 + SLAB }) - 0.00005 });
       layers.sort((a, b) => b.f - a.f);
@@ -866,7 +924,8 @@
       for (const l of layers) {
         if (this.xray && l.kind !== 'floor') {
           // inside the loupe, slabs are drawn as their edge lines only, in the drawing set's bronze
-          if (l.kind === 'slab') { g.strokeStyle = bronze(0.75); g.lineWidth = 0.7; poly(cap(slabPlan(l.k), l.k + SLAB)); g.stroke(); }
+          // (the podium roof is the transfer slab that carries the tower's columns onto the podium's grid: drawn heavier)
+          if (l.kind === 'slab') { g.strokeStyle = bronze(0.75); g.lineWidth = l.k === PODIUM ? 1.1 : 0.7; poly(cap(slabPlan(l.k), l.k + SLAB)); g.stroke(); }
           continue;
         }
         if (l.kind === 'slab') {
@@ -900,7 +959,10 @@
           const coreH = k < coreTop ? Math.min(k + 1, coreTop) : 0;
           if (glassF < 1) {
             const cols = [], cz = this.P(0, (y0 + y1) / 2, 0)[2];
-            if (built > 0) for (let j = 0; j < pl.length; j += 2) { const p = pl[j], a = this.P(p.x * 0.97, y0, p.z * 0.97), b = this.P(p.x * 0.97, y1, p.z * 0.97); cols.push([a, b, a[2] > cz]); }
+            if (built > 0) {
+              if (k >= PODIUM) for (const p of COLS) { const a = this.P(p.x, y0, p.z), b = this.P(p.x, y1, p.z); cols.push([a, b, a[2] > cz]); }
+              else for (let j = 0; j < pl.length; j += 2) { const p = pl[j], a = this.P(p.x * 0.97, y0, p.z * 0.97), b = this.P(p.x * 0.97, y1, p.z * 0.97); cols.push([a, b, a[2] > cz]); }
+            }
             const drawCols = (back) => { g.beginPath(); g.strokeStyle = this.xray ? bronze(0.9) : ink(dark ? 0.55 : 0.6); g.lineWidth = 0.8; cols.forEach(([a, b, bk]) => { if (bk === back) seg(a, b); }); g.stroke(); };
             drawCols(true);
             // (above the frame there is no slab yet: the core's walls run on through the storey)
@@ -909,21 +971,24 @@
               band(CORE, cy0, coreH, (nx, nz) => { const d = dif(nx, nz); return mix(dark ? (0.12 + 0.24 * d) * (1 - 0.4 * night) : 0.22 - 0.1 * d); }, false);
               if (ey > coreH) { poly(cap(CORE, coreH)); g.fillStyle = mix(dark ? 0.3 * (1 - 0.4 * night) : 0.12); g.fill(); }
             }
-            drawCols(false);
-            // residences already sold on this level, waiting for their glass (or for the frame, round the core)
+            // residences already sold on this level, waiting for their glass (or for the frame, round the core); the columns
+            // in front are drawn over them, crisp, so the storey reads as open structure with sold space inside it
             if (built > 0 && !this.xray) ghost(k, k + SLAB, k + 1, glassF > 0 ? Math.round(glassF * pl.length) : 0, false);
             else if (!this.xray && !inLens && this.S > 0.001 && k >= RES0 && k < RES1 && k > L + 0.001) ghost(k, k + SLAB, k + 1, 0, true);
+            drawCols(false);
           }
           if (glassF > 0 && built > 0) {
             // glass curtain wall, installed panel by panel around the floor
             const n = pl.length, lim = Math.round(glassF * n);
-            // After dark, rooms are lit in lamp light, one or two bays wide: the lobby throughout, the amenity level and
-            // the club levels at the top in part, and a scatter of homes that have not sold, more as the night deepens
+            // After dark, rooms are lit in lamp light, one or two bays wide: the lobby throughout, the amenity level in
+            // part, and a scatter of homes that have not sold, the penthouses among them, more as the night deepens
             // (only in the hero; the developer story keeps its glass for the stacking plan). Sold glass stays bronze.
-            const lamp = !dark || night < 0.05 || this.xray ? 0 : k < 2 ? 1 : k < PODIUM ? 0.5 : k >= CROWN ? 0.3 + 0.2 * night : this.o.rooms === false ? 0 : 0.07 + 0.2 * night;
-            const litAt = (j) => lamp > 0 && (hash(k, j) < lamp || (hash(k, (j + n - 1) % n) < lamp && hash(k, j, 5) < 0.45));
+            // Nothing is lived in before the building is complete and its crane gone (occ): until then, after dark, only the
+            // sales gallery in the lobby is lit, and dimly.
+            const occ = this.occ, lamp = !dark || night < 0.05 || this.xray ? 0 : k < 2 ? 1 : occ < 0.01 ? 0 : k < PODIUM ? 0.5 : this.o.rooms === false ? 0 : 0.07 + 0.2 * night;
+            const litAt = (j) => lamp > 0 && (k < 2 ? occ > 0.01 || GALLERY.has(j) : hash(k, j) < lamp || (hash(k, (j + n - 1) % n) < lamp && hash(k, j, 5) < 0.45));
             // each room a little brighter or dimmer than the next; the lobby's two storeys are one room, lit from above
-            const lampI = (j) => (k === 0 ? 0.48 : k === 1 ? 0.58 : 0.6 + 0.4 * hash(j, k, 3)) * (0.55 + 0.45 * night);
+            const lampI = (j) => { const f = (k === 0 ? 0.48 : k === 1 ? 0.58 : 0.6 + 0.4 * hash(j, k, 3)) * (0.55 + 0.45 * night); return k < 2 && GALLERY.has(j) ? 0.5 * (0.55 + 0.45 * night) * (1 - occ) + f * occ : f * occ; };
             const lit = [];
             const shade = (nx, nz, j, nn, mx, mz) => {
               if (j >= lim) return null;
@@ -1015,7 +1080,7 @@
           const b = band(SCREEN, y0, y1, (nx, nz) => { const d = dif(nx, nz); return mix(dark ? (0.17 + 0.13 * d) * (1 - 0.4 * night) : 0.07 + 0.07 * (1 - d)); }, true);
           const ns = SCREEN.length, lerp = (p, q, u) => [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u];
           // after dark the plant screen is lit from within, brightest at its foot, and the blades stand dark against it
-          const up = dark && !this.xray && night > 0.05 ? night : 0;
+          const up = dark && !this.xray && night > 0.05 ? night * this.occ : 0;
           if (up) {
             const f0 = this.P(0, y0, 0), f1 = this.P(0, y1, 0), gr = g.createLinearGradient(0, f0[1], 0, f1[1]);
             gr.addColorStop(0, `rgba(${wr},${wg},${wb},${(0.62 * up).toFixed(3)})`); gr.addColorStop(0.45, `rgba(${wr},${wg},${wb},${(0.28 * up).toFixed(3)})`); gr.addColorStop(1, `rgba(${wr},${wg},${wb},${(0.08 * up).toFixed(3)})`);
@@ -1060,8 +1125,10 @@
       // hull, and the line runs round the union of them all, in and out at every balcony and up over the crown.
       // Verticals stay plumb through the lens, so a band's hull is the top chain of its upper ring (merged with the
       // balustrade's, which stands inside the slab edge) and the bottom chain of its lower ring.
-      const clad = Math.min(Math.floor(C + 0.001), FLOORS);
-      if (clad >= 1 && !this.xray) {
+      // Above the glass it wraps each slab of the open frame too, so the line follows the structure to the top rather than
+      // stopping across the façade where the glass does.
+      const clad = Math.min(Math.floor(C + 0.001), FLOORS), top = L > 0.01 ? Math.min(Math.floor(L + 0.001), FLOORS) : -1;
+      if (top >= 0 && !this.xray) {
         const hs = [], hide = [];
         // (hid: 1 when the band's top chain always lies inside the band above, 2 when its bottom chain lies inside the one below)
         const H = (pl, y0, y1, rl, ry, hid = 0) => {
@@ -1081,15 +1148,18 @@
           for (let i = lo.length - 1; i >= 0; i--) up.push(lo[i]);
           hs.push(up);
         };
-        const railAt = (k) => railsOn && k >= PODIUM && (k < FLOORS ? k <= L - 1 : this.G > 0.5);
-        for (let k = 0; k <= clad; k++) {
+        const railAt = (k) => railsOn && k >= PODIUM && railK(k);
+        for (let k = 0; k <= top; k++) {
+          // (level 1's line is the lobby glass, which the mezzanine stands behind: until the glass below it is in, there is
+          // no edge there to wrap, only the set-back mezzanine inside the open frame)
+          if (k === 1 && clad < 1) continue;
           const sp = edgePlan(k);
           // (the balustrade's share of the outline shrinks away as it fades out on a small drawing, so nothing jumps)
           if (railAt(k)) H(sp, k, k + SLAB, RAILS[k], k + SLAB + RAIL_H * fine); else H(sp, k, k + SLAB);
           // a storey's glass stands inside the slabs above and below it (the lobby's two storeys meet at level 1)
           if (k < clad) H(PLANS[k].glass, k === 1 ? 1 : k + SLAB, k + 1, null, 0, (k !== 0 ? 1 : 0) | (k !== 1 ? 2 : 0));
         }
-        if (clad >= FLOORS && this.G > 0.01) H(SCREEN, FLOORS + SLAB, FLOORS + SLAB + crownH);
+        if (top >= FLOORS && this.G > 0.01) H(SCREEN, FLOORS + SLAB, FLOORS + SLAB + crownH);
         this.outline(hs, dark ? ink(0.7 - 0.22 * night) : ink(0.8), dark ? 1.15 + 0.2 * fine : 1.3 + 0.26 * fine, hide);
       }
       // after dark the working deck is floodlit while the frame climbs
@@ -1115,7 +1185,7 @@
 
       if (craneOn && !craneBehind) this.drawCrane(true);
       palmsFront.forEach((p) => this.drawPalm(p));
-      figsFront.forEach((f) => this.drawFigure(f));
+      g.globalAlpha = this.occ; figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
       // The level ruler stands on the plane of the near façade, and each tick is set at the height where the slab it
       // names is nearest the eye, so every tick meets its slab edge (the podium's for the lowest levels, the setback's
       // for the roof). It is on the viewer's left unless dimSide is 1.
@@ -1131,24 +1201,56 @@
 
       // Dimension line with level ticks; it comes in with the sketch
       if (!ruler) return;
-      const ra = L > 0.01 ? 1 : E0;
+      // Levels are numbered as American drawings and the weekly report number them: the ground floor is L01, the top
+      // floor L22, and the roof above it is named. Every fifth level is numbered, with a longer tick.
+      const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
       g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, ys[0]); g.lineTo(xa, ys[FLOORS]);
-      for (let i = 0; i <= FLOORS; i += 5) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
-      g.moveTo(xa, ys[FLOORS]); g.lineTo(xt, ys[FLOORS]);
+      for (let i = 0; i <= FLOORS; i++) if (named(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
       g.stroke();
       // a short tick at every level between the numbered ones
       g.strokeStyle = bronze(0.4 * ra); g.lineWidth = 0.6; g.beginPath();
-      for (let i = 1; i < FLOORS; i++) if (i % 5) { g.moveTo(xa, ys[i]); g.lineTo((xa + xt) / 2, ys[i]); }
+      for (let i = 1; i < FLOORS; i++) if (!named(i)) { g.moveTo(xa, ys[i]); g.lineTo((xa + xt) / 2, ys[i]); }
       g.stroke();
       if (this.o.labels && w > 280) {
-        g.globalAlpha = ra;
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4);
+        const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4), z = this.o.labelSize;
+        // the roof is always named; on a small drawing, where L20 would crowd it, L20 gives way, fading rather than blinking
+        const give = smooth(clamp((Math.abs(ys[FLOORS] - ys[19]) - z) / (0.5 * z), 0, 1));
         // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
-        for (let i = this.o.groundLabel === false ? 5 : 0; i <= FLOORS; i += 5) { const t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(xl, t), ys[i]); }
-        if (Math.abs(ys[FLOORS] - ys[20]) > this.o.labelSize * 1.3) g.fillText('ROOF', fx(xl, 'ROOF'), ys[FLOORS]);
+        for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
+          if (!named(i)) continue;
+          const a = ra * (i === 19 ? give : 1);
+          if (a <= 0.01) continue;
+          const t = 'L' + String(i + 1).padStart(2, '0'); g.globalAlpha = a; g.fillText(t, fx(xl, t), ys[i]);
+        }
+        g.globalAlpha = ra; g.fillText('ROOF', fx(xl, 'ROOF'), ys[FLOORS]);
         g.globalAlpha = 1;
+      }
+      // The first release: a bracket on the façade side of the ruler over the levels that hold it (the bay side's
+      // reach, from the top floor down), drawn in from the top, in ink rather than bronze, since nothing in it has sold yet
+      // when it is drawn. On a phone it goes unnamed.
+      if (this.Ra > 0.005 && this.o.release > 0 && !inLens) {
+        let k0 = FLOORS - 1;
+        for (let k = RES0; k < RES1; k++) if (RANK[k * 2] < this.o.release * 2 - 1e-6 || RANK[k * 2 + 1] < this.o.release * 2 - 1e-6) { k0 = k; break; }
+        const xb = sx(-9.15), xk = sx(-8.8), yt = ys[FLOORS], yb = ys[k0], e = smooth(this.Rd), ye = yt + (yb - yt) * e;
+        g.strokeStyle = ink(0.55 * this.Ra); g.lineWidth = 0.8; g.beginPath();
+        g.moveTo(xk, yt); g.lineTo(xb, yt); g.lineTo(xb, ye);
+        if (e > 0.98) g.lineTo(xk, yb);
+        g.stroke();
+        const lab = 'FIRST RELEASE', z = this.o.labelSize, la = this.Ra * clamp((this.Rd - 0.5) * 2, 0, 1);
+        if (la > 0.01 && w >= 480 && fine >= 0.5) {
+          g.save(); g.font = '500 ' + z + 'px Jost, sans-serif';
+          if ('letterSpacing' in g) g.letterSpacing = '1.5px';
+          const tw = g.measureText(lab).width;
+          if (tw + 16 < Math.abs(yb - yt)) {
+            g.translate(xb + (xk > xb ? 1 : -1) * (z * 0.95), (yt + yb) / 2); g.rotate(-Math.PI / 2);
+            g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillStyle = this.forced ? `rgb(${this.line.join()})` : dark ? `rgba(237,231,220,${(0.7 * la).toFixed(3)})` : `rgba(85,80,74,${la.toFixed(3)})`;
+            g.fillText(lab, 0, 0);
+          }
+          g.restore();
+        }
       }
     }
 

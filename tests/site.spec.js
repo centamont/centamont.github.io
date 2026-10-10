@@ -90,11 +90,11 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
     const s = document.querySelectorAll('#steps .step')[3];
     window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight / 2 - innerHeight / 2);
   });
-  // Selling: the lender's pre-sale threshold is met (9 of 17 residential levels sold), then ground breaks (the podium framed)
+  // Selling: the lender's 50% threshold is met (20 of 38 residences under contract), then ground breaks (the podium framed)
   await expect.poll(built).toBe(3);
-  await expect.poll(sold).toBe(9);
+  await expect.poll(sold).toBe(20);
   // and the gauge reads what the drawing shows once it settles
-  await expect.poll(() => page.locator('#gS').textContent()).toBe('09');
+  await expect.poll(() => page.locator('#gS').textContent()).toBe('20');
   await expect.poll(() => page.locator('#gB').textContent()).toBe('03');
   await page.waitForTimeout(1200);
   await page.screenshot({ path: info.outputPath('rising.png') });
@@ -103,9 +103,9 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
     const s = document.querySelectorAll('#steps .step')[5];
     window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight / 2 - innerHeight / 2);
   });
-  // every residence sold; the podium and crown levels are never for sale
-  await expect.poll(sold).toBe(17);
-  await expect.poll(() => page.locator('#gS').textContent()).toBe('17');
+  // every residence sold, the penthouses with them; the podium and crown levels are never for sale
+  await expect.poll(sold).toBe(38);
+  await expect.poll(() => page.locator('#gS').textContent()).toBe('38');
 });
 
 for (const [path, heading] of [

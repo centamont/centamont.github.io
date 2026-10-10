@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6VJ0+cqZo8I6jKM1aLGhOCrQ50vUOTLS+qCZMT+SdsI=' 'sha256-k1po7yfZM2wh6G01PFN6Ny+W1r+1NEJT49hoZj4gDnM=' 'sha256-fP8IpjVhWGdWfN9PSqhi0QQkoxnzhM8OYH6ONwR7fkE='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6VJ0+cqZo8I6jKM1aLGhOCrQ50vUOTLS+qCZMT+SdsI=' 'sha256-k1po7yfZM2wh6G01PFN6Ny+W1r+1NEJT49hoZj4gDnM=' 'sha256-VgISmdwIIbI04V5h5OTqxvNyn6khry2hYT+S7RykUHU='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -34,15 +34,15 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="site.css?v=98087b23">
+<link rel="stylesheet" href="site.css?v=c6508f68">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
 if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&d.dataset.motion!=='off')d.classList.add('intro-on')}catch(e){}})();
 </script>
-<script src="site.js?v=98087b23" defer></script>
-<script src="model.js?v=98087b23" defer></script>
-<script src="instrument.js?v=98087b23" defer></script>
+<script src="site.js?v=c6508f68" defer></script>
+<script src="model.js?v=c6508f68" defer></script>
+<script src="instrument.js?v=c6508f68" defer></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -99,7 +99,7 @@ addEventListener('beforeprint',function(){finish(true)})})();
 
 <main id="main">
 <div class="hero" id="top">
-  <canvas id="heroModel" aria-hidden="true"></canvas>
+  <canvas id="heroModel" role="img" aria-label="Illustrative massing study of a generic tower, in the light of this hour in Miami. Not a real project."></canvas>
   <div class="wrap">
     <h1><span class="ln"><span>The finest new</span></span> <span class="ln"><span>buildings, sold</span></span> <span class="ln"><span><em>with intent.</em></span></span></h1>
     <p class="lede">We help developers around the world sell new residential buildings faster, with a strategy written for each one. And we advise a small circle of buyers at the very top of the market.</p>
@@ -145,7 +145,7 @@ addEventListener('beforeprint',function(){finish(true)})})();
 
     <div class="rise">
       <figure class="elev" aria-hidden="true">
-        <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/22</i></span><span class="gs"><em>Levels sold</em> <b id="gS">00</b><i id="gR">/17</i><span class="meter"><span class="fill" id="gM"></span><span class="lim"><small>Pre-sale threshold</small></span></span></span></div>
+        <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/22</i></span><span class="gs"><em>Under contract</em> <b id="gS">00</b><i id="gR">/38</i><span class="meter"><span class="fill" id="gM"></span><span class="lim"><small>Lender’s threshold · 50%</small></span></span></span></div>
         <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
       </figure>
@@ -155,28 +155,34 @@ addEventListener('beforeprint',function(){finish(true)})})();
           <h3>We arrive while the building is still a&nbsp;sketch.</h3>
           <p>Advisory begins before the design is final, so the building is shaped around the buyer who will actually live there.</p>
           <ul><li>Pricing and unit mix</li><li>Floor plans and amenities</li><li>Buyer profile and launch strategy</li></ul>
+          <p class="vh">Illustration, not a real project: the site plan of a generic tower, before the design is final.</p>
         </li>
         <li class="step" data-built="0" data-sold="0" data-name="Strategy">
           <h3>A strategy written for this building&nbsp;alone.</h3>
           <p>No template. Positioning, buyer targets and campaigns are designed around your project. A founder sits on your account from the first meeting to the last closing, with no hand-off to juniors after signing.</p>
+          <p class="vh">Illustration: the tower’s envelope, with the first release planned on the top floors.</p>
         </li>
-        <li class="step" id="launch" data-built="0" data-sold="5" data-name="Launch">
+        <li class="step" id="launch" data-built="0" data-sold="11" data-name="First 90 days">
           <h3>Launch day, with everything already&nbsp;running.</h3>
           <p>The project website and search, the journal and market updates, social media and the business press: all of it is live before the first reservation.</p>
           <p>A small, senior sales team works the launch, each member owning a buyer segment, under one set of rules and one stream of data.</p>
+          <p class="vh">Illustration: 11 of 38 residences under contract in the first 90 days, all sold before construction.</p>
         </li>
-        <li class="step" data-built="3" data-sold="9" data-name="Selling">
+        <li class="step" data-built="3" data-sold="20" data-name="Selling">
           <h3>The numbers, every&nbsp;week.</h3>
           <p>Inquiries, tours, reservations, contracts and pricing moves arrive in one weekly report. You always know where the building stands and what we are changing next.</p>
           <a class="more" href="report.html">See a specimen report</a>
+          <p class="vh">Illustration: 20 of 38 residences under contract, past the lender’s 50 percent threshold, so ground breaks; 3 of 22 levels framed.</p>
         </li>
-        <li class="step" data-built="22" data-sold="11" data-name="Top-off">
+        <li class="step" data-built="22" data-sold="25" data-name="Top-off">
           <h3>Topped off, and still a step&nbsp;ahead.</h3>
           <p>As the structure rises, pricing and releases move with demand, so the last floors are priced as carefully as the first.</p>
+          <p class="vh">Illustration: the structure tops off at 22 levels with the façade still closing; 25 of 38 residences under contract.</p>
         </li>
-        <li class="step" data-built="22" data-sold="17" data-name="Last closing">
+        <li class="step" data-built="22" data-sold="38" data-name="Last closing">
           <h3>The last closing is not the last of&nbsp;us.</h3>
           <p>We stay in touch with every buyer we meet, so the next building begins with people who already know us.</p>
+          <p class="vh">Illustration: the building is complete and all 38 residences have closed.</p>
         </li>
       </ol>
     </div>
@@ -587,12 +593,12 @@ document.addEventListener('DOMContentLoaded',function(){
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.
-  // The hero tower then sells as the curve below has it by completion (about three quarters of its residences),
+  // The hero tower then sells as the curve below has it by completion (28 of its 38 residences, about three quarters),
   // its sold residences standing in the sketch before the frame rises into them: the pre-sale threshold is met as ground breaks.
   // It starts as the halves part. Until then it is drawn once, under the curtain, and holds still; if they have already
   // parted (a slow connection), it starts now, behind the open page. Without the curtain's script there is no intro.
   const intro=window.CentamontIntro;let started=false;
-  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);heroM.sketch();setTimeout(()=>heroM.set(0,12.5,false),reduce?0:300);setTimeout(()=>heroM.set(22,12.5,false),reduce?0:900)}hero.classList.add('lit')};
+  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:300);setTimeout(()=>heroM.set(22,14,false),reduce?0:900)}hero.classList.add('lit')};
   if(!intro)root.classList.remove('intro-on');
   if(intro&&!intro.open&&root.classList.contains('intro-on')){if(heroM)heroM.hold(true);intro.go=startHero}else startHero();
   // The open menu covers the page below the header, so its drawings run no frames until it closes (the hero only once
@@ -611,12 +617,18 @@ document.addEventListener('DOMContentLoaded',function(){
 
   // The building rises with the developer story, as a Miami pre-construction sale runs and as the curve below has it
   // at par: residences sell off plan from launch, the lender's pre-sale threshold is met, then ground breaks.
-  // Bronze is the stacking plan; the podium and crown levels are never sold. The gauge reads the drawing itself.
+  // Bronze is the stacking plan: the two penthouse levels sell with the rest, while the podium (lobby and amenities)
+  // and the crown (the plant screen and roof) are never for sale. The gauge reads the drawing itself.
+  // Step figures (data-sold, residences of 38) are the curve's at par: 11 at month 3, 20 when the threshold is met in
+  // month 14, 25 at its top-off (month 24), every one by the last closing; the hero stands at completion, 28 (month 30).
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
   const gauge=document.querySelector('.rise .gauge'),gB=document.getElementById('gB'),gS=document.getElementById('gS'),gM=document.getElementById('gM'),pad=v=>String(v).padStart(2,'0');
-  const RES=+document.getElementById('gR').textContent.replace('/',''),LIM=.5; // residential levels; the curve's default threshold
-  // what each step ends on (from its data attributes), and the camera's bearing and elevation for it
-  const data=steps.map((s,n)=>({e:n>0,b:+s.dataset.built,s:+s.dataset.sold,c:+s.dataset.built>0&&n<steps.length-1}));
+  const RES=+document.getElementById('gR').textContent.replace('/',''),LIM=.5; // residences; the curve's default threshold
+  // what each step ends on (from its data attributes; the model counts levels' worth, two residences to a level), and
+  // the camera's bearing and elevation for it
+  const data=steps.map((s,n)=>({e:n>0,b:+s.dataset.built,s:+s.dataset.sold/2,c:+s.dataset.built>0&&n<steps.length-1}));
+  // the first release, as Strategy plans it and the first 90 days sell it: the residences of step 03, marked from Strategy
+  data.forEach((d,n)=>{d.rel=n===1||n===2?data[2].s:0});
   const VIEWS=[[-0.7,-0.74],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
   // every resting view holds the whole tower, its crown and the crane inside the canvas, refitted to the canvas's size
   // (a phone, or any short figure such as a phone on its side, keeps tight margins)
@@ -633,39 +645,45 @@ document.addEventListener('DOMContentLoaded',function(){
     return v};
   // Read forward at reading pace, each step plays one idea at a time, the camera always first (ms after arrival;
   // "when" waits for the drawing). Skimming, jumping or reading back goes straight to the step's state.
-  const BEATS=[[],[{at:250,e:true}],[{at:450,s:'s'}],[{at:450,s:'s'},{at:1250,when:m=>m.S>=st.s,b:'b',c:'c'}],[{at:400,b:'b'},{at:400,when:m=>m.G>=1,s:'s'}],[{at:0,c:'c'},{at:450,s:'s'}]];
+  // Top-off: the frame climbs at a pace the counter can be read at, and sales move as it rises (the curve between the
+  // threshold, month 14, and its top-off, month 24, read level by level: 21 residences by L08, 23 by L15, 25 by L20),
+  // then the crown is set; the façade is six storeys behind and the crane still up. Last closing: the crane leaves, the
+  // glass closes over the top at the frame's pace, then the last residences sell.
+  const BEATS=[[],[{at:250,e:true},{at:900,rel:'rel'}],[{at:450,s:'s'}],[{at:450,s:'s'},{at:1250,when:m=>m.S>=st.s,b:'b',c:'c'}],
+    [{at:200,b:'b',rate:6.8},{at:200,when:m=>m.L>=8,s:10.5},{at:200,when:m=>m.L>=15,s:11.5},{at:200,when:m=>m.L>=20,s:'s'}],
+    [{at:0,c:'c',rate:6.5},{at:0,when:m=>m.C>=21.99,s:'s'}]];
   let cur=-1,last=0,timers=[],plan=[],bt0=0,reading=false,st={...data[0]};
   const motionOff=()=>reduce||root.dataset.motion==='off';
-  const put=d=>{Object.assign(st,d);if(!towerM)return;towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c)};
+  const put=d=>{Object.assign(st,d);if(!towerM)return;if(d.rate)towerM.o.rate=d.rate;if('rel' in d)towerM.release(d.rel);towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c)};
   const run=()=>{if(!plan.length)return;const now=performance.now();plan=plan.filter(b=>{if(now-bt0<b.at||(b.when&&!b.when(towerM)))return true;
-    const d={},f=data[cur];for(const k of ['e','b','s','c'])if(k in b)d[k]=typeof b[k]==='string'?f[b[k]]:b[k];put(d);return false})};
+    const d={},f=data[cur];for(const k of ['e','b','s','c','rate','rel'])if(k in b)d[k]=typeof b[k]==='string'?f[b[k]]:b[k];put(d);return false})};
   // The story's tower is made in a quiet moment after start-up, or as the story comes within a screen of view if that is
   // sooner: it is far down the page, and the first frame has the hero to draw. Until then the gauge states the step's
   // figures itself, and the drawing starts on the step the reader is at.
   const story=()=>{if(towerM||!Model)return;
     // the story's glass is kept for the stacking plan: no lit homes after dark, only the lobby
-    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,rooms:false,footprint:true,envelope:false,rate:11,slow:1.5});
+    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,rooms:false,footprint:true,envelope:false,rate:11,slow:1.5,facadeLag:6});
     if(!towerM)return;models.push(towerM);
     let lb=-1,ls=-1,lf=-1,lm=null,ps=0;
-    towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S+.02),f=Math.min(1,m.S/RES),met=m.S>=RES*LIM-.001;
+    towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S*2+.02),f=Math.min(1,m.S*2/RES),met=m.S*2>=RES*LIM-.001;
       if(b!==lb){lb=b;gB.textContent=pad(b)}if(s!==ls){ls=s;gS.textContent=pad(s)}
       if(Math.abs(f-lf)>.0005){lf=f;gM.style.transform='scaleX('+f.toFixed(4)+')'}
       if(met!==lm){gauge.classList.toggle('met',met);
         // crossing the threshold while reading forward marks it once
-        if(met&&reading&&ps<RES*LIM&&lm!==null){gauge.classList.remove('pulse');void gauge.offsetWidth;gauge.classList.add('pulse')}lm=met}
+        if(met&&reading&&ps*2<RES*LIM&&lm!==null){gauge.classList.remove('pulse');void gauge.offsetWidth;gauge.classList.add('pulse')}lm=met}
       ps=m.S;run()};
     towerM.o.onResize=()=>{narrow=mq.matches;if(cur>=0)towerM.camTo(view(cur),true)};
-    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.camTo(view(Math.max(cur,0)),true)};
+    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true)};
   function stage(n){
     if(n===cur)return;
     const now=performance.now(),fwd=n===cur+1,skim=now-last<450;last=now;cur=n;
     timers.forEach(clearTimeout);timers=[];plan=[];
     reading=fwd&&!skim&&!motionOff();
-    if(towerM){towerM.camTo(view(n));
+    if(towerM){towerM.camTo(view(n));towerM.o.rate=11;
       if(reading){put(data[n-1]);bt0=now;plan=BEATS[n].slice();plan.forEach(b=>timers.push(setTimeout(run,b.at)))}
-      else put(data[n])}
+      else{put(data[n]);towerM.release(data[n].rel,true)}}
     // without a drawing the gauge states the step's figures directly
-    else{Object.assign(st,data[n]);gB.textContent=pad(data[n].b);gS.textContent=pad(data[n].s);gM.style.transform='scaleX('+Math.min(1,data[n].s/RES).toFixed(4)+')';gauge.classList.toggle('met',data[n].s>=RES*LIM)}
+    else{Object.assign(st,data[n]);gB.textContent=pad(data[n].b);gS.textContent=pad(data[n].s*2);gM.style.transform='scaleX('+Math.min(1,data[n].s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',data[n].s*2>=RES*LIM)}
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));
     name.textContent=steps[n].dataset.name;
   }

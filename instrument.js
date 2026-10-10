@@ -132,10 +132,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const list = (a) => a.slice(0, -1).join('; ') + '; and ' + a[a.length - 1];
     const key = document.querySelector('.cv-key .k-par');
 
-    // a small elevation of the tower, as in the story above: three podium floors, seventeen tapering residential ones
-    // and a two-floor crown. Only residences sell, from the top down, so the podium and the crown never fill.
+    // a small elevation of the tower, as in the story above: three podium floors and nineteen tapering residential ones,
+    // the two penthouse levels at the top included. Only residences sell, from the top down, so the podium never fills.
     const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
-    const POD = 3, RES = 17;
+    const POD = 3, RES = 19;
     let lastN = 0;
     if (tw) for (let k = 0; k < 22; k++) {
       const wdt = k < POD ? 36 : k < POD + RES ? 20 - (k - POD) * 0.22 : 14, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
