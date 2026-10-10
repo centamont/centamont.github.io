@@ -168,7 +168,11 @@
   }
   const lum = (c) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   const hasRO = typeof ResizeObserver === 'function', hasIO = typeof IntersectionObserver === 'function';
-  const IDLE = 1000 / 12; // ms between drawings of a settled orbit
+  // ms between drawings of a settled orbit: twelve a second, eight on a touch screen (a phone, where the tower is smaller
+  // and turns under a quarter of a pixel between them)
+  const IDLE = 1000 / (matchMedia('(pointer: coarse)').matches ? 8 : 12);
+  // (an engine whose media queries take only the older addListener)
+  const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
   let GEN = 0; // camera generations, shared by every model: the plan rings are shared too
 
   function hull(pts) {
@@ -226,13 +230,26 @@
       // the sun moves on every five minutes; that redraws once and never wakes a resting orbit
       setInterval(() => { this.sunNow = miamiSun(); this.dirty = true; this.kick(); }, 300000);
       this.colors();
-      this.size();
+      // (sized by its resize observer in the first frame, where the page is laid out anyway, rather than now, while the
+      // page starts; without an observer, now)
+      if (!hasRO) this.size();
       // Resized, turned or zoomed: refit and redraw in the same frame, so the canvas never shows a blank frame.
       const resized = () => { this.size(); if (this.o.onResize) this.o.onResize(this); this.now(); };
       if (hasRO) new ResizeObserver(resized).observe(canvas);
       else addEventListener('resize', resized);
-      // Off screen nothing is drawn; on its way back the drawing is brought up to date before it shows.
-      if (hasIO) new IntersectionObserver((es) => { this.visible = es[0].isIntersecting; if (this.visible) { if (this.dirty) this.now(); this.wake(); } }, { rootMargin: '64px 0px' }).observe(canvas);
+      // Moved to a screen of another pixel density (a laptop's own display from an external one), the canvas takes the
+      // new density too, though its size on the page has not changed. (A zoom changes its size, which the observer sees.)
+      const density = () => {
+        const q = matchMedia(`(resolution: ${devicePixelRatio || 1}dppx)`), f = () => { offMQ(q, f); density(); if (this.backing() !== this.dpr) resized(); };
+        onMQ(q, f);
+      };
+      if (window.matchMedia && window.devicePixelRatio) density();
+      // Off screen nothing is drawn; on its way back (64px out) the drawing is brought up to date before it shows. The
+      // slow idle orbit turns only while some of the canvas is actually on screen.
+      if (hasIO) {
+        new IntersectionObserver((es) => { this.visible = es[0].isIntersecting; if (this.visible) { if (this.dirty) this.now(); this.wake(); } }, { rootMargin: '64px 0px' }).observe(canvas);
+        new IntersectionObserver((es) => { this.inView = es[0].isIntersecting; if (this.inView) this.wake(); }).observe(canvas);
+      }
       // a hidden tab draws nothing; coming back, the clock starts afresh
       document.addEventListener('visibilitychange', () => { if (!document.hidden) { this.t0 = 0; this.kick(); } });
     }
@@ -242,6 +259,10 @@
 
     // Someone is here: the orbit (if it rested) turns again.
     wake() { this.woke = performance.now(); this.kick(); }
+
+    // Held (under the intro's curtain), the drawing is brought up to date when asked but runs no frames of its own;
+    // let go, it carries on from there, its clock started afresh.
+    hold(on) { this.held = !!on; if (!on) { this.t0 = 0; this.kick(); } }
 
     colors() {
       if (this.dead) return;
@@ -264,11 +285,13 @@
       this.now();
     }
 
+    // phones get 1.5x: sharp enough for hairlines at half the fill cost of 2x or more (the same 820px line as the stylesheet)
+    backing() { return Math.min(devicePixelRatio || 1, matchMedia('(max-width:820px)').matches ? 1.5 : 2); }
+
     size() {
       if (this.dead) return;
       const r = this.c.getBoundingClientRect();
-      // phones get 1.5x: sharp enough for hairlines at half the fill cost of 2x or more (the same 820px line as the stylesheet)
-      const d = Math.min(devicePixelRatio || 1, matchMedia('(max-width:820px)').matches ? 1.5 : 2);
+      const d = this.backing();
       this.w = r.width; this.h = r.height;
       this.c.width = Math.max(1, Math.round(r.width * d));
       this.c.height = Math.max(1, Math.round(r.height * d));
@@ -313,7 +336,7 @@
     // Ask for a frame. An idle orbit sleeps on a timer between its frames; any request cuts the sleep short.
     kick() {
       if (this.nap) { clearTimeout(this.nap); this.nap = 0; }
-      if (this.raf || !this.w || this.visible === false) return;
+      if (this.raf || !this.w || this.visible === false || this.held) return;
       this.raf = requestAnimationFrame(() => { this.raf = 0; this.frame(); });
     }
 
@@ -377,11 +400,25 @@
       // turns about a tenth of a pixel between frames, so it is drawn twelve times a second whatever the display's
       // refresh rate, and sleeps on a timer in between instead of waking at every refresh.
       const idle = settled && orbiting && !this.dirty && !this.moved;
-      if (!idle || t - (this.drawnLast || 0) >= IDLE - 12) { if (this.dirty || this.moved || !settled || orbiting) { this.draw(); this.drawnLast = t; } }
-      this.dirty = false; this.moved = !settled;
+      // A device slow to draw (over 10 ms a drawing, on average) draws a moving tower at most thirty times a second, so the
+      // page keeps time between drawings to answer a tap or a scroll. Everything runs on the clock, so the motion keeps its
+      // pace; a frame left undrawn is owed, and the next one draws it.
+      const owed = !idle && this.slow && t - (this.drawnLast || 0) < 28;
+      if (owed) { this.dirty = true; this.moved = true; }
+      else {
+        if (!idle || t - (this.drawnLast || 0) >= IDLE - 12) {
+          if (this.dirty || this.moved || !settled || orbiting) {
+            const c0 = performance.now(); this.draw(); this.drawnLast = t;
+            // (the first two drawings warm up and are not counted)
+            if ((this.nd = (this.nd || 0) + 1) > 2) { const c = performance.now() - c0; this.cost = this.cost == null ? c : this.cost * 0.85 + c * 0.15; this.slow = this.cost > (this.slow ? 7 : 10); }
+          }
+        }
+        this.dirty = false; this.moved = !settled;
+      }
       if (this.o.onFrame) this.o.onFrame(this);
-      if (!(this.moved || orbiting) || !this.visible || document.hidden) { this.t0 = 0; return; }
-      if (idle || settled) {
+      // (the idle orbit also stops just off screen, inside the margin where a returning drawing is brought up to date)
+      if (!(this.moved || orbiting) || !this.visible || document.hidden || (!this.moved && this.inView === false)) { this.t0 = 0; return; }
+      if ((idle || settled) && !owed) {
         // wake one refresh before the next drawing is due (half a 60 Hz refresh on average)
         const wait = Math.max(0, IDLE - (performance.now() - (this.drawnLast || 0)) - 8);
         this.nap = setTimeout(() => { this.nap = 0; this.slept = true; this.kick(); }, wait);
@@ -1210,14 +1247,19 @@
       // drawn as an architect's sun-path elevation in the open corner above the levels: time across, height up
       const w = this.w, H = 54, base = 100 + H;
       // it sits clear of the crown, between the tower and the right edge of the page's column (o.edge px in from the
-      // canvas's edge, set by the page), or 20px in from the screen's edge
-      let xr = -1e9; for (const p of PLANS[PLANS.length - 1].slab) xr = Math.max(xr, this.P(p.x * 1.1, FLOORS + 2.6, p.z * 1.1)[0]);
+      // canvas's edge, set by the page), or 20px in from the screen's edge. Where it goes is settled for the drawing's
+      // size and framing, never for the moment of the orbit: it keeps clear of the furthest the crown and the level ruler
+      // reach over a whole turn, so it neither slides nor comes and goes as the tower turns (a size that leaves no room
+      // for it keeps the corner empty).
+      const key = [w, this.h, this.o.ty, this.o.scale, this.o.offsetX, this.phi, this.o.dist, this.o.labels, this.o.labelSize].join();
+      if (!this.spAt || this.spAt.key !== key) this.spAt = { key, ...this.reach() };
+      const xr = this.spAt.xr;
       const xe = w - (this.o.edge != null ? this.o.edge : 20) - 8;
       let x0 = Math.max(xr + 48, w * 0.55), x1 = Math.min(xe, x0 + 230);
       // and clear of the level ruler and its labels: past them if there is room, otherwise not at all
       // (its labels reach dy below the horizon line: one line of them, or two)
-      const rb = this.rb, hits = (dy) => rb && x0 - 8 < rb.x1 && x1 + 8 > rb.x0 && base - H - 20 < rb.y1 && base + dy > rb.y0;
-      if (hits(24)) { x0 = Math.max(x0, rb.x1 + 16); x1 = Math.min(xe, x0 + 230); }
+      const rbs = this.rb ? this.spAt.rbs : [], hit = (dy) => rbs.filter((rb) => x0 - 8 < rb.x1 && x1 + 8 > rb.x0 && base - H - 20 < rb.y1 && base + dy > rb.y0), hits = (dy) => hit(dy).length > 0;
+      if (hits(24)) { x0 = Math.max(x0, ...hit(24).map((rb) => rb.x1 + 16)); x1 = Math.min(xe, x0 + 230); }
       const W = x1 - x0;
       if (W < 150) return;
       const t0 = arc[0].t, t1 = arc[arc.length - 1].t, top = Math.max(...arc.map((q) => q.el)), [sr, sg, sb] = this.sold, [lr, lg, lb] = this.line;
@@ -1261,6 +1303,27 @@
       g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
       g.fillText(Math.round(pk.el) + '°', X(pk.t), base - H - 6);
       g.restore();
+    }
+
+    // The furthest right the crown reaches, and the box the level ruler and its labels take at each bearing, over a whole
+    // turn of the camera at its present framing: where the sun's path may go. (The pointer's tilt is left out, so the
+    // diagram holds still under the mouse; at a fortieth of a radian it stays well inside the 48px kept clear of the crown.)
+    reach() {
+      const sd = this.o.dimSide === 1 ? -1 : 1, tw = this.o.labels ? this.o.labelSize * 3 : 0, N = 36, top = PLANS[PLANS.length - 1].slab;
+      // (the near façade's depth for each bearing depends on the bearing alone, so it is found once)
+      const nf = this._nf || (this._nf = Array.from({ length: N }, (_, i) => this.nearFace(Math.cos((i * TAU) / N), Math.sin((i * TAU) / N))));
+      let xr = -1e9; const rbs = [];
+      for (let i = 0; i < N; i++) {
+        const K = this.camAt((i * TAU) / N, this.phi, this.o.ty, this.o.scale, this.o.offsetX), c = K.c, s = K.s, nr = nf[i];
+        const pr = (x, y, z) => { const Z = s * x + c * z + K.d; return [K.cx + (K.f * (c * x - s * z)) / Z, K.cy - (K.f * (y - K.ey)) / Z]; };
+        for (const p of top) xr = Math.max(xr, pr(p.x * 1.1, FLOORS + 2.6, p.z * 1.1)[0]);
+        const at = (X) => [c * X * sd - s * nr, -s * X * sd - c * nr], [ax, az] = at(-10), [lx, lz] = at(-11.9);
+        // (the top and bottom ticks sit where the roof's and the first level's slab edges are nearest the eye, as drawn)
+        const lv = (k) => { let y = 0, zn = Infinity; for (const q of edgePlan(k)) { const Z = s * q.x + c * q.z + K.d; if (Z < zn) { zn = Z; y = K.cy - (K.f * (k + SLAB - K.ey)) / Z; } } return y; };
+        const xa = pr(ax, 0, az)[0], xl = pr(lx, 0, lz)[0];
+        rbs.push({ x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: lv(FLOORS) - this.o.labelSize - 2, y1: lv(0) + 2 });
+      }
+      return { xr, rbs };
     }
 
     // The aviation light on the roof, breathing slowly.

@@ -539,9 +539,20 @@ html.menu-open{overflow:hidden}
 .hero h1 .ln > span{display:block;transition:transform 1.3s var(--ease)}
 .hero h1 .ln:nth-child(2) > span{transition-delay:.09s}.hero h1 .ln:nth-child(3) > span{transition-delay:.18s}
 .hero .lede,.hero .row,.hero .coords{transition:transform 1.4s var(--ease) .3s}
-html.intro-on .hero:not(.lit) h1 .ln > span{transform:translateY(105%)}
+html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) h1 .ln > span{transform:translateY(105%)}
 /* The rest of the hero is already painted under the curtain (it counts for first paint); it only settles. */
-html.intro-on .hero:not(.lit) :is(.lede,.row,.coords){transform:translateY(14px)}
+html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.coords){transform:translateY(14px)}
+/* The whole parting runs on the stylesheet's clock from the moment the stone splits: the halves part 0.26 s later and
+   the headline rises 0.16 s after that (at once and 0.1 s after, when the intro is skipped), so a page still busy
+   starting up never holds any of it back */
+html.intro-on .curtain.split-on ~ main .hero:not(.lit) h1 .ln > span{transition-delay:.42s}
+html.intro-on .curtain.split-on ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.51s}
+html.intro-on .curtain.split-on ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.6s}
+html.intro-on .curtain.split-on ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition-delay:.72s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln > span{transition-delay:.1s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.19s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.28s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition-delay:.4s}
 .hero .lede{font-size:clamp(18px,1.5vw,21px);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .row{margin-top:clamp(28px,4vw,44px)}
 .hero .btn{--fill:#F4F0E8;--on:#14161A;border-color:rgba(244,240,232,.6);color:#F4F0E8}
@@ -574,14 +585,14 @@ html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwards}
 @keyframes curtain-failsafe{to{visibility:hidden;opacity:0}}
 @keyframes hero-failsafe{to{transform:none}}
-.curtain .half{position:absolute;top:0;bottom:0;width:50.2%;background:rgb(var(--hero-rgb));transition:transform 1.05s cubic-bezier(.76,0,.24,1)}
+.curtain .half{position:absolute;top:0;bottom:0;width:50.2%;background:rgb(var(--hero-rgb));transition:transform 1.05s cubic-bezier(.76,0,.24,1) .26s}
 .curtain .half.l{left:0}.curtain .half.r{right:0}
-.curtain .split{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#B8976A;transform:scaleY(0);transition:transform .32s cubic-bezier(.7,0,.3,1),opacity .4s .5s}
-.curtain.split-on .split{transform:none}
-.curtain.part .half.l{transform:translateX(-101%)}.curtain.part .half.r{transform:translateX(101%)}
-.curtain.part .split{opacity:0;transition:opacity .3s .1s}
-.curtain .in{position:relative;display:grid;justify-items:center;gap:22px;transition:opacity .35s}
-.curtain.part .in{opacity:0}
+.curtain .split{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#B8976A;transform:scaleY(0);transition:transform .32s cubic-bezier(.7,0,.3,1),opacity .3s .36s}
+.curtain.split-on .split{transform:none;opacity:0}
+.curtain.split-on .half.l{transform:translateX(-101%)}.curtain.split-on .half.r{transform:translateX(101%)}
+.curtain .in{position:relative;display:grid;justify-items:center;gap:22px;transition:opacity .35s .26s}
+.curtain.split-on .in{opacity:0}
+.curtain.fast .half,.curtain.fast .in{transition-delay:0s}.curtain.fast .split{transition-delay:0s,.1s}
 .curtain .n{font-family:var(--display);font-weight:300;font-size:clamp(64px,10vw,120px);line-height:.8;letter-spacing:.02em}
 .curtain .bar{width:min(240px,50vw);height:1px;background:rgba(244,240,232,.18);position:relative;overflow:hidden}
 .curtain .bar i{position:absolute;inset:0;background:#B8976A;transform-origin:left;transform:scaleX(0)}
@@ -845,6 +856,9 @@ html:not(.js) .curve,html:not(.js) .letter{display:none}
 .letter .sheet select option{color:var(--fg);background:var(--sheet)}
 .letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:0;border-bottom:2px solid var(--accent);background-color:rgba(184,151,106,.16)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
+/* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
+.letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
+.letter .send .alt{line-height:normal}
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
 /* an empty note leaves the grid, so it adds no second gap; it stays a live region for the message to come */
 .letter .note:empty{position:absolute}
@@ -897,6 +911,9 @@ header.site{view-transition-name:site-header}
 .js .tx-rise.in .w > i{transform:none}
 .js .lift{opacity:0;transform:translateY(16px);transition:opacity 1s var(--ease),transform 1.2s var(--ease);transition-delay:var(--d,.18s)}
 .js .lift.in{opacity:1;transform:none}
+/* With motion paused, a page arrives at once: the pause stops the page-to-page fade too (the head script marks the
+   new page before it first shows, which is where the fade runs) */
+:root[data-motion="off"]::view-transition-group(*),:root[data-motion="off"]::view-transition-image-pair(*),:root[data-motion="off"]::view-transition-old(*),:root[data-motion="off"]::view-transition-new(*){animation:none!important}
 @media (prefers-reduced-motion:reduce){
   ::view-transition-old(root),::view-transition-new(root){animation:none}
   .js .tx-rise .w > i{transform:none;transition:none}
@@ -1242,7 +1259,9 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
 @media print{
   /* ink on white, whichever theme the reader was in */
   :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:#14161A;--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--grid:#D6CDBB;--accent:#7A5F3A;--seal:#14161A;--sold:#B8976A;--line:#14161A;--band:#fff;--band-fg:#14161A;--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
-  body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.letter,.cv-ctl,canvas,.seam{display:none!important}
+  body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.letter,.cv-ctl,canvas,.seam,.curtain{display:none!important}
+  /* printed while the first-visit intro plays, the page prints as it stands once the curtain has parted */
+  html.intro-on .hero :is(.lede,.row){transform:none!important}
   html,body{background:#fff!important;color:#14161A!important}
   /* every headline, paragraph and drawing prints in its final state, wherever the reader had scrolled to */
   *,*::before,*::after{transition:none!important;animation:none!important}

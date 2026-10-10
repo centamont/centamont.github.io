@@ -1,4 +1,5 @@
-// Two instruments on the home page: the sales curve for developers, and the letter to the partners.
+// Two instruments on the home page: the sales curve for developers, and the letter to the partners. Each starts on its
+// own, so a fault in one never stops the other.
 document.addEventListener('DOMContentLoaded', function () {
   // ---- Sales against the schedule: an illustrative absorption model
   const svg = document.getElementById('cvSvg');
@@ -185,7 +186,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
     // The figure sits well down the page, so it is drawn just after the page has loaded rather than while it loads
     // (measuring its labels lays the page out several times); a hand on the sliders before then draws it at once.
-    // Its height is set now, though (one measure, no labels), so nothing below it moves when it draws.
+    // Its height is set now, though (one measure, no labels), so nothing below it moves when it draws: the page has
+    // often finished loading before its first frame, and a link to a section further down is placed by then.
     // The legend's 'At par' row shows only when the price is off par; settle it now too, so the legend keeps its
     // height (and a link to a section further down still lands under the header) when the figure draws.
     let lastW = 0;
@@ -195,15 +197,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // so the first draw fills it quietly, as the sliders do between steps.
     const first = () => { if (lastW) return; const s = out('cvSay'); s.setAttribute('aria-live', 'off'); redraw(); lastW = W; setTimeout(() => s.setAttribute('aria-live', 'polite'), 600); };
     if (window.requestIdleCallback) requestIdleCallback(first, { timeout: 1000 }); else setTimeout(first, 200);
-    new ResizeObserver(() => { if (lastW && Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } }).observe(svg);
+    const resized = () => { if (!lastW) size(); else if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } };
+    // (an engine without a resize observer measures it again whenever the window changes)
+    if (window.ResizeObserver) new ResizeObserver(resized).observe(svg); else addEventListener('resize', resized);
 
     // the sentence is a live region; announce it once the slider settles, not on every step
     const sayEl = out('cvSay'); let quiet;
     const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
   }
+});
 
-  // ---- The letter: composed here, copied, and sent by the writer through Instagram
+document.addEventListener('DOMContentLoaded', function () {
+  // ---- The letter: composed here, copied, and sent by the writer through Instagram. Until this script has set it up
+  // (or if it never runs), the letter's button is a plain link to the same Instagram message (site.css, .letter.ready).
   const form = document.getElementById('letter');
   if (form) {
     const note = document.getElementById('letterNote');
@@ -294,5 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
       };
       copying.then(() => go(true), () => go(false));
     });
+    form.classList.add('ready');
   }
 });

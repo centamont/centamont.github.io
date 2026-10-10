@@ -49,6 +49,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     try { if (sessionStorage.getItem('cm-focus') === 'motion') { sessionStorage.removeItem('cm-focus'); motionBtn.focus({ preventScroll: true }); } } catch (e) {}
   }
+  // Paused in the address, the pause goes along to the next page of the site: a link followed from here carries it.
+  if (/[?&]motion=off(&|$)/.test(location.search)) {
+    const carry = (e) => {
+      const a = e.target.closest && e.target.closest('a[href]');
+      if (!a || a.origin !== location.origin || a.hasAttribute('download')) return;
+      const u = new URL(a.href);
+      if (u.searchParams.get('motion') !== 'off') { u.searchParams.set('motion', 'off'); a.href = u.href; }
+    };
+    document.addEventListener('click', carry, true); document.addEventListener('auxclick', carry, true);
+  }
 
   // Day and night, remembered per visitor. The switch is "Night mode", pressed while the page is at night, whether the
   // visitor chose it or the system did. Pages listen for 'cm-theme' to recolor drawings.
@@ -64,7 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
     try { localStorage.setItem('cm-theme', root.dataset.theme); } catch (e) {}
     changed();
   });
-  scheme.addEventListener('change', () => { pressed(); changed(); });
+  const follow = () => { pressed(); changed(); };
+  // (an engine whose media queries take only the older addListener)
+  if (scheme.addEventListener) scheme.addEventListener('change', follow); else scheme.addListener(follow);
 
   // Reading progress on journal notes, where the browser cannot draw it with CSS alone.
   const bar = document.querySelector('.progress i');
@@ -135,12 +147,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     const heads = [...document.querySelectorAll('main h2, .page h1, .feature h3, .cv-txt h3')];
     heads.forEach(split);
-    // stagger by line rather than by word: words on the same line rise together. Every heading is measured in one
-    // pass and marked in a second, so the page is laid out once rather than once a word.
-    const lines = heads.map((el) => { let top = null, line = -1; return [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }); });
-    lines.forEach((ws) => ws.forEach(([w, line]) => w.style.setProperty('--i', line)));
+    // stagger by line rather than by word: words on the same line rise together. A heading is measured as it arrives
+    // (all its words in one pass, then marked in a second), where the page is already laid out, not while it starts.
+    const lines = (el) => { let top = null, line = -1; [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }).forEach(([w, n]) => w.style.setProperty('--i', n)); };
     document.querySelectorAll('main .head .intro, main .head + p, .page .lead-in').forEach((p) => p.classList.add('lift'));
-    const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
+    const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (e.target.classList.contains('tx-rise')) lines(e.target); e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
     document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
   }
 
