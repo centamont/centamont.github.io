@@ -1,5 +1,7 @@
 // Shared by every page: the menu, day and night, and link underlines that know where they are.
-document.addEventListener('DOMContentLoaded', function () {
+// It sets up as soon as it runs: a deferred script runs once the whole page is read, so the header's buttons answer
+// without waiting for the page's other scripts (the home page's drawings) to arrive.
+(function (init) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init(); })(function () {
   document.body.classList.remove('no-js');
   const root = document.documentElement;
   root.classList.add('js');
@@ -50,15 +52,16 @@ document.addEventListener('DOMContentLoaded', function () {
     try { if (sessionStorage.getItem('cm-focus') === 'motion') { sessionStorage.removeItem('cm-focus'); motionBtn.focus({ preventScroll: true }); } } catch (e) {}
   }
   // Paused in the address, the pause goes along to the next page of the site: a link followed from here carries it.
-  if (/[?&]motion=off(&|$)/.test(location.search)) {
-    const carry = (e) => {
-      const a = e.target.closest && e.target.closest('a[href]');
-      if (!a || a.origin !== location.origin || a.hasAttribute('download')) return;
-      const u = new URL(a.href);
-      if (u.searchParams.get('motion') !== 'off') { u.searchParams.set('motion', 'off'); a.href = u.href; }
-    };
-    document.addEventListener('click', carry, true); document.addEventListener('auxclick', carry, true);
-  }
+  // So does night or day, when that too could only be kept in the address (?theme=, below).
+  const inUrl = () => { const q = new URLSearchParams(location.search), k = []; if (q.get('motion') === 'off') k.push(['motion', 'off']); if (/^(dark|light)$/.test(q.get('theme') || '')) k.push(['theme', q.get('theme')]); return k; };
+  const carry = (e) => {
+    const keep = inUrl(); if (!keep.length) return;
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.origin !== location.origin || a.hasAttribute('download')) return;
+    const u = new URL(a.href);
+    if (keep.some(([k, v]) => u.searchParams.get(k) !== v)) { keep.forEach(([k, v]) => u.searchParams.set(k, v)); a.href = u.href; }
+  };
+  document.addEventListener('click', carry, true); document.addEventListener('auxclick', carry, true);
 
   // Day and night, remembered per visitor. The switch is "Night mode", pressed while the page is at night, whether the
   // visitor chose it or the system did. Pages listen for 'cm-theme' to recolor drawings.
@@ -68,10 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const pressed = () => { if (themeBtn) themeBtn.setAttribute('aria-pressed', String(night())); };
   const changed = () => document.dispatchEvent(new CustomEvent('cm-theme'));
   pressed();
+  // Where the browser keeps no site data, the choice rides in the address (?theme=, read by each page's head script),
+  // so a reload, the motion switch's reload included, and the next page keep it.
   if (themeBtn) themeBtn.addEventListener('click', () => {
     root.dataset.theme = night() ? 'light' : 'dark';
     pressed();
-    try { localStorage.setItem('cm-theme', root.dataset.theme); } catch (e) {}
+    let kept = false;
+    try { localStorage.setItem('cm-theme', root.dataset.theme); kept = true; } catch (e) {}
+    try {
+      const u = new URL(location.href);
+      if (kept) u.searchParams.delete('theme'); else u.searchParams.set('theme', root.dataset.theme);
+      if (u.href !== location.href) history.replaceState(history.state, '', u.href);
+    } catch (e) {}
     changed();
   });
   const follow = () => { pressed(); changed(); };

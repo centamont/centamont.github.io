@@ -245,10 +245,11 @@
       };
       if (window.matchMedia && window.devicePixelRatio) density();
       // Off screen nothing is drawn; on its way back (64px out) the drawing is brought up to date before it shows. The
-      // slow idle orbit turns only while some of the canvas is actually on screen.
+      // slow idle orbit turns only while some of the canvas is actually on screen, below the 64px header that covers the
+      // top of every page, and its 1px rule (a hero showing only under the header has nothing in view).
       if (hasIO) {
         new IntersectionObserver((es) => { this.visible = es[0].isIntersecting; if (this.visible) { if (this.dirty) this.now(); this.wake(); } }, { rootMargin: '64px 0px' }).observe(canvas);
-        new IntersectionObserver((es) => { this.inView = es[0].isIntersecting; if (this.inView) this.wake(); }).observe(canvas);
+        new IntersectionObserver((es) => { this.inView = es[0].isIntersecting; if (this.inView) this.wake(); }, { rootMargin: '-65px 0px 0px 0px' }).observe(canvas);
       }
       // a hidden tab draws nothing; coming back, the clock starts afresh
       document.addEventListener('visibilitychange', () => { if (!document.hidden) { this.t0 = 0; this.kick(); } });
@@ -1141,7 +1142,8 @@
       g.stroke();
       if (this.o.labels && w > 280) {
         g.globalAlpha = ra;
-        g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
+        // (in high contrast, the system's text colour, as every other line of the drawing)
+        g.fillStyle = this.forced ? `rgb(${this.line.join()})` : this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4);
         // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
         for (let i = this.o.groundLabel === false ? 5 : 0; i <= FLOORS; i += 5) { const t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(xl, t), ys[i]); }
