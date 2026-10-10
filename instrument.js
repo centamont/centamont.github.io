@@ -41,34 +41,40 @@ document.addEventListener('DOMContentLoaded', function () {
       const phases = [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
       const tl = [];
       phases.forEach(([m, t]) => { const e = el('text', { class: 'ph', 'text-anchor': 'start' }, g, t); tl.push([m, e, e.getComputedTextLength() || t.length * 8]); });
-      // leave room past the plot for the last phase name, so every name can sit to the right of its line
+      // Where the last phase name fits to the right of its line, the plot stops short to leave it room; a narrow figure
+      // instead runs the plot to its frame and lets that name sit left of its line, when that costs at most one more row.
       const wLast = tl[tl.length - 1][2];
-      X1 = Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE));
-      const X1p = X1;
-      // Every place a name could go: right or left of its line, on one of three rows. A line starts at its own
-      // name's row, so a name may span another phase's line only when that line starts on a lower row.
-      const opts = tl.map(([m, , w]) => {
-        const sx = X0 + (X1p - X0) * m / M, o = [];
-        for (let row = 0; row < 3; row++) for (const anchor of ['start', 'end']) {
-          const a = anchor === 'start' ? sx + 6 : sx - 6, l = anchor === 'start' ? a : a - w, r = l + w;
-          if (l >= 2 && r <= W - 4) o.push({ row, anchor, a, l, r, sx });
-        }
-        return o;
-      });
-      const clear = (o, c) => (c.row !== o.row || o.l >= c.r + 12 || o.r <= c.l - 12) &&
-        !(o.l - 4 < c.sx && c.sx < o.r + 4 && c.row <= o.row) && !(c.l - 4 < o.sx && o.sx < c.r + 4 && o.row <= c.row);
-      // the best set uses the fewest rows (the plot keeps its height), then keeps names to the right of their lines
-      let best = null, bestCost = Infinity;
-      const place = (i, chosen) => {
-        if (i === opts.length) {
-          const cost = 100 * Math.max(...chosen.map((c) => c.row)) + 120 * chosen.filter((c) => c.anchor === 'end').length + 5 * chosen.reduce((n, c) => n + c.row, 0);
-          if (cost < bestCost) { bestCost = cost; best = chosen.slice(); }
-          return;
-        }
-        opts[i].forEach((o) => { if (chosen.every((c) => clear(o, c))) { chosen.push(o); place(i + 1, chosen); chosen.pop(); } });
+      const plan = (X1p) => {
+        // Every place a name could go: right or left of its line, on one of three rows. A line starts at its own
+        // name's row, so a name may span another phase's line only when that line starts on a lower row.
+        const opts = tl.map(([m, , w]) => {
+          const sx = X0 + (X1p - X0) * m / M, o = [];
+          for (let row = 0; row < 3; row++) for (const anchor of ['start', 'end']) {
+            const a = anchor === 'start' ? sx + 6 : sx - 6, l = anchor === 'start' ? a : a - w, r = l + w;
+            if (l >= 2 && r <= W - 4) o.push({ row, anchor, a, l, r, sx });
+          }
+          return o;
+        });
+        const clear = (o, c) => (c.row !== o.row || o.l >= c.r + 12 || o.r <= c.l - 12) &&
+          !(o.l - 4 < c.sx && c.sx < o.r + 4 && c.row <= o.row) && !(c.l - 4 < o.sx && o.sx < c.r + 4 && o.row <= c.row);
+        // the best set uses the fewest rows (the plot keeps its height), then keeps names to the right of their lines
+        let best = null, bestCost = Infinity;
+        const place = (i, chosen) => {
+          if (i === opts.length) {
+            const cost = 100 * Math.max(...chosen.map((c) => c.row)) + 120 * chosen.filter((c) => c.anchor === 'end').length + 5 * chosen.reduce((n, c) => n + c.row, 0);
+            if (cost < bestCost) { bestCost = cost; best = chosen.slice(); }
+            return;
+          }
+          opts[i].forEach((o) => { if (chosen.every((c) => clear(o, c))) { chosen.push(o); place(i + 1, chosen); chosen.pop(); } });
+        };
+        place(0, []);
+        if (!best) best = opts.map((o, i) => o.find((c) => c.row === Math.min(i, 2)) || o[0] || { row: 0, anchor: 'start', a: 0 });
+        return { X1p, best, rows: Math.max(...best.map((c) => c.row)) };
       };
-      place(0, []);
-      if (!best) best = opts.map((o, i) => o.find((c) => c.row === Math.min(i, 2)) || o[0] || { row: 0, anchor: 'start', a: 0 });
+      let pl = plan(Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE)));
+      if (W < 520 && pl.X1p < W - 14) { const full = plan(W - 14); if (full.rows <= pl.rows + 1) pl = full; }
+      X1 = pl.X1p;
+      const best = pl.best;
       let two = 0;
       tl.forEach(([, e], i) => { const c = best[i]; two = Math.max(two, c.row); e.dataset.row = c.row; e.setAttribute('x', c.a); e.setAttribute('text-anchor', c.anchor); });
       Y0 = 34 + 16 * two; Y1 = H - 52;
@@ -111,15 +117,28 @@ document.addEventListener('DOMContentLoaded', function () {
       lim.setAttribute('x1', X0); lim.setAttribute('x2', X1); lim.setAttribute('y1', y(T)); lim.setAttribute('y2', y(T));
       limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = 'Pre-sale threshold';
       const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T);
-      if (hit > -1) { const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.setAttribute('x', right ? x(hit) - 10 : x(hit) + 10); dotT.setAttribute('text-anchor', right ? 'end' : 'start'); dotT.setAttribute('y', y(T) + 22); dotT.textContent = 'Month ' + hit; }
+      // the curves as points a few pixels apart, for keeping notes off them
+      const pts = [];
+      for (const c of p ? [s, base] : [s]) for (let i = 0; i < M; i++) for (let t = 0; t < 1; t += 0.25) pts.push([x(i + t), y(c[i] + (c[i + 1] - c[i]) * t)]);
+      pts.push([x(M), y(s[M])]);
+      const crosses = (b) => pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
+      if (hit > -1) {
+        const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.textContent = 'Month ' + hit;
+        // the month note takes the first spot beside the dot, nearest first and below before above, that no curve runs
+        // through; failing one, the spot the curves cross least (its halo keeps it legible)
+        const sides = right ? [[-10, 'end'], [10, 'start']] : [[10, 'start'], [-10, 'end']], spots = [];
+        for (const dy of [22, -12, 38, -28]) for (const [dx, an] of sides) spots.push([dx, an, dy]);
+        const hits = spots.map(([dx, an, dy]) => { dotT.setAttribute('x', x(hit) + dx); dotT.setAttribute('text-anchor', an); dotT.setAttribute('y', y(T) + dy); const b = dotT.getBBox(); return b.x < X0 + 2 || b.x + b.width > W - 2 || b.y < 2 || b.y + b.height > Y1 ? Infinity : pts.filter(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3).length; });
+        const [dx, an, dy] = spots[hits.indexOf(Math.min(...hits))];
+        dotT.setAttribute('x', x(hit) + dx); dotT.setAttribute('text-anchor', an); dotT.setAttribute('y', y(T) + dy);
+      }
       else { dot.style.display = 'none'; dotT.textContent = ''; }
       // The threshold label takes the first spot, right or left, above or below the line, that no curve or note runs through.
-      const pts = s.map((f, i) => [x(i), y(f)]).concat(p ? base.map((f, i) => [x(i), y(f)]) : []);
       const dotB = dotT.textContent ? dotT.getBBox() : null;
       // Failing a clear spot, the label may cross a curve (its halo keeps it legible) but never the month note.
       const spots = [[X1, 'end', -8], [X0 + 6, 'start', -8], [X1, 'end', 18], [X0 + 6, 'start', 18]].map(([lx, anchor, dy]) => {
         limT.setAttribute('x', lx); limT.setAttribute('text-anchor', anchor); limT.setAttribute('y', y(T) + dy);
-        const b = limT.getBBox(), curve = pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
+        const b = limT.getBBox(), curve = crosses(b);
         const note = !!dotB && !(dotB.x > b.x + b.width || dotB.x + dotB.width < b.x || dotB.y > b.y + b.height || dotB.y + dotB.height < b.y);
         return { lx, anchor, dy, curve, note };
       });
@@ -204,7 +223,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // inputs grow with what is typed, so the letter reads as prose
     // where the browser can size a field to its text, let it; otherwise estimate
     const native = window.CSS && CSS.supports('field-sizing', 'content');
-    form.querySelectorAll('.sheet input').forEach((i) => { const fit = () => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); if (native) return; i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; }; i.addEventListener('input', fit); fit(); });
+    // and a value too long for its line (a long name on a narrow phone) sets itself smaller, to three quarters at most,
+    // rather than run out of sight
+    const shrink = (i) => { i.style.fontSize = ''; for (let k = 1; k <= 5 && i.scrollWidth > i.clientWidth + 1; k++) i.style.fontSize = 1 - k * 0.05 + 'em'; };
+    const fields = form.querySelectorAll('.sheet input');
+    fields.forEach((i) => { const fit = () => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); if (!native) i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; if (i.value) shrink(i); else i.style.fontSize = ''; }; i.addEventListener('input', fit); fit(); });
+    let rz = 0; addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => fields.forEach((i) => { if (i.value) shrink(i); })); });
     form.querySelectorAll('.sheet select').forEach((s) => { const fit = () => { if (native) return; s.style.width = s.options[s.selectedIndex].text.length * 0.42 + 1.5 + 'em'; }; s.addEventListener('change', fit); fit(); });
     const text = () => {
       const p = paras.find((x) => !x.hidden), c = p.cloneNode(true), src = [...p.querySelectorAll('input, select')];

@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // so the page is never left frozen behind a menu that no longer shows.
     const wide = matchMedia('(max-width:1180px),(max-width:73.75em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
     wide.addEventListener ? wide.addEventListener('change', onWide) : wide.addListener(onWide);
+    // (enlarged text folds the nav at a wider screen too, by site.css's header container: once Menu goes, so does the drawer)
+    addEventListener('resize', () => { if (nav.classList.contains('open') && getComputedStyle(btn).display === 'none') close(); });
     btn.addEventListener('click', () => show(!nav.classList.contains('open')));
     nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('open')) { close(); btn.focus(); } });

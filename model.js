@@ -142,6 +142,19 @@
     return { v: [Math.cos(E) * Math.sin(A), Math.sin(E), Math.cos(E) * Math.cos(A)], night: smooth(clamp((6 - el) / 12, 0, 1)), el, az };
   }
   window.CentamontSun = miamiSun;
+  // The instant of midnight in Miami that opens the calendar day holding t, so a drawing of the day's sun is the same
+  // drawing whenever in the day it is made. (A browser that cannot tell time zones takes Miami's winter clock, UTC-5.)
+  function miamiDay(t) {
+    try {
+      const f = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+      const at = (ms) => { const p = {}; for (const x of f.formatToParts(new Date(ms))) p[x.type] = +x.value; return p; };
+      // the zone's offset at a moment: its wall clock read as UTC, less the moment itself
+      const off = (ms) => { const q = at(ms); return Date.UTC(q.year, q.month - 1, q.day, q.hour, q.minute) - Math.floor(ms / 6e4) * 6e4; };
+      const p = at(t), d0 = Date.UTC(p.year, p.month - 1, p.day);
+      // taken again at the midnight it gives, since a clock change (at 2 AM) can lie between that midnight and t
+      return d0 - off(d0 - off(t));
+    } catch (e) { return Math.floor((t - 5 * 36e5) / 864e5) * 864e5 + 5 * 36e5; }
+  }
   // The ivory sheet is a drawing, not a time of day: with the sun down it keeps the draughtsman's conventional
   // light from the south-west, high over the left shoulder. The ink drawings go dark instead.
   const DRAFT = { v: [-0.55, 0.62, -0.5], night: 0, el: 40, az: 228 };
@@ -1093,7 +1106,8 @@
         g.globalAlpha = ra;
         g.fillStyle = this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4);
-        for (let i = 0; i <= FLOORS; i += 5) { const t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(xl, t), ys[i]); }
+        // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
+        for (let i = this.o.groundLabel === false ? 5 : 0; i <= FLOORS; i += 5) { const t = 'L' + String(i).padStart(2, '0'); g.fillText(t, fx(xl, t), ys[i]); }
         if (Math.abs(ys[FLOORS] - ys[20]) > this.o.labelSize * 1.3) g.fillText('ROOF', fx(xl, 'ROOF'), ys[FLOORS]);
         g.globalAlpha = 1;
       }
@@ -1168,48 +1182,64 @@
     }
 
     sunPath(now, dark) {
-      const g = this.ctx, t = Date.now(), R = this.o.sunPath === true ? 15 : this.o.sunPath;
-      if (!this.sp || t - this.sp.at > 300000) {
-        // sample the next and last day in ten-minute steps; keep the daylight arc that holds now, or the next one
-        const pts = [];
-        for (let m = -24 * 60; m <= 24 * 60; m += 10) { const d = new Date(t + m * 6e4), { el, az } = solar(d); pts.push({ m, el, az, d }); }
-        let seg = [], best = null;
-        for (const q of pts) {
-          if (q.el > -0.8) seg.push(q);
-          else if (seg.length) { if (!best && seg[seg.length - 1].m >= 0) best = seg; seg = []; }
+      const g = this.ctx, t = Date.now(), H0 = -0.833;
+      // Today's sun over Miami: the calendar day there, sampled every ten minutes from its midnight, so the arc and its
+      // times hold still all day and read the same on every visit. Sunrise and sunset are found to the second where the
+      // sun's upper edge meets the horizon (0.833° below it, with refraction) and stated to the minute, as an almanac
+      // states them. After sunset the day's arc stays, all of it behind the sun, until midnight.
+      if (!this.sp || t - this.sp.at > 60000) {
+        const day = miamiDay(t);
+        if (!this.sp || this.sp.day !== day) {
+          const el = (ms) => solar(new Date(ms)).el, pts = [];
+          for (let k = 0; k <= 144; k++) pts.push({ t: day + k * 6e5, el: el(day + k * 6e5) });
+          // the crossing between two samples either side of the horizon, halved down to a few milliseconds
+          const cross = (a, b) => { let lo = a.t, hi = b.t; const rising = b.el > a.el; for (let i = 0; i < 18; i++) { const mid = (lo + hi) / 2; if ((el(mid) > H0) === rising) hi = mid; else lo = mid; } return (lo + hi) / 2; };
+          let rise = null, set = null;
+          for (let k = 1; k < pts.length && set === null; k++) {
+            const a = pts[k - 1], b = pts[k];
+            if (rise === null && a.el <= H0 && b.el > H0) rise = cross(a, b);
+            else if (rise !== null && a.el > H0 && b.el <= H0) set = cross(a, b);
+          }
+          const fmt = (ms) => { try { return new Date(Math.round(ms / 6e4) * 6e4).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+          const arc = rise === null || set === null ? [] : [{ t: rise, el: H0 }].concat(pts.filter((q) => q.t > rise && q.t < set), [{ t: set, el: H0 }]);
+          this.sp = { day, arc, rise: arc.length ? fmt(rise) : '', set: arc.length ? fmt(set) : '' };
         }
-        if (!best && seg.length) best = seg;
-        const fmt = (d) => d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
-        this.sp = { at: t, arc: best || [], rise: best ? fmt(best[0].d) : '', set: best ? fmt(best[best.length - 1].d) : '' };
+        this.sp.at = t;
       }
       const arc = this.sp.arc; if (arc.length < 3) return;
       // drawn as an architect's sun-path elevation in the open corner above the levels: time across, height up
       const w = this.w, H = 54, base = 100 + H;
-      // it sits clear of the crown, between the tower and the edge of the page
+      // it sits clear of the crown, between the tower and the right edge of the page's column (o.edge px in from the
+      // canvas's edge, set by the page), or 20px in from the screen's edge
       let xr = -1e9; for (const p of PLANS[PLANS.length - 1].slab) xr = Math.max(xr, this.P(p.x * 1.1, FLOORS + 2.6, p.z * 1.1)[0]);
-      let x0 = Math.max(xr + 48, w * 0.55), x1 = Math.min(w - 28, x0 + 230);
+      const xe = w - (this.o.edge != null ? this.o.edge : 20) - 8;
+      let x0 = Math.max(xr + 48, w * 0.55), x1 = Math.min(xe, x0 + 230);
       // and clear of the level ruler and its labels: past them if there is room, otherwise not at all
-      const rb = this.rb;
-      if (rb && x0 - 8 < rb.x1 && x1 + 8 > rb.x0 && base - H - 20 < rb.y1 && base + 24 > rb.y0) { x0 = Math.max(x0, rb.x1 + 16); x1 = Math.min(w - 28, x0 + 230); }
+      // (its labels reach dy below the horizon line: one line of them, or two)
+      const rb = this.rb, hits = (dy) => rb && x0 - 8 < rb.x1 && x1 + 8 > rb.x0 && base - H - 20 < rb.y1 && base + dy > rb.y0;
+      if (hits(24)) { x0 = Math.max(x0, rb.x1 + 16); x1 = Math.min(xe, x0 + 230); }
       const W = x1 - x0;
       if (W < 150) return;
-      const m0 = arc[0].m, m1 = arc[arc.length - 1].m, top = Math.max(...arc.map((q) => q.el)), [sr, sg, sb] = this.sold, [lr, lg, lb] = this.line;
-      const X = (m) => x0 + ((m - m0) / (m1 - m0)) * W, Y = (el) => base - (Math.max(el, 0) / top) * H;
+      const t0 = arc[0].t, t1 = arc[arc.length - 1].t, top = Math.max(...arc.map((q) => q.el)), [sr, sg, sb] = this.sold, [lr, lg, lb] = this.line;
+      const X = (ms) => x0 + ((ms - t0) / (t1 - t0)) * W, Y = (el) => base - (Math.max(el, 0) / top) * H;
+      // where the sun stands now: on the arc while it is up, at sunrise before it, at sunset after it
+      const up = t > t0 && t < t1, cut = clamp(t, t0, t1), nowQ = { t: cut, el: up ? solar(new Date(t)).el : H0 };
       g.save(); g.lineWidth = 1;
       g.strokeStyle = `rgba(${lr},${lg},${lb},0.22)`; g.beginPath(); g.moveTo(x0 - 8, base + 0.5); g.lineTo(x1 + 8, base + 0.5); g.stroke();
       for (const past of [true, false]) {
+        const run = past ? arc.filter((q) => q.t < cut).concat([nowQ]) : [nowQ].concat(arc.filter((q) => q.t > cut));
+        if (run.length < 2) continue;
         g.setLineDash(past ? [] : [1.5, 3.5]); g.strokeStyle = `rgba(${sr},${sg},${sb},${past ? 0.85 : 0.6})`; g.beginPath();
-        let on = false; arc.forEach((q) => { if ((q.m <= 0) !== past && !(past === false && q.m === 0)) return; const x = X(q.m), y = Y(q.el); on ? g.lineTo(x, y) : g.moveTo(x, y); on = true; });
+        run.forEach((q, j) => (j ? g.lineTo(X(q.t), Y(q.el)) : g.moveTo(X(q.t), Y(q.el))));
         g.stroke();
       }
       g.setLineDash([]);
-      // hour ticks on the horizon line
+      // hour ticks on the horizon line, at Miami's whole hours
       g.strokeStyle = `rgba(${lr},${lg},${lb},0.28)`; g.beginPath();
-      arc.forEach((q) => { if (q.d.getUTCMinutes() < 10) { const x = X(q.m); g.moveTo(x, base); g.lineTo(x, base + 4); } });
+      for (let hr = this.sp.day + Math.ceil((t0 - this.sp.day) / 36e5) * 36e5; hr < t1; hr += 36e5) { const x = X(hr); g.moveTo(x, base); g.lineTo(x, base + 4); }
       g.stroke();
-      const nowQ = arc.find((q) => q.m === 0);
-      if (nowQ && nowQ.el > 0) {
-        const x = X(0), y = Y(nowQ.el), pulse = reduce ? 1 : 0.8 + 0.2 * Math.sin(now / 1200);
+      if (up && nowQ.el > 0) {
+        const x = X(t), y = Y(nowQ.el), pulse = reduce ? 1 : 0.8 + 0.2 * Math.sin(now / 1200);
         const gr = g.createRadialGradient(x, y, 0, x, y, 14);
         gr.addColorStop(0, `rgba(${sr},${sg},${sb},${0.4 * pulse})`); gr.addColorStop(1, `rgba(${sr},${sg},${sb},0)`);
         g.fillStyle = gr; g.beginPath(); g.arc(x, y, 14, 0, TAU); g.fill();
@@ -1218,19 +1248,18 @@
       }
       // sunrise and sunset under the horizon line, the peak height over the arc
       g.textBaseline = 'top'; g.fillStyle = `rgba(${lr},${lg},${lb},0.62)`;
-      const tr = 'SUNRISE ' + this.sp.rise.toUpperCase(), ts = 'SUNSET ' + this.sp.set.toUpperCase();
-      // both times, when they fit side by side without touching: at the drawing's 13px, or a pixel smaller in a tight corner
-      for (const px of [13, 12]) {
-        g.font = '500 ' + px + 'px Jost, sans-serif';
-        if (g.measureText(tr).width + g.measureText(ts).width + 16 >= W + 16) continue;
-        g.textAlign = 'left'; g.fillText(tr, x0 - 8, base + 9);
-        g.textAlign = 'right'; g.fillText(ts, x1 + 8, base + 9);
-        break;
-      }
+      const rt = this.sp.rise.toUpperCase(), st = this.sp.set.toUpperCase();
+      // both times under the ends of the arc they belong to, side by side without touching, always at the drawing's 13px:
+      // on one line where there is room, in a tight corner each name over its time, and failing that the times alone
       g.font = '500 13px Jost, sans-serif';
+      const fits = (a, b) => g.measureText(a).width + g.measureText(b).width + 16 < W + 16;
+      const put = (a, b, y) => { g.textAlign = 'left'; g.fillText(a, x0 - 8, y); g.textAlign = 'right'; g.fillText(b, x1 + 8, y); };
+      if (fits('SUNRISE ' + rt, 'SUNSET ' + st)) put('SUNRISE ' + rt, 'SUNSET ' + st, base + 9);
+      else if (!hits(42) && fits('SUNRISE', 'SUNSET') && fits(rt, st)) { put('SUNRISE', 'SUNSET', base + 9); put(rt, st, base + 26); }
+      else if (fits(rt, st)) put(rt, st, base + 9);
       const pk = arc.reduce((a, q) => (q.el > a.el ? q : a), arc[0]);
       g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
-      g.fillText(Math.round(pk.el) + '°', X(pk.m), base - H - 6);
+      g.fillText(Math.round(pk.el) + '°', X(pk.t), base - H - 6);
       g.restore();
     }
 
