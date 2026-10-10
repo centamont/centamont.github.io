@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function sheet() {
       size();
       X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
+      // a name on the top row keeps 8px clear of the corner tick (14px) at the frame's top right
+      const TC = 14 + 8;
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
       // phase names along the top, each beside its line (a phone names them in a row under the drawing instead)
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const sx = X0 + (X1p - X0) * m / M, o = [];
           for (let row = 0; row < 3; row++) for (const anchor of ['start', 'end']) {
             const a = anchor === 'start' ? sx + 6 : sx - 6, l = anchor === 'start' ? a : a - w, r = l + w;
-            if (l >= 2 && r <= W - 4) o.push({ row, anchor, a, l, r, sx });
+            if (l >= 2 && r <= W - (row ? 4 : TC)) o.push({ row, anchor, a, l, r, sx });
           }
           return o;
         });
@@ -99,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
         place(0, []);
         return best ? { X1p, best, ok: true, rows: Math.max(0, ...best.map((c) => c.row)) } : { X1p, best: [], ok: false, rows: 9 };
       };
-      let pl = phone ? { X1p: W - 14, best: [], ok: true, rows: 0 } : plan(Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE)));
+      let pl = phone ? { X1p: W - 14, best: [], ok: true, rows: 0 } : plan(Math.min(W - 14, Math.floor(X0 + (W - TC - X0 - 6 - wLast) * M / DONE)));
       if (!phone && W < 520 && pl.X1p < W - 14) { const full = plan(W - 14); if (full.ok && (!pl.ok || full.rows <= pl.rows + 1)) pl = full; }
       // where no arrangement keeps every name beside its own line, the names go to the row under the drawing
       if (!pl.ok) { tl.forEach(([, e]) => e.remove()); tl.length = 0; pl.X1p = W - 14; }
@@ -117,7 +119,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // month ticks, every six
       const step = W < 420 ? 12 : 6;
       for (let m = 0; m <= M; m += step) { el('line', { class: 'axis', x1: x(m), x2: x(m), y1: Y1, y2: Y1 + 5 }, g); el('text', { x: x(m), y: Y1 + 20, 'text-anchor': m === 0 ? 'start' : m === M ? 'end' : 'middle' }, g, String(m)); }
-      el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 42, 'text-anchor': 'end' }, g, 'Months from launch');
+      // (set 15px above the frame's foot, so it keeps 8px clear of the corner tick under it)
+      el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 37, 'text-anchor': 'end' }, g, 'Months from launch');
       build = el('path', { class: 'cv-build', d: `M${x(BREAK)} ${Y1} L${x(DONE)} ${y(1)}` });
       area = el('path', { class: 'cv-area' }); par = el('path', { class: 'cv-par' }); line = el('path', { class: 'cv-line' });
       lim = el('line', { class: 'cv-lim' }); limT = el('text', { class: 'cv-limt', 'text-anchor': 'end' });

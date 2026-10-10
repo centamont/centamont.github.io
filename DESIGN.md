@@ -4,7 +4,7 @@ The visual world of centamont.com. Product facts live in PRODUCT.md; the brand p
 
 ## World
 
-An architect's elevation sheet on ivory vellum. Ink linework, bronze for what has sold, dimension lines, ground hatching and level marks as the only ornament. The footer is the drawing's title block.
+An architect's elevation sheet on ivory vellum. Ink linework, bronze for what is committed, dimension lines, ground hatching and level marks as the only ornament. Every page stands on grade, and the footer is the drawing's title block.
 
 ## Tokens
 
@@ -23,13 +23,23 @@ An architect's elevation sheet on ivory vellum. Ink linework, bronze for what ha
   - `--t-num` 156 / 96: the developer story's step numerals, the chapter's drawing-sheet signature.
   Tablets (521 to 820px) lift chapter and spread to keep their rank over the back matter. Past 1440px the heads and lead lines keep opening up a little (the close 155, the chapters 94 and an h3 46 at 1920), as the column does from 1600px; the h1 holds at 116, so the hero tower keeps its frame, and the spreads stay under it; the reading pages' titles (the notes, privacy, the 404) hold at 81, since their 880px column does not widen.
 
+## Drawing conventions
+
+- Pens (`--lw-*`): profile 1.5px for ground lines, outer silhouettes, the table top and the deposit bar's frame; object 1px for building edges, the outer arch, the ruler's base and chart frames; detail 0.6px for inner bays, door leaves, the inner arch and the ruler's minor ticks; hatch 0.6px at 50% opacity, at 45 degrees. Strokes keep their screen width however a drawing scales (`vector-effect: non-scaling-stroke`, or the facade's `--fu`).
+- Line types (`--lt-*`): continuous for what exists or is open now; hidden (4 3) for what is planned or projected; dot (1 3) for what comes later or is for reference; datum (12 3 2 3) for datums, boundaries and thresholds.
+- Bronze, in a drawing, marks only what is committed: levels sold, deposits held in escrow, markets open now. What is possible or planned stays ink, so the advisors' table carries no bronze.
+- One caption strip: a 1px rule, a 10px gap, the sentence on the left in Jost 15px faint (disclosures word for word, never below 15px), and on the right only live information or a key, in Jost 500 13px, .14em, uppercase. No figure numbers. The facade, the doorways and the ruler stay uncaptioned.
+- Figures sit on the sheet between four 14px corner ticks (`.ticks`) in the faint tone, never in a box, so the ticks never outweigh what they frame; no label inside comes within 8px of a tick.
+- Ground line: the footer's 1px ink rule over a 9px band of 45-degree hatch at 14px pitch, inside the page width.
+- Title block: Practice, Office, Drawn, Scale and Sheet over Work with us, Sheets and Follow. The sheet number is its largest figure (72px; 40px on phones), set under its label like every other value, then a rule and the sheet's name on one line (where the cell is too narrow, the size of the set is left off rather than wrap). Drawn comes only from a page's own date metadata, otherwise October 2026; Scale reads Not to scale (the report: Specimen); Sheets lists 01 to 06 with the current sheet in ink and underlined.
+
 ## Composition
 
 - One scroll page with anchored sections (old hash URLs land on their section). One h1 in the hero; every section opens with an h2 and its intro directly beneath it. Order: hero, three practices, developer story and how an engagement begins, private clients, markets, notes, people, the name, contact.
 - Three ink grounds: the hero, private clients (the private door) and the name. The footer opens with a full-width CENTAMONT signature. Everything else sits on ivory between 1px rules.
 - Section heads share the width: the h2 on the left seven of twelve columns, its intro on the right five, opened by a short bronze rule, the two on one last baseline. The two chapter openers (services, developers) set a full-measure h2 on two lines and step the intro down into the right five; markets runs its h2 full-measure at spread scale; the advisors keep their intro under the h2 and open the right five with the lead line, under the bronze rule, on the heading's first baseline; the questions set their head and intro on five columns, held while the list passes on seven. In the name band the lead line stands on the left under the ruler's first half, the paragraph on the right under its second.
 - A padding score: chapter openers (services, developers, markets) open loud, clamp(96px,12vw,176px) above; the back matter (journal, people, questions) reads quiet, clamp(64px,6.6vw,96px) above and below; the ink bands and the close keep their own.
-- Every section carries one drawing that holds real information: the practice marks, the tower and its live level gauge, the doorway framing the private-client terms, a surveyed markets map (simplified coastline, true coordinates, labels with halos) with a South Florida detail and a world key, the deposit schedule, the advisors' table of ten seats (twenty at most), the hundred-blow ruler, and an empty lot on the 404.
+- Every section carries one drawing that holds real information: the practice marks, the tower and its live level gauge, the doorway framing the private-client terms, a surveyed markets map (simplified coastline, true coordinates, labels with halos) with a South Florida detail and a world key, the deposit schedule, the advisors' table drawn as a plan of seats (ten in ink for launch, ten more in hidden line, two dimension strings), the hundred-blow ruler, and an empty lot on grade on the 404. The colophon shows the pens, line types and marks at 1:1.
 - The page closes at display scale: "Write to the partners.", its intro with the @centamont handle across from it, then the letter, with the handle again as one quiet line beside its button.
 - Lists are ruled rows, never card grids. No eyebrows above headings; meta lines go below the title.
 - A faint vellum grain (grain.png) sits over every ground.

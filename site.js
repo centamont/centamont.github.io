@@ -115,6 +115,13 @@
     const set = () => { const h = document.documentElement.scrollHeight - innerHeight; bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, scrollY / h) : 0) + ')'; };
     addEventListener('scroll', set, { passive: true }); set();
   }
+  // Read to the end, the line steps aside: once the footer reaches the header it fades, so on a screen too short for the
+  // whole footer it never rules across the name as the page comes to rest under the header.
+  const foot = document.querySelector('body > footer');
+  if (bar && foot) {
+    const line = bar.parentElement, end = () => line.classList.toggle('end', foot.getBoundingClientRect().top < line.getBoundingClientRect().bottom);
+    addEventListener('scroll', end, { passive: true }); addEventListener('resize', end); end();
+  }
 
   // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
   // the crack draws, and once the foot of the band is in view it splits and parts onto Contact.
