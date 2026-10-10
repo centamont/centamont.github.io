@@ -745,9 +745,10 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (min-width:821px) and (max-height:720px) and (min-height:501px){:root{--t-hero:clamp(48px,min(7.8vw,calc(17.5vh - 37px)),116px)}.hero .lede{margin-top:20px}.hero .row{margin-top:28px}.hero .wrap{padding-bottom:40px}}
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
-  .hero canvas{height:58svh;bottom:auto}
+  .hero canvas{height:63svh;bottom:auto}
   .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
-  .hero .wrap{padding-top:calc(46svh - var(--rise,0px))}
+  /* the copy starts as low as the taller drawing wants (51svh), but never so low that the second button leaves the first screen; 458px is the copy's height from the headline to the second button */
+  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
   .hero h1{max-width:none}
   .hero .coords{display:none}
 }
@@ -763,9 +764,9 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 }
 
 /* Text enlarged on its own stacks the hero as a phone does (the page script sets .stack): the tower above, the copy below */
-.hero.stack canvas{height:58svh;bottom:auto}
+.hero.stack canvas{height:63svh;bottom:auto}
 .hero.stack::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
-.hero.stack .wrap{padding-top:calc(46svh - var(--rise,0px))}
+.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
 .hero.stack h1{max-width:none}
 .hero.stack .coords{top:80px}
 .hero.stack .coords > :not(.cap){display:none}
