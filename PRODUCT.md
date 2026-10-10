@@ -14,7 +14,7 @@ Static HTML/CSS/JS in one `index.html`, served by GitHub Pages at centamont.com.
 
 ## Users
 
-1. **Developers of new residential buildings** (Miami first), deciding who will advise on and sell a project before launch. They judge whether a firm will sell units faster, at stronger prices, with fewer surprises, and whether a senior person will actually be on their account.
+1. **Developers of new residential buildings** (Miami, Broward and Palm Beach first, launching together), deciding who will advise on and sell a project before launch. They judge whether a firm will sell units faster, at stronger prices, with fewer surprises, and whether a senior person will actually be on their account.
 2. **Private buyers at the very top of the market** looking for pre-launch and off-market residences, who expect discretion and one advisor.
 3. **Top-producing agents** considering joining, by invitation only.
 
