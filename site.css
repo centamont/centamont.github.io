@@ -144,9 +144,9 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main a:nth-child(2){--k:1}header.site nav.main a:nth-child(3){--k:2}header.site nav.main a:nth-child(4){--k:3}header.site nav.main a:nth-child(5){--k:4}header.site nav.main a:nth-child(6){--k:5}header.site nav.main a:nth-child(7){--k:6}
   header.site nav.main.open a:first-child{border-top:1px solid var(--rule)}
   header.site nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}
-  html.js body.home header.site.over nav.main{background:rgb(var(--hero-rgb))}
-  html.js body.home header.site.over nav.main a,html.js body.home header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8;border-color:rgba(244,240,232,.14)}
-  html.js body.home header.site.over nav.main a[aria-current="true"]{color:#C9A877}
+  html.js header.site.over nav.main{background:rgb(var(--hero-rgb))}
+  html.js header.site.over nav.main a,html.js header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8;border-color:rgba(244,240,232,.14)}
+  html.js header.site.over nav.main a[aria-current]{color:#C9A877}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
 /* the underline under a nav word overhangs both ends by the same tracking, rather than only the right */
@@ -358,27 +358,43 @@ section.band + section,section + section.band{border-top:0}
 .door > *{min-width:0}
 .door .big{color:var(--band-fg);margin-top:26px;max-width:28ch}
 .door .row{margin-top:34px}
-/* The doorway: two leaves hinged at the jambs open into a lit room as the band scrolls through (--o, 0 to 1, set from script) */
+/* the offer's call is solid on the ink, as the hero's is; the Instagram message stays the outlined second */
+.band .btn.solid{--fill:var(--band);--on:#F4F0E8;background-color:#F4F0E8;color:#14161A;border-color:#F4F0E8}
+.band .btn.solid:hover,.band .btn.solid:focus-visible{color:#F4F0E8}
+.door .note{margin-top:18px;font-size:15px;line-height:1.5;color:var(--band-muted)}
+.door .note + .more{margin-top:12px}
+/* The doorway: two leaves hinged at the jambs open into a lit room (--o, 0 to 1). Once a third of the door is in view
+   (site.js adds .in) the arch inks itself over 0.8s as the leaves swing open over 0.85s: one gesture, with the promises
+   readable about half a second after it starts. The light on the floor comes up only once the leaves are a third open,
+   and the knob fades as they part. */
+@property --o{syntax:'<number>';inherits:true;initial-value:0}
 .doorway{--o:1;position:relative;align-self:end;aspect-ratio:2/3;max-width:440px;width:100%;justify-self:end;display:grid;align-content:end;padding:0 clamp(40px,4.6vw,62px) clamp(28px,3vw,40px);margin-bottom:0}
-.js .doorway{--o:0}
+.js .doorway{--o:0;transition:--o .85s cubic-bezier(.3,0,.15,1)}
+.js .doorway.in{--o:1}
 .arch{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--bronze);stroke-width:1;vector-effect:non-scaling-stroke;overflow:visible;z-index:3;pointer-events:none}
-.arch path{vector-effect:non-scaling-stroke;stroke-dasharray:2000;stroke-dashoffset:0;transition:stroke-dashoffset 2.8s var(--ease)}
-.arch .in2{opacity:.35;transition-delay:.25s}
+.arch path{vector-effect:non-scaling-stroke;stroke-dasharray:2000;stroke-dashoffset:0;transition:stroke-dashoffset .8s cubic-bezier(.65,0,.35,1)}
+.arch .in2{stroke:rgba(237,231,220,.18);transition-delay:.1s}
 .js .doorway:not(.in) .arch path{stroke-dashoffset:2000}
 /* the opening, in the arch's own proportions: inset 22 of 400 at the sides, 28 of 600 at the crown */
 .doorway .glow,.doorway .leaves{position:absolute;left:5.5%;right:5.5%;top:4.667%;bottom:0}
 .doorway .glow{border-radius:50% 50% 0 0/31.1% 31.1% 0 0;background:radial-gradient(120% 70% at 50% 100%,rgba(201,168,119,.26),rgba(201,168,119,.08) 55%,rgba(201,168,119,0) 85%);opacity:var(--o)}
 /* the leaves are clipped to the opening, so a swung leaf never draws past the arch */
-.doorway .leaves{display:flex;perspective:2400px;z-index:2;pointer-events:none;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0}
-.leaf{flex:1;position:relative;background:var(--band);border:1px solid rgba(184,151,106,.5);backface-visibility:hidden}
-.leaf.l{transform-origin:0 50%;transform:rotateY(calc(var(--o) * 86deg));border-top-left-radius:100% 31.1%;border-right:1px solid rgba(184,151,106,.25)}
-.leaf.r{transform-origin:100% 50%;transform:rotateY(calc(var(--o) * -86deg));border-top-right-radius:100% 31.1%;border-left:1px solid rgba(184,151,106,.25)}
+.doorway .leaves{display:flex;perspective:1400px;z-index:2;pointer-events:none;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0}
+/* the leaves are a shade lighter than the band and edged in bronze, so the closed door reads as a door before it opens */
+.leaf{flex:1;position:relative;background:#1C1E23;border:1px solid rgba(184,151,106,.75);backface-visibility:hidden}
+:root[data-theme="dark"] .leaf{background:#17191D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .leaf{background:#17191D}}
+.leaf.l{transform-origin:0 50%;transform:rotateY(calc(var(--o) * 86deg));border-top-left-radius:100% 31.1%;border-right-color:rgba(184,151,106,.45)}
+.leaf.r{transform-origin:100% 50%;transform:rotateY(calc(var(--o) * -86deg));border-top-right-radius:100% 31.1%;border-left-color:rgba(184,151,106,.45)}
 /* a sunk panel in each leaf, and one bronze knob where they meet */
-.leaf::before{content:"";position:absolute;inset:34% 16% 9%;border:1px solid rgba(184,151,106,.22)}
-.leaf::after{content:"";position:absolute;top:56%;width:5px;height:5px;border-radius:50%;background:var(--bronze);opacity:calc(1 - var(--o))}
+.leaf::before{content:"";position:absolute;inset:34% 16% 9%;border:1px solid rgba(184,151,106,.4)}
+.leaf::after{content:"";position:absolute;top:56%;width:5px;height:5px;border-radius:50%;background:var(--bronze);opacity:calc(1 - clamp(0,(var(--o) - .15) / .2,1))}
 .leaf.l::after{right:9%}.leaf.r::after{left:9%}
-/* light falls out of the open door across the floor */
-.doorway .light{position:absolute;top:100%;left:-40%;width:180%;height:calc(clamp(80px,10vw,136px) + 2px);overflow:visible;pointer-events:none;opacity:var(--o);transform-origin:50% 0;transform:scaleY(calc(.25 + .75 * var(--o)))}
+/* light falls out of the open door across the floor, feathered at every edge, so it reads as light and never as a shape */
+.doorway .light{position:absolute;top:100%;left:-40%;width:180%;height:calc(clamp(80px,10vw,136px) + 2px);overflow:visible;pointer-events:none;opacity:clamp(0,(var(--o) - .35) / .65,1);transform-origin:50% 0;transform:scaleY(calc(.25 + .75 * var(--o)));filter:blur(clamp(6px,.9vw,12px))}
+/* at night the light at the threshold is brighter, so it still reads against the true-ink band */
+:root[data-theme="dark"] #doorLight stop:first-child{stop-opacity:.44}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #doorLight stop:first-child{stop-opacity:.44}}
 .doorway .terms{position:relative;z-index:1}
 /* the threshold: a sill exactly as wide as the arch */
 .doorway::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--bronze);opacity:.6;z-index:3}
@@ -400,8 +416,34 @@ section.band + section,section + section.band{border-top:0}
   .door .terms b{font-size:24px}
   .door .terms p{padding:14px 0;font-size:17px}
 }
-@media (prefers-reduced-motion:reduce){.doorway{--o:1!important}}
+/* phones: the heading, then the door with its terms, then the offer, the two calls, the note and the way to the page */
+@media (max-width:820px){
+  .door{gap:0}
+  .door > div:first-child{display:contents}
+  .door h2{order:1}
+  .door .doorway{order:2;margin:28px 0 36px}
+  .door .big{order:3;margin-top:0;position:relative}
+  .door .row{order:4;margin-top:28px}
+  .door .note{order:5}
+  .door .more{order:6}
+  /* the light pools on the floor between the door and the offer, and is spent before the offer's first line */
+  .door .doorway{margin-bottom:52px}
+  .door .doorway .light{height:46px;filter:blur(5px)}
+}
+/* tablets: the heading, the door and the offer share one column the door's width, centred in the band, so the door never
+   stands alone beside an empty measure; the door keeps the arch's own 2:3 and its terms sit under the crown */
+@media (min-width:641px) and (max-width:820px){
+  .door{max-width:calc(440px + 2 * var(--gutter))}
+  .door .doorway{max-width:none;padding-inline:68px}
+}
+@media (min-width:641px) and (max-width:820px) and (min-height:501px){.door .doorway{aspect-ratio:2/3;min-height:0;padding-top:0}}
+/* the narrowest phones: the offer's call keeps its label on one line */
+@media (max-width:359px){.door .btn.solid{letter-spacing:.14em;padding-inline:20px}}
+@media (prefers-reduced-motion:reduce){.doorway{--o:1!important}.arch path{transition:none}}
 :root[data-motion="off"] .doorway{--o:1!important}
+/* if the shared script never arrives, the door stands drawn and open */
+html.nosite body.no-js .doorway{--o:1}
+html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 /* Markets */
 .levels{margin-top:clamp(44px,6vw,80px);border-top:1px solid var(--fg)}
 .lv{display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:baseline;padding-block:24px;border-bottom:1px solid var(--rule)}
@@ -600,26 +642,27 @@ footer{border-top:1px solid var(--fg);font-size:15px;color:var(--muted)}
 :root[data-theme="dark"] .theme .sun{display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme .moon{display:none}:root:not([data-theme="light"]) .theme .sun{display:block}}
 
-/* Header floats over the ink hero, then settles onto the page */
-body.home header.site{position:fixed;left:0;right:0;transition:background .5s var(--ease),border-color .5s var(--ease),color .5s var(--ease)}
-.js body.home header.site.over{background:transparent;border-color:rgba(244,240,232,.14);color:#F4F0E8}
-.js body.home header.site.over nav.main a{color:rgba(244,240,232,.78)}
-.js body.home header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8}
-.js body.home header.site.over .mark .sym{color:#C9A877}
-.js body.home header.site.over .menu-btn,.js body.home header.site.over .theme,.js body.home header.site.over .motion{border-color:rgba(244,240,232,.28);color:#F4F0E8}
+/* Header floats over the ink hero, then settles onto the page; over any ink ground (site.js marks .over) it takes that ink,
+   and it changes at once, with no tween, so it never passes through grey at the crossing */
+body.home header.site{position:fixed;left:0;right:0}
+.js header.site.over{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14);color:#F4F0E8}
+.js header.site.over nav.main a{color:rgba(244,240,232,.78)}
+.js header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8}
+.js header.site.over .mark .sym{color:#C9A877}
+.js header.site.over .menu-btn,.js header.site.over .theme,.js header.site.over .motion{border-color:rgba(244,240,232,.28);color:#F4F0E8}
 /* over the ink, the header's hover marks take the night bronze, which reads on ink in both themes */
-@media (hover:hover){.menu-btn:hover{border-color:var(--accent)}.js body.home header.site.over :is(.menu-btn,.theme,.motion):hover{border-color:#C9A877}}
-@media (min-width:1181px){.js body.home header.site.over nav.main a:is(:hover,:focus-visible){border-color:#C9A877}}
-@media (max-width:1180px){.js body.home header.site.over nav.main{background:rgb(var(--hero-rgb))}.js body.home header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js body.home header.site.over nav.main a[aria-current="true"]{color:#C9A877}}
+@media (hover:hover){.menu-btn:hover{border-color:var(--accent)}.js header.site.over :is(.menu-btn,.theme,.motion):hover{border-color:#C9A877}}
+@media (min-width:1181px){.js header.site.over nav.main a:is(:hover,:focus-visible){border-color:#C9A877}.js header.site.over nav.main a[aria-current]{color:#F4F0E8;border-color:#C9A877}}
+@media (max-width:1180px){.js header.site.over nav.main{background:rgb(var(--hero-rgb))}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
 /* while the open menu holds the page still, the scrollbar's lane is kept, so the header's buttons never step sideways under
    the pointer; site.js marks .sb only when a scrollbar was taking room as the menu opened, so a page that fits its window
    gains no lane either */
 html.menu-open{overflow:hidden}
 html.menu-open.sb{scrollbar-gutter:stable}
 /* the same drawer colours when larger text folds the nav at a wider screen */
-@media (max-width:73.75em){.js body.home header.site.over nav.main{background:rgb(var(--hero-rgb))}.js body.home header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js body.home header.site.over nav.main a[aria-current="true"]{color:#C9A877}}
-/* Once the page moves, the header takes the hero's ink so nothing scrolls through it. */
-.js body.home header.site.over:not(.top){background:rgb(var(--hero-rgb))}
+@media (max-width:73.75em){.js header.site.over nav.main{background:rgb(var(--hero-rgb))}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
+/* At the very top of the home page the header is clear over the hero's drawing; once the page moves it takes the ink, so nothing scrolls through it. */
+.js body.home header.site.over.top{background:transparent}
 
 /* Hero: the model */
 .hero{position:relative;background:rgb(var(--hero-rgb));color:#F4F0E8;overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:#F4F0E8;--sold:#B8976A;isolation:isolate}
@@ -1226,10 +1269,26 @@ html:not(.js) .curve,html:not(.js) .letter,.js .curve:not(.ready){display:none}
 /* ---- Atelier: page-to-page transitions and type that arrives */
 @view-transition{navigation:auto}
 header.site{view-transition-name:site-header}
-::view-transition-old(root){animation:vt-out .45s cubic-bezier(.7,0,.84,0) both}
-::view-transition-new(root){animation:vt-in .9s var(--ease) .1s both}
-@keyframes vt-out{to{opacity:0;transform:translateY(-12px)}}
-@keyframes vt-in{from{opacity:0;transform:translateY(18px)}}
+/* a fade through, never a cross-fade: the old page is gone before the new one starts to show, so two headlines never
+   share a frame. Behind the old page as it fades stands the ground the reader lands on (ink on private-clients.html and
+   under the home page's hero, the sheet elsewhere; site.js lets the fade run in daylight only from a screen on that
+   ground, and covers what little of the other shows); behind the new page as it arrives stand its own grounds, ink where
+   its ink is (--vt-ground, from site.js), so ivory and ink never mix into grey */
+::view-transition{background:var(--bg);animation:vt-ground 160ms step-end both}
+:root:has(.pc-door):not(:has(:target:not(#top)))::view-transition,:root:has(body.home):not(:has(:target:not(#top)))::view-transition{background:rgb(var(--hero-rgb));animation-name:vt-ground-ink}
+@keyframes vt-ground{to{background:var(--vt-ground,var(--bg))}}
+@keyframes vt-ground-ink{to{background:var(--vt-ground,rgb(var(--hero-rgb)))}}
+.vt-cover{position:fixed;left:0;right:0;z-index:199;pointer-events:none;background:var(--bg)}
+.vt-cover.ink{background:rgb(var(--hero-rgb))}
+::view-transition-old(root){animation:vt-out 160ms cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:vt-in 360ms cubic-bezier(.23,1,.32,1) 160ms both}
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0}}
+/* the private door's arch carries from the home page to private-clients.html (named there, and on the home page by site.js
+   only while its door is in view); an arch with no partner on the other page leaves and arrives with its page */
+::view-transition-group(cm-door){animation-duration:.7s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+::view-transition-old(cm-door):only-child{animation:vt-out 160ms cubic-bezier(.4,0,1,1) both}
+::view-transition-new(cm-door):only-child{animation:vt-in 360ms cubic-bezier(.23,1,.32,1) 160ms both}
 /* Headlines rise word by word from behind a mask; paragraphs follow */
 .js .tx-rise .w{display:inline-block;overflow:clip;overflow-clip-margin:.04em;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em}
 .js .tx-rise .w > i{display:inline-block;font-style:inherit;transform:translateY(105%);transition:transform 1.15s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i,0) * 95ms)}
@@ -1238,9 +1297,10 @@ header.site{view-transition-name:site-header}
 .js .lift.in{opacity:1;transform:none}
 /* With motion paused, a page arrives at once: the pause stops the page-to-page fade too (the head script marks the
    new page before it first shows, which is where the fade runs) */
-:root[data-motion="off"]::view-transition-group(*),:root[data-motion="off"]::view-transition-image-pair(*),:root[data-motion="off"]::view-transition-old(*),:root[data-motion="off"]::view-transition-new(*){animation:none!important}
+:root[data-motion="off"]::view-transition,:root[data-motion="off"]::view-transition-group(*),:root[data-motion="off"]::view-transition-image-pair(*),:root[data-motion="off"]::view-transition-old(*),:root[data-motion="off"]::view-transition-new(*){animation:none!important}
 @media (prefers-reduced-motion:reduce){
-  ::view-transition-old(root),::view-transition-new(root){animation:none}
+  ::view-transition,::view-transition-old(root),::view-transition-new(root){animation:none}
+  ::view-transition-group(cm-door),::view-transition-old(cm-door),::view-transition-new(cm-door){animation:none}
   .js .tx-rise .w > i{transform:none;transition:none}
   .js .lift{opacity:1;transform:none;transition:none}
 }
@@ -1436,41 +1496,83 @@ header.site{view-transition-name:site-header}
   .rp-key .k-later{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 0/100% 1px no-repeat,repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 100%/100% 1px no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 0 0/1px 100% no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 100% 0/1px 100% no-repeat}
 }
 
-/* Private clients */
-.pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(32px,6vw,96px);align-items:end}
-.pc-arch{margin:0;max-width:320px;justify-self:end;width:100%}
-.pc-arch svg{display:block;width:100%;height:auto;overflow:visible}
-/* each arch path is measured as one unit (pathLength="1"), so the line draws across the whole 2.6s instead of finishing early */
-.pc-arch path{fill:none;stroke:var(--accent);stroke-width:1;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset 2.6s var(--ease)}
-.pc-arch .a2{stroke:var(--fg);opacity:.35;transition-delay:.3s}
-.pc-arch .sill{stroke:var(--fg)}
-.pc-arch .knob{fill:var(--accent)}
-.js .pc-arch:not(.in) path{stroke-dashoffset:1}
-.pc-steps,.pc-terms{margin-top:clamp(64px,8vw,120px);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(24px,3vw,36px)}
-.pc-steps h2,.pc-terms h2{font-size:clamp(30px,3vw,44px);max-width:none}
-.pc-steps ol{list-style:none;margin:0;padding:0;counter-reset:st}
-.pc-steps li{counter-increment:st;display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:4px 0;padding:20px 0;border-bottom:1px solid var(--rule)}
+/* Private clients: the threshold. The page opens on the ink with the home page's door standing in it, open, its three
+   promises inside; the reading below is on the sheet, and the door's light falls across the band's floor onto it. */
+.page.pc{padding-top:0}
+.pc-door{--floor:clamp(56px,7vw,104px);position:relative;padding-block:clamp(36px,4.4vw,64px) var(--floor);border-top:0;overflow-x:clip}
+:root[data-theme="dark"] .pc-door{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc-door{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}}
+.pc-door .crumbs,.pc-door .crumbs a{color:var(--band-muted)}
+.pc-door .crumbs a:is(:hover,:focus-visible){color:var(--band-fg)}
+.page.pc .pc-door h1{color:#F4F0E8;font-size:clamp(42px,6vw,88px)}
+.page.pc .pc-door .standfirst{color:#D9D2C5;font-size:var(--t-big,clamp(21px,1.8vw,26px))}
+.pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,6vw,96px);align-items:end}
+.pc-top > *{min-width:0}
+/* the breadcrumb at the head of the text column, the title and standfirst at its foot, level with the door's sill */
+.pc-txt{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+.pc-txt .crumbs{margin-bottom:0}
+/* the door is the home page's, at the height of the screen it stands in (2:3, so the arch carries across unchanged) */
+.pc-doorway{--pad:clamp(56px,4.6vw,66px);width:min(100%,max(360px,calc(min(70svh,620px) * 2 / 3)));max-width:none;padding:0 var(--pad) 26px;container-type:inline-size}
+.pc-doorway .arch{view-transition-name:cm-door}
+/* the inscription in the crown, over the closed leaves and then in the lit room: 17% of the 2:3 door's height, measured
+   from its width so it holds its place if the promises make the door taller, and the promises keep clear below it */
+.pc-door .pc-ann{position:absolute;left:0;right:0;top:17%;top:calc(.255 * (100cqw + 2 * var(--pad)));z-index:3;margin:0;text-align:center;font:500 13px/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--band-muted)}
+.pc-doorway .terms{display:grid;border-top:var(--lw-detail) solid var(--band-rule);margin-top:calc(.255 * (100cqw + 2 * var(--pad)) + 44px)}
+.pc-doorway .terms p{padding:11px 0;border-bottom:var(--lw-detail) solid var(--band-rule);font-size:15px;line-height:1.5;color:var(--band-muted)}
+.pc-doorway .terms b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(21px,1.6vw,23px);line-height:1.25;color:var(--band-fg);margin-bottom:3px}
+.pc-doorway .terms a{color:var(--band-fg)}
+/* the door's light: it falls across the band's floor and fades over the first 140px of the sheet below */
+.pc-light{position:absolute;top:100%;left:-40%;width:180%;height:calc(var(--floor) + 140px);pointer-events:none;opacity:clamp(0,(var(--o) - .35) / .65,1);filter:blur(clamp(8px,1.2vw,16px))}
+/* the shape of the light is cut inside the blur, so its slanted sides are feathered as softly as its foot */
+.pc-light::before{content:"";position:absolute;inset:0;clip-path:polygon(25.3% 0,74.7% 0,88% 100%,-2.5% 100%);background:linear-gradient(rgba(201,168,119,.34),rgba(201,168,119,.18) var(--floor),rgba(201,168,119,0) calc(var(--floor) + 140px))}
+:root[data-theme="dark"] .pc-light::before{background:linear-gradient(rgba(201,168,119,.44),rgba(201,168,119,.26) var(--floor),rgba(201,168,119,0) calc(var(--floor) + 140px))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc-light::before{background:linear-gradient(rgba(201,168,119,.44),rgba(201,168,119,.26) var(--floor),rgba(201,168,119,0) calc(var(--floor) + 140px))}}
+@supports not (overflow-x:clip){.pc-light{left:0;width:100%}}
+/* arrived through the home page's door (site.js hands the arch across), the door here is already open */
+html[data-door="open"] .pc-doorway{--o:1!important;transition:none!important}
+html[data-door="open"] .pc-doorway .arch path{stroke-dashoffset:0!important;transition:none!important}
+/* the reading stands over the light that reaches it */
+.pc .pc-steps{position:relative}
+.pc-steps{margin-top:clamp(64px,8vw,120px);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(24px,3vw,36px)}
+.pc-steps h2{font-size:clamp(30px,3vw,44px);max-width:none}
+.pc-steps ol{list-style:none;margin:0;padding:0}
+.pc-steps li{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
 .pc-steps li:first-child{padding-top:0}
-.pc-steps li::before{content:counter(st,upper-roman);grid-row:span 2;font-family:var(--display);font-size:28px;line-height:1.1;color:var(--accent)}
-.pc-steps b,.pc-cols b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
+.pc-steps b{grid-column:2;display:block;font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
 /* the step's description only (the heading's words are spans too), held to a reading measure on wide screens */
-.pc-steps li > span{color:var(--muted);max-width:34em}
-.pc-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px clamp(20px,3vw,40px)}
-.pc-cols p{color:var(--muted);margin:0;padding-top:14px;border-top:1px solid var(--accent)}
-.pc-cols b{margin-bottom:8px}
-/* beside the three terms, the heading starts level with the first term's title, below its bronze rule and padding */
-@media (min-width:1600px){.pc-terms h2{padding-top:15px}}
-/* phones: the title and its standfirst come first, and the doorway stands after them, smaller, opening onto the steps */
-@media (max-width:820px){.pc-top,.pc-steps,.pc-terms{grid-template-columns:1fr}.pc-arch{justify-self:start;max-width:160px}.pc-cols{grid-template-columns:1fr}}
-/* tablets keep the doorway beside the headline, so it never stands alone above an empty measure */
-@media (min-width:641px) and (max-width:820px){.pc-top{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}.pc-arch{order:0;justify-self:end;max-width:320px}}
-/* phones on their side: the doorway is no taller than the screen below the breadcrumb allows, so the headline stands whole in the first view */
-@media (min-width:641px) and (max-height:500px) and (orientation:landscape){.pc-arch{max-width:min(320px,calc((100svh - 150px) * 5 / 7))}}
-/* laptops: three terms side by side would each get about 22 characters a line, so they stack in the wide column */
-@media (min-width:821px) and (max-width:1599px){.pc-cols{grid-template-columns:minmax(0,1fr)}}
-/* stacked, the terms are ruled rows like the steps above them: hairlines beneath, none over the first, so no bronze rule
-   doubles the section's ink one. The bronze heads stay for the three columns. */
-@media (max-width:1599px){.pc-cols{gap:0}.pc-cols p{padding:20px 0;border-top:0;border-bottom:1px solid var(--rule)}.pc-cols p:first-child{padding-top:0}}
+.pc-steps li > span:not(.seq){grid-column:2;color:var(--muted);max-width:34em}
+/* the room's own letter, under its lead-in */
+.pc-write{position:relative;margin-top:clamp(56px,7vw,104px);padding-top:clamp(28px,3vw,40px);border-top:1px solid var(--fg)}
+.pc-write .big{max-width:26ch}
+.pc-write .letter{margin-top:clamp(28px,3.4vw,44px);border-top:0;padding-top:0}
+.letter .as[hidden]{display:none}
+html.js .pc-nojs{display:none}
+.pc-nojs{margin-top:28px}
+@media (min-width:821px) and (max-width:1180px){.pc-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+/* short laptop screens: the band starts closer under the header, so the whole door stands in the first view */
+@media (min-width:821px) and (max-height:760px){.pc-door{padding-top:28px}}
+/* phones on their side: the title follows the breadcrumb, so the headline stands whole in the first view beside the door */
+@media (min-width:821px) and (max-height:500px){.pc-txt{justify-content:flex-start}}
+/* phones: the title and its standfirst, then the door with its promises as the home page sets it on a phone */
+@media (max-width:820px){
+  .pc-top,.pc-steps{grid-template-columns:1fr}
+  .pc-top{gap:0}
+  .pc-txt{gap:28px;justify-content:flex-start}
+  .pc-doorway{width:100%;max-width:420px;margin-top:36px}
+  .pc-door .pc-ann{top:min(17%,112px)}
+  .pc-doorway .terms{margin-top:156px}
+}
+/* tablets: the title, standfirst and door share one column the door's width, centred, as on the home page's band */
+@media (min-width:641px) and (max-width:820px){
+  .page.pc .pc-door .wrap{max-width:calc(440px + 2 * var(--gutter))}
+  .pc-doorway{--pad:72px;max-width:none}
+}
+@media (min-width:641px) and (max-width:820px) and (min-height:501px){.pc-doorway{aspect-ratio:2/3;min-height:0}}
+/* the narrowest phones: the inscription tightens a little so it stays inside the inner arch */
+@media (max-width:359px){.pc-door .pc-ann{letter-spacing:.1em}}
+/* short phones: the door may wait closed below the fold, so its inscription comes in with the leaves as they open rather
+   than hanging over them closed */
+@media (max-height:700px){.js .pc-door .pc-ann{opacity:var(--o)}}
 
 /* Colophon */
 /* each row's head shares the first baseline of its text; the color row, which opens with swatches, aligns their tops */
@@ -1599,7 +1701,7 @@ nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
   /* the word sits in its name ("Pause motion"); the icon says which way the switch goes */
   html.menu-open .motion::after{content:"Motion"}
   html.menu-open .motion:focus-visible{outline-offset:-6px}
-  .js.menu-open body.home header.site.over .motion{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14)}
+  .js.menu-open header.site.over .motion{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14)}
   nav.main{height:calc(100svh - 116px - env(safe-area-inset-bottom));padding-bottom:clamp(20px,5svh,40px)}
   /* on a short screen the rows close up, so the whole list fits above the switch before any scrolling, never so close
      that a letter's tail meets the rule below it */
@@ -1691,6 +1793,7 @@ p,li{text-wrap:pretty}
   .js .facade path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
   .js .facade .b{opacity:.45!important}
   .doorway{--o:1!important}
+  .leaf{background:var(--band)!important}
   .dbar .s,.rp-funnel .bar i,.rp-src .bar i,.js .ruler line{transform:none!important}
   .table .seat.on rect{fill-opacity:1!important;stroke:var(--sold)!important;transform:none!important}.table .seat.off rect{opacity:1!important}
   .chart .pt{stroke:var(--fg)!important}.chart :is(.lb,.lk){fill:var(--fg)!important}
@@ -1702,7 +1805,7 @@ p,li{text-wrap:pretty}
   .faq details::details-content{content-visibility:visible;display:block;block-size:auto}
   .prose .side,.deposit,.sheet-rp > *,.rp-after{break-inside:avoid}
   .hero,.band,#services{background:#fff!important;color:#14161A!important;box-shadow:none!important;min-height:0!important;--line:#14161A}
-  .hero h1,.hero .lede,.band h2,.band p,.band .big,.name .cut{color:#14161A!important}
+  .hero h1,.hero .lede,.band h1,.band h2,.band p,.band .big,.name .cut{color:#14161A!important}
   .hero .coords,.hero::after{display:none!important}
   .hero .btn{color:#14161A!important;border-color:#14161A!important}.hero .btn.solid{background-color:#14161A!important;color:#fff!important}
   .hero>*{translate:none!important;scale:none!important;opacity:1!important}

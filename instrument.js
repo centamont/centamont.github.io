@@ -1,5 +1,5 @@
-// Two instruments on the home page: the sales curve for developers, and the letter to the partners. Each starts on its
-// own, so a fault in one never stops the other.
+// Two instruments on the home page: the sales curve for developers, and the letter to the partners (private-clients.html
+// carries the letter alone, in the buyer's voice). Each starts on its own, so a fault in one never stops the other.
 // The curve shows only once this script is here to draw it (site.css, .curve.ready): without it, an empty frame and
 // sliders that move nothing would be all there is.
 // Beside the sliders the figure stands over its readouts, which follow the price slider in the source (the order a phone
@@ -358,7 +358,8 @@ document.addEventListener('DOMContentLoaded', function () {
     form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', show));
     show(); addEventListener('pageshow', show);
     // A link can choose who is writing: ?as=buy from another page, data-as on a link within this one.
-    const preset = (v) => { if (!['dev', 'buy', 'adv'].includes(v)) return; form.querySelector('input[name="as"][value="' + v + '"]').checked = true; show(); };
+    // (a page whose letter has one voice, the buyer's on private-clients.html, keeps it)
+    const preset = (v) => { const r = ['dev', 'buy', 'adv'].includes(v) && form.querySelector('input[name="as"][value="' + v + '"]'); if (!r) return; r.checked = true; show(); };
     try {
       const q = new URLSearchParams(location.search), v = q.get('as');
       if (v) { preset(v); q.delete('as'); history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); }

@@ -268,6 +268,26 @@ test('the letter copies and opens Instagram without a clipboard permission', asy
   }
 });
 
+// The private-clients page writes its own letter, already set to a buyer, without the sales curve beside it.
+test('the buyer letter on private clients composes and copies', async ({ page, context, browserName }) => {
+  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
+  await page.goto('/private-clients.html');
+  await page.locator('#letter').scrollIntoViewIfNeeded();
+  await expect(page.locator('#letter fieldset.as')).toBeHidden();
+  await expect(page.locator('#letter [data-for="buy"]')).toBeVisible();
+  await page.locator('#letter input[name="area"]').fill('Palm Beach');
+  await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+  const popup = page.waitForEvent('popup');
+  await page.locator('#letter button[data-to="ig"]').click();
+  await expect(page.locator('#letterNote')).toContainText('Instagram', { timeout: 2000 });
+  await (await popup).waitForURL(/^https:\/\/ig\.me\/m\/centamont/, { timeout: 2000 });
+  if (browserName === 'chromium') {
+    await expect(page.locator('#letterNote')).toContainText('Your letter is copied');
+    await context.grantPermissions(['clipboard-read']);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nI am looking for a residence in Palm Beach, with a budget of over $20 million, and hope to move within six months.\n\nWith regards,\nAna Ruiz');
+  }
+});
+
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
 // Editing an inline script without updating that page's hash would silently switch it off.
 test('every page runs under its security policy with nothing refused', async ({ page }) => {

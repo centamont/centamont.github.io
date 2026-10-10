@@ -28,6 +28,26 @@
     document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !e.target.closest('header.site')) close(); });
   }
 
+  // The header takes the ground beneath it: over an ink ground (the hero, the private door, the name, the private-clients
+  // threshold) it is drawn in that ink, and on the sheet in ivory. It watches one line, the row of pixels just under its
+  // own foot, so it changes when the ground at its edge does, at once, with no tween. While the menu is open it keeps the
+  // colours it opened with.
+  const header = document.querySelector('header.site'), grounds = document.querySelectorAll('.hero, .band');
+  if (header && grounds.length && 'IntersectionObserver' in window) {
+    const under = new Set();
+    let gio = null, held = null, rw = 0;
+    const set = (o) => { if (root.classList.contains('menu-open')) { held = o; return; } held = null; header.classList.toggle('over', o); };
+    const watch = () => {
+      if (gio) gio.disconnect();
+      under.clear();
+      gio = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) under.add(e.target); else under.delete(e.target); }); set(under.size > 0); }, { rootMargin: '-64px 0px ' + -Math.max(0, innerHeight - 65) + 'px 0px' });
+      grounds.forEach((g) => gio.observe(g));
+    };
+    watch();
+    addEventListener('resize', () => { clearTimeout(rw); rw = setTimeout(watch, 120); });
+    new MutationObserver(() => { if (held !== null && !root.classList.contains('menu-open')) set(held); }).observe(root, { attributes: true, attributeFilter: ['class'] });
+  }
+
   // Motion on or off, remembered per visitor, on top of the system's reduced-motion setting.
   // The page reloads so every drawing starts again in the chosen mode. The switch keeps one name, "Pause motion",
   // and says whether it is pressed. Where the browser keeps no site data, the choice rides in the address instead
@@ -171,6 +191,62 @@
     document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
   }
 
+  // The private door: once a third of it is in view, its arch inks itself and its leaves swing open into the lit room,
+  // one gesture on the stylesheet's clock (site.css, .doorway), so its promises are readable by the time half the door
+  // is on screen. With motion off it stands drawn and open.
+  const doors = document.querySelectorAll('.doorway');
+  if (stillPage || !('IntersectionObserver' in window)) doors.forEach((d) => d.classList.add('in'));
+  else if (doors.length) {
+    const dio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting && (e.intersectionRatio >= 0.33 || e.intersectionRect.height >= innerHeight * 0.33)) { e.target.classList.add('in'); dio.unobserve(e.target); } }), { threshold: [0, 0.1, 0.2, 0.25, 0.3, 0.34, 0.4, 0.5, 0.6, 0.8, 1] });
+    doors.forEach((d) => dio.observe(d));
+  }
+
+  // The door carries across: leaving the home page for private-clients.html while the door is in view, its arch is handed
+  // to the next page's door (site.css, view-transition-name cm-door), and that page shows its door already open.
+  const arch = document.querySelector('.door .arch');
+  if (arch) addEventListener('pageswap', (e) => {
+    const r = arch.getBoundingClientRect(), to = e.activation && e.activation.entry && e.activation.entry.url;
+    const go = !!(e.viewTransition && to && /private-clients\.html/.test(to) && r.bottom > 64 && r.top < innerHeight);
+    arch.style.viewTransitionName = go ? 'cm-door' : '';
+    try { if (go) sessionStorage.setItem('cm-door', '1'); else sessionStorage.removeItem('cm-door'); } catch (err) {}
+  });
+
+  // Page to page, a fade through (site.css, ::view-transition): the old page fades out over the ground the reader lands on
+  // (ink on private-clients.html and under the home page's hero, the sheet elsewhere), then the new page fades in over
+  // its own grounds, so ivory and ink never mix into grey. Leaving, in daylight, the fade runs only from a screen that
+  // stands mostly on that same ground and under a header of the same colour; what little of the other ground shows is
+  // covered in the landing ground as the page is captured. Otherwise the new page simply appears. At night both grounds
+  // are dark and the fade always runs.
+  const inkSpans = () => {
+    const sp = [];
+    document.querySelectorAll('.hero, .band').forEach((g) => { const r = g.getBoundingClientRect(), a = Math.max(0, r.top), b = Math.min(innerHeight, r.bottom); if (b > a) sp.push([a, b]); });
+    sp.sort((x, y) => x[0] - y[0]);
+    return sp.reduce((m, q) => { const l = m[m.length - 1]; if (l && q[0] <= l[1]) l[1] = Math.max(l[1], q[1]); else m.push(q.slice()); return m; }, []);
+  };
+  addEventListener('pageswap', (e) => {
+    const vt = e.viewTransition, to = vt && e.activation && e.activation.entry && e.activation.entry.url;
+    if (!to || night()) return;
+    let u; try { u = new URL(to); } catch (err) { return; }
+    const home = /\/(index\.html)?$/.test(u.pathname) && !/\/journal\/(index\.html)?$/.test(u.pathname);
+    const lands = (home || /private-clients\.html$/.test(u.pathname)) && (!u.hash || u.hash === '#top');
+    const sp = inkSpans(), ink = sp.reduce((t, q) => t + q[1] - q[0], 0) / innerHeight;
+    const over = !!(header && header.classList.contains('over'));
+    if (lands ? !over || ink < 0.85 : over || ink > 0.15) { vt.skipTransition(); return; }
+    const cover = (a, b) => { if (b - a < 1) return; const c = document.createElement('div'); c.className = 'vt-cover' + (lands ? ' ink' : ''); c.setAttribute('aria-hidden', 'true'); c.style.top = a + 'px'; c.style.height = b - a + 'px'; document.body.appendChild(c); };
+    if (lands) { let y = 0; sp.forEach((q) => { cover(y, q[0]); y = q[1]; }); cover(y, innerHeight); } else sp.forEach((q) => cover(q[0], q[1]));
+  });
+  // (a page come back from the back-forward cache drops the covers it was captured with)
+  addEventListener('pageshow', () => document.querySelectorAll('.vt-cover').forEach((c) => c.remove()));
+  // Arriving, the new page's own grounds stand behind it as it fades in, ink where its ink is and the sheet elsewhere.
+  const landing = () => {
+    let y = 0; const st = [];
+    inkSpans().forEach((q) => { st.push('var(--bg) ' + y + 'px ' + q[0] + 'px', 'rgb(var(--hero-rgb)) ' + q[0] + 'px ' + q[1] + 'px'); y = q[1]; });
+    st.push('var(--bg) ' + y + 'px 100%');
+    root.style.setProperty('--vt-ground', 'linear-gradient(' + st.join(', ') + ')');
+  };
+  addEventListener('pagereveal', (e) => { if (e.viewTransition) landing(); });
+  try { if (root.matches(':active-view-transition')) landing(); } catch (err) {}
+
   // Drawings that draw themselves once they arrive.
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
@@ -179,7 +255,7 @@
   // had closed close again afterwards.
   let opened = [];
   addEventListener('beforeprint', () => {
-    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut').forEach((el) => el.classList.add('in'));
+    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut, .doorway').forEach((el) => el.classList.add('in'));
     opened = [...document.querySelectorAll('.faq details:not([open])')];
     opened.forEach((d) => { d.open = true; });
   });
