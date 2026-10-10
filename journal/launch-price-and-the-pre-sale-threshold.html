@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-kMXIojIHYqRiZYgZ69yx1tLLjh8DL5dBzQdP46vshI0='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -37,9 +37,9 @@
 <link rel="preload" href="../fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="../site.css?v=f3e7ea51">
-<script>document.documentElement.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))document.documentElement.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)document.documentElement.dataset.theme=q[1];try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
-<script src="../site.js?v=f3e7ea51" defer></script>
+<link rel="stylesheet" href="../site.css?v=528711e3">
+<script>document.documentElement.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))document.documentElement.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)document.documentElement.dataset.theme=q[1];try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')document.documentElement.dataset.motion='off'}catch(e){}setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))document.documentElement.classList.add('nosite')},4000)</script>
+<script src="../site.js?v=528711e3" defer></script>
 </head>
 <body class="no-js" id="top">
 <a class="skip" href="#main">Skip to content</a>
@@ -67,7 +67,7 @@
 </header>
 <div class="progress" aria-hidden="true"><i></i></div>
 <main id="main" class="page"><div class="wrap">
-<div class="crumbs"><a href="../">Centamont</a> · <a href="./">Journal</a> · Developer note</div>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="../">Centamont</a><span aria-hidden="true"> · </span><a href="./">Journal</a><span aria-hidden="true"> · </span><span aria-current="page">Developer note</span></nav>
 <h1>Launch price and <span class="nw">the pre-sale</span> threshold</h1>
 <p class="standfirst">A launch price decides more than revenue. It sets when a building reaches its lender’s pre-sale threshold, and how much is still for sale on the day it is finished.</p>
 <div class="meta"><span class="nw">The partners</span> <span class="nw"><time datetime="2026-10-08">October 8, 2026</time></span> <span class="nw">2-minute read</span> <span class="nw">Revised <time datetime="2026-10-09">October 9, 2026</time></span></div>
@@ -112,19 +112,19 @@
 <footer>
   <div class="wrap">
     <svg class="sig" viewBox="0 0 1000 130" aria-hidden="true"><text x="-7.4" y="118" textLength="1012.8" lengthAdjust="spacing">CENTAMONT</text></svg>
-    <div class="tb">
-      <div class="c4"><small>Practice</small><span>New development and private client advisory</span></div>
-      <div class="c2"><small>Office</small><span>Miami, Florida</span></div>
-      <div class="c3"><small>Sheet</small><span class="num">02.2 · Journal</span></div>
-      <div class="c3"><small>Revision</small><span class="num">October 2026</span></div>
-      <div class="c4"><small>Work with us</small><ul><li><a href="../#developers">Developers</a></li><li><a href="../private-clients.html">Private clients</a></li><li><a href="../#people">Advisors</a></li></ul></div>
-      <div class="c4"><small>Read</small><ul><li><a href="../journal/">Journal</a></li><li><a href="../report.html">The weekly report</a></li><li><a href="../colophon.html">Colophon</a></li></ul></div>
-      <div class="c4"><small>Follow</small><ul class="two">
+    <dl class="tb">
+      <div class="c4"><dt>Practice</dt><dd>New development and private client advisory</dd></div>
+      <div class="c2"><dt>Office</dt><dd>Miami, Florida</dd></div>
+      <div class="c3"><dt>Sheet</dt><dd class="num">02.2 · Journal</dd></div>
+      <div class="c3"><dt>Revision</dt><dd class="num">October 2026</dd></div>
+      <div class="c4"><dt>Work with us</dt><dd><ul><li><a href="../#developers">Developers</a></li><li><a href="../private-clients.html">Private clients</a></li><li><a href="../#people">Advisors</a></li></ul></dd></div>
+      <div class="c4"><dt>Read</dt><dd><ul><li><a href="../journal/">Journal</a></li><li><a href="../report.html">The weekly report</a></li><li><a href="../colophon.html">Colophon</a></li></ul></dd></div>
+      <div class="c4"><dt>Follow</dt><dd><ul class="two">
         <li><a href="https://www.instagram.com/centamont" target="_blank" rel="noopener">Instagram<span class="vh"> (opens in a new tab)</span></a></li>
         <li><a href="https://www.youtube.com/@centamont" target="_blank" rel="noopener">YouTube<span class="vh"> (opens in a new tab)</span></a></li>
         <li><a href="https://x.com/centamont" target="_blank" rel="noopener">X (Twitter)<span class="vh"> (opens in a new tab)</span></a></li>
-      </ul></div>
-    </div>
+      </ul></dd></div>
+    </dl>
     <div class="legal"><span>© 2026 Centamont. Miami, Florida.</span><span><span class="nw"><a href="../privacy.html">Privacy &amp; accessibility</a><i class="sep"> ·</i></span> <span class="nw">Equal Housing Opportunity</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">Back to top</a></span></span></div>
   </div>
 </footer>

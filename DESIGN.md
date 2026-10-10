@@ -8,8 +8,8 @@ An architect's elevation sheet on ivory vellum. Ink linework, bronze for what ha
 
 ## Tokens
 
-- Ink #14161A, ivory #F4F0E8 (page), paper #FAF7F1, bronze #B8976A (fills, marks on ink), bronze text #7A5F3A (text on ivory), muted #55504A, faint #6E675D, rule #D6CDBB.
-- Dark scheme: page #121417, text #EDE7DC, accent #C9A877, linework turns ivory.
+- Ink #14161A, ivory #F4F0E8 (page), paper #FAF7F1, bronze #B8976A (fills, marks on ink), bronze text #7A5F3A (text on ivory), muted #4A463F, faint #6E675D, rule #D6CDBB.
+- Dark scheme: page #1B1E23, paper #21252A, ink bands #0D0E11 framed in bronze hairlines, text #EDE7DC, muted #C2BBAF, faint #9A9388, rule #2F3236, accent #C9A877, linework turns ivory.
 - Cormorant Garamond 300 for display, 400 for h3 and large reading text; Jost 400 at 18px for body (muted #4A463F), 500 for buttons and small uppercase labels. Nothing below 15px, except small-caps labels and drawing annotations at 13px.
 
 ## Composition

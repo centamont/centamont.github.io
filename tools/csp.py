@@ -1,8 +1,11 @@
 # Writes each page's Content-Security-Policy, allowing its inline scripts by hash.
 # Run from the repo root after editing any inline <script>: python3 tools/csp.py
+# python3 tools/csp.py --check writes nothing: it names each page whose policy is stale and exits 1 if there is one.
 # require-trusted-types-for: no script on the site writes HTML from a string (innerHTML and the like), and the browser holds it to that.
 # trusted-types 'none': and no script may make a Trusted Types policy (none does), so nothing can open that door again.
-import re,hashlib,base64,glob
+import re,hashlib,base64,glob,sys
+check='--check' in sys.argv[1:]
+stale=[]
 pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','report.html']+sorted(glob.glob('journal/*.html'))
 for f in pages:
     t=open(f).read()
@@ -20,4 +23,7 @@ for f in pages:
     if not re.search(r'<[a-zA-Z][^>]*\sstyle=|<style[\s>]',t): tag=tag.replace(" 'unsafe-inline'",'')
     m=re.search(r'<meta charset="utf-8">\n',t,re.I); assert m,f
     t=t[:m.end()]+tag+t[m.end():]
-    open(f,'w').write(t); print(f,len(hs))
+    if check:
+        if t!=open(f).read(): stale.append(f); print(f,'stale')
+    else: open(f,'w').write(t); print(f,len(hs))
+if check: sys.exit(1 if stale else 0)

@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const note = document.getElementById('letterNote');
     const paras = [...form.querySelectorAll('.body')];
     // (a reminder about the blanks of one letter means nothing once another is chosen: it goes, with its marks)
-    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); }); } };
+    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }); } };
     let reminding = '';
     form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', show));
     show(); addEventListener('pageshow', show);
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // rather than run out of sight
     const shrink = (i) => { i.style.fontSize = ''; for (let k = 1; k <= 5 && i.scrollWidth > i.clientWidth + 1; k++) i.style.fontSize = 1 - k * 0.05 + 'em'; };
     const fields = form.querySelectorAll('.sheet input');
-    fields.forEach((i) => { const fit = () => { if (i.classList.contains('miss')) { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); remind(); } if (!native) i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; if (i.value) shrink(i); else i.style.fontSize = ''; }; i.addEventListener('input', fit); fit(); });
+    fields.forEach((i) => { const fit = () => { if (i.classList.contains('miss')) { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); remind(); } if (!native) i.style.width = Math.min(Math.max(i.placeholder.length, i.value.length, 3) + 1, 26) + 'ch'; if (i.value) shrink(i); else i.style.fontSize = ''; }; i.addEventListener('input', fit); fit(); });
     let rz = 0; addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => fields.forEach((i) => { if (i.value) shrink(i); })); });
     form.querySelectorAll('.sheet select').forEach((s) => { const fit = () => { if (native) return; s.style.width = s.options[s.selectedIndex].text.length * 0.42 + 1.5 + 'em'; }; s.addEventListener('change', fit); fit(); });
     const text = () => {
@@ -421,9 +421,14 @@ document.addEventListener('DOMContentLoaded', function () {
       const p = paras.find((x) => !x.hidden);
       const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim() && !i.closest('[data-opt]'));
       if (empty.length) {
-        empty.forEach((i) => { i.classList.add('miss'); i.setAttribute('aria-invalid', 'true'); });
-        empty[0].focus();
+        // each blank left empty is marked, and names the reminder as its description
+        empty.forEach((i) => { i.classList.add('miss'); i.setAttribute('aria-invalid', 'true'); i.setAttribute('aria-describedby', 'letterNote'); });
+        empty[0].focus({ preventScroll: true });
         reminding = ask(empty); say(reminding);
+        // the focus moves without scrolling, and the page then moves once, next frame when the note is filled: it brings the
+        // focused blank under the header and the reminder (printed under the button) above the fold whenever both fit; when
+        // they cannot both fit, the blank wins. Letting focus() scroll instead would start a smooth scroll this check can't see.
+        requestAnimationFrame(() => { const lo = note.getBoundingClientRect().bottom + 16 - innerHeight, hi = empty[0].getBoundingClientRect().top - 76, d = Math.min(Math.max(0, lo), hi); if (d) scrollBy(0, d); });
         return;
       }
       reminding = '';
