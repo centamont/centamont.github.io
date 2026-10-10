@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const label = btn.querySelector('span') || btn, word = label.textContent;
     // While the menu is open the page behind it is inert, and Tab cycles between the links and Close.
     const behind = () => document.querySelectorAll('main, footer, .skip');
-    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; behind().forEach((el) => { el.inert = o; }); };
+    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); if (o) root.classList.toggle('sb', innerWidth > root.clientWidth); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; behind().forEach((el) => { el.inert = o; }); };
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
@@ -145,12 +145,17 @@ document.addEventListener('DOMContentLoaded', function () {
       };
       walk(el); el.classList.add('tx-rise');
     };
-    const heads = [...document.querySelectorAll('main h2, .page h1, .feature h3, .cv-txt h3')];
+    // A headline the reader can already see stays as it is: on a slow phone this script can run after the first paint,
+    // and hiding a painted headline only to raise it again reads as a flicker. (The journal's note titles are list rows
+    // and never rise.)
+    const painted = performance.getEntriesByType && performance.getEntriesByType('paint').some((e) => e.name === 'first-contentful-paint');
+    const seen = (el) => { if (!painted) return false; const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
+    const heads = [...document.querySelectorAll('main h2:not(.ji-t), .page h1, .feature h3, .cv-txt h3')].filter((el) => !seen(el));
     heads.forEach(split);
     // stagger by line rather than by word: words on the same line rise together. A heading is measured as it arrives
     // (all its words in one pass, then marked in a second), where the page is already laid out, not while it starts.
     const lines = (el) => { let top = null, line = -1; [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }).forEach(([w, n]) => w.style.setProperty('--i', n)); };
-    document.querySelectorAll('main .head .intro, main .head + p, .page .lead-in').forEach((p) => p.classList.add('lift'));
+    document.querySelectorAll('main .head .intro, main .head + p, .page .lead-in').forEach((p) => { if (!seen(p)) p.classList.add('lift'); });
     const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (e.target.classList.contains('tx-rise')) lines(e.target); e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
     document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
   }
