@@ -31,13 +31,27 @@
   --display:'Cormorant Garamond','Cormorant fallback','Iowan Old Style',Georgia,serif;
   --body:'Jost','Jost fallback','Helvetica Neue',Arial,sans-serif;
   --gutter:clamp(20px,5vw,72px); --max:1240px;
+  /* past 1440px the heads and lead lines keep opening up a little, as the column does from 1600px (--wide runs from 0 at
+     1440px to 640px at 2080px); the h1 stays at its size, so the hero tower keeps its frame, and the spreads stay under it */
+  --wide:clamp(0px,100vw - 1440px,640px);
   --ease:cubic-bezier(.16,1,.3,1);
   /* pen weights and line types for every drawing: a continuous line is open now; hidden dashes are planned or projected,
      dots are later or for reference, the datum dash marks datums, boundaries and thresholds */
   --lw-profile:1.5px; --lw-object:1px; --lw-detail:.6px; --lw-hatch:.6px;
   --lt-hidden:4 3; --lt-dot:1 3; --lt-datum:12 3 2 3;
+  /* the type ladder: one size per role, and a heading never smaller than one below it in rank. The close is set at
+     display scale, the one h1 next, then the full-measure spreads (markets, the name), the chapter openers (and each
+     subpage's title), the back-matter heads, every h3, and the large reading lines. Body stays 18px, labels 13px. */
+  --t-display:clamp(48px,9.6vw,calc(136px + var(--wide) * .04)); --t-hero:clamp(48px,min(7.8vw,12.4vh),116px);
+  --t-spread:clamp(46px,7.2vw,calc(104px + var(--wide) * .015)); --t-chapter:clamp(42px,5.6vw,calc(84px + var(--wide) * .02));
+  --t-section:clamp(36px,3.9vw,calc(56px + var(--wide) * .018)); --t-head:clamp(28px,2.8vw,calc(40px + var(--wide) * .012));
+  --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
+  --t-num:clamp(96px,10.8vw,168px);
   color-scheme:light;
 }
+/* tablets: the chapter and spread heads keep their rank over the back matter; phones: a ladder of their own, under the h1 */
+@media (min-width:521px) and (max-width:820px){:root{--t-chapter:clamp(40px,7.2vw,56px);--t-spread:clamp(44px,7.6vw,60px)}}
+@media (max-width:520px){:root{--t-hero:clamp(44px,12.3vw,50px);--t-display:clamp(44px,12.3vw,50px);--t-spread:clamp(38px,10.8vw,44px);--t-chapter:clamp(34px,10vw,40px);--t-section:clamp(34px,10vw,40px);--t-head:clamp(26px,7.4vw,30px);--t-big:21px}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
   --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC; --sold-line:#B8976A; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
@@ -169,16 +183,28 @@ header.site{container:site/inline-size;max-width:100vw}
 /* Section scaffolding */
 section{padding-block:clamp(80px,10vw,136px)}
 section + section{border-top:1px solid var(--rule)}
+/* The score: the chapters open loud, the back matter reads quiet (the ink bands and the close keep their own) */
+#services,#developers,#markets{padding-top:clamp(96px,12vw,176px)}
+#journal,#people,#questions{padding-block:clamp(64px,6.6vw,96px)}
 .head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px clamp(32px,6vw,96px);align-items:end}
 .head > *{min-width:0}
 h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacing:-.015em}
+/* each head takes its rung of the ladder: the chapter openers, then the back matter and the private door */
+.head.statement h2{font-size:var(--t-chapter)}
+.head.quiet h2,.door h2{font-size:var(--t-section)}
+/* (on tablets the chapter heads keep the desktop measure, so they break where they do on a laptop) */
+@media (min-width:521px) and (max-width:820px){.head.statement h2{max-width:21ch}}
 .intro{color:var(--muted);font-size:clamp(19px,1.45vw,21px);max-width:44ch}
 .head .intro::before{content:"";display:block;width:56px;height:1px;background:var(--accent);margin-bottom:22px}
 .head.wide{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
-.head.wide h2{grid-column:1/-1;font-size:clamp(46px,7.6vw,116px);max-width:13ch;letter-spacing:-.025em;line-height:.98}
+.head.wide h2{grid-column:1/-1;font-size:var(--t-spread);max-width:13ch;letter-spacing:-.025em;line-height:.98}
 .head.wide .intro{grid-column:2}
 @media (max-width:820px){.head,.head.wide{grid-template-columns:1fr}.head.wide .intro{grid-column:1}.head .intro::before{margin-bottom:18px}}
-.big{font-family:var(--display);font-size:clamp(24px,2.4vw,32px);line-height:1.32;font-weight:400}
+.big{font-family:var(--display);font-size:var(--t-big);line-height:1.32;font-weight:400}
+/* the lead lines that answer a heading across a spread (the two ink bands, the advisors) keep the larger lede size */
+.band .big,.people .col .big{font-size:var(--t-lede)}
+/* lead lines and intros balance their lines rather than leave one short */
+.big,.standfirst,.head .intro,.reach .intro{text-wrap:balance}
 
 /* Practices */
 .practices{margin-top:clamp(48px,6vw,80px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -208,7 +234,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
 .pr:is(:hover,:focus-within)::after{transform:none}
 .pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
-.pr h3{font-size:clamp(28px,2.8vw,38px)}
+.pr h3{font-size:var(--t-head)}
 .pr p{color:var(--muted);margin-top:14px}
 .pr p{margin-bottom:12px}
 .pr .more{margin-top:auto;padding-top:6px}
@@ -255,9 +281,11 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
 /* the last step can reach the middle of the screen while the tower is still standing beside it */
 .step:last-child{min-height:100svh}
-.step h3{font-size:clamp(32px,3.2vw,46px);max-width:17ch}
+/* beside the tower each step holds the screen about as long as its words take to read (the last keeps its runway) */
+@media (min-width:1041px){.step:nth-child(1),.step:nth-child(3){min-height:60svh}.step:nth-child(2){min-height:54svh}.step:nth-child(4),.step:nth-child(5){min-height:50svh}}
+.step h3{font-size:var(--t-head);max-width:17ch}
 /* each step's numeral at display size, sliding in as the step arrives */
-.step h3::before{content:counter(st,decimal-leading-zero);display:block;width:max-content;font:300 clamp(96px,11vw,168px)/.8 var(--display);letter-spacing:-.03em;color:var(--accent);margin:0 0 .16em -.06em;font-variant-numeric:lining-nums tabular-nums;opacity:.14;transform:translateX(-.22em);transition:opacity .9s var(--ease),transform 1.2s var(--ease)}
+.step h3::before{content:counter(st,decimal-leading-zero);display:block;width:max-content;font:300 var(--t-num)/.8 var(--display);letter-spacing:-.03em;color:var(--accent);margin:0 0 .12em -.06em;font-variant-numeric:lining-nums tabular-nums;opacity:.14;transform:translateX(-.22em);transition:opacity .9s var(--ease),transform 1.2s var(--ease)}
 .step.on h3::before{opacity:1;transform:none}
 /* the numerals are ornament: the list already gives the order, so a screen reader passes over them */
 .step h3::before{content:counter(st,decimal-leading-zero) / ""}
@@ -275,7 +303,6 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .step{min-height:auto;padding-block:40px 44px;gap:14px}
   .step:first-child{min-height:auto;padding-top:40px}
   .step:last-child{min-height:44svh}
-  .step h3{font-size:clamp(28px,7.6vw,36px)}
 }
 @media (prefers-reduced-motion:reduce){.step h3::before{transform:none;transition:none}}
 :root[data-motion="off"] .step h3::before{transform:none}
@@ -285,7 +312,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);border-top:1px solid var(--fg);padding-top:clamp(36px,4vw,56px)}
 .begin > *{min-width:0}
 .b-l,.b-r{display:grid;align-content:start;gap:clamp(28px,3vw,40px)}
-.begin h3{font-size:clamp(30px,3vw,42px);max-width:14ch}
+.begin h3{font-size:var(--t-head);max-width:14ch}
 .begin ol{list-style:none;margin:0;padding:0;display:grid;gap:0}
 .begin ol > li{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
 .begin ol > li:first-child{padding-top:0}
@@ -452,7 +479,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 /* the status follows the market's name in the markup (a meta line goes below its title); in the ruled phone table it keeps its column at the left */
 .lv .when{grid-column:1;grid-row:1}.lv h3{grid-column:2;grid-row:1}
 .lv.now .when{color:var(--accent)}
-.lv h3{font-size:clamp(28px,3vw,40px);font-weight:300}
+.lv h3{font-size:var(--t-head);font-weight:300}
 .lv.now h3{font-style:italic;font-weight:400}
 .lv p{color:var(--muted)}
 @media (max-width:700px){.lv{grid-template-columns:80px minmax(0,1fr);gap:4px 16px}.lv p{grid-column:2;font-size:17px}}
@@ -461,7 +488,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .feature{margin-top:clamp(44px,6vw,80px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(32px,4vw,48px);align-items:start}
 .feature > *{min-width:0}
 .feature .txt{display:grid;gap:18px;align-content:start}
-.feature h3{font-size:clamp(30px,3.2vw,44px);font-weight:300;letter-spacing:-.015em;line-height:1.02}
+.feature h3{font-size:var(--t-head);font-weight:300;letter-spacing:-.015em;line-height:1.02}
 .feature h3 a{text-decoration:none;background:linear-gradient(currentColor,currentColor) no-repeat 0 96%/0 1px;transition:background-size .7s var(--ease)}
 .feature h3 a:is(:hover,:focus-visible){background-size:100% 1px}
 .feature p{color:var(--muted)}
@@ -524,10 +551,30 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .people ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .people li{padding:12px 0;border-bottom:1px solid var(--rule)}
 @media (max-width:820px){.people{grid-template-columns:1fr}}
+/* the bronze rule opens the lead on the right, not the intro under the heading */
+.people .head .intro::before{display:none}
+.people .col::before{content:"";display:block;width:56px;height:1px;background:var(--accent);transform-origin:left;transition:transform .7s var(--ease) .2s}
+/* (it draws in as the column arrives, as the intros' rules do; still or on paper it is simply drawn) */
+@media screen and (prefers-reduced-motion:no-preference){.js:not([data-motion="off"]) .people .col:not(.in)::before{transform:scaleX(0)}}
+@media (min-width:821px){
+  .people{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px)}
+  .people .head.quiet{grid-area:1/1/2/8;grid-template-columns:minmax(0,1fr);align-items:start}
+  .people .head.quiet h2,.people .head.quiet .intro{grid-column:1}
+  .people .col{grid-area:1/8/2/13}
+  .people .table{grid-area:2/1/3/13}
+  /* the lead line starts on the heading's first line, the two on one baseline, with its rule standing above it */
+  .people .head.quiet,.people .col{align-self:baseline}
+  .people .col{position:relative}
+  .people .col::before{position:absolute;left:0;top:-23px}
+}
+/* on small laptops and large tablets the lead line takes six columns, so it doesn't wrap word by word */
+@media (min-width:821px) and (max-width:960px){.people .head.quiet{grid-area:1/1/2/7}.people .col{grid-area:1/7/2/13}}
 
 /* The house */
-.name .cut{font-family:var(--display);font-weight:300;font-size:clamp(44px,7.6vw,112px);line-height:1;letter-spacing:-.02em;color:var(--band-fg)}
+.name .cut{font-family:var(--display);font-weight:300;font-size:var(--t-spread);line-height:1;letter-spacing:-.02em;color:var(--band-fg);max-width:none}
 .name .cut i{color:var(--bronze)}
+/* (on a phone the name takes the one head size every section shares there) */
+@media (max-width:520px){.name .cut{font-size:var(--t-chapter)}}
 .ruler{display:block;width:100%;height:auto;margin-top:clamp(40px,5vw,72px);overflow:visible}
 .ruler line{stroke:var(--band-muted);stroke-width:1;opacity:.55;transform-box:fill-box;transform-origin:50% 100%}
 .ruler line.base{stroke:var(--band-rule);opacity:1}
@@ -546,22 +593,13 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .ruler.struck + .rscale span:last-child{color:var(--bronze)}
 .name .cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);margin-top:clamp(48px,7vw,96px);border-top:1px solid var(--band-rule);padding-top:36px}
 .name .cols > *{min-width:0}
-/* the second line stays whole: on the narrowest phones the size gives way instead. The heading takes its column's width,
-   so the line held together is measured against the column, not against a narrower heading measure it overhangs */
-.name h2{font-size:clamp(min(34px,9.4vw),3.8vw,50px);max-width:none}
-/* beside the text column its unbroken line may run on into half the column gap, as it always has on laptops; wider than that
-   (text spaced out or enlarged) it wraps rather than print over the column */
-@media (min-width:821px){.name .cols h2{margin-right:calc(clamp(32px,7vw,120px) / -2)}}
-/* (on a phone the size alone keeps it whole, across the column, so text set larger than the page expects wraps
-   rather than pushing the page, and the header with it, past the screen's edge) */
-@media (max-width:600px){.name h2{max-width:none}.name h2 .nw{white-space:normal}}
-/* beside its columns it takes the quiet heads' size, so the page keeps five clear heading sizes rather than two a hair apart
-   (from 900px, where its unbroken second line still keeps clear of the column gap) */
-@media (min-width:900px){.name h2{font-size:clamp(38px,3.6vw,52px)}}
 .name .cols div{display:grid;gap:20px}
 /* on the widest screens the column outgrows a comfortable line, so the prose keeps to one */
 .name .cols div p:not(.big){max-width:32em}
 .name .cols .big{color:var(--band-fg)}
+/* the lead line stands in the left column, under the ruler's first half, and the paragraph in the right, under its second,
+   the two on one first baseline */
+@media (min-width:821px){.name .cols{align-items:baseline}.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
 @media (max-width:820px){.name .cols{grid-template-columns:1fr}}
 /* The band's foot splits along the crack and parts onto Contact. A decorative overlay below the text, never the text itself. */
 #house{position:relative;padding-bottom:clamp(112px,13vw,184px)}
@@ -590,14 +628,15 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 html:not(.js) .seam{display:none}
 
 /* Contact: the page closes at display scale */
-.display{font-size:clamp(54px,9.6vw,136px);text-wrap:balance;font-weight:300;letter-spacing:-.03em;line-height:.95;max-width:none}
-.reach{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-areas:"intro handle" "also handle";gap:12px clamp(32px,6vw,96px);align-items:end;margin-top:clamp(36px,4vw,56px)}
-.reach .intro{grid-area:intro}
-.reach .also{grid-area:also;color:var(--muted);font-size:17px}
+.display{font-size:var(--t-display);text-wrap:balance;font-weight:300;letter-spacing:-.03em;line-height:.95;max-width:none}
+/* the intro, with the handle across from it as the second way in, then the letter (the handle again as one quiet line
+   beside its button) */
+.reach{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-areas:"intro handle";gap:12px clamp(32px,6vw,96px);align-items:end;margin-top:clamp(36px,4vw,56px)}
+.reach .intro{grid-area:intro;max-width:32em}
 .handle{grid-area:handle;justify-self:end;display:inline-flex;align-items:center;gap:.28em;font-family:var(--display);font-weight:300;font-size:clamp(34px,3.6vw,56px);line-height:1.1;letter-spacing:-.02em;color:var(--fg);padding-bottom:6px}
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
 .handle:hover svg{transform:translateX(.12em)}
-@media (max-width:820px){.reach{grid-template-columns:1fr;grid-template-areas:"intro" "handle" "also"}.handle{justify-self:start}}
+@media (max-width:820px){.reach{grid-template-columns:1fr;grid-template-areas:"intro" "handle"}.handle{justify-self:start}}
 .who{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--fg)}
 .who div{padding:24px 28px 26px 0;display:grid;gap:8px;align-content:start}
 .who div + div{padding-left:28px;border-left:1px solid var(--rule)}
@@ -670,7 +709,7 @@ html.menu-open.sb{scrollbar-gutter:stable}
 .hero.loupe{cursor:none}
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),linear-gradient(0deg,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),0) 36%)}
 .hero .wrap{width:100%;padding-block:clamp(96px,14vh,150px) clamp(48px,9vh,96px);display:grid;gap:0}
-.hero h1{font-size:clamp(44px,min(7vw,11vh),112px);font-weight:300;max-width:12ch;letter-spacing:-.025em;line-height:.98;color:#F4F0E8}
+.hero h1{font-size:var(--t-hero);font-weight:300;max-width:12ch;letter-spacing:-.025em;line-height:.98;color:#F4F0E8}
 .hero h1 em{font-style:italic;color:#C9A877}
 /* Each line rises out of its own clip. The clip reaches .14em under the line, so the g of "buildings" keeps the round foot
    of its bowl, and the waiting lines sit 112% down, so not a hair of them shows under it before they rise. */
@@ -703,8 +742,8 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 /* Short laptop windows (1366x657, 1280x600): the headline starts below the survey note, never through it,
    and the lede and buttons close up so the row still lands above the fold. */
 @media (min-width:821px) and (min-height:501px){.hero .wrap{padding-top:max(clamp(96px,14vh,150px),calc(126px + clamp(28px,5vh,52px)))}}
-@media (min-width:821px) and (max-height:720px) and (min-height:501px){.hero .lede{margin-top:20px}.hero .row{margin-top:28px}.hero .wrap{padding-bottom:40px}}
-@media (min-width:821px) and (min-height:501px) and (max-height:580px){.hero h1{font-size:clamp(44px,min(7vw,10vh),112px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
+@media (min-width:821px) and (max-height:720px) and (min-height:501px){:root{--t-hero:clamp(48px,min(7.8vw,calc(17.5vh - 37px)),116px)}.hero .lede{margin-top:20px}.hero .row{margin-top:28px}.hero .wrap{padding-bottom:40px}}
+@media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:58svh;bottom:auto}
   .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
@@ -712,6 +751,9 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
   .hero h1{max-width:none}
   .hero .coords{display:none}
 }
+/* on a phone the headline sets a touch tighter, and the copy under it closes up a little, so both buttons stand whole above
+   the fold of a 390x844 screen (and the first above a 360x640 one) without the drawing giving way */
+@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{line-height:1.55;margin-top:20px}.hero .row{margin-top:24px;gap:10px}.hero .btn{padding-block:15px}}
 /* A tablet held upright has more height than the drawing's 58% takes, which left a band of empty ink between the tower's
    ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 36px above
    the headline, as on a phone, and the shading starts lower to keep the ground in view. */
@@ -896,10 +938,13 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .page .wrap{max-width:880px}
 .crumbs{font-size:15px;color:var(--faint);margin-bottom:28px}
 .crumbs a{color:var(--accent)}
-.page h1{font-size:clamp(42px,6vw,76px);font-weight:300;letter-spacing:-.02em;line-height:1.04;max-width:8.586em}
+.page h1{font-size:var(--t-chapter);font-weight:300;letter-spacing:-.02em;line-height:1.04;max-width:8.586em}
 /* a note's headline gets three more characters, so 'Buying pre-construction' holds one line, as on the index and its share card */
 .page:has(.prose.lead) h1{max-width:10.017em}
-.page .standfirst{font-family:var(--display);font-size:clamp(23px,2.4vw,30px);line-height:1.35;margin-top:26px;max-width:16.218em}
+/* the reading column stops at 880px, so past 1440px a reading page's title holds the size it has there and keeps its lines
+   (the wide sheets keep opening up) */
+.page:not(.wide) h1{font-size:min(var(--t-chapter),80.64px)}
+.page .standfirst{font-family:var(--display);font-size:var(--t-big);line-height:1.35;margin-top:26px;max-width:16.218em}
 /* These measures are counted in Cormorant's figures (18, 21 and 34 of its 0.477em zeros) but written in em: a ch is
    measured in whichever face is showing, and the stand-in face's wider zero would set a wider measure until Cormorant
    arrives, so a headline could break one way and then the other. In em both faces share one measure. */
@@ -928,7 +973,7 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
 @supports (animation-timeline: scroll()){.progress i{animation:prog linear both;animation-timeline:scroll(root)}}
 @keyframes prog{to{transform:scaleX(1)}}
-.prose h2{font-size:clamp(30px,3.2vw,40px);font-weight:400;max-width:none;margin:56px 0 16px}
+.prose h2{font-size:var(--t-head);font-weight:400;max-width:none;margin:56px 0 16px}
 .prose h2:first-child{margin-top:0}
 .prose p,.prose li{font-family:var(--display);line-height:1.55;color:var(--read);font-variant-numeric:lining-nums}
 .prose p + p{margin-top:.9em}
@@ -1114,7 +1159,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 
 @media (max-width:520px){.hero .row,.page .row{display:grid;grid-template-columns:1fr}.hero .row .btn,.page .row .btn{justify-content:space-between}}
 /* a short phone held upright closes up the hero copy a little, so the first button clears the fold without the drawing giving way */
-@media (max-width:520px) and (max-height:700px) and (orientation:portrait){.hero .lede{margin-top:18px}.hero .row{margin-top:20px}}
+@media (max-width:520px) and (max-height:700px) and (orientation:portrait){:root{--t-hero:clamp(40px,11.2vw,44px)}.hero .lede{line-height:1.45;margin-top:14px}.hero .row{margin-top:16px}}
 /* the meta rules end where the prose does (29em of the 22px reading face; the meta itself is set at 13px) */
 .page .meta{max-width:638px}
 @media (max-width:1180px),(max-width:73.75em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
@@ -1190,7 +1235,7 @@ figcaption,.dkey dd{text-wrap:pretty}
    above the plot, the price slider straight under the plot, the two readouts, the sentence, and last the lender's slider:
    the source order, so the keyboard runs down the page with the eye */
 @media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}.cv-txt{display:contents}.cv-txt,.cv-fig,.cv-p,.cv-read,.cv-say,.cv-l{grid-area:auto}.cv-fig{position:relative;top:auto;margin-bottom:0}.cv-read{position:static;margin-top:0}.cv-p{margin-top:-4px}.cv-fig figcaption{order:-1;margin-bottom:6px}.cv-now{display:block;margin:0;font-family:var(--display);font-size:21px;line-height:1.3;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}.cv-read dd{font-size:26px}.cv-read{grid-template-rows:auto auto}.cv-read div{grid-row:span 2;grid-template-rows:subgrid;row-gap:0;padding-top:12px}.cv-done dd{align-items:flex-end}.cv-done .cv-tower{width:16px;height:44px}}
-html:not(.js) .curve,html:not(.js) .letter,.js .curve:not(.ready){display:none}
+html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){display:none}
 
 /* The letter to the partners */
 .letter{margin-top:clamp(56px,7vw,96px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(22px,3vw,32px)}.letter > *{min-width:0}
@@ -1218,6 +1263,11 @@ html:not(.js) .curve,html:not(.js) .letter,.js .curve:not(.ready){display:none}
 /* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
 .letter .send .alt{line-height:normal}
+.letter .send .direct{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 0 0 12px;padding-block:12px 3px}
+.letter .send .direct svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
+.letter .send .direct:is(:hover,:focus-visible) svg{transform:translateX(4px)}
+/* (until the letter is ready its plain link already goes there, so the line waits) */
+.letter:not(.ready) .send .direct{display:none}
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
 /* an empty note leaves the grid, so it adds no second gap; it stays a live region for the message to come */
 .letter .note:empty{position:absolute}
@@ -1228,13 +1278,13 @@ html:not(.js) .curve,html:not(.js) .letter,.js .curve:not(.ready){display:none}
 /* a blank still to fill takes a heavier dashed rule, which stays when the focus moves on (its margin gives the extra pixel back) */
 .letter .sheet input:user-invalid,.letter .sheet input.miss{border-bottom:2px dashed var(--accent);margin-bottom:-1px}
 .letter .fine{color:var(--faint);font-size:15px}
-@media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter legend{float:none;width:100%;margin-bottom:6px}}
+@media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter .send .direct{justify-self:start;margin:0}.letter legend{float:none;width:100%;margin-bottom:6px}}
 /* the narrowest phones give the letter's lines a little more room, and keep the send button's label on one line; below 354px
    the letter's type also steps down with the screen, so the longest choice ('when the right home appears') still fits its line */
 @media (max-width:365px){.letter .sheet{padding:22px 20px;font-size:min(22px,calc(8.8vw - 9.3px))}}
 @media (max-width:370px){.letter .send .btn{letter-spacing:.12em;padding-inline:18px;gap:10px}}
 @media (max-width:339px){.letter .send .btn{letter-spacing:.08em}}
-.cv-txt h3{font-size:clamp(30px,3vw,42px);max-width:14ch}
+.cv-txt h3{font-size:var(--t-head);max-width:14ch}
 .cv-done dd{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 /* the little tower stands on the numeral's baseline */
 .cv-tower{width:22px;height:60px;flex:none;overflow:visible;margin-bottom:0}
@@ -1308,12 +1358,16 @@ header.site{view-transition-name:site-header}
 /* Three tiers of section head, so the page has rhythm instead of one repeated layout */
 @media (min-width:821px){
   .head.statement{grid-template-columns:repeat(12,minmax(0,1fr));row-gap:clamp(28px,3vw,44px)}
-  .head.statement h2{grid-column:1/span 12;font-size:clamp(44px,5.6vw,84px);max-width:21ch;letter-spacing:-.022em;line-height:1.01}
+  .head.statement h2{grid-column:1/span 12;max-width:21ch;letter-spacing:-.022em;line-height:1.01}
   .head.statement .intro{grid-column:8/-1}
   .head.wide{grid-template-columns:repeat(12,minmax(0,1fr));align-items:last baseline}
   .head.wide h2{grid-column:1/span 8}
   .head.wide .intro{grid-column:9/-1;grid-row:1;padding-bottom:0}
-  .head.quiet h2{font-size:clamp(38px,3.6vw,52px)}
+  /* one head for the back matter: the h2 on seven of the twelve columns, its intro on the last five, from the same x as
+     the chapters' intros, the two ending on one baseline */
+  .head.quiet{grid-template-columns:repeat(12,minmax(0,1fr));align-items:last baseline}
+  .head.quiet h2{grid-column:1/span 7}
+  .head.quiet .intro{grid-column:8/-1}
 }
 /* display heads hang their first letter's side bearing outside the column, so the ink, not the box, meets the text below.
    The contact head opens on a W, which has almost none, so it stays on the column. */
@@ -1327,11 +1381,12 @@ header.site{view-transition-name:site-header}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band:#0D0E11;--band-rule:#2C2F34;--hero-rgb:13,14,17}}
 :root[data-theme="dark"] .band{background:#0D0E11}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{background:#0D0E11}}
-/* Ink bands open like a door as they arrive */
+/* Ink bands open like a door as they arrive. Below the screen a band waits open (the door only closes as its edge comes into
+   view), and the door never closes past half the gutter, so the text keeps an inner margin at every point of the opening. */
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
-    section.band{animation:band-open linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
-    @keyframes band-open{from{clip-path:inset(0 5% 0 5%)}to{clip-path:inset(0 0 0 0)}}
+    section.band{animation:band-open linear forwards;animation-timeline:view();animation-range:entry 0% entry 45%}
+    @keyframes band-open{from{clip-path:inset(0 min(5%,max(calc(var(--gutter) / 2),calc(50% - var(--max) / 2))))}to{clip-path:inset(0 0 0 0)}}
   }
 }
 /* The rule above each intro draws in after the headline */
@@ -1368,7 +1423,7 @@ header.site{view-transition-name:site-header}
 /* ---- Deeper pages: wide sheets for the report, private clients, colophon and the journal index */
 .page.wide .wrap{max-width:var(--max)}
 /* on the narrowest phones the size gives way, so a closing word held to its neighbour still fits */
-.page.wide h1{max-width:7.632em;font-size:clamp(min(44px,12vw),6.4vw,96px);line-height:1}
+.page.wide h1{max-width:7.632em;line-height:1}
 .page.wide .standfirst{max-width:17.172em}
 /* The report opens on its sheet: the title on seven columns, the standfirst on five beside it, and the sheet just below */
 .page.report{padding-top:48px}
@@ -1838,14 +1893,14 @@ p,li{text-wrap:pretty}
 /* Questions: ruled rows that open in place */
 .faq{border-top:1px solid var(--fg);margin-top:clamp(32px,4vw,56px)}
 .faq details{border-bottom:1px solid var(--rule)}
-.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 28px;align-items:center;gap:24px;padding:22px 0;font-family:var(--display);font-weight:400;font-size:clamp(23px,2.2vw,30px);line-height:1.25;color:var(--fg);transition:color .3s var(--ease)}
+.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 28px;align-items:center;gap:24px;padding:20px 0;font-family:var(--display);font-weight:400;font-size:var(--t-big);line-height:1.25;color:var(--fg);transition:color .3s var(--ease)}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"";width:13px;height:13px;justify-self:end;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
 .faq details[open] summary::after{transform:rotate(45deg)}
 .faq summary:is(:hover,:focus-visible){color:var(--accent)}
 .faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
 /* the answer's space below is padding, not margin, so it stays inside the panel that opens and closes */
-.faq details p{margin:0;padding-bottom:26px;max-width:54ch;color:var(--muted)}
+.faq details p{margin:0;padding-bottom:24px;max-width:58ch;font-size:17px;line-height:1.65;color:var(--muted)}
 /* An answer opens as the + turns, where the browser can size a panel to its content; elsewhere it simply appears */
 @media screen and (prefers-reduced-motion:no-preference){
   .faq details{interpolate-size:allow-keywords}
@@ -1854,6 +1909,13 @@ p,li{text-wrap:pretty}
 }
 :root[data-motion="off"] .faq details::details-content{transition:none}
 @media (min-width:821px){.faq details p{margin-left:0;padding-right:52px}}
+/* Side by side the questions are back matter: the head on five columns, held while the list passes, the list on seven */
+@media (min-width:1041px){
+  #questions .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);align-items:start}
+  #questions .head{grid-column:1/span 5;grid-template-columns:minmax(0,1fr);align-items:start;position:sticky;top:120px}
+  #questions .head > *{grid-column:auto}
+  #questions .faq{grid-column:6/-1;margin-top:0}
+}
 /* More notes under the featured guide */
 .notes-list{list-style:none;margin:clamp(32px,4vw,48px) 0 0;padding:0;border-top:1px solid var(--rule)}
 .notes-list li{border-bottom:1px solid var(--rule)}

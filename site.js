@@ -178,10 +178,10 @@
     };
     // A headline the reader can already see stays as it is: on a slow phone this script can run after the first paint,
     // and hiding a painted headline only to raise it again reads as a flicker. (The journal's note titles are list rows
-    // and never rise.)
+    // and never rise, and the name is cut in line by line by the page's own script.)
     const painted = performance.getEntriesByType && performance.getEntriesByType('paint').some((e) => e.name === 'first-contentful-paint');
     const seen = (el) => { if (!painted) return false; const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
-    const heads = [...document.querySelectorAll('main h2:not(.ji-t), .page h1, .feature h3, .cv-txt h3')].filter((el) => !seen(el));
+    const heads = [...document.querySelectorAll('main h2:not(.ji-t):not(.cut), .page h1, .feature h3, .cv-txt h3')].filter((el) => !seen(el));
     heads.forEach(split);
     // stagger by line rather than by word: words on the same line rise together. A heading is measured as it arrives
     // (all its words in one pass, then marked in a second), where the page is already laid out, not while it starts.

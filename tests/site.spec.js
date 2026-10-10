@@ -11,7 +11,7 @@ const sections = [
   ['markets', 'South Florida first'],
   ['journal', 'Notes on new development'],
   ['people', 'A seat here is earned'],
-  ['house', 'Quiet by design'],
+  ['house', 'Centum, a hundred'],
   ['contact', 'Write to the partners'],
 ];
 
