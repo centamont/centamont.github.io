@@ -1,5 +1,17 @@
 // Two instruments on the home page: the sales curve for developers, and the letter to the partners. Each starts on its
 // own, so a fault in one never stops the other.
+// The curve shows only once this script is here to draw it (site.css, .curve.ready): without it, an empty frame and
+// sliders that move nothing would be all there is.
+// Beside the sliders the figure stands over its readouts, which follow the price slider in the source (the order a phone
+// shows them in): their heights keep the readouts under the figure, the two held together (site.css, .cv-read).
+(function () {
+  const c = document.getElementById('curve'); if (!c) return;
+  c.classList.add('ready');
+  const f = c.querySelector('.cv-fig'), r = c.querySelector('.cv-read');
+  if (!f || !r || !window.ResizeObserver) return;
+  const ro = new ResizeObserver((es) => es.forEach((e) => c.style.setProperty(e.target === f ? '--cv-fh' : '--cv-rh', e.borderBoxSize[0].blockSize + 'px')));
+  ro.observe(f); ro.observe(r);
+})();
 document.addEventListener('DOMContentLoaded', function () {
   // ---- Sales against the schedule: an illustrative absorption model
   const svg = document.getElementById('cvSvg');
@@ -27,11 +39,17 @@ document.addEventListener('DOMContentLoaded', function () {
       return sold;
     }
 
-    let build, area, par, line, lim, limT, dot, dotT;
-    const keyRow = document.querySelector('.cv-key');
+    let build, area, par, line, lim, limT, dot, dotT, labC, labP, labB;
+    const keyRow = document.querySelector('.cv-key'), fig = svg.closest('.cv-fig');
+    // On a phone the drawing names its own lines (there is no legend row) and the phases are named in a row under it.
+    const narrow = matchMedia('(max-width:520px)');
+    // beside its controls on a wide screen the drawing keeps a wider aspect, so it and its readouts end level with them
+    const wide = matchMedia('(min-width:901px)');
+    let phone = false;
     function size() {
       W = Math.max(240, Math.round(svg.clientWidth || 640));
-      H = Math.round(W >= 520 ? Math.min(500, W * 0.76) : Math.max(280, Math.min(380, W * 0.52)));
+      phone = narrow.matches;
+      H = Math.round(phone ? 260 : W >= 520 ? Math.min(500, W * (wide.matches ? 0.62 : 0.76)) : Math.max(280, Math.min(380, W * 0.52)));
       // and never taller than the screen below the header allows, so on a phone held sideways the curve stays in view
       // beside its sliders (the figure is sticky there, 72px from the top)
       H = Math.min(H, Math.max(240, Math.round(innerHeight - 80)));
@@ -44,16 +62,16 @@ document.addEventListener('DOMContentLoaded', function () {
       X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
-      // phase names along the top, each beside its line
-      const phases = [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
+      // phase names along the top, each beside its line (a phone names them in a row under the drawing instead)
+      const phases = phone ? [] : [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
       const tl = [];
       phases.forEach(([m, t]) => { const e = el('text', { class: 'ph', 'text-anchor': 'start' }, g, t); tl.push([m, e, e.getComputedTextLength() || t.length * 8]); });
       // Where the last phase name fits to the right of its line, the plot stops short to leave it room; a narrow figure
       // instead runs the plot to its frame and lets that name sit left of its line, when that costs at most one more row.
-      const wLast = tl[tl.length - 1][2];
+      const wLast = tl.length ? tl[tl.length - 1][2] : 0;
       const plan = (X1p) => {
-        // Every place a name could go: right or left of its line, on one of three rows. A line starts at its own
-        // name's row, so a name may span another phase's line only when that line starts on a lower row.
+        // Every place a name could go: right or left of its line, on one of three rows. A name never spans another
+        // phase's line, so each name reads as belonging to the line beside it.
         const opts = tl.map(([m, , w]) => {
           const sx = X0 + (X1p - X0) * m / M, o = [];
           for (let row = 0; row < 3; row++) for (const anchor of ['start', 'end']) {
@@ -63,43 +81,50 @@ document.addEventListener('DOMContentLoaded', function () {
           return o;
         });
         const clear = (o, c) => (c.row !== o.row || o.l >= c.r + 12 || o.r <= c.l - 12) &&
-          !(o.l - 4 < c.sx && c.sx < o.r + 4 && c.row <= o.row) && !(c.l - 4 < o.sx && o.sx < c.r + 4 && o.row <= c.row);
+          !(o.l - 4 < c.sx && c.sx < o.r + 4) && !(c.l - 4 < o.sx && o.sx < c.r + 4);
         // the best set uses the fewest rows (the plot keeps its height), then keeps names to the right of their lines,
-        // and never sets a later phase's name to the left of an earlier one's, so the names read in the order they happen
+        // and never sets a later phase's name to the left of, or on a row above, an earlier one's, so the names read in
+        // the order they happen, across and down
         let best = null, bestCost = Infinity;
         const place = (i, chosen) => {
           if (i === opts.length) {
-            let order = 0;
-            chosen.forEach((c, k) => { for (let j = k + 1; j < chosen.length; j++) if (c.l + c.r > chosen[j].l + chosen[j].r) order++; });
-            const cost = 100 * Math.max(...chosen.map((c) => c.row)) + 120 * chosen.filter((c) => c.anchor === 'end').length + 5 * chosen.reduce((n, c) => n + c.row, 0) + 250 * order;
+            let order = 0, rise = 0;
+            chosen.forEach((c, k) => { for (let j = k + 1; j < chosen.length; j++) { if (c.l + c.r > chosen[j].l + chosen[j].r) order++; if (chosen[j].row < c.row) rise++; } });
+            const cost = 100 * Math.max(...chosen.map((c) => c.row)) + 120 * chosen.filter((c) => c.anchor === 'end').length + 5 * chosen.reduce((n, c) => n + c.row, 0) + 250 * order + 400 * rise;
             if (cost < bestCost) { bestCost = cost; best = chosen.slice(); }
             return;
           }
           opts[i].forEach((o) => { if (chosen.every((c) => clear(o, c))) { chosen.push(o); place(i + 1, chosen); chosen.pop(); } });
         };
         place(0, []);
-        if (!best) best = opts.map((o, i) => o.find((c) => c.row === Math.min(i, 2)) || o[0] || { row: 0, anchor: 'start', a: 0 });
-        return { X1p, best, rows: Math.max(...best.map((c) => c.row)) };
+        return best ? { X1p, best, ok: true, rows: Math.max(0, ...best.map((c) => c.row)) } : { X1p, best: [], ok: false, rows: 9 };
       };
-      let pl = plan(Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE)));
-      if (W < 520 && pl.X1p < W - 14) { const full = plan(W - 14); if (full.rows <= pl.rows + 1) pl = full; }
+      let pl = phone ? { X1p: W - 14, best: [], ok: true, rows: 0 } : plan(Math.min(W - 14, Math.floor(X0 + (W - 4 - X0 - 6 - wLast) * M / DONE)));
+      if (!phone && W < 520 && pl.X1p < W - 14) { const full = plan(W - 14); if (full.ok && (!pl.ok || full.rows <= pl.rows + 1)) pl = full; }
+      // where no arrangement keeps every name beside its own line, the names go to the row under the drawing
+      if (!pl.ok) { tl.forEach(([, e]) => e.remove()); tl.length = 0; pl.X1p = W - 14; }
+      if (fig) fig.classList.toggle('ph-row', !phone && !pl.ok);
       X1 = pl.X1p;
       const best = pl.best;
       let two = 0;
       tl.forEach(([, e], i) => { const c = best[i]; two = Math.max(two, c.row); e.dataset.row = c.row; e.setAttribute('x', c.a); e.setAttribute('text-anchor', c.anchor); });
-      Y0 = 34 + 16 * two; Y1 = H - 52;
+      Y0 = tl.length ? 34 + 16 * two : 30; Y1 = H - 52;
       tl.forEach(([m, e]) => e.setAttribute('y', 18 + 16 * +e.dataset.row));
       [0.25, 0.5, 0.75, 1].forEach((f) => { el('line', { x1: X0, x2: X1, y1: y(f), y2: y(f) }, g); el('text', { x: X0 - 8, y: y(f) + 4, 'text-anchor': 'end' }, g, Math.round(f * 100) + '%'); });
       tl.forEach(([m, e]) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: 6 + 16 * +e.dataset.row, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
+      if (!tl.length) [BREAK, TOP, DONE].forEach((m) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: Y0 - 8, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
       el('line', { class: 'axis', x1: X0, x2: X1, y1: Y1, y2: Y1 }, g);
       // month ticks, every six
       const step = W < 420 ? 12 : 6;
       for (let m = 0; m <= M; m += step) { el('line', { class: 'axis', x1: x(m), x2: x(m), y1: Y1, y2: Y1 + 5 }, g); el('text', { x: x(m), y: Y1 + 20, 'text-anchor': m === 0 ? 'start' : m === M ? 'end' : 'middle' }, g, String(m)); }
-      el('text', { class: 'ph', x: X1, y: Y1 + 42, 'text-anchor': 'end' }, g, 'Months from launch');
+      el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 42, 'text-anchor': 'end' }, g, 'Months from launch');
       build = el('path', { class: 'cv-build', d: `M${x(BREAK)} ${Y1} L${x(DONE)} ${y(1)}` });
       area = el('path', { class: 'cv-area' }); par = el('path', { class: 'cv-par' }); line = el('path', { class: 'cv-line' });
       lim = el('line', { class: 'cv-lim' }); limT = el('text', { class: 'cv-limt', 'text-anchor': 'end' });
       dot = el('circle', { class: 'cv-dot', r: 4.5 }); dotT = el('text', { class: 'cv-dott' });
+      // with no legend row, a phone names each line in the drawing (placed in draw(), clear of the curves and notes)
+      labC = labP = labB = null;
+      if (phone) { labB = el('text', { class: 'cv-lab faint' }, null, 'Construction'); labP = el('text', { class: 'cv-lab' }, null, 'At par'); labC = el('text', { class: 'cv-lab' }, null, 'Contracts signed'); }
     }
 
     const path = (s) => s.map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).toFixed(1)).join(' ');
@@ -155,10 +180,39 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const pick = spots.find((o) => !o.curve && !o.note) || spots.find((o) => !o.note) || spots[0];
       limT.setAttribute('x', pick.lx); limT.setAttribute('text-anchor', pick.anchor); limT.setAttribute('y', y(T) + pick.dy);
-      // On a phone the label is half the plot wide and would cross a curve; the legend names the line instead.
-      if (W < 520) limT.textContent = '';
+      // A narrow figure below phone width names the threshold in its legend row instead.
+      if (W < 520 && !phone) limT.textContent = '';
+      if (phone) {
+        // A phone has no legend row, so each line is named in the drawing. A name takes the first of its spots that stays
+        // inside the plot, clear of the names and the note already set, and that no line runs through; failing that, the
+        // clear spot the lines cross least (its halo keeps it legible); failing even that, it is left out.
+        const lines = pts.slice();
+        for (let i = 0; i <= 48; i++) lines.push([x(BREAK + (DONE - BREAK) * i / 48), Y1 - (Y1 - y(1)) * i / 48]);
+        for (let px = X0; px <= X1; px += 4) lines.push([px, y(T)]);
+        const taken = dotB ? [dotB] : [];
+        const name = (t, text, at) => {
+          t.textContent = text; let pickN = null, least = Infinity;
+          for (const [lx, an, ly] of at) {
+            t.setAttribute('x', lx); t.setAttribute('text-anchor', an); t.setAttribute('y', ly);
+            const b = t.getBBox();
+            if (b.x < X0 + 2 || b.x + b.width > W - 2 || b.y < 2 || b.y + b.height > Y1 - 1) continue;
+            if (taken.some((q) => !(q.x > b.x + b.width + 4 || q.x + q.width < b.x - 4 || q.y > b.y + b.height + 2 || q.y + q.height < b.y - 2))) continue;
+            const n = lines.filter(([px, py]) => px > b.x - 3 && px < b.x + b.width + 3 && py > b.y - 2 && py < b.y + b.height + 2).length;
+            if (n < least) { least = n; pickN = [lx, an, ly]; if (!n) break; }
+          }
+          if (!pickN) { t.textContent = ''; return; }
+          t.setAttribute('x', pickN[0]); t.setAttribute('text-anchor', pickN[1]); t.setAttribute('y', pickN[2]); taken.push(t.getBBox());
+        };
+        const yT = y(T), pe = y(base[M]), mm = Math.round(M * 0.72), pm = y(base[mm]), se = y(s[M]);
+        name(limT, 'Threshold', [[X0 + 6, 'start', yT - 8], [X1, 'end', yT - 8], [X1, 'end', yT + 18], [X0 + 6, 'start', yT + 18]]);
+        name(labP, p ? 'At par' : '', !p ? [] : p > 0 ? [[X1, 'end', pe - 8], [X1, 'end', pe - 22], [x(mm), 'end', pm - 8], [x(M / 2), 'end', y(base[M / 2]) - 8]] : [[x(mm), 'start', pm + 18], [x(M / 2), 'start', y(base[M / 2]) + 18], [X1, 'end', pe + 18], [X1, 'end', pe + 30]]);
+        name(labB, 'Construction', [[x(DONE) - 8, 'end', y(1) - 6], [x(BREAK) + 22, 'start', Y1 - 8]]);
+        name(labC, 'Contracts signed', [[X1, 'end', Y1 - 8], [X1, 'end', Y1 - 24], [X1, 'end', se - 8], [X1, 'end', se + 18]]);
+      }
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
+      // and the same reading in one line just above a phone's plot
+      out('cvNowM').textContent = hit > -1 ? 'Month ' + hit : 'Threshold not met'; out('cvNowD').textContent = Math.round(done * 100) + '%';
       // the same share of the building, filled floor by floor in a small elevation beside the figure
       if (tw) { const n = Math.round(done * RES); tw.querySelectorAll('rect').forEach((r, k) => { const d = POD + RES - 1 - k; r.classList.toggle('on', k >= POD && d >= 0 && d < n); r.style.transitionDelay = (reduceM || k < POD || d < 0 ? 0 : Math.abs(d - lastN) * 22) + 'ms'; }); lastN = n; }
       let say;
@@ -169,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const when = hit < 0 ? 'the threshold is not met within ' + M + ' months' : d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
         // "but" only where the threshold pays for the higher price; otherwise the two clauses are simply set side by side
         const join = p > 0 && (hit < 0 || d > 0) ? ', but ' : '; ';
-        say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + ', and ' + unsold + ' percent of the building is still for sale at completion, against ' + unsoldPar + ' percent at par.';
+        say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + '. At completion, ' + unsold + ' percent is still for sale, against ' + unsoldPar + ' percent at par.';
       }
       out('cvSay').textContent = say;
       // the drawing's text alternative also reads the curve itself, every six months
@@ -194,8 +248,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const m = Math.round((u - X0) / (X1 - X0) * M);
       last = m < 0 || m > M ? null : m; read(last);
     };
+    // the month the keyboard last read: a mouse that crosses the figure and leaves hands the reading back to it
+    let kb = null;
     svg.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && lastW) at(e); });
-    svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { last = null; read(null); } });
+    svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { last = document.activeElement === svg ? kb : null; read(last); } });
     // a tap reads the month under the finger (a drag is the page scrolling, and reads nothing); the reading stays until
     // the next tap, and a tap anywhere off the figure clears it
     let down = null;
@@ -208,19 +264,27 @@ document.addEventListener('DOMContentLoaded', function () {
     // each step is spoken by a hidden line of its own, so the sentence under the figure keeps its place
     const heard = document.createElement('span');
     heard.className = 'vh'; heard.setAttribute('aria-live', 'polite'); svg.after(heard);
+    // a one-line hint, shown in place of the axis title while the keyboard is on the drawing, and read as its description
+    const kbd = out('cvKbd');
+    if (kbd) svg.setAttribute('aria-describedby', 'cvKbd');
+    const opening = () => { const s = model(+price.value), hit = s.findIndex((f) => f >= +loan.value / 100); return hit > -1 ? hit : DONE; };
     svg.addEventListener('focus', () => {
       first();
-      if (last !== null) return;
-      const s = model(+price.value), hit = s.findIndex((f) => f >= +loan.value / 100);
-      last = hit > -1 ? hit : DONE; read(last);
+      const axt = svg.querySelector('.cv-axt');
+      if (kbd && axt) { const f = fig.getBoundingClientRect(), t = axt.getBoundingClientRect(); kbd.style.top = ((t.top + t.bottom) / 2 - f.top - kbd.offsetHeight / 2) + 'px'; kbd.style.right = (f.right - t.right - 6) + 'px'; }
+      if (last === null) last = opening();
+      kb = last; read(last);
     });
-    svg.addEventListener('blur', () => { last = null; read(null); heard.textContent = ''; });
+    svg.addEventListener('blur', () => { last = kb = null; read(null); heard.textContent = ''; });
     svg.addEventListener('keydown', (e) => {
-      if (last === null) return;
+      // the browser's own shortcuts (Back, the start of the page) pass through
+      if (e.altKey || e.metaKey || e.ctrlKey) return;
       const step = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1, PageDown: -6, PageUp: 6 }[e.key];
-      const m = e.key === 'Home' ? 0 : e.key === 'End' ? M : step ? last + step : null;
-      if (m === null) return;
-      e.preventDefault(); last = Math.max(0, Math.min(M, m)); read(last);
+      if (!step && e.key !== 'Home' && e.key !== 'End') return;
+      // while the figure has the focus its keys always read it, even after a mouse has cleared the reading
+      if (last === null) last = opening();
+      const m = e.key === 'Home' ? 0 : e.key === 'End' ? M : last + step;
+      e.preventDefault(); last = kb = Math.max(0, Math.min(M, m)); read(last);
       heard.textContent = 'Month ' + last + ', ' + Math.round(model(+price.value)[last] * 100) + ' percent under contract.';
     });
     const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
@@ -245,6 +309,39 @@ document.addEventListener('DOMContentLoaded', function () {
     const sayEl = out('cvSay'); let quiet;
     const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
+
+    // One peek, once a session: when the figure has stood at least 60% in view for a second with no hand on the
+    // instrument, the price steps up two notches and back, quietly, while a bronze ring pulses once on its thumb. Any
+    // touch, key or wheel in the instrument stops it and puts the price back. Never with reduced motion or motion paused.
+    const box = document.getElementById('curve');
+    let peeked = true;
+    try { peeked = sessionStorage.getItem('cm-cv-peek') === '1'; } catch (e) {}
+    if (box && fig && !reduceM && !peeked && 'IntersectionObserver' in window) {
+      let wait = 0, run = null, v0 = 0, seen = false;
+      const ring = document.createElement('span');
+      ring.className = 'cv-ring'; ring.setAttribute('aria-hidden', 'true'); price.parentNode.appendChild(ring);
+      const setP = (v) => { price.value = v; draw(); if (last !== null) read(last); };
+      const settle = () => { peeked = true; clearTimeout(wait); io.disconnect(); try { sessionStorage.setItem('cm-cv-peek', '1'); } catch (e) {} };
+      const play = () => {
+        if (peeked) return;
+        settle(); first();
+        v0 = +price.value; const d = v0 + 2 > +price.max ? -1 : 1, f = (v0 - price.min) / (price.max - price.min);
+        ring.style.left = (price.offsetLeft + 10.5 + (price.offsetWidth - 21) * f) + 'px';
+        ring.style.top = (price.offsetTop + price.offsetHeight / 2) + 'px';
+        ring.classList.add('go');
+        sayEl.setAttribute('aria-live', 'off');
+        run = [1, 2, 1, 0].map((k, i) => setTimeout(() => { setP(v0 + d * k); if (i === 3) { run = null; sayEl.setAttribute('aria-live', 'polite'); } }, 120 * (i + 1)));
+      };
+      const stop = () => { if (run) { run.forEach(clearTimeout); run = null; setP(v0); sayEl.setAttribute('aria-live', 'polite'); } };
+      const arm = () => { clearTimeout(wait); if (seen && !peeked) wait = setTimeout(play, 1000); };
+      const io = new IntersectionObserver((es) => es.forEach((e) => { seen = e.isIntersecting && e.intersectionRatio >= 0.6; arm(); }), { threshold: [0, 0.6] });
+      io.observe(fig);
+      ring.addEventListener('animationend', () => ring.classList.remove('go'));
+      // a hand on the instrument means it needs no peek; a wheel is the page scrolling past, so the second starts again
+      const hand = () => { if (run) stop(); else if (!peeked) settle(); };
+      box.addEventListener('pointerdown', hand, true); box.addEventListener('keydown', hand, true);
+      box.addEventListener('wheel', () => { if (run) stop(); else arm(); }, { passive: true, capture: true });
+    }
   }
 });
 

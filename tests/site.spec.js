@@ -213,6 +213,19 @@ test('the sales curve answers the launch price, and says it is illustrative', as
   await expect(page.locator('.cv-fig figcaption')).toContainText('illustrative');
 });
 
+test('on a phone the price slider sits right under the sales curve', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  await page.goto('/');
+  await page.locator('#curve').scrollIntoViewIfNeeded();
+  const box = (s) => page.locator(s).boundingBox();
+  const fig = await box('.cv-fig'), svg = await box('#cvSvg'), price = await box('#cvPrice'), read = await box('.cv-read'), loan = await box('#cvLoan');
+  // chart, then the price slider (only its label between them), then the readings, then the lender's slider
+  expect(svg.y + svg.height).toBeLessThanOrEqual(price.y);
+  expect(price.y - (fig.y + fig.height)).toBeLessThan(140);
+  expect(price.y + price.height).toBeLessThanOrEqual(read.y);
+  expect(read.y + read.height).toBeLessThanOrEqual(loan.y);
+});
+
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await page.goto('/');

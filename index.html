@@ -34,15 +34,15 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="site.css?v=8252c8fb">
+<link rel="stylesheet" href="site.css?v=98087b23">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
 if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&d.dataset.motion!=='off')d.classList.add('intro-on')}catch(e){}})();
 </script>
-<script src="site.js?v=8252c8fb" defer></script>
-<script src="model.js?v=8252c8fb" defer></script>
-<script src="instrument.js?v=8252c8fb" defer></script>
+<script src="site.js?v=98087b23" defer></script>
+<script src="model.js?v=98087b23" defer></script>
+<script src="instrument.js?v=98087b23" defer></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -186,36 +186,58 @@ addEventListener('beforeprint',function(){finish(true)})})();
       <div class="cv-txt">
         <h3>Sales against the&nbsp;schedule.</h3>
         <p>Every pricing decision moves two numbers: the month the lender’s pre-sale threshold is met, and how many residences are still unsold when the building is finished. Move the launch price and watch both.</p>
-        <div class="cv-ctl">
-          <div class="lab"><label for="cvPrice" id="cvPriceL">Launch price against comparable buildings</label><output id="cvPriceOut" for="cvPrice" aria-hidden="true">At par</output></div>
-          <input type="range" id="cvPrice" min="-10" max="10" step="1" value="0" aria-valuetext="At par">
-          <div class="lab"><label for="cvLoan" id="cvLoanL">Lender’s pre-sale threshold</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
-          <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 percent">
-        </div>
-        <dl class="cv-read">
-          <div><dt>Pre-sale threshold</dt><dd id="cvMonth">Month 14</dd></div>
-          <div class="cv-done"><dt>Sold by completion</dt><dd><span id="cvDone">74%</span><svg class="cv-tower" id="cvTower" viewBox="0 0 40 112" aria-hidden="true"></svg></dd></div>
-        </dl>
-        <p class="cv-say" id="cvSay" aria-live="polite"></p>
       </div>
       <figure class="cv-fig" data-draw>
+        <p class="cv-now" aria-hidden="true"><span id="cvNowM">Month 14</span> · <span id="cvNowD">74%</span> sold by completion</p>
         <svg id="cvSvg" viewBox="0 0 640 330" height="330" role="img" aria-label="Illustrative sales curve"></svg>
+        <p class="cv-kbd" id="cvKbd" aria-hidden="true">Arrow keys read the curve month by month.</p>
         <ul class="cv-key" aria-hidden="true"><li><i class="k-line"></i>Contracts signed</li><li><i class="k-par"></i>At par</li><li><i class="k-build"></i>Construction</li><li class="k-lim-li"><i class="k-lim"></i>Pre-sale threshold</li></ul>
+        <p class="cv-ph" aria-hidden="true"><span><b>6</b> Ground broken</span> <i>·</i> <span><b>24</b> Top-off</span> <i>·</i> <span><b>30</b> Completion</span></p>
         <figcaption>An illustrative model with assumed sales rates and a fixed construction schedule. It is not a&nbsp;forecast or a&nbsp;promise of results.</figcaption>
       </figure>
+      <div class="cv-ctl cv-p">
+        <div class="lab"><label for="cvPrice" id="cvPriceL">Launch price against comparable buildings</label><output id="cvPriceOut" for="cvPrice" aria-hidden="true">At par</output></div>
+        <input type="range" id="cvPrice" min="-10" max="10" step="1" value="0" aria-valuetext="At par">
+      </div>
+      <dl class="cv-read">
+        <div><dt>Threshold met</dt><dd id="cvMonth">Month 14</dd></div>
+        <div class="cv-done"><dt>Sold by completion</dt><dd><span id="cvDone">74%</span><svg class="cv-tower" id="cvTower" viewBox="0 0 40 112" aria-hidden="true"></svg></dd></div>
+      </dl>
+      <p class="cv-say" id="cvSay" aria-live="polite"></p>
+      <div class="cv-ctl cv-l">
+        <div class="lab"><label for="cvLoan" id="cvLoanL">Lender’s pre-sale threshold</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
+        <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 percent">
+      </div>
     </div>
 
     <div class="begin">
-      <h3>How an engagement&nbsp;begins.</h3>
-      <div>
+      <div class="b-l">
+        <h3>How an engagement&nbsp;begins.</h3>
+        <a class="spec" href="report.html" data-draw>
+          <div class="sp-sheet" aria-hidden="true">
+            <div class="sp-hd"><span>Weekly report<span class="sp-day"> · Monday</span></span><span>Specimen</span></div>
+            <div class="sp-body">
+              <svg class="sp-plan" viewBox="0 0 96 241" width="96" height="241" aria-hidden="true" focusable="false"><defs><pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" class="rp-hatch"/></pattern></defs><g style="--r:21"><rect class="rp-c sold" x="34.5" y="0.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="0.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="0.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="0.5" width="13" height="8"/></g><g style="--r:20"><rect class="rp-c sold" x="34.5" y="11.5" width="13" height="8"/><rect class="rp-c res" x="50.5" y="11.5" width="13" height="8"/><rect class="rp-c res" x="66.5" y="11.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="11.5" width="13" height="8"/></g><g style="--r:19"><text x="26" y="31" text-anchor="end">L20</text><rect class="rp-c sold" x="34.5" y="22.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="22.5" width="13" height="8"/><rect class="rp-c res" x="66.5" y="22.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="22.5" width="13" height="8"/></g><g style="--r:18"><rect class="rp-c sold" x="34.5" y="33.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="33.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="33.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="33.5" width="13" height="8"/></g><g style="--r:17"><rect class="rp-c sold" x="34.5" y="44.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="44.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="44.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="44.5" width="13" height="8"/></g><g style="--r:16"><rect class="rp-c sold" x="34.5" y="55.5" width="13" height="8"/><rect class="rp-c res" x="50.5" y="55.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="55.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="55.5" width="13" height="8"/></g><g style="--r:15"><rect class="rp-c sold" x="34.5" y="66.5" width="13" height="8"/><rect class="rp-c res" x="50.5" y="66.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="66.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="66.5" width="13" height="8"/></g><g style="--r:14"><text x="26" y="86" text-anchor="end">L15</text><rect class="rp-c sold" x="34.5" y="77.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="77.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="77.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="77.5" width="13" height="8"/></g><g style="--r:13"><rect class="rp-c sold" x="34.5" y="88.5" width="13" height="8"/><rect class="rp-c sold" x="50.5" y="88.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="88.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="88.5" width="13" height="8"/></g><g style="--r:12"><rect class="rp-c sold" x="34.5" y="99.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="99.5" width="13" height="8"/><rect class="rp-c sold" x="66.5" y="99.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="99.5" width="13" height="8"/></g><g style="--r:11"><rect class="rp-c sold" x="34.5" y="110.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="110.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="110.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="110.5" width="13" height="8"/></g><g style="--r:10"><rect class="rp-c sold" x="34.5" y="121.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="121.5" width="13" height="8"/><rect class="rp-c res" x="66.5" y="121.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="121.5" width="13" height="8"/></g><g style="--r:9"><text x="26" y="141" text-anchor="end">L10</text><rect class="rp-c sold" x="34.5" y="132.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="132.5" width="13" height="8"/><rect class="rp-c later" x="66.5" y="132.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="132.5" width="13" height="8"/></g><g style="--r:8"><rect class="rp-c sold" x="34.5" y="143.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="143.5" width="13" height="8"/><rect class="rp-c later" x="66.5" y="143.5" width="13" height="8"/><rect class="rp-c res" x="82.5" y="143.5" width="13" height="8"/></g><g style="--r:7"><rect class="rp-c open" x="34.5" y="154.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="154.5" width="13" height="8"/><rect class="rp-c later" x="66.5" y="154.5" width="13" height="8"/><rect class="rp-c res" x="82.5" y="154.5" width="13" height="8"/></g><g style="--r:6"><rect class="rp-c open" x="34.5" y="165.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="165.5" width="13" height="8"/><rect class="rp-c later" x="66.5" y="165.5" width="13" height="8"/><rect class="rp-c sold" x="82.5" y="165.5" width="13" height="8"/></g><g style="--r:5"><rect class="rp-c sold" x="34.5" y="176.5" width="13" height="8"/><rect class="rp-c later" x="50.5" y="176.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="176.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="176.5" width="13" height="8"/></g><g style="--r:4"><text x="26" y="196" text-anchor="end">L05</text><rect class="rp-c res" x="34.5" y="187.5" width="13" height="8"/><rect class="rp-c later" x="50.5" y="187.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="187.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="187.5" width="13" height="8"/></g><g style="--r:3"><rect class="rp-c open" x="34.5" y="198.5" width="13" height="8"/><rect class="rp-c later" x="50.5" y="198.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="198.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="198.5" width="13" height="8"/></g><g style="--r:2"><rect class="rp-c open" x="34.5" y="209.5" width="13" height="8"/><rect class="rp-c later" x="50.5" y="209.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="209.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="209.5" width="13" height="8"/></g><g style="--r:1"><rect class="rp-c open" x="34.5" y="220.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="220.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="220.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="220.5" width="13" height="8"/></g><g style="--r:0"><rect class="rp-c open" x="34.5" y="231.5" width="13" height="8"/><rect class="rp-c open" x="50.5" y="231.5" width="13" height="8"/><rect class="rp-c open" x="66.5" y="231.5" width="13" height="8"/><rect class="rp-c open" x="82.5" y="231.5" width="13" height="8"/></g></svg>
+              <div class="sp-side">
+                <svg class="sp-pace" viewBox="36 12 518 206" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="sp-grid" d="M40 165H548M40 116H548M40 67H548M40 18H548"/><path class="sp-axis" d="M40 214H548"/><path class="sp-now" d="M344.8 18V214"/><path class="sp-plan-l" d="M40 214L548 65.5"/><path class="sp-act" d="M40.0 214.0 L56.9 202.9 L73.9 194.0 L90.8 187.3 L107.7 182.8 L124.7 178.4 L141.6 173.9 L158.5 169.5 L175.5 165.0 L192.4 160.5 L209.3 156.1 L226.3 153.9 L243.2 149.4 L260.1 147.2 L277.1 145.0 L294.0 140.5 L310.9 138.3 L327.9 131.6 L344.8 122.7"/><path class="sp-dot" d="M344.8 122.7h0"/></svg>
+                <ul class="rp-key sp-pk"><li><i class="k-act"></i>Contracts signed</li><li><i class="k-plan"></i>Plan</li></ul>
+              </div>
+              <ul class="rp-key sp-key"><li><i class="k-sold"></i>Under contract</li><li><i class="k-res"></i>Reserved</li><li><i class="k-open"></i>Available</li><li><i class="k-later"></i>Not yet released</li></ul>
+            </div>
+          </div>
+          <p class="sp-cap"><span>Specimen weekly report, invented figures</span><span class="sp-go">Open the specimen report<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></span></p>
+        </a>
+      </div>
+      <div class="b-r">
         <ol>
-          <li><b>A first conversation with the partners.</b> <span>Tell us about the site, the timeline and where design stands.</span></li>
-          <li><b>A study of the project.</b> <span>Financing, approvals, design team and track record. We&nbsp;take on few buildings, and only ones we believe&nbsp;in.</span></li>
-          <li><b>A written proposal for your&nbsp;building.</b> <span>The strategy, the team and the milestones we will report&nbsp;against.</span></li>
+          <li><span class="seq" aria-hidden="true">01</span><b>A first conversation with the partners.</b> <span>Tell us about the site, the timeline and where design stands.</span></li>
+          <li><span class="seq" aria-hidden="true">02</span><b>A study of the project.</b> <span>Financing, approvals, design team and track record. We&nbsp;take on few buildings, and only ones we believe&nbsp;in.</span></li>
+          <li><span class="seq" aria-hidden="true">03</span><b>A written proposal for your&nbsp;building.</b> <span>The strategy, the team and the milestones we will report&nbsp;against.</span></li>
         </ol>
         <div class="close">
-          <p>Every engagement is reported against its plan, every week. Case studies appear here only with each developer’s written approval.</p>
+          <p class="lead-in">Every engagement is reported against its plan, every week.</p>
           <a class="btn solid" href="#contact">Write to the partners<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
+          <p>Case studies appear here only with each developer’s written approval.</p>
         </div>
       </div>
     </div>
