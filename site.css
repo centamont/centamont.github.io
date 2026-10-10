@@ -360,7 +360,7 @@ section.band + section,section + section.band{border-top:0}
 .feature{margin-top:clamp(44px,6vw,80px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(32px,4vw,48px);align-items:start}
 .feature > *{min-width:0}
 .feature .txt{display:grid;gap:18px;align-content:start}
-.feature h3{font-size:clamp(34px,4vw,56px);font-weight:300;letter-spacing:-.015em;line-height:1.02}
+.feature h3{font-size:clamp(30px,3.2vw,44px);font-weight:300;letter-spacing:-.015em;line-height:1.02}
 .feature h3 a{text-decoration:none;background:linear-gradient(currentColor,currentColor) no-repeat 0 96%/0 1px;transition:background-size .7s var(--ease)}
 .feature h3 a:is(:hover,:focus-visible){background-size:100% 1px}
 .feature p{color:var(--muted)}
@@ -706,18 +706,22 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
    so on phones it is set on two lines in both */
 @media (min-width:421px){.page h1 br.sm{display:none}}
 /* the date and reading time are set as they are on the journal index and the home page: small uppercase labels */
-.meta{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:28px;padding-block:14px;border-block:1px solid var(--rule);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-/* 31em of 18px Jost: about 70 characters a line, never more than 80 */
-.prose{margin-top:clamp(40px,5vw,64px);max-width:31em}
-/* A two-line initial: its cap height spans line 1's cap line to line 2's baseline (30.6px + Jost's 12.6px caps = Cormorant's
-   .625 cap at 3.84em), and the line height drops that baseline onto line 2's */
-.prose.lead h2:first-child + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.84em;line-height:.872;padding:0 .14em 0 0;color:var(--accent)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 1.15em;margin-top:28px;padding-block:14px;border-block:1px solid var(--rule);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+/* A note is read in Cormorant at 22px: 29em is about 68 characters a line, in an ink a shade softer than the headings' */
+.prose{margin-top:clamp(40px,5vw,64px);max-width:29em;font-size:22px}
+:root{--read:#2B2924}
+:root[data-theme="dark"]{--read:#E2DBCF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--read:#E2DBCF}}
+@media print{:root,:root[data-theme],:root:not([data-theme="light"]){--read:#2B2924}}
+/* A two-line initial: its cap height spans line 1's cap line to line 2's baseline (34.1px + Cormorant's 13.75px caps = its
+   .625 cap at 3.48em), and the line height drops that baseline onto line 2's */
+.prose.lead h2:first-child + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
 .prose .side{float:right;width:min(210px,40%);margin:6px 0 16px 28px;padding-top:12px;border-top:1px solid var(--accent);display:grid;gap:6px}
 .prose .side b{font-family:var(--display);font-weight:300;font-size:72px;line-height:.85;color:var(--fg);font-variant-numeric:lining-nums}
 .prose .side span{font-size:15px;line-height:1.5;color:var(--faint)}
 @media (max-width:560px){.prose .side{float:none;width:auto;margin:28px 0;grid-template-columns:auto minmax(0,1fr);align-items:end;gap:16px}}
 /* on a wide screen the aside hangs in the empty right margin, so the paragraph beside it keeps its full measure */
-@media (min-width:1024px){.prose .side{margin-right:-258px}}
+@media (min-width:1140px){.prose .side{margin-right:-258px}}
 .prose .deposit{margin:36px 0 8px}
 .progress{position:fixed;top:64px;left:0;right:0;height:1px;z-index:25;pointer-events:none}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
@@ -725,20 +729,96 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 @keyframes prog{to{transform:scaleX(1)}}
 .prose h2{font-size:clamp(30px,3.2vw,40px);font-weight:400;max-width:none;margin:56px 0 16px}
 .prose h2:first-child{margin-top:0}
-.prose p,.prose li{color:var(--muted)}
-.prose p + p{margin-top:18px}
+.prose p,.prose li{font-family:var(--display);line-height:1.55;color:var(--read);font-variant-numeric:lining-nums}
+.prose p + p{margin-top:.9em}
 .prose ul,.prose ol{margin:18px 0 0;padding-left:1.2em}
 /* under a heading a list starts as close as a paragraph does: the first item's 10px folds into the heading's 16px (also when a side note sits between them) */
 .prose h2 + :is(ul,ol),.prose h2 + .side + :is(ul,ol){margin-top:0}
-.prose li{margin-top:10px;padding-left:4px}
+.prose li{margin-top:.4em;padding-left:4px}
 .prose li::marker{color:var(--accent)}
-.prose strong{color:var(--fg);font-weight:500}
+/* only Cormorant's 300 and 400 are served, so a term set off in the reading face is set in its italic, never a forged bold */
+.prose strong{color:var(--fg);font-weight:400;font-style:italic}
+/* reference lists (the documents, the questions) and the closing note keep the sans, at the body size */
+.prose .ref{font-size:18px}
+.prose .ref li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
+.prose .ref li{margin-top:10px;color:var(--muted)}
+.prose .ref strong{font-style:normal;font-weight:500}
 .prose a{color:var(--accent)}
 .prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
 @media (min-width:821px){.prose .note{padding-right:2.5em}}
 .page .row{margin-top:48px}
 /* a note closes with its way back to the others */
 .page .row + .links{margin-top:28px}
+/* Meta lines: every item holds together, and the dot between two items is drawn in the gap between them, so a line that
+   wraps never ends on one; an item that starts a line has its dot outside the box, where it is clipped */
+.dots{display:flex;flex-wrap:wrap;column-gap:1.15em}
+:is(.meta,.dots){overflow:hidden}
+:is(.meta,.dots) > .nw{position:relative;white-space:normal;min-width:0}
+:is(.meta,.dots) > .nw + .nw::before{content:"\00B7";content:"\00B7" / "";position:absolute;right:calc(100% + .07em);width:1.15em;text-align:center;letter-spacing:0}
+/* the next note: one ruled row, the whole of it a link */
+.next{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:center;max-width:638px;min-height:96px;margin-top:clamp(44px,5vw,60px);padding:20px 0 22px;border-top:1px solid var(--fg);border-bottom:1px solid var(--rule);color:var(--fg);text-decoration:none}
+.next > span{grid-column:1}
+.next-k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.next-t{margin-top:4px;font-family:var(--display);font-size:30px;line-height:1.15;text-wrap:balance;transition:color .3s}
+.next-d{margin-top:10px;font-size:13px;font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
+.next > svg{grid-column:2;grid-row:1 / span 3;width:28px;height:12px;color:var(--accent);transition:transform .6s var(--ease)}
+.next:is(:hover,:focus-visible) .next-t{color:var(--accent)}
+.next:is(:hover,:focus-visible) > svg{transform:translateX(6px)}
+.next + .row{margin-top:40px}
+/* the end mark: the ruler's crack, small, after a note's last word */
+.end{display:inline-block;width:9px;height:14px;margin-left:.12em;vertical-align:-1px;fill:none;stroke:var(--sold-line);stroke-width:1.2}
+/* figures in a note are set in the sans, their numbers upright */
+.prose figure li{margin:0;padding:0;font-family:var(--body);line-height:1.7;color:var(--faint)}
+/* Fig. 1 of the launch-price note: drawn in percentages of its plot, so its labels keep their size at every width */
+.prose .cp{margin:40px 0 36px}
+.cp-plot{position:relative;height:clamp(190px,40vw,224px);margin:30px 0 58px 44px}
+.cp-svg{display:block}
+.cp :is(line,path,circle){vector-effect:non-scaling-stroke}
+.cp-grid line{stroke:var(--grid);stroke-dasharray:2 4}
+.cp-done{stroke:var(--grid)}
+.cp-axis,.cp-ticks line{stroke:var(--fg);stroke-width:var(--lw-object,1px)}
+.cp-lim{stroke:var(--fg);stroke-dasharray:12 3 2 3}
+.cp-par{fill:none;stroke:var(--accent);stroke-width:1.5}
+.cp-alt{fill:none;stroke:var(--fg);stroke-dasharray:4 3;opacity:.6}
+.cp-dot{fill:var(--sold);stroke:var(--bg);stroke-width:2}
+.cp-vd{fill:var(--bg);stroke:var(--fg)}
+.cp-t text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.cp-t .cp-up,.cp-lt{text-transform:uppercase;letter-spacing:.12em;paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round}
+.cp-lt{fill:var(--fg);font:500 13px var(--body)}
+.cp-m text{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.prose .cp-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.prose .cp-key li{display:flex;align-items:center;gap:8px;margin-right:-.14em}
+.cp-key i{display:inline-block;width:22px;height:0;border-top:1.5px solid var(--accent)}
+.cp-key .k-alt{border-top:1px dashed var(--fg);opacity:.6}
+.cp-key .k-lim{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 12px,transparent 12px 15px,var(--fg) 15px 17px,transparent 17px 20px)}
+.prose .cp-key .k-lim-li{display:none}
+.cp figcaption,.wk figcaption{margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
+.cp figcaption{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 28px;align-items:baseline}
+.cp figcaption .more{white-space:nowrap}
+/* a figure too narrow to name the threshold in the drawing names it in the key */
+@media (max-width:560px){.prose .cp-key .k-lim-li{display:flex}.cp-lt,.cp-y50{display:none}.cp figcaption{grid-template-columns:1fr}}
+@media (max-width:359px){.cp-mw{display:none}.cp-t .cp-dl{text-anchor:end}}
+/* the curves draw out along the months as the figure arrives, then the points are named */
+.cp-data path{clip-path:inset(-2px);transition:clip-path .9s var(--ease)}
+.cp-data .cp-hi{transition-delay:80ms}.cp-data .cp-par{transition-delay:160ms}
+.cp-marks,.cp-m{transition:opacity .5s var(--ease) .6s}
+/* hidden only while motion is allowed: with reduced motion or Pause motion the figure is drawn from the start */
+@media (prefers-reduced-motion:no-preference){
+  .js:not([data-motion="off"]) .cp:not(.in) .cp-data path{clip-path:inset(0 100% 0 0)}
+  .js:not([data-motion="off"]) .cp:not(.in) :is(.cp-marks,.cp-m){opacity:0}
+}
+/* Fig. 1 of the weekly-report note: the report's inventory block at about half its size, beside the paragraph about it */
+.prose .wk{float:right;width:200px;margin:8px 0 20px 32px;display:grid;gap:12px}
+.wk-plan{display:block;width:100%;height:auto;overflow:visible}
+.wk .rp-c{vector-effect:non-scaling-stroke;stroke-width:1px}
+.wk .rp-t{font-size:15.7px}
+.prose .wk .rp-key{flex-direction:column;gap:2px;margin:0;padding:0}
+.wk figcaption{margin-top:0}
+@media (min-width:1140px){.prose .wk{width:210px;margin-right:-258px}}
+/* without the margin to hang in, the figure is taller than its section, so it is set in the text with its key beside it */
+@media (max-width:1139px){.prose .wk{float:none;width:auto;margin:36px 0 32px;grid-template-columns:200px minmax(0,1fr);grid-template-rows:1fr auto;gap:16px 32px;align-items:end}.wk-plan{grid-row:1 / span 2}}
+@media (max-width:560px){.prose .wk{float:none;width:auto;margin:28px 0 24px;grid-template-columns:132px minmax(0,1fr);gap:12px 20px;align-items:start}.wk-plan{grid-row:1 / span 2}.wk .rp-t{font-size:23.8px}}
+@media (max-width:379px){.prose .wk{grid-template-columns:116px minmax(0,1fr)}.wk-plan{grid-row:auto}.wk .rp-t{font-size:27px}.prose .wk .rp-key li{align-items:baseline}.wk figcaption{grid-column:1 / -1}}
 .lot .wrap{max-width:var(--max);display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32px,6vw,96px);align-items:center}
 .lot .wrap > *{min-width:0}
 /* the empty lot sits in its cell (not on the story's sticky offset), and its survey grid dissolves into the vellum at the sides */
@@ -818,14 +898,14 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 @media (max-width:820px){.pr p,.feature p,.begin li span{max-width:52ch}}
 /* line breaks: market notes balance, captions avoid a lone last word, a question never strands its last word */
 .lv p{text-wrap:balance}
-figcaption{text-wrap:pretty}
+figcaption,.dkey dd{text-wrap:pretty}
 .faq summary{text-wrap:balance}
 
 @media (max-width:520px){.hero .row,.page .row{display:grid;grid-template-columns:1fr}.hero .row .btn,.page .row .btn{justify-content:space-between}}
 /* a short phone held upright closes up the hero copy a little, so the first button clears the fold without the drawing giving way */
 @media (max-width:520px) and (max-height:700px) and (orientation:portrait){.hero .lede{margin-top:18px}.hero .row{margin-top:20px}}
-/* the meta rules end where the prose does (31em of the 18px body; the meta itself is set at 13px) */
-.page .meta{max-width:558px}
+/* the meta rules end where the prose does (29em of the 22px reading face; the meta itself is set at 13px) */
+.page .meta{max-width:638px}
 @media (max-width:1180px),(max-width:73.75em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
 :root[data-theme="dark"] .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}}
@@ -1208,18 +1288,65 @@ header.site{view-transition-name:site-header}
 @media (max-width:820px){.co-row{grid-template-columns:1fr}}
 @media (max-width:560px){.co-sw{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* Journal index */
+/* Journal index: the first screen carries the latest note's plate beside the title; each note is a ruled row with its
+   standfirst, its meta line under the title, and a plate of its own figure */
+.ji-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,72px);align-items:end}
+.ji-top > *{min-width:0}
+.ji-hero{margin:0;justify-self:end;width:100%;max-width:420px}
+.ji-hero figcaption{margin-top:14px;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
+@media (max-width:820px){.ji-top{grid-template-columns:minmax(0,1fr)}.ji-hero{display:none}}
+.ji-defs{position:absolute;width:0;height:0;overflow:hidden}
 .ji{list-style:none;margin:clamp(48px,6vw,88px) 0 0;padding:0;border-top:1px solid var(--fg)}
-.ji a{display:grid;grid-template-columns:4em 10em minmax(0,1fr) auto;align-items:baseline;gap:8px 24px;padding:clamp(22px,2.6vw,34px) 0;border-bottom:1px solid var(--rule);color:inherit;text-decoration:none}
-.ji-n{font-family:var(--display);font-size:28px;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
-.ji-k,.ji-d{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.ji a{display:grid;grid-template-columns:4em minmax(0,1fr) 168px;grid-template-areas:"n t p" ". s p" ". d p";align-items:baseline;column-gap:24px;padding:clamp(26px,3vw,40px) 0;border-bottom:1px solid var(--rule);color:inherit;text-decoration:none}
+.ji-n{grid-area:n;font-family:var(--display);font-size:28px;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
+.ji-d{grid-area:d;margin-top:14px;font-size:13px;font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
 /* each title is the note's heading (an h2, so a screen reader can step from note to note), set as it was before */
-.ji-t{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;max-width:none;letter-spacing:normal;transition:transform .6s var(--ease)}
+.ji-t{grid-area:t;font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;max-width:none;letter-spacing:normal;transition:transform .6s var(--ease)}
+.ji-s{grid-area:s;margin:10px 0 0;max-width:46ch;font-size:18px;line-height:1.6;color:var(--muted)}
 .ji a:is(:hover,:focus-visible) .ji-t{transform:translateX(8px)}
-/* below 1000px the title column would drop to 160-300px and wrap to four lines, so kind, title and date stack beside the number */
-@media (max-width:1000px){.ji a{grid-template-columns:3em minmax(0,1fr)}.ji-k,.ji-t,.ji-d{grid-column:2}}
+.ji .pl{grid-area:p;align-self:start;margin-top:6px}
+@media (max-width:1000px){.ji a{grid-template-columns:3em minmax(0,1fr) 168px}}
+@media (max-width:820px){.ji a{grid-template-columns:3em minmax(0,1fr) 120px}.ji .pl{width:120px;height:69px}}
+/* phones: the plate goes above the title, the full width of the row */
+@media (max-width:600px){.ji a{grid-template-columns:3em minmax(0,1fr);grid-template-areas:"p p" "n t" ". s" ". d"}.ji .pl{width:100%;height:120px;margin:0 0 22px}}
+@media (max-width:420px){.ji a{grid-template-columns:2.2em minmax(0,1fr);column-gap:16px}}
+/* The plates: line drawings of each note's figure, in percentages of the plate, so a wider plate keeps its hatches and pens */
+.pl{display:block;width:168px;height:96px;overflow:visible}
+.pl-hero{width:100%;height:240px}
+.pl :is(line,rect,path,circle){vector-effect:non-scaling-stroke}
+.pl-box,.pl-l,.pl-ax,.pl-alt,.pl-c,.pl-lim{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail,.6px)}
+.pl-s.esc{fill:var(--sold)}.pl-s.con{fill:url(#jiH)}.pl-s.often{fill:url(#jiH2)}
+.pl-h{stroke:var(--sold-line);stroke-width:1px}
+.pl-h2{stroke:var(--grid);stroke-width:1px}
+.pl-dash{stroke-dasharray:2 2}
+.pl-lim{stroke-dasharray:8 2 1.5 2}
+.pl-alt{stroke-dasharray:4 3;opacity:.7}
+.pl-par{fill:none;stroke:var(--sold-line);stroke-width:var(--lw-object,1px)}
+.pl-area{fill:var(--sold);opacity:.16}
+.pl-dot{fill:var(--sold)}
+.pl-c.sold{fill:var(--sold);stroke:var(--sold-line)}
+.pl-c.res{fill:var(--sold);fill-opacity:.4;stroke:var(--sold-line)}
+.pl-c.open{stroke:var(--faint)}
+.pl-c.later{stroke:var(--faint);stroke-dasharray:1.5 1.5}
+.pl-gr{stroke:var(--fg);stroke-width:var(--lw-profile,1.5px)}
+.pl-dim{fill:none;stroke:var(--faint);stroke-width:var(--lw-detail,.6px)}
+.pl-gh{fill:url(#jiG)}
+/* each plate draws as it arrives: the deposit bands fill along the price, the curves draw out along the months, the levels rise */
+.pl-s,.pl-col{transform-box:fill-box;transition:transform .9s var(--ease)}
+.pl-s{transform-origin:0 50%}.pl-col{transform-origin:50% 100%}
+.pl-alt,.pl-par{clip-path:inset(-2px);transition:clip-path .9s var(--ease)}
+.pl-area,.pl-dot{transition:opacity .9s var(--ease)}
+.pl .d2{transition-delay:80ms}.pl .d3{transition-delay:160ms}.pl .d4{transition-delay:240ms}
+@media (prefers-reduced-motion:no-preference){
+  .js:not([data-motion="off"]) .pl:not(.in) .pl-s{transform:scale(0,1)}
+  .js:not([data-motion="off"]) .pl:not(.in) .pl-col{transform:scale(1,0)}
+  .js:not([data-motion="off"]) .pl:not(.in) :is(.pl-alt,.pl-par){clip-path:inset(0 100% 0 0)}
+  .js:not([data-motion="off"]) .pl:not(.in) :is(.pl-area,.pl-dot){opacity:0}
+}
+@media print{.js .pl :is(.pl-s,.pl-col){transform:none!important}.js :is(.pl,.cp) path{clip-path:none!important}.js .pl .pl-area{opacity:.16!important}.js .pl .pl-dot{opacity:1!important}.js .cp :is(.cp-marks,.cp-m){opacity:1!important}}
+@media (forced-colors:active){.pl-s.esc,.pl-c.sold,.pl-dot,.wk .rp-c.sold{fill:CanvasText}.pl-h,.pl-par,.pl-c.res,.pl-c.sold,.end{stroke:CanvasText}.cp-key i{border-color:CanvasText}}
 /* on a folded phone's cover screen 'pre-construction' is wider than the title column, so it may break at its hyphen there */
-@media (max-width:319px){.ji-t .nw{white-space:normal}}
+@media (max-width:319px){:is(.ji-t,.next-t) .nw{white-space:normal}}
 .feature .txt .more + .more{margin-left:0}
 .door .more{margin-top:28px;color:#C9A877}
 .door .more:is(:hover,:focus-visible){color:var(--band-fg)}
@@ -1403,5 +1530,5 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
 .notes-list .k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25;transition:color .3s}
 .notes-list a:is(:hover,:focus-visible) .t{color:var(--accent)}
-@media (max-width:600px){.notes-list a{grid-template-columns:1fr}}
+@media (max-width:600px){.notes-list a{grid-template-columns:1fr}.notes-list .k{order:1}}
 .prose :is(ul,ol) + p{margin-top:1.2em}
