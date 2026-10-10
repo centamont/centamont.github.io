@@ -30,6 +30,10 @@
   --body:'Jost','Jost fallback','Helvetica Neue',Arial,sans-serif;
   --gutter:clamp(20px,5vw,72px); --max:1240px;
   --ease:cubic-bezier(.16,1,.3,1);
+  /* pen weights and line types for every drawing: a continuous line is open now; hidden dashes are planned or projected,
+     dots are later or for reference, the datum dash marks datums, boundaries and thresholds */
+  --lw-profile:1.5px; --lw-object:1px; --lw-detail:.6px; --lw-hatch:.6px;
+  --lt-hidden:4 3; --lt-dot:1 3; --lt-datum:12 3 2 3;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -680,47 +684,119 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 
 
 /* Markets chart */
-/* The map at display scale: full measure, routes drawn out from Miami by the reader's scroll, one market at a time.
-   Sizes on the map are set in screen pixels through --u (viewBox units per pixel, kept by the page script). */
+/* The map as one plate: the overview of every market, with the routes drawn out from South Florida by the reader's scroll,
+   and beside it a survey of the stretch of coast that opens first. Sizes on each drawing are set in screen pixels through
+   --u (viewBox units per pixel, kept by the page script for each drawing). */
 .chart{margin-top:clamp(44px,6vw,80px);display:grid;gap:clamp(36px,4.4vw,64px)}
 .chart > *{min-width:0}
 .chart .map{margin:0;display:grid;gap:10px}
-.chart .map figcaption{font-size:15px;color:var(--faint);justify-self:end}
-.chart svg{width:100%;height:auto;display:block;border:1px solid var(--rule);background:var(--sheet)}
-.chart .coast path{fill:none;stroke:var(--fg);stroke-width:.75px;vector-effect:non-scaling-stroke;opacity:.4;stroke-linejoin:round}
+.chart svg{display:block}
+/* the overview takes most of the width and the survey a narrow sheet beside it, at the same height (the survey is cut to
+   its land and coast), with a ruled gutter between them; leaders run from the locator on the overview to the survey's corners */
+.chart .plate{position:relative;display:grid;grid-template-columns:minmax(0,284fr) minmax(0,16fr) minmax(0,100fr)}
+.chart .plate::after{content:"";position:absolute;top:0;bottom:0;left:73%;width:1px;background:var(--rule)}
+.chart .pa{grid-column:1;grid-row:1;position:relative;overflow:hidden;aspect-ratio:720/330}
+.chart .ov{width:100%;height:auto}
+.chart .sv{grid-column:3;grid-row:1;width:100%;height:100%}
+.chart .ldr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.chart .ldr path{fill:none;stroke:var(--faint);stroke-width:.75px;vector-effect:non-scaling-stroke}
+/* a frame drawn only at its corners, over the sheet */
+.ticks{--tk:14px;--tc:var(--sold-line);background:linear-gradient(var(--tc),var(--tc)) 0 0/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 0 0/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 0/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 0/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 0 100%/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 0 100%/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 100%/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 100%/1px var(--tk) no-repeat,var(--sheet)}
+.chart .coast path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;opacity:.5;stroke-linejoin:round}
 .chart [data-m]{transition:opacity .4s var(--ease)}
-.chart[data-hl] svg [data-m]{opacity:.18}
-.chart[data-hl="miami"] svg [data-m="miami"],.chart[data-hl="bpb"] svg [data-m="bpb"],.chart[data-hl="ny"] svg [data-m="ny"],.chart[data-hl="ladal"] svg [data-m="ladal"],.chart[data-hl="more"] svg [data-m="more"],.chart[data-hl="intl"] svg [data-m="intl"]{opacity:1}
-/* every route leaves from Miami, so Miami stays lit whichever market is picked */
-.chart[data-hl] svg [data-m="miami"]{opacity:1}
+.chart[data-hl] .ov [data-m]{opacity:.18}
+.chart[data-hl="sf"] .ov [data-m="sf"],.chart[data-hl="ny"] .ov [data-m="ny"],.chart[data-hl="ladal"] .ov [data-m="ladal"],.chart[data-hl="more"] .ov [data-m="more"],.chart[data-hl="intl"] .ov [data-m="intl"]{opacity:1}
+/* every route leaves from South Florida, so its locator stays lit whichever market is picked */
+.chart[data-hl] .ov :is(.loc,.rch){opacity:1}
+/* picked from the list, the launch stands out from the survey's linework */
+.chart .sv .ctx{transition:opacity .4s var(--ease)}
+.chart[data-hl="sf"] .sv .ctx{opacity:.35}
 .lv{transition:color .3s}
 .lv h3{transition:color .3s,transform .5s var(--ease)}
 @media (hover:hover){.lv:hover h3{color:var(--accent);transform:translateX(6px)}}
+.chart .lv:focus-visible h3{color:var(--accent);transform:translateX(6px)}
 .chart .grid line{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
 .chart .gl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.12em}
-.chart .arc{fill:none;stroke:var(--accent);stroke-width:calc(1.25px * var(--u,1));stroke-linecap:round;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
-.chart .arc.later{stroke-dasharray:calc(3px * var(--u,1)) calc(5px * var(--u,1));stroke-dashoffset:0;stroke-linecap:butt;stroke-opacity:.6}
+/* routes: planned in hidden dashes, later in dots; each draws out through a mask of its own */
+.chart .arc{fill:none;stroke:var(--fg);stroke-width:1.25px;vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
+.chart .arc.later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
+.chart .ov mask rect{fill:#000}
 .chart mask path{fill:none;stroke:#fff;stroke-width:14;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
-.chart .pt.now{fill:var(--sold);stroke:var(--sold)}
-.js .chart .pt:not(.landed):not(.now){stroke:var(--rule)}
-.chart .ring{fill:none;stroke:var(--sold);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}.chart.in .ring{animation:ring 2.8s var(--ease) 3 both}
-@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
-.chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .6s var(--ease)}
+.js .chart .pt:not(.landed){stroke:var(--rule)}
+/* what opens now is the only continuous line: the reach along the coast, three points, the locator around them */
+.chart .rch{fill:none;stroke:var(--sold-line);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
+.chart .loc{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
-.js .chart .lb:not(.landed){fill:var(--faint)}
+.js .chart :is(.lb,.lk):not(.landed){fill:var(--faint)}
 .chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
-/* The list beneath reads as a ruled table; a row takes a bronze rule when its route lands. */
-.chart .levels{margin-top:0}
+/* then, the world: the International route ends on a world key that marks the overview's own frame */
+.chart .ko{fill:var(--sheet)}
+.chart .wo{fill:none;stroke:var(--faint);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.chart .wf{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.chart .lk{font-style:italic}
+/* the survey: hatched land, the coast and its islands, county lines, the reach, three cities, a scale and a north point */
+.chart .sv #hatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.chart .sv .land{fill:url(#hatch);opacity:.5}
+.chart .sv .swp{transform:translateY(calc((1 - var(--c,1)) * 600px))}
+.chart .sv .coast path,.chart .sv .isle path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+.chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
+.chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.chart .sv .cn{opacity:var(--t,1)}
+.chart .sv .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.chart .sv :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.chart .sv .nh{fill:var(--fg)}
+.chart .sv .now-k{fill:var(--accent);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
+.chart .sv .cp{r:calc(4px * var(--u,1));fill:var(--sold);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1));transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
+.chart .sv .cl text{fill:var(--fg);font:italic 400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.chart .ring{r:calc(4px * var(--u,1));fill:none;stroke:var(--sold);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
+.chart.pulse .ring{animation:ring 2.4s var(--ease) both}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
+/* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. */
+.chart .levels{margin:0;padding:0;list-style:none}
 .chart .lv{position:relative}
+.chart .lv .no{display:none}
 .chart .lv::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
 .chart .lv.landed::before{transform:none}
-.chart .lv.landed .when{color:var(--accent)}
-@media (min-width:600px){.chart .levels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(24px,3vw,48px);border-top:0}.chart .lv{display:block;padding-block:20px 26px;border-bottom:0;border-top:1px solid var(--rule)}.chart .lv:nth-child(-n+2){border-top-color:var(--fg)}.chart .lv h3{font-size:clamp(26px,2.4vw,34px)}.chart .lv .when{display:block;margin-top:4px;line-height:1.6}.chart .lv p{margin-top:8px}}
-@media (min-width:1000px){.chart .levels{grid-template-columns:repeat(3,minmax(0,1fr))}.chart .lv:nth-child(-n+3){border-top-color:var(--fg)}}
-@media (max-width:599px){.chart .gl{display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}}
-/* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it */
-@media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(10px,calc(12px * var(--u,1)))}}
+@media (min-width:700px){.chart .lv{grid-template-columns:56px 132px minmax(0,1fr);gap:6px 24px;padding-block:22px}.chart .lv .no{display:block;grid-column:1;grid-row:1;font-size:13px;font-weight:500;letter-spacing:.14em;color:var(--faint);font-variant-numeric:lining-nums tabular-nums}.chart .lv .when{grid-column:2}.chart .lv h3{grid-column:3;font-size:var(--t-head,clamp(28px,2.8vw,40px))}.chart .lv p{grid-column:3;font-size:17px;text-wrap:balance}}
+/* (the coverage takes a column of its own once there is room for it beside the name) */
+@media (min-width:1000px){.chart .lv{grid-template-columns:56px 132px minmax(0,6fr) minmax(0,4fr);row-gap:0}.chart .lv p{grid-column:4;grid-row:1}}
+/* below 1200px (where the survey's type would crowd it beside the overview) the survey comes first, cut wide and short
+   (y 36 to 286, its slice of the viewBox; its land and sea run on out to the plate's edges) with its scale and title moved out
+   into the empty ocean, then the overview, in its crop on a phone; the leaders fold away */
+@media (max-width:1199px){.chart .plate{grid-template-columns:minmax(0,1fr);overflow:hidden}.chart .plate::after,.chart .ldr{display:none}.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}.chart .pa{grid-row:2;border-top:1px solid var(--rule)}.chart .lk{transform:translateY(calc(48px + 10px * var(--u,1)))}
+  .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
+@media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
+/* the overview's phone crop (x 290 to 720, y 24 to 300) is cut by its frame, so it holds without the page script too */
+@media (max-width:599px){.chart .pa{aspect-ratio:430/276}.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.696%}
+  .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(-6px,calc(48px + 10px * var(--u,1)))}}
+/* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it, clear of Houston's */
+@media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
+@media (max-width:374px){.chart .ov .lb.now{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
+/* (narrower still, the survey's title no longer fits beside the coast; the overview below names South Florida) */
+@media (max-width:340px){.chart .sv .ttl{display:none}}
+/* A drawing's caption strip: what the drawing is, on the left; its key, on the right */
+.cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;color:var(--faint);text-align:left}
+.cap .key{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+.cap .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.cap .key svg{width:28px;height:6px;overflow:visible}
+.cap .key path{fill:none;stroke:var(--fg)}
+.cap .k-now{stroke:var(--sold-line)!important;stroke-width:3px;stroke-linecap:round}
+.cap .k-plan{stroke-width:1.25px;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
+.cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
+@media (max-width:600px){.cap{grid-template-columns:minmax(0,1fr)}}
+/* in forced colours the plate's sheet turns to the system canvas: the knock-outs, halos and ink lines follow it */
+@media (forced-colors:active){.chart .ko{fill:Canvas}.chart svg text{fill:CanvasText;stroke:Canvas}.chart :is(.coast path,.isle path,.arc,.county path,.sbar,.sl,.na,.wo,.ldr path){stroke:CanvasText}.chart .nh{fill:CanvasText}.chart .pt{fill:Canvas;stroke:CanvasText}.cap .key path:not(.k-now){stroke:CanvasText}}
+/* without the page script the drawings take an approximate scale for their type at each width */
+html:not(.js) .chart .sv{--u:1.06}
+@media (min-width:1600px){html:not(.js) .chart .sv{--u:.87}}
+@media (min-width:821px) and (max-width:1199px){html:not(.js) .chart .ov{--u:.8}html:not(.js) .chart .sv{--u:.65}}
+@media (min-width:600px) and (max-width:820px){html:not(.js) .chart .sv{--u:.73}}
+@media (max-width:820px){html:not(.js) .chart .ov{--u:1.1}}
+@media (max-width:599px){html:not(.js) .chart .ov{--u:1.25}html:not(.js) .chart .sv{--u:1.03}}
+@media (max-width:374px){html:not(.js) .chart .ov{--u:1.5}html:not(.js) .chart .sv{--u:1.17}}
+@media (max-width:340px){html:not(.js) .chart .sv{--u:1.29}}
 
 /* The name, cut line by line */
 .cut .ln{display:block;overflow:hidden;padding-bottom:.06em}
@@ -739,7 +815,7 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .sig.eng.in text{stroke-dashoffset:0;fill-opacity:1;stroke-opacity:0}
 
 @media (prefers-reduced-motion:reduce){
-  .chart .ring,.chart.in .ring{animation:none}
+  .chart .ring,.chart.pulse .ring{animation:none}
   html.js .cut .ln > span{transform:none}
 }
 
@@ -1176,9 +1252,9 @@ header.site{view-transition-name:site-header}
 .pr .more::after{content:"";position:absolute;inset:0}
 .pr .num{transition:transform .6s var(--ease),font-style 0s}
 .pr:is(:hover,:focus-within) .num{transform:translateX(6px);font-style:italic}
-.chart [data-m="miami"],.chart [data-m="bpb"],.chart [data-m="ny"],.chart [data-m="ladal"],.chart [data-m="more"],.chart [data-m="intl"]{cursor:default}
+.chart [data-m]{cursor:default}
 .chart[data-hl] .lv:not(:hover){transition:opacity .4s var(--ease)}
-.chart[data-hl="miami"] .lv:not([data-m="miami"]),.chart[data-hl="bpb"] .lv:not([data-m="bpb"]),.chart[data-hl="ny"] .lv:not([data-m="ny"]),.chart[data-hl="ladal"] .lv:not([data-m="ladal"]),.chart[data-hl="more"] .lv:not([data-m="more"]),.chart[data-hl="intl"] .lv:not([data-m="intl"]){opacity:.4}
+.chart[data-hl="sf"] .lv:not([data-m="sf"]),.chart[data-hl="ny"] .lv:not([data-m="ny"]),.chart[data-hl="ladal"] .lv:not([data-m="ladal"]),.chart[data-hl="more"] .lv:not([data-m="more"]),.chart[data-hl="intl"] .lv:not([data-m="intl"]){opacity:.4}
 /* Reading the curve: a hairline and the month under the pointer */
 .cv-fig svg{cursor:crosshair}
 .cv-hair{stroke:var(--fg);stroke-width:1;opacity:.5;pointer-events:none}
@@ -1581,7 +1657,8 @@ html:not(.js) :is(.menu-btn,.motion,.theme){display:none}
   .doorway{--o:1!important}
   .dbar .s,.rp-funnel .bar i,.rp-src .bar i,.js .ruler line{transform:none!important}
   .table .seat.on rect{fill-opacity:1!important;stroke:var(--sold)!important;transform:none!important}.table .seat.off rect{opacity:1!important}
-  .chart .pt:not(.now){stroke:var(--fg)!important}.chart .lb{fill:var(--fg)!important}
+  .chart .pt{stroke:var(--fg)!important}.chart :is(.lb,.lk){fill:var(--fg)!important}
+  .chart,.chart mask path{--a:1!important;--c:1!important;--t:1!important;--r:1!important}
   .step h3::before{opacity:1!important;transform:none!important}
   /* the specimen sheet prints filled in, with its corner ticks and key swatches (backgrounds are dropped otherwise) */
   .spec{-webkit-print-color-adjust:exact;print-color-adjust:exact}.js .spec .sp-plan g,.js .spec .sp-pace,.js .spec .sp-dot{opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}.js .spec .sp-act{clip-path:none!important}
