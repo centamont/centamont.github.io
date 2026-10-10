@@ -208,8 +208,9 @@
     ruled.forEach((p) => { if (seen(p)) ruleIn(p); else hio.observe(p); });
   }
 
-  // Three headlines rise, word by word: the place (Markets), the close (Contact) and a reading page's title, its standfirst
-  // lifting in after it. Every other head stands still, so the drawings inking themselves stay the page's motion.
+  // Three headlines rise, word by word: the place (Markets), the close (Contact) and a reading page's title. The lede under
+  // a heading never waits for it, here or anywhere: it stands from the start, and only a section intro's bronze rule draws.
+  // Every other head stands still, so the drawings inking themselves stay the page's motion.
   // Words keep their spaces, so text reads and copies normally.
   if (!stillPage) {
     const split = (el) => {
@@ -236,15 +237,8 @@
     // stagger by line rather than by word: words on the same line rise together. A heading is measured as it arrives
     // (all its words in one pass, then marked in a second), where the page is already laid out, not while it starts.
     const lines = (el) => { let top = null, line = -1; [...el.querySelectorAll('.w > i')].map((w) => { const t = w.parentNode.offsetTop; if (top === null || Math.abs(t - top) > 4) { top = t; line++; } return [w, line]; }).forEach(([w, n]) => w.style.setProperty('--i', n)); };
-    // (a standfirst follows only a title that rises, and it waits hidden at once, not fading out first: where the page
-    // was styled before this script ran, its opacity would otherwise ease towards nothing and turn back unseen)
-    document.querySelectorAll('.page .standfirst').forEach((p) => {
-      const h = p.previousElementSibling;
-      if (!h || !h.classList.contains('tx-rise') || seen(p)) return;
-      p.style.transition = 'none'; p.classList.add('lift'); void getComputedStyle(p).opacity; p.style.transition = ''; void getComputedStyle(p).transitionDelay;
-    });
     const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (e.target.classList.contains('tx-rise')) lines(e.target); e.target.classList.add('in'); rio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
-    document.querySelectorAll('.tx-rise, .lift').forEach((el) => rio.observe(el));
+    document.querySelectorAll('.tx-rise').forEach((el) => rio.observe(el));
   }
 
   // The private door: once a third of it is in view, its arch inks itself and its leaves swing open into the lit room,
@@ -354,7 +348,7 @@
   // had closed close again afterwards.
   let opened = [];
   addEventListener('beforeprint', () => {
-    document.querySelectorAll('.tx-rise, .lift, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
+    document.querySelectorAll('.tx-rise, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
     opened = [...document.querySelectorAll('.faq details:not([open])')];
     opened.forEach((d) => { d.open = true; });
   });
