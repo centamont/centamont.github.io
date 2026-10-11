@@ -16,9 +16,9 @@
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
-    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1180px or 73.75em) closes the drawer,
+    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1023px or 63.9375em) closes the drawer,
     // so the page is never left frozen behind a menu that no longer shows.
-    const wide = matchMedia('(max-width:1180px),(max-width:73.75em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
+    const wide = matchMedia('(max-width:1023px),(max-width:63.9375em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
     wide.addEventListener ? wide.addEventListener('change', onWide) : wide.addListener(onWide);
     // (enlarged text folds the nav at a wider screen too, by site.css's header container: once Menu goes, so does the drawer)
     addEventListener('resize', () => { if (nav.classList.contains('open') && getComputedStyle(btn).display === 'none') close(); });
@@ -38,6 +38,14 @@
   // While the menu is open it keeps the colours it opened with.
   const header = document.querySelector('header.site'), grounds = [...document.querySelectorAll('.hero, .band')];
   let ground = () => {};
+  // Browser chrome follows the page: the one theme-color is the ground under the header (the ink of the hero or a band, or
+  // the sheet; on a phone whose header has stepped aside, the ground at the top of the screen), set as the header takes its
+  // ground and as day turns to night. The two tones are read once per theme, never per frame.
+  const tc = document.querySelector('meta[name="theme-color"]'), hex = (s) => '#' + (s.match(/\d+/g) || []).slice(0, 3).map((v) => (+v).toString(16).padStart(2, '0')).join('');
+  let tones = { ink: '', page: '' }, onInk = false;
+  const tone = () => { const cs = getComputedStyle(root); tones = { ink: hex(cs.getPropertyValue('--hero-rgb')), page: hex(getComputedStyle(document.body).backgroundColor) }; };
+  const chrome = (ink) => { onInk = ink; const v = ink ? tones.ink : tones.page; if (tc && v.length === 7 && tc.content !== v) tc.content = v; };
+  tone(); chrome(false);
   if (header && grounds.length) {
     let raf = 0, key = '', lead = [];
     const sym = header.querySelector('.mark .sym');
@@ -70,6 +78,7 @@
       const k = b > a ? Math.round(a) + 'px ' + Math.round(b) + 'px' : '0px 0px';
       if (k !== key) { key = k; const [ka, kb] = k.split(' '); header.style.setProperty('--ka', ka); header.style.setProperty('--kb', kb); }
       swap('over', over); swap('ink-foot', foot);
+      chrome(root.classList.contains('hdr-off') ? grounds.some((g) => { const r = g.getBoundingClientRect(); return r.top <= 0 && r.bottom > 0; }) : over);
     };
     const req = () => { if (!raf) raf = requestAnimationFrame(ground); };
     let rz = 0;
@@ -77,6 +86,33 @@
     // (and once the open menu lets go, the bar catches up with wherever the page now stands)
     new MutationObserver(req).observe(root, { attributes: true, attributeFilter: ['class'] });
     ground();
+    // (while the phone header slides, the ink it carries is cut afresh each frame, so it meets the ground it slides over)
+    let slide = 0;
+    new MutationObserver((ms) => { if (!ms.some((m) => /\bhdr-off\b/.test(m.oldValue || '') !== root.classList.contains('hdr-off'))) return; const t0 = performance.now(); cancelAnimationFrame(slide); const f = () => { ground(); if (performance.now() - t0 < 340) slide = requestAnimationFrame(f); }; slide = requestAnimationFrame(f); }).observe(root, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+  }
+
+  // On a phone the header steps aside while the reader reads on down the page (more than 8px at a time), and comes back at
+  // the first move up, at the top of the page, while the menu is open, for a jump to a place and when focus comes into it
+  // (site.css: html.hdr-off, and --hdr for what stands under it).
+  let steady = () => {};
+  if (header) {
+    // (with motion reduced or paused the header stays put: a bar that blinks out and back at every turn of the scroll
+    // would be a jump of its own)
+    const narrow = matchMedia('(max-width:820px)'), calm = matchMedia('(prefers-reduced-motion: reduce)');
+    let lastY = scrollY, down = 0, hold = 0, hraf = 0;
+    const off = (o) => { if (root.classList.contains('hdr-off') !== o) root.classList.toggle('hdr-off', o); };
+    steady = () => { off(false); down = 0; hold = performance.now() + 1500; addEventListener('scrollend', () => { hold = performance.now() + 120; }, { once: true }); };
+    const step = () => {
+      hraf = 0;
+      const y = Math.max(0, scrollY), d = y - lastY; lastY = y;
+      if (!narrow.matches || calm.matches || root.dataset.motion === 'off' || root.classList.contains('menu-open') || y <= header.offsetHeight || header.querySelector(':focus-visible') || d < 0) { down = 0; off(false); return; }
+      if (performance.now() < hold) { down = 0; return; }
+      down += d; if (down > 8) off(true);
+    };
+    addEventListener('scroll', () => { if (!hraf) hraf = requestAnimationFrame(step); }, { passive: true });
+    header.addEventListener('focusin', () => off(false));
+    addEventListener('hashchange', steady); addEventListener('popstate', steady);
+    (narrow.addEventListener ? narrow.addEventListener('change', step) : narrow.addListener(step));
   }
 
   // Motion on or off, remembered per visitor, on top of the system's reduced-motion setting.
@@ -93,6 +129,8 @@
       try {
         if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off');
         kept = true;
+        // and the page comes back where the reader was, not where the address or the browser would put it
+        sessionStorage.setItem('cm-y', JSON.stringify({ p: location.pathname, y: Math.round(scrollY) }));
         // pressed from the keyboard, the focus comes back to the switch after the reload
         if (e.detail === 0) sessionStorage.setItem('cm-focus', 'motion');
       } catch (err) {}
@@ -102,6 +140,15 @@
     });
     try { if (sessionStorage.getItem('cm-focus') === 'motion') { sessionStorage.removeItem('cm-focus'); motionBtn.focus({ preventScroll: true }); } } catch (e) {}
   }
+  // Back from the motion switch's reload, the page stands where the reader left it.
+  try {
+    const k = JSON.parse(sessionStorage.getItem('cm-y') || 'null');
+    sessionStorage.removeItem('cm-y');
+    if (k && k.p === location.pathname && k.y > 0) {
+      const put = () => { steady(); scrollTo({ top: k.y, behavior: 'instant' }); };
+      put(); addEventListener('load', () => { if (Math.abs(scrollY - k.y) > 2) put(); }, { once: true });
+    }
+  } catch (e) {}
   // Paused in the address, the pause goes along to the next page of the site: a link followed from here carries it.
   // So does night or day, when that too could only be kept in the address (?theme=, below).
   const inUrl = () => { const q = new URLSearchParams(location.search), k = []; if (q.get('motion') === 'off') k.push(['motion', 'off']); if (/^(dark|light)$/.test(q.get('theme') || '')) k.push(['theme', q.get('theme')]); return k; };
@@ -120,12 +167,15 @@
   const scheme = matchMedia('(prefers-color-scheme: dark)');
   const night = () => (root.dataset.theme ? root.dataset.theme === 'dark' : scheme.matches);
   const pressed = () => { if (themeBtn) themeBtn.setAttribute('aria-pressed', String(night())); };
-  const changed = () => document.dispatchEvent(new CustomEvent('cm-theme'));
+  const changed = () => { tone(); chrome(onInk); document.dispatchEvent(new CustomEvent('cm-theme')); };
   pressed();
   // Where the browser keeps no site data, the choice rides in the address (?theme=, read by each page's head script),
   // so a reload, the motion switch's reload included, and the next page keep it.
-  if (themeBtn) themeBtn.addEventListener('click', () => {
+  // The turn uncovers the new theme from the header down over the old one held still (site.css, html.theming), the
+  // drawings recoloured inside it, and never the page-to-page fade; with motion reduced or paused it is instant.
+  const flip = () => {
     root.dataset.theme = night() ? 'light' : 'dark';
+    root.classList.add('turned');
     pressed();
     let kept = false;
     try { localStorage.setItem('cm-theme', root.dataset.theme); kept = true; } catch (e) {}
@@ -135,6 +185,16 @@
       if (u.href !== location.href) history.replaceState(history.state, '', u.href);
     } catch (e) {}
     changed();
+  };
+  let turns = 0;
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    // (a second press while the first turn runs cuts it short; only the last turn clears the marks)
+    const me = ++turns, done = () => { if (me === turns) root.classList.remove('theming', 'turned'); };
+    if (stillPage || matchMedia('(prefers-reduced-motion: reduce)').matches) { flip(); done(); return; }
+    root.classList.add('theming');
+    let vt = null;
+    try { if (document.startViewTransition) vt = document.startViewTransition(flip); } catch (e) { vt = null; }
+    if (vt) vt.finished.then(done, done); else { flip(); setTimeout(done, 300); }
   });
   const follow = () => { pressed(); changed(); };
   // (an engine whose media queries take only the older addListener)
@@ -319,7 +379,7 @@
       if (!h.matches('a[href], button, input, select, textarea, summary, [tabindex]')) { h.setAttribute('tabindex', '-1'); h.classList.add('jt'); h.addEventListener('blur', () => { h.removeAttribute('tabindex'); h.classList.remove('jt'); }, { once: true }); }
       h.focus({ preventScroll: true });
     };
-    const go = (behavior) => t.scrollIntoView({ behavior, block: 'start' });
+    const go = (behavior) => { steady(); t.scrollIntoView({ behavior, block: 'start' }); };
     // (the address first, so going back returns to where the reader was)
     if (location.hash !== a.hash) history.pushState(history.state, '', a.hash);
     const far = Math.abs(t.getBoundingClientRect().top - 64) > 1.5 * innerHeight, drawer = !!(nav && nav.classList.contains('open'));
@@ -339,6 +399,40 @@
     };
     v.addEventListener('transitionend', turn, { once: true }); setTimeout(turn, 300);
   }, true);
+
+  // A button fills from the left: a copy of its label in the fill's colours, hidden from screen readers, that site.css
+  // uncovers over the label (whose own colour never changes).
+  document.querySelectorAll('.btn').forEach((b) => {
+    if (b.querySelector(':scope > .fx')) return;
+    const fx = document.createElement('span'); fx.className = 'fx'; fx.setAttribute('aria-hidden', 'true');
+    b.childNodes.forEach((n) => { if (!(n.nodeType === 1 && n.classList.contains('vh'))) fx.appendChild(n.cloneNode(true)); });
+    b.appendChild(fx);
+  });
+  // A ruled row that leads somewhere takes an arrow at its end, drawn in as the row answers (site.css, .ra).
+  const NS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll('.notes-list a, .ji a').forEach((a) => {
+    const s = document.createElementNS(NS, 'svg'), p = document.createElementNS(NS, 'path');
+    s.setAttribute('class', 'ra'); s.setAttribute('viewBox', '0 0 18 8'); s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+    p.setAttribute('d', 'M0 4H17L13 .5L17 4L13 7.5'); p.setAttribute('pathLength', '1');
+    s.appendChild(p); a.appendChild(s);
+  });
+  // (a touch screen shows a press only where the page listens for touches)
+  document.addEventListener('touchstart', () => {}, { passive: true });
+  // A touch answers at once and lets go. The browser's own :active waits to see whether the finger means to scroll (some
+  // 150 ms) and then holds on after it lifts; here the control the finger lands on is marked .press in the same event, so
+  // it answers in the next frame (site.css), and the mark goes as the finger lifts, slides off into a scroll, or the page
+  // is left. A mouse keeps its hover and :active.
+  const pressable = 'a[href], button, summary, label, [tabindex]:not([tabindex="-1"])';
+  let held = null;
+  const letGo = () => { if (held) { held.classList.remove('press'); held = null; } };
+  document.addEventListener('pointerdown', (e) => {
+    letGo();
+    if (e.pointerType === 'mouse' || !e.isPrimary) return;
+    const el = e.target.closest && e.target.closest(pressable);
+    if (el && !el.disabled) { held = el; el.classList.add('press'); }
+  }, { capture: true, passive: true });
+  ['pointerup', 'pointercancel', 'dragstart'].forEach((t) => document.addEventListener(t, letGo, { capture: true, passive: true }));
+  addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
 
   // Drawings that draw themselves once they arrive.
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });

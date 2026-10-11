@@ -60,14 +60,15 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
   --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC; --sold-line:#B8976A; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
-  --band:#0B0C0E; --band-rule:#2A2D31; color-scheme:dark}}
+  --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
   --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC; --sold-line:#B8976A; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
-  --band:#0B0C0E; --band-rule:#2A2D31; color-scheme:dark}
+  --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:64px;scrollbar-color:var(--rule) transparent;scrollbar-width:thin;-webkit-text-size-adjust:100%}
+:root{--hdr:64px}
+html{scroll-behavior:smooth;scroll-padding-top:var(--hdr);scrollbar-color:var(--rule) transparent;scrollbar-width:thin;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-weight:400;font-size:18px;line-height:1.7;-webkit-font-smoothing:antialiased;caret-color:var(--accent)}
 ::selection{background:var(--bronze);color:var(--ink)}
 /* Vellum: a faint grain over every ground, so nothing reads as flat screen color */
@@ -79,13 +80,18 @@ body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;ba
 .cv-say,.rp-lede,.rp-next li,.rp-table td,.letter .sheet,.letter .fallback textarea{font-variant-numeric:lining-nums}
 /* Links draw their underline: it slips away to the right and returns from the left */
 .ul,.more,.handle,.tb a,.legal a,.prose a,.crumbs a{text-decoration:none;background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/100% 1px}
+/* two lines hand over: the one standing slips away to the right while a second draws in from the left, 140 ms behind it,
+   so the line never empties; wherever the pointer leaves, the two simply turn back, and the line stands whole again */
+@property --ul-a{syntax:'<length-percentage>';inherits:false;initial-value:100%}
+@property --ul-b{syntax:'<length-percentage>';inherits:false;initial-value:0%}
+.ul,.more,.handle,.prose a,.crumbs a,.sp-go{--ul-a:100%;--ul-b:0%;background:linear-gradient(currentColor,currentColor) no-repeat 100% 100%/var(--ul-a) 1px,linear-gradient(currentColor,currentColor) no-repeat 0 100%/var(--ul-b) 1px;transition:--ul-a 240ms var(--ease-out),--ul-b 300ms var(--ease-out),color var(--t-ui)}
+@media (hover:hover) and (pointer:fine){:is(.ul,.more,.handle,.prose a,.crumbs a):hover,.spec:hover .sp-go{--ul-a:0%;--ul-b:100%;transition:--ul-a var(--t-ui) cubic-bezier(.4,0,.2,1),--ul-b 260ms var(--ease-out) 140ms,color var(--t-ui)}}
 /* the title block's links draw theirs in, and take it away again, the same way under the pointer and under keyboard focus */
 .tb a,.legal a{background-size:0 1px;transition:background-size .5s var(--ease),color .2s}
-.ul:hover,.more:hover,.handle:hover,.prose a:hover,.crumbs a:hover{animation:ul .7s var(--ease)}
-.tb a:is(:hover,:focus-visible),.legal a:is(:hover,:focus-visible){background-size:100% 1px;color:var(--fg)}
+.tb a:focus-visible,.legal a:focus-visible{background-size:100% 1px;color:var(--fg)}
+@media (hover:hover) and (pointer:fine){.tb a:hover,.legal a:hover{background-size:100% 1px;color:var(--fg)}}
 /* on the dense legal line a closer ring keeps clear of the separators beside it */
 .legal a:focus-visible{outline-offset:3px}
-@keyframes ul{0%{background-size:100% 1px;background-position:100% 100%}45%{background-size:0 1px;background-position:100% 100%}46%{background-size:0 1px;background-position:0 100%}100%{background-size:100% 1px;background-position:0 100%}}
 ::-webkit-scrollbar{width:10px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--rule);border:2px solid var(--bg)}
@@ -105,6 +111,16 @@ p{margin:0;text-wrap:pretty}
 
 /* Header */
 header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}
+/* On a phone the header steps aside while the reader reads on down the page (site.js marks html.hdr-off) and comes back at
+   the first move up; the sticky drawings under it and the scroll padding rise with it, through --hdr */
+@media (max-width:820px){
+  html.js header.site{transition:translate 300ms var(--ease-out)}
+  html.hdr-off{--hdr:0px}
+  html.hdr-off header.site{translate:0 -100%}
+  .rise .elev{transition:top 300ms var(--ease-out)}
+  /* (a journal note's reading line, which hangs from the header's foot, rises with it) */
+  html .progress{top:var(--hdr);transition:top 300ms var(--ease-out),opacity .4s var(--ease)}
+}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px}
 /* The lockup: the massif stands 1.7 caps tall on the wordmark's baseline, half a cap away.
    The eye lines the wordmark up with the nav, not the massif, so the lockup is lifted until the wordmark's
@@ -117,73 +133,105 @@ header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:
 .mark svg{width:auto;flex:none;overflow:visible}
 .mark .sym{height:var(--sym);color:var(--seal)}
 .mark .wm{height:var(--wm)}
-nav.main{display:flex;gap:clamp(14px,1.5vw,22px)}
+nav.main{display:flex;gap:clamp(18px,2.1vw,30px)}
 nav.main a{white-space:nowrap;font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding-block:6px;border-bottom:1px solid transparent;transition:color var(--t-ui),border-color var(--t-ui)}
-nav.main a:is(:hover,:focus-visible),nav.main a[aria-current="true"]{color:var(--fg);border-color:var(--accent)}
+nav.main a:focus-visible,nav.main a[aria-current="true"]{color:var(--fg)}
+@media (hover:hover) and (pointer:fine){nav.main a:hover{color:var(--fg)}}
 /* wide enough for Close, with its tracking, so the label swap never shifts the day/night button */
-.menu-btn{display:none;min-width:86px;text-align:center;background:none;border:1px solid var(--rule);color:var(--fg);font:inherit;font-size:13px;letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:border-color var(--t-ui) var(--ease-out)}
-/* The inline nav needs about 1170px; below that the sections fold into the menu (site.js closes the menu at the same 1180px) */
-/* 73.75em is 1180px at the default text size, so a larger browser text size folds them too */
-@media (max-width:1180px),(max-width:73.75em){
+.menu-btn{display:none;min-width:86px;text-align:center;background:none;border:1px solid var(--rule);color:var(--fg);font:inherit;font-size:13px;letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:border-color var(--t-ui) var(--ease-out),background-color var(--t-ui) var(--ease-out)}
+@property --dp{syntax:'<number>';inherits:false;initial-value:0}
+/* The inline nav (five sections; What we do and Advisors wait in the drawer) needs about 960px; from 1024px it stands in the bar, and
+   below that the sections fold into the menu (site.js closes the menu at the same 1023px) */
+/* 63.9375em is 1023px at the default text size, so a larger browser text size folds them too */
+@media (max-width:1023px),(max-width:63.9375em){
   .mark{--cap:.7px}
   .menu-btn{display:block}
   /* the list sits in the middle of the drawer; auto margins, unlike centring, fall back to the top when it is taller than the screen, so every link stays in reach */
   /* its rows take their size from the screen's height as well as its width, so on a tablet held sideways or a short laptop
      all seven stand above the fold, Contact included */
-  nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .6s var(--ease),visibility 0s linear .6s}
+  /* the drawer opens on the sheet's curve with a rule riding its edge, so the page is seen to go under it, and closes
+     in a little over half the time, its rows fading together */
+  nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
   nav.main a:first-child{margin-top:auto}nav.main a:last-child{margin-bottom:auto}
-  nav.main.open{clip-path:inset(0);visibility:visible;transition:clip-path .6s var(--ease)}
-  nav.main a{font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding-block:min(10px,1.2svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .7s var(--ease),color .2s}
-  nav.main.open a{opacity:1;transform:none;transition-delay:calc(var(--k,0) * 45ms + 120ms)}
+  nav.main.open{clip-path:inset(0);visibility:visible;--dp:1;transition:clip-path 420ms var(--ease-drawer),--dp 420ms var(--ease-drawer)}
+  nav.main a{font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding-block:min(10px,1.2svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
+  nav.main.open a{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),color var(--t-ui)}
   nav.main a:nth-child(2){--k:1}nav.main a:nth-child(3){--k:2}nav.main a:nth-child(4){--k:3}nav.main a:nth-child(5){--k:4}nav.main a:nth-child(6){--k:5}nav.main a:nth-child(7){--k:6}
   nav.main a[aria-current="true"]{color:var(--accent)}
 }
 /* phones on their side: a shorter list, and where the screen is wide enough two columns of it, so all seven show at once */
-@media (max-width:1180px) and (max-height:500px),(max-width:73.75em) and (max-height:500px){nav.main{padding-block:12px 28px}nav.main a{font-size:28px;line-height:1.25;padding-block:8px}}
-@media (min-width:540px) and (max-width:1180px) and (max-height:500px),(min-width:540px) and (max-width:73.75em) and (max-height:500px){
+@media (max-width:1023px) and (max-height:500px),(max-width:63.9375em) and (max-height:500px){nav.main{padding-block:12px 28px}nav.main a{font-size:28px;line-height:1.25;padding-block:8px}}
+@media (min-width:540px) and (max-width:1023px) and (max-height:500px),(min-width:540px) and (max-width:63.9375em) and (max-height:500px){
   nav.main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,auto);grid-auto-flow:column;column-gap:clamp(28px,5vw,64px);align-content:center;align-content:safe center}
   nav.main a:first-child,nav.main a:last-child{margin-block:0}
   nav.main.open a:nth-child(5){border-top:1px solid var(--rule)}
 }
 /* Text enlarged on its own (a text-only zoom) widens the nav but not the screen. The header is a query container measured
-   in its own text size, so past 64.5em (1161px at the 18px body size, which a 1181px window keeps even with a classic
+   in its own text size, so past 55.5em (999px at the 18px body size, which a 1024px window keeps even with a classic
    scrollbar) the nav folds into the drawer exactly as it does on a narrow screen, and the day/night and motion switches
    stay in reach. (The media queries stay for older browsers.) */
 header.site{container:site/inline-size;max-width:100vw}
 /* (it only has work to do on a screen wider than that, where the media queries above have not already folded the nav,
    and it outranks the inline nav's own rules there) */
-@media (min-width:1181px){@container site (max-width:64.5em){
+@media (min-width:1024px){@container site (max-width:55.5em){
   header.site .mark{--cap:.7px}
   header.site .menu-btn{display:block}
-  header.site nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .6s var(--ease),visibility 0s linear .6s}
+  header.site nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;margin:0;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
   header.site nav.main a:first-child{margin-top:auto}header.site nav.main a:last-child{margin-bottom:auto}
-  header.site nav.main.open{clip-path:inset(0);visibility:visible;transition:clip-path .6s var(--ease)}
-  header.site nav.main a{font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding:min(10px,1.2svh) 0;margin-left:0;border-bottom:1px solid var(--rule);opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .7s var(--ease),color .2s}
-  header.site nav.main.open a{opacity:1;transform:none;transition-delay:calc(var(--k,0) * 45ms + 120ms)}
+  header.site nav.main.open{clip-path:inset(0);visibility:visible;--dp:1;transition:clip-path 420ms var(--ease-drawer),--dp 420ms var(--ease-drawer)}
+  header.site nav.main a{font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding:min(10px,1.2svh) 0;margin-left:0;border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
+  header.site nav.main.open a{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),color var(--t-ui)}
   header.site nav.main a:nth-child(2){--k:1}header.site nav.main a:nth-child(3){--k:2}header.site nav.main a:nth-child(4){--k:3}header.site nav.main a:nth-child(5){--k:4}header.site nav.main a:nth-child(6){--k:5}header.site nav.main a:nth-child(7){--k:6}
   header.site nav.main.open a:first-child{border-top:1px solid var(--rule)}
   header.site nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}
-  html.js header.site.over nav.main{background:rgb(var(--hero-rgb))}
+  header.site nav.main a.dw{display:block}header.site nav.main a[aria-current]::after{content:none}
+  html.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}
   html.js header.site.over nav.main a,html.js header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8;border-color:rgba(244,240,232,.14)}
   html.js header.site.over nav.main a[aria-current]{color:#C9A877}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
-/* the underline under a nav word overhangs both ends by the same tracking, rather than only the right */
-@media (min-width:1181px){nav.main a{padding-left:.14em;margin-left:-.14em}}
+/* the mark under a nav word overhangs both ends by the same tracking, rather than only the right */
+@media (min-width:1024px){nav.main a{padding-left:.14em;margin-left:-.14em}}
+/* In the bar: the lockup alone on the left, the five sections and the two switches together on the right. The section the
+   reader is in carries a dimension line (1px bronze between 5px ticks) that stands still; a hover changes colour only. */
+@media (min-width:1024px){
+  nav.main{margin-left:auto;margin-right:clamp(10px,1.6vw,26px)}
+  nav.main a{position:relative}
+  /* each a 44px target, whatever points at it */
+  nav.main a::before{content:"";position:absolute;left:0;right:0;top:50%;height:44px;translate:0 -50%}
+  nav.main a.dw{display:none}
+  nav.main a[aria-current]::after{content:"";--dim:var(--accent);position:absolute;left:0;right:0;bottom:-2px;height:5px;background:linear-gradient(var(--dim),var(--dim)) 0 50%/100% 1px no-repeat,linear-gradient(var(--dim),var(--dim)) 0 0/1px 100% no-repeat,linear-gradient(var(--dim),var(--dim)) 100% 0/1px 100% no-repeat}
+}
 
 /* Buttons: one label per intent */
-.btn{--fill:var(--fg);--on:var(--bg);display:inline-flex;align-items:center;gap:14px;font-family:var(--body);font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;text-decoration:none;padding:17px 26px;border:1px solid var(--fg);color:var(--fg);background:linear-gradient(var(--fill),var(--fill)) no-repeat 0 0/0 100%;cursor:pointer;transition:background-size .55s var(--ease),color .35s var(--ease),border-color .35s var(--ease)}
-/* keyboard focus looks like hover: the fill slides in under the label, and the focus ring stands outside it */
-.btn:hover,.btn:focus-visible{background-size:100% 100%;color:var(--on)}
+.btn{--fill:var(--fg);--on:var(--bg);position:relative;display:inline-flex;align-items:center;gap:14px;font-family:var(--body);font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;text-decoration:none;padding:17px 26px;border:1px solid var(--fg);color:var(--fg);background:none;cursor:pointer;transition:border-color var(--t-move) var(--ease-out),scale var(--t-press) var(--ease-out)}
+/* The fill is a second copy of the label set in the fill's colours (site.js adds it, hidden from screen readers), uncovered
+   from the left and covered again towards the left. The label beneath never changes colour, so no letter is ever caught
+   half way between ink and ivory. It answers on the curve of things that answer: fast at first, settling at the end
+   (380 ms in, 260 ms out). Keyboard focus takes the fill at once; the focus ring stands outside it. */
+.btn .fx{position:absolute;inset:0;display:inherit;align-items:center;justify-content:inherit;gap:inherit;padding:inherit;background:var(--fill);color:var(--on);clip-path:inset(0 100% 0 0);pointer-events:none;-webkit-user-select:none;user-select:none;transition:clip-path 260ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.btn:hover .fx{clip-path:inset(0);transition-duration:380ms}.btn:active{scale:.98}.btn:active .fx{clip-path:inset(0);transition-duration:var(--t-press)}}
+.btn:focus-visible .fx,.btn:focus-visible svg{clip-path:inset(0);transition:none}
+/* a touch answers in the next frame (site.js marks the press as the finger lands, where the browser's own :active waits
+   to see whether the finger means to scroll): the fill runs across under it in 120 ms and goes as it lifts */
+.btn.press{scale:.98}
+.btn.press .fx{clip-path:inset(0);transition:clip-path var(--t-press) var(--ease-out)}
+/* (without the script there is no copy to uncover: the button simply takes its fill) */
+@media (hover:hover) and (pointer:fine){html .btn:not(:has(> .fx)):hover{background-color:var(--fill);color:var(--on)}}
+html .btn:not(:has(> .fx)):is(:focus-visible,:active){background-color:var(--fill);color:var(--on)}
 .btn.solid{--fill:var(--bg);--on:var(--fg);background-color:var(--fg);color:var(--bg)}
 /* the last letter's tracking hangs inside the label, so a button without an arrow takes it back from its right padding */
 .btn:not(:has(svg)){padding-right:calc(26px - .2em)}
-.btn svg{width:18px;height:8px;transition:transform .3s var(--ease)}
-.btn:hover svg,.btn:focus-visible svg{transform:translateX(4px)}
+.btn svg{width:18px;height:8px;transition:transform 260ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.btn:hover svg{transform:translateX(4px);transition-duration:380ms}}
+.btn:focus-visible svg{transform:translateX(4px)}
+.btn.press svg{transform:translateX(4px);transition-duration:var(--t-press)}
 .band .btn{--fill:var(--bronze);--on:var(--ink);border-color:var(--bronze);color:var(--band-fg)}
 .row{display:flex;flex-wrap:wrap;gap:14px}
-.more{display:inline-block;font-size:16px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-block:12px 3px;margin-top:-9px;justify-self:start;transition:color .2s}
-.more:is(:hover,:focus-visible){color:var(--fg)}
+.more{display:inline-block;font-size:16px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-block:12px 3px;margin-top:-9px;justify-self:start}
+.more:focus-visible,.more.press{color:var(--fg)}
+.more.press{transition:none}
+@media (hover:hover) and (pointer:fine){.more:hover{color:var(--fg)}}
 
 /* Section scaffolding */
 section{padding-block:clamp(80px,10vw,136px)}
@@ -229,19 +277,28 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .js .facade.in .b{animation:facade-b .9s var(--ease) .9s backwards}
 @keyframes facade-b{from{opacity:0}}
 .js .facade:not(.in) .b{opacity:0}
-.practices:has(.pr:nth-of-type(1):is(:hover,:focus-within)) .lt:nth-of-type(1),
-.practices:has(.pr:nth-of-type(2):is(:hover,:focus-within)) .lt:nth-of-type(2),
-.practices:has(.pr:nth-of-type(3):is(:hover,:focus-within)) .lt:nth-of-type(3){opacity:.14}
-.practices:has(.pr:nth-of-type(1):is(:hover,:focus-within)) g:nth-of-type(1) .b,
-.practices:has(.pr:nth-of-type(2):is(:hover,:focus-within)) g:nth-of-type(2) .b,
-.practices:has(.pr:nth-of-type(3):is(:hover,:focus-within)) g:nth-of-type(3) .b{opacity:1}
+.practices:has(.pr:nth-of-type(1):focus-within) .lt:nth-of-type(1),
+.practices:has(.pr:nth-of-type(2):focus-within) .lt:nth-of-type(2),
+.practices:has(.pr:nth-of-type(3):focus-within) .lt:nth-of-type(3){opacity:.14}
+.practices:has(.pr:nth-of-type(1):focus-within) g:nth-of-type(1) .b,
+.practices:has(.pr:nth-of-type(2):focus-within) g:nth-of-type(2) .b,
+.practices:has(.pr:nth-of-type(3):focus-within) g:nth-of-type(3) .b{opacity:1}
+@media (hover:hover) and (pointer:fine){
+.practices:has(.pr:nth-of-type(1):hover) .lt:nth-of-type(1),
+.practices:has(.pr:nth-of-type(2):hover) .lt:nth-of-type(2),
+.practices:has(.pr:nth-of-type(3):hover) .lt:nth-of-type(3){opacity:.14}
+.practices:has(.pr:nth-of-type(1):hover) g:nth-of-type(1) .b,
+.practices:has(.pr:nth-of-type(2):hover) g:nth-of-type(2) .b,
+.practices:has(.pr:nth-of-type(3):hover) g:nth-of-type(3) .b{opacity:1}
+}
 @media (prefers-reduced-motion:reduce){.js .facade path{stroke-dashoffset:0;transition:none}.js .facade .b,.js .facade:not(.in) .b,.js .facade.in .b{opacity:.45;animation:none}}
 :root[data-motion="off"] .facade path{stroke-dashoffset:0;transition:none}
 :root[data-motion="off"] .facade:not(.in) .b{opacity:.45}
 .pr{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:clamp(28px,3vw,40px) clamp(16px,2.4vw,36px) 0}
 .pr > *{min-width:0;max-width:100%}
 .pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
-.pr:is(:hover,:focus-within)::after{transform:none}
+.pr:focus-within::after{transform:none}
+@media (hover:hover) and (pointer:fine){.pr:hover::after{transform:none}}
 .pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
 .pr h3{font-size:var(--t-head)}
 .pr p{color:var(--muted);margin-top:14px}
@@ -324,11 +381,18 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
    full ink under a ghost numeral, and two steps never compete in one window. The words stand back to the faint tone, which
    still reads at AA. (On phones the steps pass one at a time under the drawing and keep their ink.) */
 @media screen and (min-width:821px) and (forced-colors:none){
-  html.js .step :is(h3,p,li,.more){transition:color .6s var(--ease-out)}
+  html.js .step :is(h3,p,li){transition:color .6s var(--ease-out)}
+  /* (the link's underline keeps its hand-over beside the step's change of tone) */
+  html.js .step .more{transition:--ul-a 240ms var(--ease-out),--ul-b 300ms var(--ease-out),color .6s var(--ease-out)}
   html.js .step:not(.on) :is(h3,p,li,.more){color:var(--faint)}
-  html.js .step:not(.on) .more:is(:hover,:focus-visible){color:var(--fg)}
+  html.js .step:not(.on) .more:is(:focus-visible,.press){color:var(--fg)}
   /* (a link still answers the pointer at its own pace) */
-  html.js .step .more:is(:hover,:focus-visible){transition-duration:.2s}
+  html.js .step .more:focus-visible{transition:color .2s}
+  html.js .step .more.press{transition:none}
+  @media (hover:hover) and (pointer:fine){
+    html.js .step:not(.on) .more:hover{color:var(--fg)}
+    html.js .step .more:hover{transition:--ul-a var(--t-ui) cubic-bezier(.4,0,.2,1),--ul-b 260ms var(--ease-out) 140ms,color .2s}
+  }
 }
 /* the numerals are ornament: the list already gives the order, so a screen reader passes over them */
 .step h3::before{content:counter(st,decimal-leading-zero) / ""}
@@ -337,7 +401,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step li{padding:12px 0;border-bottom:1px solid var(--rule)}
 @media (max-width:820px){
   .rise{--bleed:0px;grid-template-columns:1fr;gap:0}
-  .elev{top:64px;height:42svh;z-index:2;padding:8px var(--gutter);margin-inline:calc(var(--gutter) * -1);background:var(--bg);gap:6px}
+  .elev{top:var(--hdr);height:42svh;z-index:2;padding:8px var(--gutter);margin-inline:calc(var(--gutter) * -1);background:var(--bg);gap:6px}
   /* the figure grows by the meter's line and its 13px threshold label, so the tower keeps its size */
   .rise .elev{height:calc(42svh + 26px)}
   .gauge{font-size:13px;justify-content:space-between;padding-bottom:28px}.gauge b{font-size:24px;margin-left:6px}.gauge .meter{bottom:-9px}.gauge .lim small{top:11px;font-size:13px;letter-spacing:.1em}
@@ -398,11 +462,11 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 /* a narrow sheet sets the key in a row beneath the drawing, and its header drops the day */
 @container (max-width:339px){.sp-plan{grid-row:1}.spec .sp-key{grid-column:1 / -1;display:flex;gap:8px 20px;padding-top:14px}.sp-day{display:none}}
 .sp-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 18px;margin:0;font-size:16px;line-height:1.5;color:var(--muted)}
-.sp-go{display:inline-flex;align-items:center;gap:10px;font-weight:500;letter-spacing:.04em;color:var(--accent);background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/100% 1px;padding-bottom:2px;transition:color .2s}
+.sp-go{display:inline-flex;align-items:center;gap:10px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-bottom:2px}
 .sp-go svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
-.spec:is(:hover,:focus-visible) .sp-go{color:var(--fg)}
-.spec:hover .sp-go{animation:ul .7s var(--ease)}
-.spec:is(:hover,:focus-visible) .sp-go svg{transform:translateX(4px)}
+.spec:focus-visible .sp-go{color:var(--fg)}
+.spec:focus-visible .sp-go svg{transform:translateX(4px)}
+@media (hover:hover) and (pointer:fine){.spec:hover .sp-go{color:var(--fg)}.spec:hover .sp-go svg{transform:translateX(4px)}}
 /* it arrives as a sheet is filled in: the floors from the first level up, 40ms apart, then the contracts in bronze */
 .js .spec:not(.in) .sp-plan g,.js .spec:not(.in) .sp-pace{opacity:0}
 .js .spec:not(.in) .sp-plan .sold{fill-opacity:0}
@@ -430,7 +494,6 @@ section.band + section,section + section.band{border-top:0}
 .door .row{margin-top:34px}
 /* the offer's call is solid on the ink, as the hero's is; the Instagram message stays the outlined second */
 .band .btn.solid{--fill:var(--band);--on:#F4F0E8;background-color:#F4F0E8;color:#14161A;border-color:#F4F0E8}
-.band .btn.solid:hover,.band .btn.solid:focus-visible{color:#F4F0E8}
 .door .note{margin-top:18px;font-size:16px;line-height:1.5;color:var(--band-muted)}
 .door .note + .more{margin-top:12px}
 /* The doorway: two leaves hinged at the jambs open into a lit room (--o, 0 to 1). Once a third of the door is in view
@@ -533,7 +596,8 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .feature .txt{display:grid;gap:18px;align-content:start}
 .feature h3{font-size:var(--t-head);font-weight:300;letter-spacing:-.015em;line-height:1.02}
 .feature h3 a{text-decoration:none;background:linear-gradient(currentColor,currentColor) no-repeat 0 96%/0 1px;transition:background-size .7s var(--ease)}
-.feature h3 a:is(:hover,:focus-visible){background-size:100% 1px}
+.feature h3 a:focus-visible{background-size:100% 1px}
+@media (hover:hover) and (pointer:fine){.feature h3 a:hover{background-size:100% 1px}}
 .feature p{color:var(--muted)}
 .nw{white-space:nowrap}
 /* Words held together in a heading still give way when the text is spaced out or enlarged past its line (WCAG text spacing,
@@ -727,7 +791,8 @@ html:not(.js) .seam{display:none}
 .reach .intro{grid-area:intro;max-width:32em}
 .handle{grid-area:handle;justify-self:end;display:inline-flex;align-items:center;gap:.28em;font-family:var(--display);font-weight:300;font-size:clamp(34px,3.6vw,56px);line-height:1.1;letter-spacing:-.02em;color:var(--fg);padding-bottom:6px}
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
-.handle:hover svg{transform:translateX(.12em)}
+.handle:focus-visible svg{transform:translateX(.12em)}
+@media (hover:hover) and (pointer:fine){.handle:hover svg{transform:translateX(.12em)}}
 @media (max-width:820px){.reach{grid-template-columns:1fr;grid-template-areas:"intro" "handle"}.handle{justify-self:start}}
 .who{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--fg)}
 .who div{padding:24px 28px 26px 0;display:grid;gap:8px;align-content:start}
@@ -761,9 +826,16 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 
 /* Theme toggle */
 .tools{display:flex;align-items:center;gap:12px}
-.theme,.motion{width:38px;height:38px;display:grid;place-items:center;background:none;border:1px solid var(--rule);color:inherit;cursor:pointer;padding:0;transition:border-color var(--t-ui) var(--ease-out)}
-.theme:hover,.motion:hover{border-color:var(--accent)}
-.theme svg,.motion svg{width:16px;height:16px}
+/* Pause and Night are two glyphs, each in a 44px target, parted by a short rule; each gives its name to a screen reader and
+   to the pointer (its tooltip) */
+.theme,.motion{width:44px;height:44px;display:grid;place-items:center;background:none;border:0;color:var(--muted);cursor:pointer;padding:0;transition:color var(--t-ui) var(--ease-out)}
+.theme:focus-visible,.motion:focus-visible{color:var(--fg);outline-offset:-6px}
+@media (hover:hover) and (pointer:fine){.theme:hover,.motion:hover{color:var(--fg)}}
+.theme svg,.motion svg{grid-area:1/1;width:18px;height:18px}
+.theme svg *,.motion svg *{vector-effect:non-scaling-stroke}
+.motion ~ .theme{position:relative;margin-left:-12px}
+.motion ~ .theme::before{content:"";position:absolute;left:-.5px;top:14px;width:1px;height:16px;background:var(--rule)}
+@media (max-width:520px){.motion ~ .theme{margin-left:0}.motion ~ .theme::before{content:none}}
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 /* Motion switched off on this site: everything arrives in its final state, and anchors jump rather than glide */
 :root[data-motion="off"]{scroll-behavior:auto}
@@ -779,20 +851,23 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 body.home header.site{position:fixed;left:0;right:0}
 .js header.site.over{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14);color:#F4F0E8}
 .js header.site.over nav.main a{color:rgba(244,240,232,.78)}
-.js header.site.over nav.main a:is(:hover,:focus-visible){color:#F4F0E8}
+.js header.site.over nav.main a:focus-visible{color:#F4F0E8}
+@media (hover:hover) and (pointer:fine){.js header.site.over nav.main a:hover{color:#F4F0E8}}
 .js header.site.over .mark .sym{color:#C9A877}
-.js header.site.over .menu-btn,.js header.site.over .theme,.js header.site.over .motion{border-color:rgba(244,240,232,.28);color:#F4F0E8}
+.js header.site.over .menu-btn{border-color:rgba(244,240,232,.28);color:#F4F0E8}
+.js header.site.over :is(.theme,.motion){color:rgba(244,240,232,.78)}.js header.site.over :is(.theme,.motion):focus-visible{color:#F4F0E8}
+.js header.site.over .motion ~ .theme::before{background:rgba(244,240,232,.28)}
 /* over the ink, the header's hover marks take the night bronze, which reads on ink in both themes */
-@media (hover:hover){.menu-btn:hover{border-color:var(--accent)}.js header.site.over :is(.menu-btn,.theme,.motion):hover{border-color:#C9A877}}
-@media (min-width:1181px){.js header.site.over nav.main a:is(:hover,:focus-visible){border-color:#C9A877}.js header.site.over nav.main a[aria-current]{color:#F4F0E8;border-color:#C9A877}}
-@media (max-width:1180px){.js header.site.over nav.main{background:rgb(var(--hero-rgb))}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
+@media (hover:hover) and (pointer:fine){.menu-btn:hover{border-color:var(--accent)}.js header.site.over .menu-btn:hover{border-color:#C9A877}.js header.site.over :is(.theme,.motion):hover{color:#F4F0E8}}
+@media (min-width:1024px){.js header.site.over nav.main a[aria-current]{color:#F4F0E8}.js header.site.over nav.main a[aria-current]::after{--dim:#C9A877}}
+@media (max-width:1023px){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
 /* while the open menu holds the page still, the scrollbar's lane is kept, so the header's buttons never step sideways under
    the pointer; site.js marks .sb only when a scrollbar was taking room as the menu opened, so a page that fits its window
    gains no lane either */
 html.menu-open{overflow:hidden}
 html.menu-open.sb{scrollbar-gutter:stable}
 /* the same drawer colours when larger text folds the nav at a wider screen */
-@media (max-width:73.75em){.js header.site.over nav.main{background:rgb(var(--hero-rgb))}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
+@media (max-width:63.9375em){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
 /* At the very top of the home page the header is clear over the hero's drawing; once the page moves it takes the ink, so nothing scrolls through it. */
 .js body.home header.site.over.top{background:transparent}
 /* In step with the page (site.js marks .lk and writes --ka and --kb each frame): the bar keeps the sheet's ground, and the
@@ -804,7 +879,7 @@ html.menu-open.sb{scrollbar-gutter:stable}
 header.site.lk::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgb(var(--hero-rgb));clip-path:inset(var(--ka,0px) 0 calc(100% - var(--kb,0px)) 0)}
 .js body.home header.site.lk.top{background:transparent}.js body.home header.site.lk.top::before{visibility:hidden}
 header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!important}
-@media (min-width:1181px){header.site.swap nav.main a{transition:none!important}}
+@media (min-width:1024px){header.site.swap nav.main a{transition:none!important}}
 @media (forced-colors:active){header.site.lk::before{display:none}}
 
 /* Hero: the model */
@@ -840,7 +915,8 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 .hero .lede{font-size:clamp(18px,1.5vw,21px);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .row{margin-top:clamp(28px,4vw,44px)}
 .hero .btn{--fill:#F4F0E8;--on:#14161A;border-color:rgba(244,240,232,.6);color:#F4F0E8}
-.hero .btn:hover,.hero .btn:focus-visible{border-color:#F4F0E8}
+.hero .btn:focus-visible{border-color:#F4F0E8}
+@media (hover:hover) and (pointer:fine){.hero .btn:hover{border-color:#F4F0E8}}
 .hero .btn.solid{--fill:rgb(var(--hero-rgb));--on:#F4F0E8;background-color:#F4F0E8;color:#14161A;border-color:#F4F0E8}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,240,232,.62);font-variant-numeric:tabular-nums}
 .hero .coords b{font-weight:500;color:#C9A877}
@@ -957,10 +1033,8 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 /* picked from the list, the launch stands out from the survey's linework */
 .chart .sv .ctx{transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .sv .ctx{opacity:.35}
+/* a row answers in ink: it holds its ink while the other markets stand back on the map and in the list (below) */
 .lv{transition:color .3s}
-.lv h3{transition:color .3s,transform .5s var(--ease)}
-@media (hover:hover){.lv:hover h3{color:var(--accent);transform:translateX(6px)}}
-.chart .lv:focus-visible h3{color:var(--accent);transform:translateX(6px)}
 .chart .grid line{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
 .chart .gl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.12em}
 /* routes: planned in hidden dashes, later in dots; each draws out through a mask of its own */
@@ -1138,11 +1212,18 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .next{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:center;max-width:638px;min-height:96px;margin-top:clamp(44px,5vw,60px);padding:20px 0 22px;border-top:1px solid var(--fg);border-bottom:1px solid var(--rule);color:var(--fg);text-decoration:none}
 .next > span{grid-column:1}
 .next-k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.next-t{margin-top:4px;font-family:var(--display);font-size:30px;line-height:1.15;text-wrap:balance;transition:color .3s}
+.next-t{margin-top:4px;font-family:var(--display);font-size:30px;line-height:1.15;text-wrap:balance}
 .next-d{margin-top:10px;font-size:13px;font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
 .next > svg{grid-column:2;grid-row:1 / span 3;width:28px;height:12px;color:var(--accent);transition:transform .6s var(--ease)}
-.next:is(:hover,:focus-visible) .next-t{color:var(--accent)}
-.next:is(:hover,:focus-visible) > svg{transform:translateX(6px)}
+/* it answers as a ruled row does, in ink: its foot rule takes the ink from the left as its arrow steps on, and the title
+   keeps its colour */
+.next{position:relative}
+.next::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left;transition:transform 210ms var(--ease-out)}
+.next:focus-visible::after{transform:none;transition-duration:300ms}
+.next:focus-visible > svg{transform:translateX(6px)}
+.next.press::after{transform:none;transition-duration:var(--t-press)}
+.next.press > svg{transform:translateX(6px);transition-duration:var(--t-press)}
+@media (hover:hover) and (pointer:fine){.next:hover::after{transform:none;transition-duration:300ms}.next:hover > svg{transform:translateX(6px)}}
 .next + .row{margin-top:40px}
 /* the end mark: the ruler's crack, small, after a note's last word */
 .end{display:inline-block;width:9px;height:14px;margin-left:.12em;vertical-align:-1px;fill:none;stroke:var(--sold-line);stroke-width:1.2}
@@ -1231,8 +1312,6 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{transition-duration:0s!important;transition-delay:0s!important}
-  /* the link underline stays drawn under the pointer instead of slipping away and back */
-  .ul:hover,.more:hover,.handle:hover,.prose a:hover,.crumbs a:hover{animation:none}
 }
 
 /* Phone: every control is at least 44px to the touch */
@@ -1265,7 +1344,7 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){
   .rise{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:32px}
   .rise{--bleed:0px}
-  .rise .elev{position:sticky;top:72px;height:calc(100svh - 88px);margin-inline:0;padding-block:8px}
+  .rise .elev{position:sticky;top:calc(var(--hdr) + 8px);height:calc(100svh - 88px);margin-inline:0;padding-block:8px}
   /* a compact gauge, so the short figure keeps its tower: the meter and its threshold tick stay, the label goes */
   .gauge{padding-bottom:12px}.gauge b{font-size:24px}.gauge em{margin-bottom:2px}.gauge .meter{bottom:-7px}.gauge .lim small{display:none}
   .rise .elev::after{display:none}
@@ -1298,11 +1377,6 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 }
 
 /* Audit 4 */
-.btn:hover,.btn:focus-visible{color:var(--on)}
-.hero .btn:hover,.hero .btn:focus-visible{color:#14161A}
-.hero .btn.solid:hover,.hero .btn.solid:focus-visible{color:#F4F0E8}
-.btn.solid:hover,.btn.solid:focus-visible{color:var(--fg)}
-.band .btn:hover,.band .btn:focus-visible{color:var(--ink)}
 .hero :focus-visible,.band :focus-visible,header.site.over :focus-visible{outline-color:#C9A877}
 @media (max-width:1180px) and (min-width:821px) and (min-height:501px),(min-width:1041px) and (max-width:1180px){.hero .lede{max-width:21.6em}}
 @media (max-width:820px){.pr p,.feature p,.begin ol > li > span:not(.seq){max-width:52ch}}
@@ -1316,7 +1390,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 @media (max-width:520px) and (max-height:700px) and (orientation:portrait){:root{--t-hero:clamp(40px,11.2vw,44px)}.hero .lede{line-height:1.45;margin-top:14px}.hero .row{margin-top:16px}}
 /* the meta rules end where the prose does (29em of the 22px reading face; the meta itself is set at 13px) */
 .page .meta{max-width:638px}
-@media (max-width:1180px),(max-width:73.75em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
+@media (max-width:1023px),(max-width:63.9375em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
 :root[data-theme="dark"] .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}}
 
@@ -1409,7 +1483,20 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .letter .as input{position:absolute;opacity:0;width:1px;height:1px}
 .letter .as label:has(input:checked){color:var(--fg);border-color:var(--accent)}
 .letter .as label:has(input:focus-visible){outline:1px solid var(--accent);outline-offset:4px}
-.letter .as label:hover{color:var(--fg)}
+/* Choosing a voice, the letter rewrites itself softly (instrument.js): the chosen label's dimension line (1px bronze between
+   5px ticks) travels to it, the old paragraph goes, the sheet takes the new one's height and the new one settles in.
+   Without the script, the label's own rule marks the choice and the paragraphs simply change. */
+.letter .as{position:relative}
+.letter .as .dim{position:absolute;left:0;top:0;width:var(--dw,0px);height:5px;transform:translate(var(--dx,0px),var(--dy,0px));pointer-events:none;background:linear-gradient(var(--accent),var(--accent)) 0 50%/100% 1px no-repeat,linear-gradient(var(--accent),var(--accent)) 0 0/1px 100% no-repeat,linear-gradient(var(--accent),var(--accent)) 100% 0/1px 100% no-repeat;transition:transform 280ms var(--ease-ink),width 280ms var(--ease-ink)}
+.letter .as .dim.still{transition:none}
+.letter .as.dimmed label:has(input:checked){border-color:transparent}
+.letter .bodies.moving{overflow:hidden;transition:height 240ms var(--ease-out)}
+.letter .body{transition:opacity 220ms var(--ease-out),transform 220ms var(--ease-out)}
+.letter .body.out{opacity:0;transition:opacity 120ms cubic-bezier(.4,0,1,1)}
+.letter .body.pre{opacity:0;transform:translateY(4px);transition:none}
+@supports not selector(:has(*)){.letter .as .dim{display:none}}
+@media (forced-colors:active){.letter .as .dim{display:none}.letter .as.dimmed label:has(input:checked){border-bottom-color:Highlight}}
+@media (hover:hover) and (pointer:fine){.letter .as label:hover{color:var(--fg)}}
 .letter .sheet{padding:clamp(26px,4.5vw,64px);font-family:var(--display);font-size:clamp(22px,2.3vw,30px);line-height:1.75;font-weight:300;color:var(--fg);overflow-wrap:anywhere}
 .letter .sheet p{max-width:34em}
 .letter .salute{margin-bottom:.6em}
@@ -1429,7 +1516,8 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .letter .send .alt{line-height:normal}
 .letter .send .direct{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 0 0 12px;padding-block:12px 3px}
 .letter .send .direct svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
-.letter .send .direct:is(:hover,:focus-visible) svg{transform:translateX(4px)}
+.letter .send .direct:focus-visible svg{transform:translateX(4px)}
+@media (hover:hover) and (pointer:fine){.letter .send .direct:hover svg{transform:translateX(4px)}}
 /* (until the letter is ready its plain link already goes there, so the line waits) */
 .letter:not(.ready) .send .direct{display:none}
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
@@ -1510,8 +1598,23 @@ header.site{view-transition-name:site-header}
 .vt-veil.on.off{opacity:0;transition:opacity 260ms var(--ease-out)}
 /* the heading a jump lands on takes the focus for reading on from it, without a ring round the whole title */
 .jt:focus{outline:none}
+/* Day and night turn over as one sheet laid over the other: the new theme is uncovered from the header down, 360 ms on
+   the ink curve, over the old one held still, so the two are never mixed and no frame passes through grey (site.js: a
+   same-page view transition, with html.theming on while it runs, never the page-to-page fade or its grounds). The whole
+   screen is one picture while it runs, the header in it; nothing tweens beneath it, and the sun or the moon turns in as
+   it arrives. */
+html.theming :is(header.site,.pc-doorway .arch){view-transition-name:none}
+html.theming::view-transition{background:none!important;animation:none!important}
+html.theming::view-transition-group(root){animation:none}
+html.theming::view-transition-image-pair(root){isolation:auto}
+html.theming::view-transition-old(root){animation:none;opacity:1;mix-blend-mode:normal}
+html.theming::view-transition-new(root){animation:th-wipe 360ms var(--ease-ink) both;mix-blend-mode:normal}
+@keyframes th-wipe{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+html.theming *,html.theming *::before,html.theming *::after{transition:none!important}
+html.turned .theme svg{animation:th-icon 200ms var(--ease-out) both}
+@keyframes th-icon{from{opacity:0;rotate:-45deg}}
 /* under the open menu, a far jump has already changed the page: the menu draws up off it on the drawer's curve */
-header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 320ms var(--ease-drawer),visibility 0s linear 320ms}
+header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 320ms var(--ease-drawer),--dp 320ms var(--ease-drawer),visibility 0s linear 320ms}
 /* Headlines rise word by word from behind a mask; the lede under them never waits for them, it stands from the start, on
    every page. Each word's mask reaches well past its ink on every side (an accent's height above, a descender and more
    below, an italic's overhang to either side), so it never cuts a letter at rest, and the word waits far enough below it
@@ -1549,11 +1652,14 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .name .cut{margin-left:-.045em}
 @media (min-width:1600px){:root{--max:1480px}}
 .pr:last-child{border-bottom:0}
-/* Night keeps the day's rhythm: graphite rooms, true-ink bands framed in bronze hairlines, a heavier grain on the ink */
-:root[data-theme="dark"]{--band:#0D0E11;--band-rule:#2C2F34;--hero-rgb:13,14,17}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band:#0D0E11;--band-rule:#2C2F34;--hero-rgb:13,14,17}}
-:root[data-theme="dark"] .band{background:#0D0E11}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{background:#0D0E11}}
+/* Night keeps the day's rhythm: graphite rooms, true-ink bands framed in bronze hairlines, a heavier grain on the ink.
+   The ink is the brand ink taken deeper (#090A0C, the same cool hue as #14161A), so the hero, the private door and the
+   name sit in one temperature with the graphite page (#1B1E23) and still read as rooms, a step down of 1.19:1; the
+   curtain, the header over them, the page change's ground and the browser's bar all share it through --hero-rgb. */
+:root[data-theme="dark"]{--band:#090A0C;--band-rule:#2A2D31;--hero-rgb:9,10,12}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band:#090A0C;--band-rule:#2A2D31;--hero-rgb:9,10,12}}
+:root[data-theme="dark"] .band{background:#090A0C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{background:#090A0C}}
 /* The rule above each intro draws itself as its section arrives (site.js marks the section .in; without the shared
    script it simply stands drawn) */
 .head .intro::before{transform-origin:left}
@@ -1563,7 +1669,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* A practice row is one target: the numeral leans and steps in, and its bay of the facade takes the light */
 .pr .more::after{content:"";position:absolute;inset:0}
 .pr .num{transition:transform .6s var(--ease),font-style 0s}
-.pr:is(:hover,:focus-within) .num{transform:translateX(6px);font-style:italic}
+.pr:focus-within .num{transform:translateX(6px);font-style:italic}
+@media (hover:hover) and (pointer:fine){.pr:hover .num{transform:translateX(6px);font-style:italic}}
 .chart [data-m]{cursor:default}
 .chart[data-hl] .lv:not(:hover){transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .lv:not([data-m="sf"]),.chart[data-hl="ny"] .lv:not([data-m="ny"]),.chart[data-hl="ladal"] .lv:not([data-m="ladal"]),.chart[data-hl="more"] .lv:not([data-m="more"]),.chart[data-hl="intl"] .lv:not([data-m="intl"]){opacity:.4}
@@ -1592,7 +1699,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* a title too long for its cell turns its second line under the title, not under the number */
 .tb .ss a{background:none;padding-left:var(--n);text-indent:calc(var(--n) * -1)}
 .ss .t{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1px;transition:background-size .5s var(--ease)}
-.ss a:is(:hover,:focus-visible) .t,.ss a[aria-current] .t{background-size:100% 1px}
+.ss a:focus-visible .t,.ss a[aria-current] .t{background-size:100% 1px}
+@media (hover:hover) and (pointer:fine){.ss a:hover .t{background-size:100% 1px}}
 .tb .ss a[aria-current]{color:var(--fg)}
 /* where the cell is wide enough for two columns of three, the set takes them */
 .t-ss{container-type:inline-size}
@@ -1753,7 +1861,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 :root[data-theme="dark"] .pc-door{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc-door{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}}
 .pc-door .crumbs,.pc-door .crumbs a{color:var(--band-muted)}
-.pc-door .crumbs a:is(:hover,:focus-visible){color:var(--band-fg)}
+.pc-door .crumbs a:focus-visible{color:var(--band-fg)}
+@media (hover:hover) and (pointer:fine){.pc-door .crumbs a:hover{color:var(--band-fg)}}
 .page.pc .pc-door h1{color:#F4F0E8;font-size:clamp(42px,6vw,88px)}
 .page.pc .pc-door .standfirst{color:#D9D2C5;font-size:var(--t-big,clamp(21px,1.8vw,26px))}
 .pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,6vw,96px);align-items:end}
@@ -1906,7 +2015,6 @@ html.js .pc-nojs{display:none}
 /* each title is the note's heading (an h2, so a screen reader can step from note to note), set as it was before */
 .ji-t{grid-area:t;font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;max-width:none;letter-spacing:normal;transition:transform .6s var(--ease)}
 .ji-s{grid-area:s;margin:10px 0 0;max-width:46ch;font-size:18px;line-height:1.6;color:var(--muted)}
-.ji a:is(:hover,:focus-visible) .ji-t{transform:translateX(8px)}
 .ji .pl{grid-area:p;align-self:start;margin-top:6px}
 @media (max-width:1000px){.ji a{grid-template-columns:3em minmax(0,1fr) 168px}}
 @media (max-width:820px){.ji a{grid-template-columns:3em minmax(0,1fr) 120px}.ji .pl{width:120px;height:69px}}
@@ -1952,7 +2060,8 @@ html.js .pc-nojs{display:none}
 @media (max-width:319px){:is(.ji-t,.next-t) .nw{white-space:normal}}
 .feature .txt .more + .more{margin-left:0}
 .door .more{margin-top:28px;color:#C9A877}
-.door .more:is(:hover,:focus-visible){color:var(--band-fg)}
+.door .more:focus-visible{color:var(--band-fg)}
+@media (hover:hover) and (pointer:fine){.door .more:hover{color:var(--band-fg)}}
 .step .more{padding-top:6px;margin-top:20px;align-self:flex-start}
 /* on phones and tablets the tower rides above the steps in a sticky band: a step reached by a link lands just below it,
    and a link in a step that takes focus is scrolled clear of the band and its fade (header 64, band 42svh + 26, fade 32, ring 12) */
@@ -1970,9 +2079,9 @@ html.js .pc-nojs{display:none}
 .sheet-rp section{padding-block:0}
 section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .pc-steps,.pc-terms{padding-bottom:0}
-nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
+nav.main a[aria-current="page"]{color:var(--fg)}
 /* in the drawer the current row is marked by its bronze words alone, the same on every page; its separator stays a rule */
-@media (max-width:1180px),(max-width:73.75em){nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}}
+@media (max-width:1023px),(max-width:63.9375em){nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}}
 /* the title block marks the sheet you are on: its link stands underlined, in ink */
 .tb a[aria-current="page"]:not(.ss a),.legal a[aria-current="page"]{color:var(--fg);background-size:100% 1px}
 /* The pace chart's labels are set in its 560-unit viewBox, so they shrink with the drawing. Each rule follows the chart's
@@ -1996,13 +2105,24 @@ nav.main a[aria-current="page"]{color:var(--fg);border-color:var(--accent)}
   nav.main a{line-height:max(1.15em,min(1.7em,7svh));padding-block:min(10px,1.2svh)}
 }
 @media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .motion{animation:motion-in .5s var(--ease) .35s backwards}}
+/* and beside the switch, the handle, to write from the menu itself */
+.tools .hd{display:none}
+@media (max-width:520px){
+  html.menu-open .tools .hd{display:inline-flex;align-items:center;gap:.3em;position:fixed;right:var(--gutter);bottom:env(safe-area-inset-bottom);height:52px;z-index:2;font-family:var(--display);font-weight:300;font-size:26px;line-height:1;letter-spacing:-.01em;color:var(--fg);text-decoration:none}
+  html.menu-open .tools .hd svg{width:.6em;height:auto;color:var(--accent);translate:0 .08em}
+  html.menu-open .tools .hd:focus-visible{outline-offset:-2px}
+  .js.menu-open header.site.over .hd{color:#F4F0E8}.js.menu-open header.site.over .hd svg{color:#C9A877}
+}
+@media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .tools .hd{animation:motion-in .5s var(--ease) .35s backwards}}
+@media (max-width:319px){html.menu-open .tools .hd{display:none}}
 @keyframes motion-in{from{opacity:0}}
 /* The practices sheet is laid over the ink: the hero sinks and dims beneath its bronze edge */
 #services{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(184,151,106,.55)}
-/* A jump to the practices lands with the hero's foot just passed above the bar (this gives back the page's 64px scroll
-   padding), so the bar lands on the sheet, not on the hero's last strip; the section's own opening space keeps its
-   heading clear below the bar */
-#services{scroll-margin-top:-64px}
+/* A jump to the practices lands with the hero's foot just passed above the bar (this gives back the page's scroll
+   padding, --hdr: 64px, or nothing while a phone's header has stepped aside), so the bar lands on the sheet, not on the
+   hero's last strip, and the section's top meets the screen's top either way; its own opening space keeps its heading
+   clear below the bar, which comes back for the jump */
+#services{scroll-margin-top:calc(var(--hdr) * -1)}
 .hero>*{translate:0 calc(var(--p,0) * 42vh);opacity:calc(1 - var(--p,0) * .5)}
 
 /* Audit round two */
@@ -2078,7 +2198,9 @@ p,li{text-wrap:pretty}
    the header scrolls away with the page rather than stay pinned over the reading on a phone (on the home page it stands above
    the hero, in the hero's ink where the page script still marks it as over the hero, so the drawing's caption stays clear). */
 :is(html:not(.js),html.nosite body.no-js) :is(.menu-btn,.motion,.theme){display:none}
-@media (max-width:1180px),(max-width:73.75em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
+/* (with no switches beside it, the bar's five sections keep to the right edge, as the full list did) */
+@media (min-width:1024px){:is(html:not(.js),html.nosite body.no-js) nav.main{margin-right:0}}
+@media (max-width:1023px),(max-width:63.9375em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
 /* Print: ink on paper, no chrome */
 @media print{
   /* ink on white, whichever theme the reader was in */
@@ -2148,7 +2270,14 @@ p,li{text-wrap:pretty}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"";width:13px;height:13px;justify-self:end;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
 .faq details[open] summary::after{transform:rotate(45deg)}
-.faq summary:is(:hover,:focus-visible){color:var(--accent)}
+/* a question answers in ink, as the ruled rows do: its foot rule takes the ink from the left (300 ms), and the title
+   keeps its colour */
+.faq details{position:relative}
+.faq details::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left;pointer-events:none;transition:transform 210ms var(--ease-out)}
+.faq details:has(> summary:focus-visible)::after{transform:none;transition-duration:300ms}
+.faq details:has(> summary.press)::after{transform:none;transition-duration:var(--t-press)}
+@media (hover:hover) and (pointer:fine){.faq details:has(> summary:hover)::after{transform:none;transition-duration:300ms}}
+@media (forced-colors:active){.faq details::after,.next::after{background:CanvasText}}
 .faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
 /* the answer's space below is padding, not margin, so it stays inside the panel that opens and closes */
 .faq details p{margin:0;padding-bottom:24px;max-width:58ch;font-size:18px;line-height:1.65;color:var(--muted)}
@@ -2172,7 +2301,44 @@ p,li{text-wrap:pretty}
 .notes-list li{border-bottom:1px solid var(--rule)}
 .notes-list a{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 24px;align-items:baseline;padding:18px 0;text-decoration:none;color:var(--fg)}
 .notes-list .k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25;transition:color .3s}
-.notes-list a:is(:hover,:focus-visible) .t{color:var(--accent)}
+.notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25}
 @media (max-width:600px){.notes-list a{grid-template-columns:1fr}.notes-list .k{order:1}}
+/* Ruled rows answer with their rule: under the pointer or keyboard focus an ink line draws over the row's top rule from
+   the left (300 ms, on the curve of things that answer) and an arrow draws in at the row's end in step with it, done as
+   the rule is (site.js adds it); both go in a little over two thirds of the time. The title keeps its ink. */
+.notes-list a,.ji a{position:relative}
+:is(.notes-list a,.ji a)::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left;transition:transform 210ms var(--ease-out)}
+.ra{width:18px;height:8px;overflow:visible;color:var(--accent);pointer-events:none}
+.notes-list .ra{position:absolute;right:0;top:50%;margin-top:-4px}
+.ji .ra{grid-area:t;justify-self:end;align-self:center}
+.ra path{fill:none;stroke:currentColor;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 140ms var(--ease-out)}
+:is(.notes-list a,.ji a):focus-visible::before{transform:none;transition-duration:300ms}
+:is(.notes-list a,.ji a):focus-visible .ra path{stroke-dashoffset:0;transition:stroke-dashoffset 220ms var(--ease-out) 80ms}
+@media (hover:hover) and (pointer:fine){:is(.notes-list a,.ji a):hover::before{transform:none;transition-duration:300ms}:is(.notes-list a,.ji a):hover .ra path{stroke-dashoffset:0;transition:stroke-dashoffset 220ms var(--ease-out) 80ms}}
+/* A touch answers at once and lets go. The browser's own tap flash is off everywhere (html, above); in its place each
+   control shows its press in the next frame (site.js marks it .press as the finger lands, and clears it as the finger
+   lifts or the page takes the gesture for a scroll): a button fills, a row draws its ink rule and arrow, a link takes
+   the ink, a switch or the menu's box takes an ink edge. Bronze never answers a touch: it stays for what is committed. */
+:is(.notes-list a,.ji a).press::before{transform:none;transition-duration:var(--t-press)}
+:is(.notes-list a,.ji a).press .ra path{stroke-dashoffset:0;transition:stroke-dashoffset var(--t-press) var(--ease-out)}
+.menu-btn.press{border-color:var(--fg);background-color:rgba(20,22,26,.06);background-color:color-mix(in srgb,var(--fg) 7%,transparent);transition:none}
+.js header.site.over .menu-btn.press{border-color:#F4F0E8;background-color:rgba(244,240,232,.1)}
+:is(.theme,.motion) svg{transition:scale var(--t-ui) var(--ease-out)}
+:is(.theme,.motion).press{color:var(--fg);transition:none}
+:is(.theme,.motion).press svg{scale:.86;transition-duration:var(--t-press)}
+.js header.site.over :is(.theme,.motion).press{color:#F4F0E8}
+nav.main a.press{color:var(--fg);transition:none}
+.js header.site.over nav.main a.press{color:#F4F0E8}
+@media (max-width:1023px),(max-width:63.9375em){nav.main a.press{border-color:var(--fg)}.js header.site.over nav.main a.press{border-color:rgba(244,240,232,.6)}}
+.ul.press,.prose a.press,.crumbs a.press,.hd.press,.letter .send .direct.press{color:var(--fg);transition:none}
+.spec.press .sp-go{color:var(--fg);transition:none}
+.spec.press .sp-go svg,.letter .send .direct.press svg{transform:translateX(4px);transition-duration:var(--t-press)}
+.handle.press svg{transform:translateX(.12em);transition-duration:var(--t-press)}
+:is(.tb a,.legal a).press{background-size:100% 1px;color:var(--fg);transition:none}
+.ss a.press .t,.feature h3 a.press{background-size:100% 1px;transition:none}
+.pr:has(.more.press)::after{transform:none;transition-duration:var(--t-press)}
+.letter .as label.press{color:var(--fg);transition:none}
+.door .more.press,.pc-door .crumbs a.press{color:var(--band-fg)}
+.js.menu-open header.site.over .hd.press{color:#F4F0E8}
+@media (forced-colors:active){:is(.notes-list a,.ji a)::before,.motion ~ .theme::before{background:CanvasText}}
 .prose :is(ul,ol) + p{margin-top:1.2em}

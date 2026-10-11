@@ -356,9 +356,54 @@ document.addEventListener('DOMContentLoaded', function () {
     const note = document.getElementById('letterNote');
     const paras = [...form.querySelectorAll('.body')];
     // (a reminder about the blanks of one letter means nothing once another is chosen: it goes, with its marks)
-    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }); } };
+    let mark = () => {};
+    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }); } mark(); };
     let reminding = '';
-    form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', show));
+    // Choosing a voice, the letter rewrites itself softly (site.css): the dimension line under the chosen label travels to
+    // it (280 ms), the old paragraph goes (120 ms), then the sheet takes the new one's height (240 ms) as it settles in
+    // (220 ms). The focus stays on the voice chosen; with motion reduced or paused the change is instant.
+    const as = form.querySelector('fieldset.as'), first = paras[0];
+    let wrap = null, dim = null, placed = null, turn = 0;
+    if (first && paras.every((p) => p.parentNode === first.parentNode)) { wrap = document.createElement('div'); wrap.className = 'bodies'; first.before(wrap); paras.forEach((p) => wrap.appendChild(p)); }
+    const place = (still, force) => {
+      const c = dim && form.querySelector('input[name="as"]:checked'), lab = c && c.closest('label');
+      if (!lab || (lab === placed && !force)) return;
+      placed = lab;
+      const a = as.getBoundingClientRect(), r = lab.getBoundingClientRect();
+      if (still) dim.classList.add('still');
+      dim.style.setProperty('--dx', r.left - a.left + 'px'); dim.style.setProperty('--dy', r.bottom - a.top - 3 + 'px'); dim.style.setProperty('--dw', r.width + 'px');
+      if (still) { void dim.offsetWidth; dim.classList.remove('still'); }
+    };
+    if (as && !as.hidden) {
+      dim = document.createElement('span'); dim.className = 'dim'; dim.setAttribute('aria-hidden', 'true'); as.appendChild(dim); as.classList.add('dimmed');
+      mark = () => place(true);
+      addEventListener('resize', () => place(true, true));
+      if (document.fonts) document.fonts.ready.then(() => place(true, true));
+    }
+    const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
+    // (each step waits for the one before it to finish, on the page's own animation clock)
+    const then = (el, prop, ms, fn) => {
+      const t = turn, go = () => { if (t === turn) fn(); };
+      const a = el.getAnimations ? el.getAnimations().filter((x) => x.transitionProperty === prop) : null;
+      if (!a) setTimeout(go, ms); else if (!a.length) go(); else Promise.all(a.map((x) => x.finished)).then(go, go);
+    };
+    const soft = () => {
+      const v = form.querySelector('input[name="as"]:checked').value, from = paras.find((p) => !p.hidden), to = paras.find((p) => p.dataset.for === v);
+      if (!calm()) place(false);
+      // (a turn still running finishes at once)
+      turn++; paras.forEach((p) => p.classList.remove('out', 'pre'));
+      if (wrap) { wrap.classList.remove('moving'); wrap.style.height = ''; }
+      if (!wrap || !from || !to || from === to || calm()) { show(); return; }
+      wrap.style.height = wrap.offsetHeight + 'px'; wrap.classList.add('moving');
+      from.classList.add('out');
+      then(from, 'opacity', 120, () => {
+        from.classList.remove('out'); show();
+        to.classList.add('pre'); const h = to.offsetHeight;
+        wrap.style.height = h + 'px'; to.classList.remove('pre');
+        then(wrap, 'height', 260, () => { wrap.classList.remove('moving'); wrap.style.height = ''; });
+      });
+    };
+    form.querySelectorAll('input[name="as"]').forEach((r) => r.addEventListener('change', soft));
     show(); addEventListener('pageshow', show);
     // A link can choose who is writing: ?as=buy from another page, data-as on a link within this one.
     // (a page whose letter has one voice, the buyer's on private-clients.html, keeps it)
