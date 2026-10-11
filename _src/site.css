@@ -993,7 +993,9 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .hero{position:relative;background:rgb(var(--hero-rgb));color:#F4F0E8;overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:#F4F0E8;--sold:#B8976A;isolation:isolate}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
 .hero.loupe{cursor:none}
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),linear-gradient(0deg,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),0) 36%)}
+/* The veil under the copy: across from the left, and up from the foot of the copy column only (to about half the width),
+   so the tower's lit lobby and its ground stand clear of it. */
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),radial-gradient(54% 40% at 0 100%,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),.9) 40%,rgba(var(--hero-rgb),0) 100%)}
 .hero .wrap{width:100%;padding-block:clamp(96px,14vh,150px) clamp(48px,9vh,96px);display:grid;gap:0}
 .hero h1{font-size:var(--t-hero);font-weight:300;max-width:12ch;letter-spacing:-.025em;line-height:.98;color:#F4F0E8}
 .hero h1 em{font-style:italic;color:#C9A877}
@@ -1039,7 +1041,8 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
+  /* the veil rises only to just under the tower's ground (36px above the headline), so the lobby's light and the ground are clear of it */
+  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) - 40px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) + 16px))}
   /* the copy starts as low as the taller drawing wants (51svh), but never so low that the second button leaves the first screen; 458px is the copy's height from the headline to the second button */
   .hero .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
   .hero h1{max-width:none}
@@ -2302,12 +2305,17 @@ nav.main a[aria-current="page"]{color:var(--fg)}
 /* Audit round two */
 @media (max-width:820px){
   .hero .coords{display:flex;top:80px;font-size:13px;letter-spacing:.14em}
-  .hero .coords > :not(.cap){display:none}
+  /* the caption, and under it on one line of its own, the sun the drawing is lit by (the drawing is framed under both,
+     so the line never meets the crown) */
+  .hero .coords > :not(.cap):not(#sunline){display:none}
+  .hero .coords #sunline{flex-basis:100%;white-space:nowrap;line-height:1}
   .step h3::before{transform:translateY(.12em);margin-left:0}
   .gauge{font-size:13px}
   /* when a label stacks over its numeral, the numeral starts flush under it; on one line the label keeps the same gap */
   .gauge b{margin-left:0}.gauge em{margin-right:6px}
 }
+/* a phone or small tablet on its side keeps its survey note as it was (the sun line is for the upright phone's caption row) */
+@media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.hero .coords #sunline{display:none}}
 /* phones on their side keep the illustration caption above the headline, clear of it */
 @media (min-width:480px) and (max-width:820px) and (max-height:500px) and (orientation:landscape){.hero .coords{top:72px}.hero .wrap{padding-top:102px}}
 /* narrower phones on their side keep the illustration caption, so the hero starts under it and closes up enough for whole buttons;
