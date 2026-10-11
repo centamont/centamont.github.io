@@ -34,9 +34,9 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="site.css?v=4f63d237">
+<link rel="stylesheet" href="site.css?v=265356b5">
 <script>document.documentElement.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))document.documentElement.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)document.documentElement.dataset.theme=q[1];try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')document.documentElement.dataset.motion='off'}catch(e){}setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))document.documentElement.classList.add('nosite')},4000)</script>
-<script src="site.js?v=4f63d237" defer></script>
+<script src="site.js?v=265356b5" defer></script>
 </head>
 <body class="no-js" id="top">
 <a class="skip" href="#main">Skip to content</a>
@@ -67,22 +67,24 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Centamont</a><span aria-hidden="true"> · </span><span aria-current="page">The weekly report</span></nav>
 <div class="rp-top">
 <h1>Every Monday, <span class="nw">the building on one sheet.</span></h1>
-<p class="standfirst">Every engagement comes with the same report each week: inquiries, tours, reservations, contracts and pricing moves, measured against the plan. Below is a specimen, drawn with invented figures for an imaginary building of <span class="num">22</span>&nbsp;residential levels.</p>
+<p class="standfirst">Every engagement comes with the same report each week: inquiries, tours, reservations, contracts and pricing moves, measured against the plan. Below is a specimen, drawn with invented figures for an imaginary building of <span class="num">22</span>&nbsp;residential levels, a different one from the tower on our home&nbsp;page.</p>
 </div>
 
 <article class="sheet-rp" aria-label="Specimen weekly report">
-  <header class="rp-head">
-    <div><small>Weekly report</small><b>Week 18</b></div>
-    <div><small>Building</small><b>Specimen, 22&nbsp;levels</b></div>
-    <div><small>Residences</small><b class="num">88</b></div>
-    <div><small>Status</small><b>Ahead of plan</b></div>
-  </header>
+  <dl class="rp-head">
+    <div><dt>Weekly report</dt><dd>Week 18</dd></div>
+    <div><dt>Building</dt><dd>Specimen, 22&nbsp;levels</dd></div>
+    <div><dt>Residences</dt><dd class="num">88</dd></div>
+    <div><dt>Status</dt><dd>Ahead of plan</dd></div>
+  </dl>
 
-  <section class="rp-figs" aria-label="This week">
-    <div><small>Inquiries</small><b>142</b><span class="vs">Plan&nbsp;125, 17&nbsp;ahead</span><span>Last week 130</span></div>
-    <div><small>Private tours</small><b>23</b><span class="vs">Plan&nbsp;20, 3&nbsp;ahead</span><span>Last week 19</span></div>
-    <div><small>Reservations</small><b>6</b><span class="vs">Plan&nbsp;7, 1&nbsp;behind</span><span>Last week 7</span></div>
-    <div><small>Contracts</small><b>4</b><span class="vs">Plan&nbsp;2, 2&nbsp;ahead</span><span>Last week 3</span></div>
+  <section aria-label="This week">
+  <dl class="rp-figs">
+    <div><dt>Inquiries</dt><dd class="fig">142</dd><dd class="vs">Plan&nbsp;125, 17&nbsp;ahead</dd><dd>Last week 130</dd></div>
+    <div><dt>Private tours</dt><dd class="fig">23</dd><dd class="vs">Plan&nbsp;20, 3&nbsp;ahead</dd><dd>Last week 19</dd></div>
+    <div><dt>Reservations</dt><dd class="fig">6</dd><dd class="vs">Plan&nbsp;7, 1&nbsp;behind</dd><dd>Last week 7</dd></div>
+    <div><dt>Contracts</dt><dd class="fig">4</dd><dd class="vs">Plan&nbsp;2, 2&nbsp;ahead</dd><dd>Last week 3</dd></div>
+  </dl>
   </section>
 
   <div class="rp-grid2 rp-cols">

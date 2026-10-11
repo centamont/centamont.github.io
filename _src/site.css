@@ -117,13 +117,14 @@ p{margin:0;text-wrap:pretty}
 /* Header */
 header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}
 /* On a phone the header steps aside while the reader reads on down the page (site.js marks html.hdr-off) and comes back at
-   the first move up; the sticky drawings under it and the scroll padding rise with it, through --hdr */
+   the first move up; the sticky drawings under it rise with it, through --hdr. The scroll padding keeps the header's
+   height even while it is away: whatever brings a place into view at the top (a focus moving back up the page, the
+   browser's find) moves the page up, which brings the header back, so the place must already stand clear of it. */
 /* (the root itself never changes --hdr, and it is not inherited: each of the few things that read it is given its own
    value, so the header stepping aside at every turn of the scroll restyles those alone, never the whole page) */
 @property --hdr{syntax:'<length>';inherits:false;initial-value:64px}
 @media (max-width:820px){
   html.js header.site{transition:translate 300ms var(--ease-out)}
-  html.hdr-off{scroll-padding-top:0}
   html.hdr-off :is(.elev,.cv-fig,.cv-txt h3,.progress,#services){--hdr:0px}
   html.hdr-off header.site{translate:0 -100%}
   .rise .elev{transition:top 300ms var(--ease-out)}
@@ -441,10 +442,13 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 @media (max-width:820px){
   .rise{--bleed:0px;grid-template-columns:1fr;gap:0}
   /* On a phone the drawing owns the sticky panel: the caption is one line above it and the gauge one line below, so
-     the canvas keeps the height (the model refits to it). The 18px fade at its foot hands the panel to the reading text. */
+     the canvas keeps the height (the model refits to it). The panel ends on a foot of its own ground 10px under the
+     threshold label, then a long, eased fade (32px, more than a line, as the sideways curve heading's band has), so the
+     words passing under it have all but dissolved before they reach the label, never cut and never read as the gauge's. */
   .elev{top:var(--hdr);z-index:2;padding:6px var(--gr) 0 var(--gl);margin-inline:calc(var(--gl) * -1) calc(var(--gr) * -1);background:var(--bg);gap:4px}
-  .rise .elev{height:calc(46svh + 28px)}
-  .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:18px;background:linear-gradient(var(--bg),transparent);pointer-events:none}
+  .rise .elev{height:calc(46svh + 38px)}
+  .rise .gauge{padding-bottom:3.54em}
+  .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:32px;background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 88%,transparent) 30%,color-mix(in srgb,var(--bg) 45%,transparent) 65%,transparent);pointer-events:none}
   /* (with forced colours the fade is dropped, so the panel ends on a rule over a short solid band instead, and the words
      passing under it never meet the threshold label) */
   @media (forced-colors:active){.rise .elev::after{height:6px;background:Canvas;border-bottom:1px solid CanvasText}}
@@ -459,32 +463,35 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 /* On a phone held either way the panel reads as a drawing sheet: the caption strip over the drawing and the gauge, a
    title block, under it; and the steps share one family of numerals and headings */
 @media (max-width:820px),(min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){
-  .elev figcaption{order:-1;border-top:0;padding-top:0;line-height:1.25;align-items:baseline}
+  .elev figcaption{line-height:1.25;align-items:baseline}
+  .rise .elev figcaption{order:-1;border-top:0;padding-top:0}
   /* the gauge: a title block under the drawing, each counter's label over its figure (Levels framed, Under contract), in
      three bands with air between them: the counters; the meter under the residences, its 50% tick a small cross on the
      line (10px clear of the figures above); and the tick's label under the meter, ending under the tick it names, 8px clear
      of it, so the words point at the mark at every width and nothing runs into them. (The figure grows by the bands' air,
-     13px, so the drawing keeps its height.) */
+     13px, so the drawing keeps its height.) The bands are measured in the labels' own em, and the panel's two narrow
+     layouts below are asked for in the panel's em (its 18px), so where the reader sets the text larger (a browser's text
+     zoom) the bands open with it and the counters stack as on a narrower panel, rather than run off the page. */
   .rise .elev{container-type:inline-size}
-  .gauge{order:1;display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:clamp(16px,100cqw - 270px,48px);align-items:end;padding:6px 0 36px;border-top:1px solid var(--rule);font-size:13px;line-height:1}
+  .gauge{order:1;display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:clamp(16px,100cqw - 270px,48px);align-items:end;padding:6px 0 2.77em;border-top:1px solid var(--rule);font-size:13px;line-height:1}
   .gauge > span{display:block;white-space:nowrap}
   .gauge em{display:block;margin:0 0 3px}
   .gauge b{font-size:24px;line-height:.8}
-  .gauge .meter{bottom:-13px}
-  .gauge .lim small{top:15px;left:auto;right:0;transform:none;letter-spacing:.1em}
+  .gauge .meter{bottom:-1em}
+  .gauge .lim small{top:1.154em;left:auto;right:0;transform:none;letter-spacing:.1em}
   /* the drawing is masked off a few pixels short of the caption strip above it and the gauge's rule below it, so the
      site plan's grid and the ground's linework never run up to either (it fades out over 8px, then leaves 3px clear) */
   .rise .elev canvas{-webkit-mask-image:linear-gradient(transparent 1px,#000 7px,#000 calc(100% - 12px),transparent calc(100% - 3px));mask-image:linear-gradient(transparent 1px,#000 7px,#000 calc(100% - 12px),transparent calc(100% - 3px))}
   /* (a panel under 300px, on the narrowest phones or a phone on its side up to about 800px, closes up the labels' spacing so
      Under contract keeps inside the meter's end) */
-  @container (max-width:300px){.gauge em{letter-spacing:.1em}.gauge .lim small{letter-spacing:.08em}}
+  @container (max-width:16.67em){.gauge em{letter-spacing:.1em}.gauge .lim small{letter-spacing:.08em}}
   /* a panel too narrow for the two counters side by side (a phone on its side under about 740px, a zoomed window) takes
      each on a line, its label beside its figure; the meter then runs across the panel, its label centred on the tick */
-  @container (max-width:277px){
+  @container (max-width:15.39em){
     .gauge{grid-template-columns:minmax(0,1fr);row-gap:6px}
     .gauge > span{display:flex;align-items:baseline}
     .gauge em{margin:0 8px 0 0}
-    .gauge .lim small{left:0;right:auto;transform:translateX(-50%)}
+    .gauge .lim small{left:0;right:auto;transform:translateX(-50%);width:max-content;max-width:100cqw;white-space:normal;text-align:center}
   }
   /* each step's numeral stands on its own line just over its heading, in the step's own opening space, so the heading
      keeps the full measure and breaks in two lines (the fourth keeps its deliberate break; the 12em cap keeps the fifth and
@@ -517,11 +524,12 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .b-l,.b-r{display:grid;align-content:start;gap:clamp(28px,3vw,40px)}
 .begin h3{font-size:var(--t-head);max-width:14ch}
 .begin ol{list-style:none;margin:0;padding:0;display:grid;gap:0}
-.begin ol > li{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
+.begin ol > li{display:grid;grid-template-columns:max(56px,3.12em) minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
 .begin ol > li:first-child{padding-top:0}
 .begin ol > li > b{font-weight:500}
 .begin ol > li > span:not(.seq){color:var(--muted);grid-column:2}
-/* a sequence numeral, hung in its own column: shared by every numbered run of rows */
+/* a sequence numeral, hung in its own column: shared by every numbered run of rows (the column is 56px, or 3.12em of the
+   row's text where the reader sets the text larger, so the numeral never runs into its words) */
 .seq{font-family:var(--display);font-weight:300;font-size:32px;line-height:1;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
 .begin .close{display:grid;gap:14px;margin-top:-4px}
 .begin .close .btn{justify-self:start}
@@ -530,7 +538,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
 @media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
 @media (max-width:1040px){.begin{grid-template-columns:minmax(0,1fr);gap:28px}.b-l,.b-r{display:contents}.begin h3{order:1}.begin ol{order:2}.spec{order:3;max-width:560px}.begin .close{order:4;margin-top:0}}
-@media (max-width:520px){.begin ol > li{grid-template-columns:44px minmax(0,1fr);column-gap:10px}}
+@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px}}
 
 /* The specimen sheet, drawn without figures: the report's own stacking plan, its pace against the plan, and the key.
    The whole drawing is one link to the report. */
@@ -753,8 +761,10 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 :is(#journal,.prose) .dbar{height:clamp(64px,5vw,76px)}
 :is(#journal,.prose) .dkey{margin-top:clamp(14px,1.3vw,18px)}
 :is(#journal,.prose) .dkey div{grid-template-columns:minmax(0,7.5em) minmax(0,1fr);align-items:start;gap:2px 16px;padding:9px 0;line-height:1.5}
-/* (a narrow plate stands each key over its meaning) */
-@container (max-width:339px){:is(#journal,.prose) .dkey div{grid-template-columns:minmax(0,1fr)}}
+/* (a narrow plate stands each key over its meaning: asked in the plate's em, set at 18px wherever it stands, so text set
+   larger by the reader stacks the key as a narrower plate does, rather than push its words past the page's edge) */
+:is(#journal,.prose) .deposit{font-size:18px}
+@container (max-width:18.83em){:is(#journal,.prose) .dkey div{grid-template-columns:minmax(0,1fr)}}
 #journal .feature .links{margin-top:calc(14px - clamp(32px,6vw,96px))}
 @media (min-width:821px){
   /* (the text's row is as tall as the text; the plate's extra height falls to the row under it, so the links keep to the
@@ -1202,9 +1212,11 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 @media (max-width:1199px){.chart .plate{grid-template-columns:minmax(0,1fr);overflow:hidden}.chart .plate::after,.chart .ldr{display:none}.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}.chart .pa{grid-row:2;border-top:1px solid var(--rule)}.chart .lk{transform:translateY(calc(48px + 10px * var(--u,1)))}
   .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
 @media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
-/* the overview's phone crop (x 290 to 720, y 24 to 300) is cut by its frame, so it holds without the page script too */
-@media (max-width:599px){.chart .pa{aspect-ratio:430/276}.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.696%}
-  .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(-6px,calc(48px + 10px * var(--u,1)))}}
+/* the overview's phone crop (x 290 to 720, y 24 to 310) is cut by its frame, so it holds without the page script too. Its
+   foot runs 10 units past the world key's label, and the label stands 2px further in, so it keeps 8px clear of the
+   frame's corner ticks down to a 320px phone. */
+@media (max-width:599px){.chart .pa{aspect-ratio:430/286}.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.392%}
+  .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
 /* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it, clear of Houston's */
 @media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
 @media (max-width:374px){.chart .ov .lb.now{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
@@ -1260,6 +1272,8 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .page .wrap{max-width:880px}
 .crumbs{font-size:15px;color:var(--faint);margin-bottom:28px}
 .crumbs a{color:var(--accent)}
+/* (each crumb answers a touch 4px above and below its words, a 30px target, without moving the line or its underline) */
+.crumbs a{position:relative}.crumbs a::before{content:"";position:absolute;inset:-4px 0}
 .page h1{font-size:var(--t-chapter);font-weight:300;letter-spacing:-.02em;line-height:1.04;max-width:8.586em}
 /* a note's headline gets three more characters, so 'Buying pre-construction' holds one line, as on the index and its share card */
 .page:has(.prose.lead) h1{max-width:10.017em}
@@ -1348,6 +1362,10 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .prose figure li{margin:0;padding:0;font-family:var(--body);line-height:1.7;color:var(--faint)}
 /* Fig. 1 of the launch-price note: drawn in percentages of its plot, so its labels keep their size at every width */
 .prose .cp{margin:40px 0 36px}
+/* the note's figures sit between corner ticks over their caption strip, as the buying guide's deposit plate does: the
+   curves with their axes and key, and the level plan with its key */
+.prose :is(.cp,.wk) > .ticks{padding:clamp(14px,1.55vw,22px) clamp(14px,1.8vw,26px) clamp(12px,1.3vw,18px)}
+.prose .cp > .ticks{display:flow-root}
 .cp-plot{position:relative;height:clamp(190px,40vw,224px);margin:30px 0 58px 44px}
 .cp-svg{display:block}
 .cp :is(line,path,circle){vector-effect:non-scaling-stroke}
@@ -1385,17 +1403,24 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
   .js:not([data-motion="off"]) .cp:not(.in) :is(.cp-marks,.cp-m){opacity:0}
 }
 /* Fig. 1 of the weekly-report note: the report's inventory block at about half its size, beside the paragraph about it */
-.prose .wk{float:right;width:200px;margin:8px 0 20px 32px;display:grid;gap:12px}
+/* (hung in the margin, the ticks stand 12px outside the plan, so the plan keeps its width and its place) */
+.prose .wk{float:right;width:234px;margin:8px -270px 20px 32px;display:grid;gap:12px}
+.prose .wk > .ticks{display:grid;gap:12px;padding:12px}
 .wk-plan{display:block;width:100%;height:auto;overflow:visible}
 .wk .rp-c{vector-effect:non-scaling-stroke;stroke-width:1px}
 .wk .rp-t{font-size:15.7px}
 .prose .wk .rp-key{flex-direction:column;gap:2px;margin:0;padding:0}
 .wk figcaption{margin-top:0}
-@media (min-width:1140px){.prose .wk{width:210px;margin-right:-258px}}
-/* without the margin to hang in, the figure is taller than its section, so it is set in the text with its key beside it */
-@media (max-width:1139px){.prose .wk{float:none;width:auto;margin:36px 0 32px;grid-template-columns:200px minmax(0,1fr);grid-template-rows:1fr auto;gap:16px 32px;align-items:end}.wk-plan{grid-row:1 / span 2}}
-@media (max-width:560px){.prose .wk{float:none;width:auto;margin:28px 0 24px;grid-template-columns:132px minmax(0,1fr);gap:12px 20px;align-items:start}.wk-plan{grid-row:1 / span 2}.wk .rp-t{font-size:23.8px}}
-@media (max-width:379px){.prose .wk{grid-template-columns:116px minmax(0,1fr)}.wk-plan{grid-row:auto}.wk .rp-t{font-size:27px}.prose .wk .rp-key li{align-items:baseline}.wk figcaption{grid-column:1 / -1}}
+/* without the margin to hang in (below 1170px the hung frame would run past the page's right content edge), the figure
+   is set in the text with its key beside it, and its caption strip under both */
+@media (max-width:1169px){.prose .wk{float:none;width:auto;margin:36px 0 32px}.prose .wk > .ticks{grid-template-columns:200px minmax(0,1fr);gap:16px 32px;align-items:end;padding:clamp(14px,1.55vw,22px) clamp(14px,1.8vw,26px)}}
+@media (max-width:560px){.prose .wk{margin:28px 0 24px}.prose .wk > .ticks{grid-template-columns:132px minmax(0,1fr);gap:12px 20px;align-items:start}.wk .rp-t{font-size:23.8px}}
+/* (on a phone the frame closes in to 10px and the key to .12em; at 387px and below the plan narrows to 116px, and at
+   339px and below the frame and the gap close in again, so every key holds one line from 375px up (from 361 to 374px two keys
+   take two lines) and the shortest phones break no more lines than they did unframed) */
+@media (max-width:420px){.prose .wk > .ticks{padding:12px 10px;column-gap:14px}.prose .wk .rp-key{letter-spacing:.12em}}
+@media (max-width:387px){.prose .wk > .ticks{grid-template-columns:116px minmax(0,1fr);padding-inline:12px}.wk .rp-t{font-size:27px}.prose .wk .rp-key li{align-items:baseline}}
+@media (max-width:339px){.prose .wk > .ticks{padding-inline:10px;column-gap:12px}}
 .lot .wrap{max-width:var(--max);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,6vw,96px);align-items:center}
 .lot .wrap > *{min-width:0}
 /* the two actions stand side by side from 821px up: beside the lot, the text column widens to hold them on one line (the lot
@@ -1413,17 +1438,24 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .grade pattern path{stroke-width:var(--lw-hatch)}
 .grade .h{opacity:.5}
 /* where the figure is short (a phone, or a window low on height) the strip adds to it, so the lot keeps the height it had;
-   the disclosure under it stays at 15px there too. On a phone the lot follows the actions closely. */
+   the disclosure under it stays at 15px there too. On a phone the lot follows the actions closely, and its caption stays
+   under it on its own rule, as on a wide screen (the story's caption-first panel is not for the lot), so the disclosure
+   is never read as a footnote to the button above it. Where the lot stands under the text (up to 1100px) the footer's
+   ground line comes into view just under it, so the lot keeps a plain ground line there and leaves the hatch to the
+   sheet's own ground: one hatched ground per screen. */
+@media (max-width:1100px){.lot .grade .h{display:none}}
 
 /* the lot is drawn at the middle of its canvas, under an empty band of sky about a third of its height; on a phone the
    canvas reaches up behind the actions by all but 30px of that band (the figure is the shorter by as much, so the lot keeps
    its size), and the actions stay on top */
 @media (max-width:1100px){.lot .wrap{row-gap:8px}.lot .vacant{pointer-events:none}.lot .vacant canvas{margin-top:var(--sky)}.lot .txt{position:relative;z-index:1}}
-@media (max-width:820px){.lot .vacant{--sky:min(0px,42px - 11svh);height:calc(34svh + 17px + var(--sky))}}
+@media (max-width:820px){.lot .vacant{--sky:min(0px,42px - 11svh);height:calc(34svh + 28px + var(--sky))}}
 .lot .vacant figcaption{font-size:15px}
 @media (min-width:821px) and (max-height:620px){.lot .vacant{height:calc(56svh + 23px)}}
 /* (under the text on a tablet, the same: the canvas is the figure's height less 72px of strip, caption and gaps) */
 @media (min-width:821px) and (max-width:1100px){.lot .vacant{--sky:min(0px,53px - .32 * min(46svh,440px));height:calc(min(46svh,440px) + var(--sky));padding:0}}
+/* (a phone on its side gives the caption its own rule there too, 11px more of strip, so the figure takes those 11px) */
+@media (min-width:821px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.lot .vacant{height:calc(min(46svh,440px) + 11px + var(--sky))}}
 @media (max-width:820px){.lot .wrap{grid-template-columns:1fr}.vacant{position:relative;top:auto;height:34svh;margin:0;border-inline:1px solid var(--rule);padding:14px}}
 /* on a phone held on its side the heading takes one line and the standfirst two, so both actions stand whole above the fold */
 @media (min-width:480px) and (max-width:1100px) and (max-height:500px) and (orientation:landscape){
@@ -1468,6 +1500,7 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
   .rise{--bleed:0px}
   .rise .elev{position:sticky;top:calc(var(--hdr) + 8px);height:calc(100svh - 88px);margin-inline:0;padding:8px 0;gap:6px}
   .rise .elev::after{display:none}
+  .rise .gauge{padding-bottom:2.77em}
   /* the first step's heading reaches the reading line (about a third of the way down) as the drawing settles under the
      header, so the whole sheet, caption to gauge, is in view with it */
   .step:first-child{padding-top:calc(36svh - 72px)}
@@ -1633,6 +1666,8 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .letter .sheet select option{color:var(--fg);background:var(--sheet)}
 /* a blank with the focus takes the site's bronze ring, drawn close round it so it keeps clear of the lines above and below */
 .letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:1px solid var(--accent);outline-offset:3px;background-color:rgba(184,151,106,.16)}
+/* (over that tint a placeholder steps up from faint to muted, so it keeps AA by night: 6.7:1, where faint falls to 4.2) */
+.letter .sheet input:focus-visible::placeholder{color:var(--muted)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
 /* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
@@ -1683,6 +1718,9 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
     @container scroll-state(stuck:top){.cv-txt h3::after{opacity:1}}
   }
   .cv-txt > p{grid-area:2 / 1}.cv-p{grid-area:3 / 1}.cv-l{grid-area:4 / 1}.cv-say{grid-area:5 / 1}
+  /* (a slider that takes the focus from below, reading back up, is brought in under the held heading's band and its fade,
+     at most 76px and 32px, with its label clear of both, never left under them) */
+  .cv-ctl input{scroll-margin-top:140px}
 }
 @media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{--cvt:8px;grid-template-rows:repeat(6,auto) 1fr}.cv-read{grid-area:6 / 1}}
 .cv-tower rect{fill:none;stroke:var(--faint);stroke-opacity:.45;stroke-width:.8;transition:fill .5s var(--ease),stroke .5s var(--ease)}
@@ -1860,7 +1898,10 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* where the cell is wide enough for two columns of three, the set takes them */
 .t-ss{container-type:inline-size}
 @container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(3,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
-.t-dr time{white-space:nowrap}
+/* a date keeps whole, taking the next line as one piece where its line is full; only text set far larger than the cell (a
+   browser's text zoom) breaks it, so it never runs on into the next cell. The sheet number's revision does the same. */
+.t-dr time,.sn small{display:inline-block;max-width:100%}
+.sn{max-width:100%}
 .legal .totop{white-space:nowrap}
 /* narrower, three rows of two-column cells: the sheet keeps its full figure */
 @media (max-width:1023px){.tb{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"pr pr pr of of of" "dr dr sc sc sh sh" "wk wk ss ss fo fo"}}
@@ -1910,13 +1951,16 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .sheet-rp{margin-top:clamp(48px,6vw,88px);background:var(--sheet);border:1px solid var(--rule);padding:clamp(20px,3.4vw,48px);display:grid;gap:clamp(28px,3.4vw,48px);position:relative}
 .sheet-rp::before,.sheet-rp::after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--faint)}
 .sheet-rp::before{left:-1px;top:-1px;border-width:1px 0 0 1px}.sheet-rp::after{right:-1px;bottom:-1px;border-width:0 1px 1px 0}
-.sheet-rp small,.rp-block h2{font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.4}
+.sheet-rp small,.sheet-rp dt,.rp-block h2{font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.4}
 .rp-block h2{max-width:none;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
-@media (max-width:520px){.sheet-rp small,.rp-block h2{letter-spacing:.1em}}
+@media (max-width:520px){.sheet-rp small,.sheet-rp dt,.rp-block h2{letter-spacing:.1em}}
+/* the sheet's head and its four figures are lists of terms and values (dl), so a screen reader pairs each label with its
+   figure; drawn as before */
+.rp-head,.rp-figs{margin:0}.sheet-rp dd{margin:0}
 .rp-head{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule)}
 .rp-head > div{padding:12px 16px;display:grid;gap:2px;min-width:0}
 .rp-head > div + div{border-left:1px solid var(--rule)}
-.rp-head b{font-family:var(--display);font-weight:400;font-size:clamp(20px,1.8vw,26px);line-height:1.2;font-variant-numeric:lining-nums tabular-nums}
+.rp-head dd{font-family:var(--display);font-weight:400;font-size:clamp(20px,1.8vw,26px);line-height:1.2;font-variant-numeric:lining-nums tabular-nums}
 .rp-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
 .rp-figs > div{display:grid;gap:4px;padding-right:20px}
 .rp-figs > div + div{padding-left:20px;border-left:1px solid var(--rule)}
@@ -1925,10 +1969,10 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .rp-head > div,.rp-figs > div{align-content:start}
 .rp-head > div{grid-row:span 2;grid-template-rows:subgrid}
 .rp-figs > div{grid-row:span 4;grid-template-rows:subgrid}
-.rp-figs b{font-family:var(--display);font-weight:300;font-size:clamp(56px,6.4vw,104px);line-height:.9;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums}
-.rp-figs span{font-size:15px;color:var(--faint)}
+.rp-figs dd.fig{font-family:var(--display);font-weight:300;font-size:clamp(56px,6.4vw,104px);line-height:.9;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums}
+.rp-figs dd:not(.fig){font-size:15px;color:var(--faint)}
 /* each figure answers to its plan first (in muted, as a reading that carries information), then to last week */
-.rp-figs .vs{color:var(--muted)}
+.rp-figs dd.vs{color:var(--muted)}
 .rp-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,64px)}
 .rp-grid2 > *{min-width:0}
 /* the sheet's charts in two columns: contracts, then the funnel; inventory, then the sources */
@@ -2065,11 +2109,14 @@ html[data-door="open"] .pc-doorway .arch path{stroke-dashoffset:0!important;tran
 .pc-steps{margin-top:clamp(64px,8vw,120px);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(24px,3vw,36px)}
 .pc-steps h2{font-size:clamp(30px,3vw,44px);max-width:none}
 .pc-steps ol{list-style:none;margin:0;padding:0}
-.pc-steps li{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
+.pc-steps li{display:grid;grid-template-columns:max(56px,3.12em) minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
 .pc-steps li:first-child{padding-top:0}
 .pc-steps b{grid-column:2;display:block;font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
 /* the step's description only (the heading's words are spans too), held to a reading measure on wide screens */
 .pc-steps li > span:not(.seq){grid-column:2;color:var(--muted);max-width:34em}
+/* under the steps, a buyer's next read: the guide to buying pre-construction, set at the steps' measure */
+.pc-guide{grid-column:2;justify-self:start;margin-top:4px}
+@media (max-width:820px){.pc-guide{grid-column:1}}
 /* the room's own letter, under its lead-in */
 .pc-write{position:relative;margin-top:clamp(56px,7vw,104px);padding-top:clamp(28px,3vw,40px);border-top:1px solid var(--fg)}
 .pc-write .big{max-width:26ch}
@@ -2178,10 +2225,10 @@ html.js .pc-nojs{display:none}
 .ji-hero{margin:0;justify-self:end;width:100%;max-width:420px}
 .ji-hero figcaption{margin-top:14px;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
 @media (max-width:820px){.ji-top{grid-template-columns:minmax(0,1fr)}.ji-hero{display:none}}
-/* where the lead plate draws note 03's inventory, note 03's row draws its funnel (the figure on its share card), so the
-   first screen never shows one drawing twice; where the lead plate is left off, the row keeps the inventory */
-.ji .pl-fun{display:none}
-@media (min-width:821px){.ji .pl-fun{display:block}.ji .pl-stk{display:none}}
+/* the lead plate draws note 03's inventory, so note 03's row draws its funnel (the figure on its share card) and the first
+   screen never shows one drawing twice; where the lead plate is left off (a tablet or phone) the row keeps the funnel, a
+   plate as wide as the measure like the curve and the deposit bands under it, where the tall inventory stack would stand
+   as a narrow pillar in the middle of a wide plate */
 .ji-defs{position:absolute;width:0;height:0;overflow:hidden}
 .ji{list-style:none;margin:clamp(48px,6vw,88px) 0 0;padding:0;border-top:1px solid var(--fg)}
 .ji a{display:grid;grid-template-columns:4em minmax(0,1fr) 168px;grid-template-areas:"n t p" ". s p" ". d p";align-items:baseline;column-gap:24px;padding:clamp(26px,3vw,40px) 0;border-bottom:1px solid var(--rule);color:inherit;text-decoration:none}
@@ -2240,9 +2287,9 @@ html.js .pc-nojs{display:none}
 .step .more{padding-top:6px;margin-top:20px;align-self:flex-start}
 /* on phones and tablets the tower rides above the steps in a sticky band: a step reached by a link lands just below it,
    its numeral clear of the band's fade, and a link in a step that takes focus is scrolled clear of the band and its fade
-   (header 64, band 46svh + 28, fade 18, ring 12; the step's 24px of opening space less 6 keeps the numeral just clear of
+   (header 64, band 46svh + 38, fade 32, ring 12; the step's 24px of opening space less 6 keeps the numeral just clear of
    the fade) */
-@media (max-width:820px){.step{scroll-margin-top:calc(46svh + 22px)}.step a{scroll-margin-top:calc(46svh + 122px)}}
+@media (max-width:820px){.step{scroll-margin-top:calc(46svh + 46px)}.step a{scroll-margin-top:calc(46svh + 146px)}}
 /* (in the sideways two-column story the band is beside the steps, not above them, so a focused link needs no extra room) */
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.step a{scroll-margin-top:8px}}
 /* a window too short for the band (a 1280px window zoomed to 300% or 400%) keeps the tower above the story, where it scrolls
@@ -2271,17 +2318,20 @@ nav.main a[aria-current="page"]{color:var(--fg)}
    its foot named as the other small labels are. The links scroll above that row, never under it. */
 @media (max-width:520px){
   .motion{display:none}
-  html.menu-open .motion{display:flex;align-items:center;gap:12px;position:fixed;left:0;right:0;bottom:0;z-index:1;width:auto;height:calc(52px + env(safe-area-inset-bottom));padding:0 var(--gutter) env(safe-area-inset-bottom);background:var(--bg);border:0;border-top:1px solid var(--rule);font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+  html.menu-open .motion{display:flex;align-items:center;gap:12px;position:fixed;left:0;right:auto;bottom:0;z-index:2;width:auto;height:calc(52px + env(safe-area-inset-bottom));padding:0 16px env(safe-area-inset-bottom) var(--gutter);background:transparent;border:0;font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
   /* the word sits in its name ("Pause motion"); the icon says which way the switch goes */
   html.menu-open .motion::after{content:"Motion"}
   html.menu-open .motion:focus-visible{outline-offset:-6px}
-  .js.menu-open header.site.over .motion{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14)}
+  /* (the row itself is drawn under the switch, so the switch is only as wide as its glyph and word, with 16px to spare:
+     a touch in the row's blank middle does nothing, and the switch's focus ring never takes in the handle beside it) */
+  html.menu-open .tools::before{content:"";position:fixed;left:0;right:0;bottom:0;z-index:1;height:calc(52px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--rule)}
+  .js.menu-open header.site.over .tools::before{background:rgb(var(--hero-rgb));border-color:rgba(244,240,232,.14)}
   nav.main{height:calc(100svh - 116px - env(safe-area-inset-bottom));padding-bottom:clamp(20px,5svh,40px)}
   /* on a short screen the rows close up, so the whole list fits above the switch before any scrolling, never so close
      that a letter's tail meets the rule below it */
   nav.main a{line-height:max(1.15em,min(1.7em,7svh));padding-block:min(10px,1.2svh)}
 }
-@media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .motion{animation:motion-in .5s var(--ease) .35s backwards}}
+@media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .motion,html.menu-open .tools::before{animation:motion-in .5s var(--ease) .35s backwards}}
 /* and beside the switch, the handle, to write from the menu itself */
 .tools .hd{display:none}
 @media (max-width:520px){

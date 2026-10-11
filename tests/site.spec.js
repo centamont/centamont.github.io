@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 // Every section of the one-page centamont.com and a phrase from its heading.
 const sections = [
   ['services', 'One firm, from the first sketch to the last closing'],
-  ['developers', 'Your building, sold like it is the only one we have'],
+  ['developers', 'Your building, sold as if it were the only one we have'],
   ['clients', 'Residences that never reach the open market'],
   ['markets', 'South Florida first'],
   ['journal', 'Notes on new development'],

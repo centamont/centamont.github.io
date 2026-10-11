@@ -46,8 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // beside its controls on a wide screen the drawing keeps a wider aspect, so it and its readouts end level with them
     const wide = matchMedia('(min-width:901px)');
     let phone = false;
+    let measured = 0;
     function size() {
-      W = Math.max(240, Math.round(svg.clientWidth || 640));
+      measured = svg.clientWidth || 0;
+      W = Math.max(240, Math.round(measured || 640));
       phone = narrow.matches;
       H = Math.round(phone ? 260 : W >= 520 ? Math.min(500, W * (wide.matches ? 0.62 : 0.76)) : Math.max(280, Math.min(380, W * 0.52)));
       // and never taller than the screen below the header allows, so on a phone held sideways the curve stays in view
@@ -299,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
       heard.textContent = 'Month ' + last + ', ' + Math.round(model(+price.value)[last] * 100) + ' percent under contract.';
     });
     const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
-    // The figure sits well down the page, so it is drawn just after the page has loaded rather than while it loads
+    // The figure sits well down the page, so it is drawn as the reader comes near it rather than while the page loads
     // (measuring its labels lays the page out several times); a hand on the sliders before then draws it at once.
     // Its height is set now, though (one measure, no labels), so nothing below it moves when it draws: the page has
     // often finished loading before its first frame, and a link to a section further down is placed by then.
@@ -311,11 +313,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // The sentence below the figure is a live region: filled after load it would be read out away from its figure,
     // so the first draw fills it quietly, as the sliders do between steps.
     const first = () => { if (lastW) return; const s = out('cvSay'); s.setAttribute('aria-live', 'off'); redraw(); lastW = W; setTimeout(() => s.setAttribute('aria-live', 'polite'), 600); };
-    // (in a quiet moment once the page has settled, or as the figure comes within a screen and a half of view if that is
-    // sooner, so it never takes a turn of its own while the page is still starting)
-    if (window.requestIdleCallback) requestIdleCallback(first, { timeout: 4000 }); else setTimeout(first, 200);
+    // (as the figure comes within a screen and a half of view, so a reader who never scrolls that far never pays for it,
+    // and it never takes a turn of its own while the page is still starting; an engine without the observer draws it
+    // just after load)
     if ('IntersectionObserver' in window) new IntersectionObserver((es, o) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); first(); } }, { rootMargin: '150% 0px' }).observe(svg);
-    const resized = () => { if (!lastW) size(); else if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } };
+    else setTimeout(first, 200);
+    // (before the first draw a change of width only resizes the frame, and the observer's first report, of the width just
+    // measured, changes nothing, so it lays nothing out again)
+    const resized = (es) => {
+      if (!lastW) { const w = es && es[0] ? es[0].contentRect.width : (svg.clientWidth || 0); if (Math.abs(w - measured) > 2) size(); }
+      else if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); }
+    };
     // (an engine without a resize observer measures it again whenever the window changes)
     if (window.ResizeObserver) new ResizeObserver(resized).observe(svg); else addEventListener('resize', resized);
 
@@ -323,6 +331,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const sayEl = out('cvSay'); let quiet;
     const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
+    // On a phone on its side the heading holds over its column on a band of its own. A slider the keyboard brings the focus
+    // to while it lies under that band or its fade (reading back up the page, the browser sees it as in view) is brought out
+    // below them; site.css gives the sliders that room as their scroll margin.
+    const held = document.querySelector('.cv-txt h3');
+    const clear = (e) => {
+      const s = e.target;
+      if (!held || !s.matches(':focus-visible') || getComputedStyle(held).position !== 'sticky') return;
+      const h = held.getBoundingClientRect(), b = s.getBoundingClientRect();
+      if (b.top < h.bottom + 32 && b.bottom > h.top) s.scrollIntoView({ block: 'start' });
+    };
+    price.addEventListener('focus', clear); loan.addEventListener('focus', clear);
 
     // One peek, once a session: when the figure has stood at least 60% in view for a second with no hand on the
     // instrument, the price steps up two notches and back, quietly, while a bronze ring pulses once on its thumb. Any
