@@ -311,7 +311,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // The sentence below the figure is a live region: filled after load it would be read out away from its figure,
     // so the first draw fills it quietly, as the sliders do between steps.
     const first = () => { if (lastW) return; const s = out('cvSay'); s.setAttribute('aria-live', 'off'); redraw(); lastW = W; setTimeout(() => s.setAttribute('aria-live', 'polite'), 600); };
-    if (window.requestIdleCallback) requestIdleCallback(first, { timeout: 1000 }); else setTimeout(first, 200);
+    // (in a quiet moment once the page has settled, or as the figure comes within a screen and a half of view if that is
+    // sooner, so it never takes a turn of its own while the page is still starting)
+    if (window.requestIdleCallback) requestIdleCallback(first, { timeout: 4000 }); else setTimeout(first, 200);
+    if ('IntersectionObserver' in window) new IntersectionObserver((es, o) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); first(); } }, { rootMargin: '150% 0px' }).observe(svg);
     const resized = () => { if (!lastW) size(); else if (Math.abs((svg.clientWidth || 0) - lastW) > 2) { lastW = svg.clientWidth; redraw(); } };
     // (an engine without a resize observer measures it again whenever the window changes)
     if (window.ResizeObserver) new ResizeObserver(resized).observe(svg); else addEventListener('resize', resized);
@@ -377,16 +380,23 @@ document.addEventListener('DOMContentLoaded', function () {
       const c = dim && form.querySelector('input[name="as"]:checked'), lab = c && c.closest('label');
       if (!lab || (lab === placed && !force)) return;
       placed = lab;
-      const a = as.getBoundingClientRect(), r = lab.getBoundingClientRect();
+      // (measured from the line's own origin, its box less the shift it carries now, even mid-travel: where the legend stands
+      // on a row of its own, as on a phone, the fieldset sets its positioned children below it, not at its own top)
+      const o = dim.getBoundingClientRect(), t = new DOMMatrixReadOnly(getComputedStyle(dim).transform), r = lab.getBoundingClientRect(), x = o.left - t.m41, y = o.top - t.m42;
       if (still) dim.classList.add('still');
-      dim.style.setProperty('--dx', r.left - a.left + 'px'); dim.style.setProperty('--dy', r.bottom - a.top - 3 + 'px'); dim.style.setProperty('--dw', r.width + 'px');
+      dim.style.setProperty('--dx', r.left - x + 'px'); dim.style.setProperty('--dy', r.bottom - y - 3 + 'px'); dim.style.setProperty('--dw', r.width + 'px');
       if (still) { void dim.offsetWidth; dim.classList.remove('still'); }
     };
+    // (the line is drawn as the letter comes within a screen of view, not while the page starts: until then the chosen
+    // label keeps its own bronze rule)
     if (as && !as.hidden) {
-      dim = document.createElement('span'); dim.className = 'dim'; dim.setAttribute('aria-hidden', 'true'); as.appendChild(dim); as.classList.add('dimmed');
-      mark = () => place(true);
-      addEventListener('resize', () => place(true, true));
-      if (document.fonts) document.fonts.ready.then(() => place(true, true));
+      const line = () => {
+        dim = document.createElement('span'); dim.className = 'dim'; dim.setAttribute('aria-hidden', 'true'); as.appendChild(dim); as.classList.add('dimmed');
+        mark = () => place(true); place(true, true);
+        addEventListener('resize', () => place(true, true));
+        if (document.fonts) document.fonts.ready.then(() => place(true, true));
+      };
+      if ('IntersectionObserver' in window) new IntersectionObserver((es, o) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); line(); } }, { rootMargin: '100% 0px' }).observe(as); else line();
     }
     const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
     // (each step waits for the one before it to finish, on the page's own animation clock)

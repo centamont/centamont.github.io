@@ -383,6 +383,18 @@ test('assets carry the current version', async ({}, info) => {
   expect(refs).toBeGreaterThanOrEqual(23);
 });
 
+// An id names one element on its page: a second one (a drawing's pattern, say) silently loses to the first, and whatever
+// points at it by url(#id) takes the wrong one.
+test('no page repeats an id', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'journal/index.html',
+    'journal/buying-pre-construction-florida.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html'];
+  for (const p of pages) {
+    const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+    expect(ids.filter((v, i) => ids.indexOf(v) !== i), `${p} repeats an id`).toEqual([]);
+  }
+});
+
 // A note's dates are written in five places. They must agree: the date on the page, the share tags, the structured
 // data and the feed say the same published and revised days, and the sitemap never claims an older change.
 test('journal dates agree everywhere they are written', async ({}, info) => {

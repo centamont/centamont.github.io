@@ -12,7 +12,11 @@
     const label = btn.querySelector('span') || btn, word = label.textContent;
     // While the menu is open the page behind it is inert, and Tab cycles between the links and Close.
     const behind = () => document.querySelectorAll('main, footer, .skip');
-    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); if (o) root.classList.toggle('sb', innerWidth > root.clientWidth); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word; behind().forEach((el) => { el.inert = o; }); };
+    // (opening, the page behind turns inert a frame after the drawer has painted, so the press answers at once: making the
+    // whole page inert restyles all of it; closing, it is live again at once, so a place chosen in the menu can take the focus)
+    let still = 0;
+    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); if (o) root.classList.toggle('sb', innerWidth > root.clientWidth); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word;
+      cancelAnimationFrame(still); if (o) still = requestAnimationFrame(() => { still = requestAnimationFrame(() => { if (nav.classList.contains('open')) behind().forEach((el) => { el.inert = true; }); }); }); else behind().forEach((el) => { el.inert = false; }); };
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
@@ -99,12 +103,14 @@
     // (with motion reduced or paused the header stays put: a bar that blinks out and back at every turn of the scroll
     // would be a jump of its own)
     const narrow = matchMedia('(max-width:820px)'), calm = matchMedia('(prefers-reduced-motion: reduce)');
-    let lastY = scrollY, down = 0, hold = 0, hraf = 0;
+    // (the first scroll is only taken as where the reader stands: the browser's own move to a place named in the address, or
+    // back to where a reloaded page was, is not reading on down)
+    let lastY = -1, down = 0, hold = 0, hraf = 0;
     const off = (o) => { if (root.classList.contains('hdr-off') !== o) root.classList.toggle('hdr-off', o); };
     steady = () => { off(false); down = 0; hold = performance.now() + 1500; addEventListener('scrollend', () => { hold = performance.now() + 120; }, { once: true }); };
     const step = () => {
       hraf = 0;
-      const y = Math.max(0, scrollY), d = y - lastY; lastY = y;
+      const y = Math.max(0, scrollY), d = lastY < 0 ? 0 : y - lastY; lastY = y;
       if (!narrow.matches || calm.matches || root.dataset.motion === 'off' || root.classList.contains('menu-open') || y <= header.offsetHeight || header.querySelector(':focus-visible') || d < 0) { down = 0; off(false); return; }
       if (performance.now() < hold) { down = 0; return; }
       down += d; if (down > 8) off(true);
@@ -112,6 +118,10 @@
     addEventListener('scroll', () => { if (!hraf) hraf = requestAnimationFrame(step); }, { passive: true });
     header.addEventListener('focusin', () => off(false));
     addEventListener('hashchange', steady); addEventListener('popstate', steady);
+    // a page opened on a place (a link from another page to one of this page's sections) lands as a jump does, the bar held
+    // over it until the browser has settled the page there
+    if (location.hash.length > 1) { steady(); addEventListener('load', steady, { once: true }); }
+    addEventListener('pageshow', (e) => { if (e.persisted && location.hash.length > 1) steady(); });
     (narrow.addEventListener ? narrow.addEventListener('change', step) : narrow.addListener(step));
   }
 
@@ -126,24 +136,26 @@
     motionBtn.setAttribute('aria-pressed', String(off));
     motionBtn.addEventListener('click', (e) => {
       let kept = false;
-      try {
-        if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off');
-        kept = true;
-        // and the page comes back where the reader was, not where the address or the browser would put it
-        sessionStorage.setItem('cm-y', JSON.stringify({ p: location.pathname, y: Math.round(scrollY) }));
-        // pressed from the keyboard, the focus comes back to the switch after the reload
-        if (e.detail === 0) sessionStorage.setItem('cm-focus', 'motion');
-      } catch (err) {}
+      try { if (off) localStorage.removeItem('cm-motion'); else localStorage.setItem('cm-motion', 'off'); kept = true; } catch (err) {}
       const u = new URL(location.href);
       if (!off && !kept) u.searchParams.set('motion', 'off'); else u.searchParams.delete('motion');
-      if (u.href === location.href) location.reload(); else location.replace(u.href);
+      // and the page comes back where the reader was, not where the address or the browser would put it, and, pressed from
+      // the keyboard, with the focus on the switch: both ride in this page's own history entry, which a reload keeps, so
+      // they hold even where the browser keeps no site data
+      let moved = false;
+      try { history.replaceState(Object.assign({}, typeof history.state === 'object' ? history.state : null, { cmY: { p: location.pathname, y: Math.round(scrollY) }, cmFocus: e.detail === 0 }), '', u.href); moved = true; } catch (err) {}
+      if (moved || u.href === location.href) location.reload(); else location.replace(u.href);
     });
-    try { if (sessionStorage.getItem('cm-focus') === 'motion') { sessionStorage.removeItem('cm-focus'); motionBtn.focus({ preventScroll: true }); } } catch (e) {}
   }
-  // Back from the motion switch's reload, the page stands where the reader left it.
+  // Back from the motion switch's reload, the page stands where the reader left it (and the switch has the focus, if the
+  // keyboard pressed it); the entry then lets both go.
   try {
-    const k = JSON.parse(sessionStorage.getItem('cm-y') || 'null');
-    sessionStorage.removeItem('cm-y');
+    const hs = history.state && typeof history.state === 'object' ? history.state : null, k = hs && hs.cmY;
+    if (hs && ('cmY' in hs || 'cmFocus' in hs)) {
+      if (hs.cmFocus && motionBtn) motionBtn.focus({ preventScroll: true });
+      const rest = Object.assign({}, hs); delete rest.cmY; delete rest.cmFocus;
+      history.replaceState(rest, '');
+    }
     if (k && k.p === location.pathname && k.y > 0) {
       const put = () => { steady(); scrollTo({ top: k.y, behavior: 'instant' }); };
       put(); addEventListener('load', () => { if (Math.abs(scrollY - k.y) > 2) put(); }, { once: true });
@@ -401,11 +413,15 @@
   }, true);
 
   // A button fills from the left: a copy of its label in the fill's colours, hidden from screen readers, that site.css
-  // uncovers over the label (whose own colour never changes).
+  // uncovers over the label (whose own colour never changes). The copy's words are drawn from an attribute (site.css,
+  // .btn .fx::before), not written into the page, so the page's text, and a link's words as a search engine reads them,
+  // hold the label once; only its arrow is copied.
   document.querySelectorAll('.btn').forEach((b) => {
     if (b.querySelector(':scope > .fx')) return;
     const fx = document.createElement('span'); fx.className = 'fx'; fx.setAttribute('aria-hidden', 'true');
-    b.childNodes.forEach((n) => { if (!(n.nodeType === 1 && n.classList.contains('vh'))) fx.appendChild(n.cloneNode(true)); });
+    let words = '';
+    b.childNodes.forEach((n) => { if (n.nodeType === 3) words += n.textContent; else if (n.nodeType === 1 && !n.classList.contains('vh')) { if (n.matches('svg')) fx.appendChild(n.cloneNode(true)); else words += n.textContent; } });
+    fx.dataset.label = words.replace(/\s+/g, ' ').trim();
     b.appendChild(fx);
   });
   // A ruled row that leads somewhere takes an arrow at its end, drawn in as the row answers (site.css, .ra).
