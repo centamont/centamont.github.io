@@ -2,6 +2,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 
 // Every section of the one-page centamont.com and a phrase from its heading.
 const sections = [
@@ -361,6 +362,16 @@ test('the report bars draw on a short phone screen', async ({ page }) => {
     await expect(page.locator(sel)).toHaveClass(/\bin\b/);
   }
   await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.rp-funnel .bar i, .rp-src .bar i')].every((i) => getComputedStyle(i).transform === 'none'))).toBe(true);
+});
+
+// The stylesheet is written, with its notes, in _src/site.css; tools/version.py builds the site.css pages load without them.
+// A hand edit to site.css, or a source change without a rebuild, would ship styles that differ from the source.
+test('the stylesheet is built from its source', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  let out = '';
+  try { execFileSync('python3', ['tools/version.py', '--check'], { encoding: 'utf8' }); }
+  catch (e) { out = String(e.stdout || e.message); }
+  expect(out, 'site.css or a ?v= token is stale: run python3 tools/version.py').toBe('');
 });
 
 // Stylesheet and scripts are linked with one shared ?v= token taken from their contents (tools/version.py), so a

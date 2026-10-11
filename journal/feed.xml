@@ -7,7 +7,7 @@
   <id>https://centamont.com/journal/</id>
   <icon>https://centamont.com/apple-touch-icon.png</icon>
   <logo>https://centamont.com/og.png</logo>
-  <updated>2026-10-10T12:00:00Z</updated>
+  <updated>2026-10-11T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <rights>© 2026 Centamont</rights>
   <entry>
@@ -16,7 +16,7 @@
     <id>https://centamont.com/journal/what-a-weekly-sales-report-should-measure.html</id>
     <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
-    <updated>2026-10-08T12:00:00Z</updated>
+    <updated>2026-10-10T12:00:00Z</updated>
     <summary>The figures that belong on a developer’s weekly sales report, why each is measured against the plan, and how the sheet should end in decisions.</summary>
   </entry>
   <entry>
@@ -25,7 +25,7 @@
     <id>https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html</id>
     <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
-    <updated>2026-10-09T12:00:00Z</updated>
+    <updated>2026-10-11T12:00:00Z</updated>
     <summary>How a launch price moves two numbers: the month the lender’s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
   </entry>
   <entry>
@@ -35,6 +35,6 @@
     <category term="Buyer guide"/>
     <published>2026-10-07T12:00:00Z</published>
     <updated>2026-10-10T12:00:00Z</updated>
-    <summary>How deposits are protected, the 15-day window to cancel, and the questions to ask a developer before you reserve in a new Miami building.</summary>
+    <summary>How deposits are protected, the 15-day window to cancel, and the questions to ask a developer before you reserve in a new Florida building.</summary>
   </entry>
 </feed>
