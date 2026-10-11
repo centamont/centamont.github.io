@@ -110,10 +110,18 @@ document.addEventListener('DOMContentLoaded', function () {
       const best = pl.best;
       let two = 0;
       tl.forEach(([, e], i) => { const c = best[i]; two = Math.max(two, c.row); e.dataset.row = c.row; e.setAttribute('x', c.a); e.setAttribute('text-anchor', c.anchor); });
-      Y0 = tl.length ? 34 + 16 * two : 30; Y1 = H - 52;
-      tl.forEach(([m, e]) => e.setAttribute('y', 18 + 16 * +e.dataset.row));
+      // names stacked over one another (a later one on the row under an earlier one it overlaps) get a wider row pitch,
+      // so the two read as separate lines with clear air between them; names that sit side by side keep the close one.
+      // Up to a phone on its side (1040px), where Ground broken and Top-off stack, a name that comes within 12px of the one
+      // above it counts as stacked too, and the pitch opens to a clear line of air (30px), so the two never read as one
+      // label in two lines
+      const tight = matchMedia('(max-width:1040px)').matches;
+      const over = (a, b) => (tight ? a.l < b.r + 12 && b.l < a.r + 12 : a.l < b.r && b.l < a.r);
+      const P = best.some((a) => best.some((b) => b.row === a.row + 1 && over(a, b))) ? (tight ? 30 : 22) : 16;
+      Y0 = tl.length ? 34 + P * two : 30; Y1 = H - 52;
+      tl.forEach(([m, e]) => e.setAttribute('y', 18 + P * +e.dataset.row));
       [0.25, 0.5, 0.75, 1].forEach((f) => { el('line', { x1: X0, x2: X1, y1: y(f), y2: y(f) }, g); el('text', { x: X0 - 8, y: y(f) + 4, 'text-anchor': 'end' }, g, Math.round(f * 100) + '%'); });
-      tl.forEach(([m, e]) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: 6 + 16 * +e.dataset.row, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
+      tl.forEach(([m, e]) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: 6 + P * +e.dataset.row, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
       if (!tl.length) [BREAK, TOP, DONE].forEach((m) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: Y0 - 8, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
       el('line', { class: 'axis', x1: X0, x2: X1, y1: Y1, y2: Y1 }, g);
       // month ticks, every six
