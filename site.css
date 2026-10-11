@@ -182,7 +182,7 @@ header.site{container:site/inline-size;max-width:100vw}
 .btn:hover svg,.btn:focus-visible svg{transform:translateX(4px)}
 .band .btn{--fill:var(--bronze);--on:var(--ink);border-color:var(--bronze);color:var(--band-fg)}
 .row{display:flex;flex-wrap:wrap;gap:14px}
-.more{display:inline-block;font-size:15px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-block:12px 3px;margin-top:-9px;justify-self:start;transition:color .2s}
+.more{display:inline-block;font-size:16px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-block:12px 3px;margin-top:-9px;justify-self:start;transition:color .2s}
 .more:is(:hover,:focus-visible){color:var(--fg)}
 
 /* Section scaffolding */
@@ -262,7 +262,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .rise > *{min-width:0}
 .elev{position:sticky;align-self:start;top:64px;height:calc(100svh - 64px);display:flex;flex-direction:column;gap:12px;margin:0 0 0 calc(var(--bleed) * -1);padding:clamp(18px,3vh,36px) 0 clamp(14px,2.4vh,28px)}
 .elev canvas{width:100%;flex:1;min-height:0;display:block}
-.gauge{display:flex;justify-content:flex-start;align-items:baseline;gap:clamp(28px,4vw,72px);margin-left:var(--bleed);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.gauge{display:flex;justify-content:flex-start;align-items:baseline;gap:clamp(28px,4vw,72px);margin-left:var(--bleed);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .gauge b{font-family:var(--display);font-weight:300;font-size:clamp(40px,3.8vw,60px);letter-spacing:-.01em;color:var(--fg);margin-left:12px;line-height:1}
 .gauge span + span b{color:var(--accent)}
 .gauge i{font-style:normal;color:var(--faint);margin-left:2px;letter-spacing:.04em}
@@ -274,7 +274,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .gauge .fill{position:absolute;left:0;right:0;top:-.5px;height:2px;background:var(--sold);transform:scaleX(0);transform-origin:0 50%}
 .gauge .lim{position:absolute;left:50%;top:-4px;width:1px;height:9px}
 .gauge .lim::before{content:'';position:absolute;inset:0;background:var(--sold)}
-.gauge .lim small{position:absolute;top:13px;left:0;transform:translateX(-50%);font-size:13px;line-height:1;letter-spacing:.14em;white-space:nowrap;color:var(--faint);transition:color .6s var(--ease)}
+.gauge .lim small{position:absolute;top:13px;left:0;transform:translateX(-50%);font-size:13px;line-height:1;letter-spacing:.14em;white-space:nowrap;color:var(--muted);transition:color .6s var(--ease)}
 .gauge.met .lim small{color:var(--accent)}
 .gauge.pulse .lim::before{animation:lim 1.1s var(--ease)}
 @keyframes lim{30%{transform:scaleY(2.2)}}
@@ -288,14 +288,48 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .steps{list-style:none;margin:0;padding:0;counter-reset:st}
 .step{min-height:64svh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding-block:40px;counter-increment:st}
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
-/* the last step can reach the middle of the screen while the tower is still standing beside it */
+/* the last step is the tower's last runway: a full window, so its last closing view settles before the drawing lets go */
 .step:last-child{min-height:100svh}
-/* beside the tower each step holds the screen about as long as its words take to read (the last keeps its runway) */
-@media (min-width:1041px){.step:nth-child(1),.step:nth-child(3){min-height:60svh}.step:nth-child(2){min-height:54svh}.step:nth-child(4),.step:nth-child(5){min-height:50svh}}
+/* beside the tower every step is as tall as its words, with the same measured gap between one step and the next, so the
+   story reads at an even pace (the last keeps its runway) */
+@media (min-width:1041px){.steps{--pad:clamp(40px,4.5svh,72px)}.step{padding-block:var(--pad)}.step:not(:last-child){min-height:0}}
+/* Step 05 keeps the drawing until its first line meets the bar, so it has a window of its own, whole, after 04 has passed
+   under the bar and before 06 takes the ink: the line between the two steps' boxes (where the drawing changes hands, at
+   the middle of the window) moves down the gap between their words, which stays the same measured gap. 405px is the bar
+   (65px) and 05's words (about 340px); a short window, where 05 cannot stand whole beside a whole 06, keeps the change at
+   the top of the gap, and a tall one at its foot. */
+@media screen and (min-width:1041px){
+  html.js .steps{--hand:clamp(0px,52svh - 405px,2 * var(--pad))}
+  html.js .step:nth-last-child(2){padding-bottom:var(--hand)}
+  html.js .step:last-child{padding-top:calc(2 * var(--pad) - var(--hand))}
+}
+/* the last step's words are a coda: a box of their own inside the runway (on a phone it simply stands in the step) */
+.coda{display:flex;flex-direction:column;gap:inherit}
+/* Beside the tower the runway is the drawing's moment: the last step's words arrive at the same gap as every other step
+   and stop at the foot of the sheet, their last line on the baseline of the figure's caption (Last closing), and hold
+   there beside the finished building while its last closing view settles; then words and drawing leave together, line
+   for line, so no fragment of the words is left beside the drawing and no part of the drawing beside an empty column.
+   (The words hold their foot as far above the window's foot as the step's own padding, which is the figure's own bottom
+   padding less the 1px between the two faces' baselines, so they let go exactly as the figure reaches the end of the story.) */
+@media screen and (min-width:821px) and (min-height:600px){
+  html.js .step:last-child{--hold:calc(clamp(14px,2.4vh,28px) - 1px);justify-content:flex-end;padding-bottom:var(--hold)}
+  html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
+}
 .step h3{font-size:var(--t-head);max-width:17ch}
-/* each step's numeral at display size, sliding in as the step arrives */
-.step h3::before{content:counter(st,decimal-leading-zero);display:block;width:max-content;font:300 var(--t-num)/.8 var(--display);letter-spacing:-.03em;color:var(--accent);margin:0 0 .12em -.06em;font-variant-numeric:lining-nums tabular-nums;opacity:.14;transform:translateX(-.22em);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
+/* each step's numeral at display size, sliding in as the step arrives; the steps before and after it keep a steady ghost */
+.step h3::before{content:counter(st,decimal-leading-zero);display:block;width:max-content;font:300 var(--t-num)/.8 var(--display);letter-spacing:-.03em;color:var(--accent);margin:0 0 .12em -.06em;font-variant-numeric:lining-nums tabular-nums;opacity:.2;transform:translateX(-.22em);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
 .step.on h3::before{opacity:1;transform:none}
+/* Beside the tower a step turns as one: its numeral, heading and words take the ink together, on the same clock, as the
+   drawing takes the step, and stand back together as it moves on, so a step still to come (or already read) never shows
+   full ink under a ghost numeral, and two steps never compete in one window. The words stand back to the faint tone, which
+   still reads at AA. (On phones the steps pass one at a time under the drawing and keep their ink.) */
+@media screen and (min-width:821px) and (forced-colors:none){
+  html.js .step :is(h3,p,li,.more){transition:color .6s var(--ease-out)}
+  html.js .step:not(.on) :is(h3,p,li,.more){color:var(--faint)}
+  html.js .step:not(.on) .more:is(:hover,:focus-visible){color:var(--fg)}
+  /* (a link still answers the pointer at its own pace) */
+  html.js .step .more:is(:hover,:focus-visible){transition-duration:.2s}
+}
 /* the numerals are ornament: the list already gives the order, so a screen reader passes over them */
 .step h3::before{content:counter(st,decimal-leading-zero) / ""}
 .step p{color:var(--muted);max-width:46ch}
@@ -313,7 +347,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .step:first-child{min-height:auto;padding-top:40px}
   .step:last-child{min-height:44svh}
 }
-@media (prefers-reduced-motion:reduce){.step h3::before{transform:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.step h3::before{transform:none;transition:none}html.js .step :is(h3,p,li,.more){transition:none}}
 :root[data-motion="off"] .step h3::before{transform:none}
 
 /* How an engagement begins: the heading and the specimen sheet on the left; the steps, the call to write and the
@@ -331,7 +365,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .seq{font-family:var(--display);font-weight:300;font-size:32px;line-height:1;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
 .begin .close{display:grid;gap:14px;margin-top:-4px}
 .begin .close .btn{justify-self:start}
-.begin .close p{font-size:15px;line-height:1.55;color:var(--faint);max-width:32em}
+.begin .close p{font-size:16px;line-height:1.55;color:var(--muted);max-width:32em}
 /* the line that leads into the call reads as the steps do; the case-study note under it stays small */
 .begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
 @media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
@@ -346,7 +380,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .sp-sheet::before{content:"";position:absolute;inset:-9px;pointer-events:none;--t:linear-gradient(var(--accent),var(--accent));background:var(--t) 0 8px/8px 1px no-repeat,var(--t) 8px 0/1px 8px no-repeat,var(--t) 100% 8px/8px 1px no-repeat,var(--t) calc(100% - 8px) 0/1px 8px no-repeat,var(--t) 0 calc(100% - 8px)/8px 1px no-repeat,var(--t) 8px 100%/1px 8px no-repeat,var(--t) 100% calc(100% - 8px)/8px 1px no-repeat,var(--t) calc(100% - 8px) 100%/1px 8px no-repeat}
 .sp-hd{display:flex;justify-content:space-between;gap:12px;padding:10px 14px 9px;border-bottom:1px solid var(--rule);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;line-height:1.4;color:var(--fg)}
 .sp-hd > span{margin-right:-.14em}
-.sp-hd > span + span{color:var(--faint)}
+.sp-hd > span + span{color:var(--muted)}
 .sp-body{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;column-gap:18px;padding:16px 14px 14px}
 .sp-plan{display:block;overflow:visible;grid-row:1 / span 2}
 .sp-plan text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
@@ -359,11 +393,11 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .sp-plan-l{stroke:var(--fg);stroke-width:1.2;stroke-dasharray:4 3;opacity:.6}
 .sp-act{stroke:var(--sold-line);stroke-width:2}
 .sp-dot{stroke:var(--sold);stroke-width:8;stroke-linecap:round}
-.spec .rp-key{margin:10px 0 0;gap:6px 14px}
+.spec .rp-key{margin:10px 0 0;gap:6px 14px;font-weight:500;color:var(--muted)}
 .spec .sp-key{margin:0;padding-top:12px;display:grid;gap:5px}
 /* a narrow sheet sets the key in a row beneath the drawing, and its header drops the day */
 @container (max-width:339px){.sp-plan{grid-row:1}.spec .sp-key{grid-column:1 / -1;display:flex;gap:8px 20px;padding-top:14px}.sp-day{display:none}}
-.sp-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 18px;margin:0;font-size:15px;line-height:1.5;color:var(--faint)}
+.sp-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 18px;margin:0;font-size:16px;line-height:1.5;color:var(--muted)}
 .sp-go{display:inline-flex;align-items:center;gap:10px;font-weight:500;letter-spacing:.04em;color:var(--accent);background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/100% 1px;padding-bottom:2px;transition:color .2s}
 .sp-go svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
 .spec:is(:hover,:focus-visible) .sp-go{color:var(--fg)}
@@ -397,7 +431,7 @@ section.band + section,section + section.band{border-top:0}
 /* the offer's call is solid on the ink, as the hero's is; the Instagram message stays the outlined second */
 .band .btn.solid{--fill:var(--band);--on:#F4F0E8;background-color:#F4F0E8;color:#14161A;border-color:#F4F0E8}
 .band .btn.solid:hover,.band .btn.solid:focus-visible{color:#F4F0E8}
-.door .note{margin-top:18px;font-size:15px;line-height:1.5;color:var(--band-muted)}
+.door .note{margin-top:18px;font-size:16px;line-height:1.5;color:var(--band-muted)}
 .door .note + .more{margin-top:12px}
 /* The doorway: two leaves hinged at the jambs open into a lit room (--o, 0 to 1). Once a third of the door is in view
    (site.js adds .in) the arch inks itself over 0.8s as the leaves swing open over 0.85s: one gesture, with the promises
@@ -484,7 +518,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .levels{margin-top:clamp(44px,6vw,80px);border-top:1px solid var(--fg)}
 .lv{display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:baseline;padding-block:24px;border-bottom:1px solid var(--rule)}
 .lv > *{min-width:0}
-.lv .when{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.lv .when{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 /* the status follows the market's name in the markup (a meta line goes below its title); in the ruled phone table it keeps its column at the left */
 .lv .when{grid-column:1;grid-row:1}.lv h3{grid-column:2;grid-row:1}
 .lv.now .when{color:var(--accent)}
@@ -522,9 +556,9 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .sw.often{border-style:dashed}
 :root[data-theme="dark"] :is(.s,.sw).often{--hatch:rgba(237,231,220,.3)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.s,.sw).often{--hatch:rgba(237,231,220,.3)}}
-.dscale{position:relative;height:20px;font-size:13px;color:var(--faint)}
+.dscale{position:relative;height:20px;font-size:13px;color:var(--muted)}
 .dscale span{position:absolute;left:calc(var(--at) * 1%);transform:translateX(-50%);white-space:nowrap}
-.dscale span:first-child{transform:none}.dscale span:last-child{transform:translateX(-100%)}
+.dscale span:last-child{transform:translateX(-100%)}
 .dkey{margin:10px 0 0;border-top:1px solid var(--rule)}
 .dkey div{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--rule);font-size:16px}
 .dkey dt{font-weight:500;display:flex;align-items:center;gap:10px}
@@ -533,9 +567,33 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .deposit figcaption{font-size:15px;line-height:1.5;color:var(--faint);border-top:1px solid var(--rule);padding-top:10px}
 /* the caption's rule closes the key */
 .dkey div:last-child{border-bottom:0}
-@media (max-width:520px){.dkey div{grid-template-columns:1fr;gap:2px}.dscale span:nth-child(3){display:none}}
-/* on a narrow bar the 10% mark stands close to the bar's start, so the start goes unlabelled rather than read as '0 10%' */
-@container (max-width:419px){.dscale span:first-child{display:none}}
+@media (max-width:520px){.dkey div{grid-template-columns:1fr;gap:2px}}
+/* Journal: the guide and its deposit schedule read as one article. Its standfirst reads in the display face; the schedule
+   is a plate on the sheet, inside the measure, between corner ticks and over its caption strip, as every figure is: the
+   price marked off above the bar in the display face, as a dimension string is (two steps under the guide's title, in
+   the muted tone of a label that carries information, so it never outweighs the title or the key under the bar), the
+   bar's own end standing for zero, and the key in ruled rows under it, each key in bold, then what it means. From a tablet
+   up the words stand beside the plate, and the guide's links follow its meta line at the text's own pace, as part of the
+   article; on a phone, where the plate follows the meta line at once, the links close the article under its caption. */
+#journal .feature .txt > p:not([class]){font-family:var(--display);font-size:var(--t-big);line-height:1.32;color:var(--fg);max-width:32em;text-wrap:balance}
+#journal .deposit{gap:10px}
+#journal .deposit .ticks{display:grid;padding:clamp(14px,1.55vw,22px) clamp(14px,1.8vw,26px) clamp(8px,.85vw,12px)}
+#journal .dscale{order:-1;--t-dim:max(13px,min(var(--t-big),6.6cqi));height:calc(var(--t-dim) + 18px);font:300 var(--t-dim)/1 var(--display);font-variant-numeric:lining-nums;letter-spacing:-.01em;color:var(--muted)}
+#journal .dscale span::after{content:"";position:absolute;left:50%;top:calc(100% + 6px);height:12px;border-left:1px solid var(--fg)}
+#journal .dscale span:last-child::after{left:auto;right:0}
+#journal .dbar{height:clamp(64px,5vw,76px)}
+#journal .dkey{margin-top:clamp(14px,1.3vw,18px)}
+#journal .dkey div{grid-template-columns:minmax(0,7.5em) minmax(0,1fr);align-items:start;gap:2px 16px;padding:9px 0;line-height:1.5}
+/* (a narrow plate stands each key over its meaning) */
+@container (max-width:339px){#journal .dkey div{grid-template-columns:minmax(0,1fr)}}
+#journal .feature .links{margin-top:calc(14px - clamp(32px,6vw,96px))}
+@media (min-width:821px){
+  /* (the text's row is as tall as the text; the plate's extra height falls to the row under it, so the links keep to the
+     meta line: the row's 24px gap less 6px gives the 18px between the text's own lines) */
+  #journal .feature{grid-template-columns:minmax(0,3fr) minmax(0,5fr);grid-template-rows:auto 1fr;gap:24px clamp(32px,4.4vw,64px)}
+  #journal .deposit{grid-area:1 / 2 / span 2}
+  #journal .feature .links{grid-area:2 / 1;align-self:start;margin:-6px 0 0}
+}
 
 /* People */
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
@@ -1270,7 +1328,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-ctl{display:grid;gap:10px;margin-top:8px}
 .cv-l{margin-top:-12px}
 .cv-ctl .lab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 16px;margin-top:10px}
-.cv-ctl label{flex:1 1 0;min-width:min(100%,10em);text-wrap:balance;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.cv-ctl label{flex:1 1 0;min-width:min(100%,10em);text-wrap:balance;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .cv-ctl output{font-family:var(--display);font-size:24px;color:var(--accent);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
 .cv-ctl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;margin:0;cursor:pointer}
 .cv-ctl input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--fg)}
@@ -1283,7 +1341,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-read div{padding:14px 14px 0 0;display:grid;grid-template-rows:auto 1fr}
 .cv-read dd{align-self:end}
 .cv-read div + div{padding-left:14px;border-left:1px solid var(--rule)}
-.cv-read dt{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.cv-read dt{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .cv-read dd{margin:6px 0 0;font-family:var(--display);font-size:clamp(26px,2.4vw,34px);font-weight:300;line-height:1.1;font-variant-numeric:lining-nums tabular-nums}
 .cv-say{font-family:var(--display);font-style:italic;font-size:21px;line-height:1.45;color:var(--muted);min-height:3em}
 /* beside the figure the sentence keeps room for its three lines, so the columns hold still while the price moves */
@@ -1383,7 +1441,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .letter .fallback textarea{font:300 18px/1.6 var(--display);font-variant-numeric:lining-nums;color:var(--fg);background:var(--sheet);border:1px solid var(--rule);padding:16px 18px;resize:vertical;width:100%}
 /* a blank still to fill takes a heavier dashed rule, which stays when the focus moves on (its margin gives the extra pixel back) */
 .letter .sheet input:user-invalid,.letter .sheet input.miss{border-bottom:2px dashed var(--accent);margin-bottom:-1px}
-.letter .fine{color:var(--faint);font-size:15px}
+.letter .fine{color:var(--muted);font-size:16px}
 @media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter .send .direct{justify-self:start;margin:0}.letter legend{float:none;width:100%;margin-bottom:6px}}
 /* the narrowest phones give the letter's lines a little more room, and keep the send button's label on one line; below 354px
    the letter's type also steps down with the screen, so the longest choice ('when the right home appears') still fits its line */
@@ -1404,7 +1462,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 /* Touch: each blank is tall enough to tap (the padding sits above the words), and its top margin gives that height back,
    so a line with a blank keeps the same pitch as a line without one. Phones held sideways are touch screens too. */
 @media (max-width:520px),(pointer:coarse){.letter .sheet input,.letter .sheet select{padding-block:10px 1px;margin-block:-9px 0}.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline-offset:0}}
-.cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .cv-key li{display:flex;align-items:center;gap:8px}
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
@@ -2093,7 +2151,7 @@ p,li{text-wrap:pretty}
 .faq summary:is(:hover,:focus-visible){color:var(--accent)}
 .faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
 /* the answer's space below is padding, not margin, so it stays inside the panel that opens and closes */
-.faq details p{margin:0;padding-bottom:24px;max-width:58ch;font-size:17px;line-height:1.65;color:var(--muted)}
+.faq details p{margin:0;padding-bottom:24px;max-width:58ch;font-size:18px;line-height:1.65;color:var(--muted)}
 /* An answer opens as the + turns, where the browser can size a panel to its content; elsewhere it simply appears */
 @media screen and (prefers-reduced-motion:no-preference){
   .faq details{interpolate-size:allow-keywords}
@@ -2113,7 +2171,7 @@ p,li{text-wrap:pretty}
 .notes-list{list-style:none;margin:clamp(32px,4vw,48px) 0 0;padding:0;border-top:1px solid var(--rule)}
 .notes-list li{border-bottom:1px solid var(--rule)}
 .notes-list a{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 24px;align-items:baseline;padding:18px 0;text-decoration:none;color:var(--fg)}
-.notes-list .k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.notes-list .k{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25;transition:color .3s}
 .notes-list a:is(:hover,:focus-visible) .t{color:var(--accent)}
 @media (max-width:600px){.notes-list a{grid-template-columns:1fr}.notes-list .k{order:1}}
