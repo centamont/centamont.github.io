@@ -2448,9 +2448,9 @@ p,li{text-wrap:pretty}
   .js .tx-rise .w{overflow:visible}.js .tx-rise .w > i{transform:none!important}
   .head .intro::before{transform:none!important}
   html.js .cut .ln > span,.hero h1 .ln > span{transform:none!important}
-  .js .facade path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
+  .js .facade path,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
   .ruler .crack{opacity:1!important}
-  .js .facade .b{opacity:.45!important}
+  .js .facade .b{opacity:.45!important}.js .mk-el text{opacity:1!important}
   .doorway{--o:1!important}
   .leaf{background:var(--band)!important}
   .dbar .s,.rp-funnel .bar i,.rp-src .bar i,.js .ruler line{transform:none!important}
@@ -2603,3 +2603,25 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-fig .mk-ny .pt{r:1.5}.mk-fig .mk-ny .pt + .pt{r:1.3}
 @media (max-width:600px){.mk-fig .sv{--u:1}.mk-fig .mk-ny{--u:.42}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
+/* Each market page opens on its city seen from the water: a composite elevation, drawn to the same scale in feet for both
+   cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the
+   skyline, at a heavier pen, and leaves the ruler and the water's name to the wider screens. */
+.mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+.mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
+.mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
+.mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el .dt,.mk-el .bk{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.6}
+.mk-el .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu));opacity:.5}
+.mk-el .br{stroke:var(--sold-line)}
+.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu))}
+.mk-el text{font:500 calc(11px * var(--fu)) var(--body);letter-spacing:.2em;fill:var(--faint)}
+.mk-el .rl text{text-anchor:end;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.js .mk-el path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--t-ink) var(--ease-ink) calc(var(--i,0) * 140ms)}
+.js .mk-el.in path{stroke-dashoffset:0}
+.js .mk-el text{opacity:0;transition:opacity .6s var(--ease-out) 1s}
+.js .mk-el.in text{opacity:1}
+@media (prefers-reduced-motion:reduce){.js .mk-el path{stroke-dashoffset:0;transition:none}.js .mk-el text{opacity:1;transition:none}}
+:root[data-motion="off"] .mk-el path{stroke-dashoffset:0;transition:none}
+:root[data-motion="off"] .mk-el text{opacity:1;transition:none}
+@media (max-width:900px){.mk-el{--fu:1.4;aspect-ratio:2/1}}
+@media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
