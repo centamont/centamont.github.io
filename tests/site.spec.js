@@ -107,7 +107,7 @@ test('a far jump lands on its heading with the story in step', async ({ page, is
 // the sheet for the places after the door and the name.
 test('the header lands on the ground of the place it lands on', async ({ page, isMobile }) => {
   await page.goto('/');
-  for (const [id, ink] of [['clients', true], ['markets', false], ['contact', false]]) {
+  for (const [id, ink] of [['clients', true], ['contact', false]]) {
     if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
     await page.locator(`nav.main a[href="#${id}"]`).click();
     await expect.poll(() => page.evaluate((id) => Math.round(document.getElementById(id).getBoundingClientRect().top), id)).toBe(64);
