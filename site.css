@@ -806,7 +806,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart [data-m]{transition:opacity .4s var(--ease)}
 .chart[data-hl] .ov [data-m]{opacity:.18}
 .chart[data-hl="sf"] .ov [data-m="sf"],.chart[data-hl="ny"] .ov [data-m="ny"],.chart[data-hl="ladal"] .ov [data-m="ladal"],.chart[data-hl="more"] .ov [data-m="more"],.chart[data-hl="intl"] .ov [data-m="intl"]{opacity:1}
-.chart[data-hl] .ov :is(.loc,.rch){opacity:1}
+.chart[data-hl] .ov :is(.loc,.rch[data-m="sf"]){opacity:1}
 .chart .sv .ctx{transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .sv .ctx{opacity:.35}
 .lv{transition:color .3s}
@@ -822,6 +822,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .loc{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
+.chart .ov .pt.now{fill:var(--sold);stroke:var(--sheet);transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
 .js .chart :is(.lb,.lk):not(.landed){fill:var(--faint)}
 .chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .ko{fill:var(--sheet)}
@@ -857,7 +858,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 @media (max-width:599px){.chart .pa{aspect-ratio:430/286}.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.392%}
   .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
 @media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
-@media (max-width:374px){.chart .ov .lb.now{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
+@media (max-width:374px){.chart .ov .lb.now[data-m="sf"]{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
 @media (max-width:340px){.chart .sv .ttl{display:none}}
 .cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;color:var(--faint);text-align:left}
 figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}

@@ -1129,7 +1129,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 
 
 /* Markets chart */
-/* The map as one plate: the overview of every market, with the routes drawn out from South Florida by the reader's scroll,
+/* The map as one plate: the overview of every market, with the routes to later markets drawn out from South Florida by the reader's scroll,
    and beside it a survey of the stretch of coast that opens first. Sizes on each drawing are set in screen pixels through
    --u (viewBox units per pixel, kept by the page script for each drawing). */
 .chart{margin-top:clamp(44px,6vw,80px);display:grid;gap:clamp(36px,4.4vw,64px)}
@@ -1153,7 +1153,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart[data-hl] .ov [data-m]{opacity:.18}
 .chart[data-hl="sf"] .ov [data-m="sf"],.chart[data-hl="ny"] .ov [data-m="ny"],.chart[data-hl="ladal"] .ov [data-m="ladal"],.chart[data-hl="more"] .ov [data-m="more"],.chart[data-hl="intl"] .ov [data-m="intl"]{opacity:1}
 /* every route leaves from South Florida, so its locator stays lit whichever market is picked */
-.chart[data-hl] .ov :is(.loc,.rch){opacity:1}
+.chart[data-hl] .ov :is(.loc,.rch[data-m="sf"]){opacity:1}
 /* picked from the list, the launch stands out from the survey's linework */
 .chart .sv .ctx{transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .sv .ctx{opacity:.35}
@@ -1173,6 +1173,8 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .loc{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
+/* New York opens with South Florida: its two points take the survey's bronze, drawn in with the reach between them */
+.chart .ov .pt.now{fill:var(--sold);stroke:var(--sheet);transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
 .js .chart :is(.lb,.lk):not(.landed){fill:var(--faint)}
 .chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 /* then, the world: the International route ends on a world key that marks the overview's own frame */
@@ -1219,7 +1221,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
   .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
 /* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it, clear of Houston's */
 @media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
-@media (max-width:374px){.chart .ov .lb.now{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
+@media (max-width:374px){.chart .ov .lb.now[data-m="sf"]{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
 /* (narrower still, the survey's title no longer fits beside the coast; the overview below names South Florida) */
 @media (max-width:340px){.chart .sv .ttl{display:none}}
 /* A drawing's caption strip: what the drawing is, on the left; its key, on the right */

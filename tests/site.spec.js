@@ -9,7 +9,7 @@ const sections = [
   ['services', 'One firm, from the first sketch to the last closing'],
   ['developers', 'Your building, sold as if it were the only one we have'],
   ['clients', 'Residences that never reach the open market'],
-  ['markets', 'South Florida first'],
+  ['markets', 'South Florida and New York first'],
   ['journal', 'Notes on new development'],
   ['people', 'A seat here is earned'],
   ['house', 'Centum, a hundred'],
