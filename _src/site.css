@@ -2450,7 +2450,7 @@ p,li{text-wrap:pretty}
   html.js .cut .ln > span,.hero h1 .ln > span{transform:none!important}
   .js .facade path,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
   .ruler .crack{opacity:1!important}
-  .js .facade .b{opacity:.45!important}.js .mk-el text{opacity:1!important}
+  .js .facade .b{opacity:.45!important}.js .mk-el text{opacity:1!important}.js .tl li,.js .tl ol::before,.js .wy .tr i{opacity:1!important;transform:none!important}
   .doorway{--o:1!important}
   .leaf{background:var(--band)!important}
   .dbar .s,.rp-funnel .bar i,.rp-src .bar i,.js .ruler line{transform:none!important}
@@ -2625,3 +2625,48 @@ nav.main a.press{color:var(--fg);transition:none}
 :root[data-motion="off"] .mk-el text{opacity:1;transition:none}
 @media (max-width:900px){.mk-el{--fu:1.4;aspect-ratio:2/1}}
 @media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
+/* A buyer guide's steps, drawn as a schedule: a ruled rail with a tick at each step, the time to its left and the step to
+   its right. Bronze marks the step where the money is at stake. The rail draws down and the steps arrive in turn. */
+.prose .tl{margin:clamp(40px,5vw,56px) 0}
+.prose .tl ol{list-style:none;margin:0 0 24px;padding:0;position:relative;display:grid;gap:22px}
+.tl ol::before{content:'';position:absolute;left:calc(152px + 14px);top:9px;bottom:9px;width:1px;background:var(--fg);transform-origin:50% 0}
+.prose .tl li{display:grid;grid-template-columns:152px minmax(0,1fr);column-gap:29px;position:relative;margin:0;padding:0;font:400 16px/1.5 var(--body);color:var(--muted)}
+.tl li::before{content:'';position:absolute;left:calc(152px + 8px);top:9px;width:13px;height:1px;background:var(--fg)}
+.tl li.m::before{background:var(--sold-line);height:3px;top:8px}
+.tl .w{grid-row:1/3;font:500 13px/1.45 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:right;padding-top:1px;text-wrap:balance}
+.tl li b{grid-column:2;font:400 var(--t-big)/1.15 var(--display);color:var(--fg);margin-bottom:4px}
+.tl li.m b{color:var(--accent)}
+.tl .d{grid-column:2}
+@media (max-width:560px){
+  .tl ol::before{left:4px}
+  .prose .tl li{grid-template-columns:minmax(0,1fr);padding-left:30px}
+  .tl li::before{left:0}
+  .tl .w,.tl li b,.tl .d{grid-column:1;grid-row:auto;text-align:left}
+  .tl .w{margin-bottom:4px}
+}
+.js .tl ol::before{transform:scaleY(0);transition:transform var(--t-ink) var(--ease-ink)}
+.js .tl.in ol::before{transform:none}
+.js .tl li{opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease-out) calc(var(--k,0) * 110ms + 150ms),transform .5s var(--ease-out) calc(var(--k,0) * 110ms + 150ms)}
+.js .tl.in li{opacity:1;transform:none}
+.tl li:nth-child(2){--k:1}.tl li:nth-child(3){--k:2}.tl li:nth-child(4){--k:3}.tl li:nth-child(5){--k:4}.tl li:nth-child(6){--k:5}.tl li:nth-child(7){--k:6}
+/* New York's builder warranties, to scale against a six-year ruler */
+.prose .wy{margin:clamp(36px,5vw,48px) 0}
+.prose .wy ul{list-style:none;margin:0;padding:0;display:grid;gap:20px}
+.prose .wy li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;align-items:baseline;margin:0;padding:0;font:400 16px/1.45 var(--body);color:var(--muted)}
+.wy .v{font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);white-space:nowrap;font-variant-numeric:tabular-nums}
+.wy .tr{grid-column:1/-1;position:relative;height:13px;margin-top:8px;background:linear-gradient(to right,var(--rule) 1px,transparent 1px) 0 0/calc(100% / 6) 100% repeat-x;border-right:1px solid var(--rule)}
+.wy .tr i{position:absolute;left:0;top:5px;height:3px;background:var(--fg);transform-origin:0 50%}
+.wy .y1{width:calc(100% / 6)}.wy .y2{width:calc(100% / 3)}.wy .y6{width:100%;background:var(--sold-line)!important}
+.wy .sc{position:relative;height:13px;margin:10px 0 24px;font:500 13px/1 var(--body);letter-spacing:.06em;color:var(--faint);font-variant-numeric:tabular-nums}
+.wy .sc span{--n:0;position:absolute;top:0;left:calc(var(--n) * 100% / 6);transform:translateX(-50%);white-space:nowrap}.wy .sc span:first-child{transform:none}.wy .sc span:last-child{transform:translateX(-100%)}
+.wy .sc span:nth-child(2){--n:1}.wy .sc span:nth-child(3){--n:2}.wy .sc span:nth-child(4){--n:3}.wy .sc span:nth-child(5){--n:4}.wy .sc span:nth-child(6){--n:5}.wy .sc span:nth-child(7){--n:6}
+.js .wy .tr i{transform:scaleX(0);transition:transform var(--t-ink) var(--ease-ink) calc(var(--k,0) * 160ms + 100ms)}
+.js .wy.in .tr i{transform:none}
+.wy li:nth-child(2){--k:1}.wy li:nth-child(3){--k:2}
+@media (prefers-reduced-motion:reduce){.js .tl ol::before,.js .tl li,.js .wy .tr i{transform:none;opacity:1;transition:none}}
+:root[data-motion="off"] .tl ol::before,:root[data-motion="off"] .tl li,:root[data-motion="off"] .wy .tr i{transform:none;opacity:1;transition:none}
+/* the Hamptons house sits in the reading column, so it keeps a wider frame and a lighter pen than the city views */
+.mk-el.hp{--fu:1.2;aspect-ratio:5/2}
+.mk-el .sh{opacity:.4}
+.prose .hp-fig{margin:28px 0 8px}
+@media (max-width:600px){.mk-el.hp{--fu:1.6;aspect-ratio:3/2}}
