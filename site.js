@@ -20,9 +20,9 @@
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
     const close = () => show(false);
-    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1023px or 63.9375em) closes the drawer,
+    // Widening or turning the device past the drawer's breakpoint (site.css, max-width:1279px or 79.9375em) closes the drawer,
     // so the page is never left frozen behind a menu that no longer shows.
-    const wide = matchMedia('(max-width:1023px),(max-width:63.9375em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
+    const wide = matchMedia('(max-width:1279px),(max-width:79.9375em)'), onWide = (e) => { if (!e.matches && nav.classList.contains('open')) close(); };
     wide.addEventListener ? wide.addEventListener('change', onWide) : wide.addListener(onWide);
     // (enlarged text folds the nav at a wider screen too, by site.css's header container: once Menu goes, so does the drawer)
     addEventListener('resize', () => { if (nav.classList.contains('open') && getComputedStyle(btn).display === 'none') close(); });

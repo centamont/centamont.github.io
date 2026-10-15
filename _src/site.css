@@ -150,48 +150,48 @@ nav.main a:focus-visible,nav.main a[aria-current="true"]{color:var(--fg)}
 /* wide enough for Close, with its tracking, so the label swap never shifts the day/night button */
 .menu-btn{display:none;min-width:86px;text-align:center;background:none;border:1px solid var(--rule);color:var(--fg);font:inherit;font-size:13px;letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:border-color var(--t-ui) var(--ease-out),background-color var(--t-ui) var(--ease-out)}
 @property --dp{syntax:'<number>';inherits:false;initial-value:0}
-/* The inline nav (five sections; What we do and Advisors wait in the drawer) needs about 960px; from 1024px it stands in the bar, and
-   below that the sections fold into the menu (site.js closes the menu at the same 1023px) */
-/* 63.9375em is 1023px at the default text size, so a larger browser text size folds them too */
-@media (max-width:1023px),(max-width:63.9375em){
+/* The inline nav (eight sections; What we do and Advisors wait in the drawer) needs about 1230px; from 1280px it stands in the bar, and
+   below that the sections fold into the menu (site.js closes the menu at the same 1279px) */
+/* 79.9375em is 1279px at the default text size, so a larger browser text size folds them too */
+@media (max-width:1279px),(max-width:79.9375em){
   .mark{--cap:.7px}
   .menu-btn{display:block}
   /* the list sits in the middle of the drawer; auto margins, unlike centring, fall back to the top when it is taller than the screen, so every link stays in reach */
   /* its rows take their size from the screen's height as well as its width, so on a tablet held sideways or a short laptop
-     all seven stand above the fold, Contact included */
+     all ten stand above the fold, Contact included */
   /* the drawer opens on the sheet's curve with a rule riding its edge, so the page is seen to go under it, and closes
      in a little over half the time, its rows fading together */
-  nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
+  nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(20px,4svh,40px);overflow-y:auto;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
   nav.main a:first-child{margin-top:auto}nav.main a:last-child{margin-bottom:auto}
   nav.main.open{clip-path:inset(0);visibility:visible;--dp:1;transition:clip-path 420ms var(--ease-drawer),--dp 420ms var(--ease-drawer)}
-  nav.main a{white-space:normal;font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding-block:min(10px,1.2svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
+  nav.main a{white-space:normal;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
   nav.main.open a{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),color var(--t-ui)}
-  nav.main a:nth-child(2){--k:1}nav.main a:nth-child(3){--k:2}nav.main a:nth-child(4){--k:3}nav.main a:nth-child(5){--k:4}nav.main a:nth-child(6){--k:5}nav.main a:nth-child(7){--k:6}nav.main a:nth-child(8){--k:7}
+  nav.main a:nth-child(2){--k:1}nav.main a:nth-child(3){--k:2}nav.main a:nth-child(4){--k:3}nav.main a:nth-child(5){--k:4}nav.main a:nth-child(6){--k:5}nav.main a:nth-child(7){--k:6}nav.main a:nth-child(8){--k:7}nav.main a:nth-child(9){--k:8}nav.main a:nth-child(10){--k:9}
   nav.main a[aria-current="true"]{color:var(--accent)}
 }
-/* phones on their side: a shorter list, and where the screen is wide enough two columns of it, so all seven show at once */
-@media (max-width:1023px) and (max-height:500px),(max-width:63.9375em) and (max-height:500px){nav.main{padding-block:12px 28px}nav.main a{font-size:28px;line-height:1.25;padding-block:8px}}
-@media (min-width:540px) and (max-width:1023px) and (max-height:500px),(min-width:540px) and (max-width:63.9375em) and (max-height:500px){
-  nav.main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,auto);grid-auto-flow:column;column-gap:clamp(28px,5vw,64px);align-content:center;align-content:safe center}
+/* phones on their side: a shorter list, and where the screen is wide enough two columns of it, so all ten show at once */
+@media (max-width:1279px) and (max-height:500px),(max-width:79.9375em) and (max-height:500px){nav.main{padding-block:12px 28px}nav.main a{font-size:28px;line-height:1.25;padding-block:8px}}
+@media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
+  nav.main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,auto);grid-auto-flow:column;column-gap:clamp(28px,5vw,64px);align-content:center;align-content:safe center}
   nav.main a:first-child,nav.main a:last-child{margin-block:0}
-  nav.main.open a:nth-child(5){border-top:1px solid var(--rule)}
+  nav.main.open a:nth-child(6){border-top:1px solid var(--rule)}
 }
 /* Text enlarged on its own (a text-only zoom) widens the nav but not the screen. The header is a query container measured
-   in its own text size, so past 55.5em (999px at the 18px body size, which a 1024px window keeps even with a classic
+   in its own text size, so past 71em (1278px at the 18px body size, which a 1280px window keeps even with a classic
    scrollbar) the nav folds into the drawer exactly as it does on a narrow screen, and the day/night and motion switches
    stay in reach. (The media queries stay for older browsers.) */
 header.site{container:site/inline-size;max-width:100vw}
 /* (it only has work to do on a screen wider than that, where the media queries above have not already folded the nav,
    and it outranks the inline nav's own rules there) */
-@media (min-width:1024px){@container site (max-width:55.5em){
+@media (min-width:1280px){@container site (max-width:71em){
   header.site .mark{--cap:.7px}
   header.site .menu-btn{display:block}
-  header.site nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(28px,7svh,56px);overflow-y:auto;margin:0;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
+  header.site nav.main{position:fixed;left:0;right:0;top:64px;height:calc(100svh - 64px);background-color:var(--bg);flex-direction:column;justify-content:flex-start;gap:0;padding:clamp(12px,3svh,24px) max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter))) clamp(20px,4svh,40px);overflow-y:auto;margin:0;clip-path:inset(0 0 100% 0);visibility:hidden;--dp:0;background-image:linear-gradient(var(--edge,var(--rule)),var(--edge,var(--rule)));background-repeat:no-repeat;background-size:100% calc(clamp(0,(1 - var(--dp)) * 40,1) * 1px);background-position:0 calc(var(--dp) * 100% + (var(--dp) - 1) * 1px);transition:clip-path 240ms var(--ease-drawer),--dp 240ms var(--ease-drawer),visibility 0s linear 240ms}
   header.site nav.main a:first-child{margin-top:auto}header.site nav.main a:last-child{margin-bottom:auto}
   header.site nav.main.open{clip-path:inset(0);visibility:visible;--dp:1;transition:clip-path 420ms var(--ease-drawer),--dp 420ms var(--ease-drawer)}
-  header.site nav.main a{white-space:normal;font-family:var(--display);font-weight:300;font-size:clamp(30px,min(8vw,6.4svh),46px);line-height:min(1.7em,8svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding:min(10px,1.2svh) 0;margin-left:0;border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
+  header.site nav.main a{white-space:normal;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--fg);padding:min(8px,1svh) 0;margin-left:0;border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms,color var(--t-ui)}
   header.site nav.main.open a{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k,0) * 30ms + 80ms),color var(--t-ui)}
-  header.site nav.main a:nth-child(2){--k:1}header.site nav.main a:nth-child(3){--k:2}header.site nav.main a:nth-child(4){--k:3}header.site nav.main a:nth-child(5){--k:4}header.site nav.main a:nth-child(6){--k:5}header.site nav.main a:nth-child(7){--k:6}header.site nav.main a:nth-child(8){--k:7}
+  header.site nav.main a:nth-child(2){--k:1}header.site nav.main a:nth-child(3){--k:2}header.site nav.main a:nth-child(4){--k:3}header.site nav.main a:nth-child(5){--k:4}header.site nav.main a:nth-child(6){--k:5}header.site nav.main a:nth-child(7){--k:6}header.site nav.main a:nth-child(8){--k:7}header.site nav.main a:nth-child(9){--k:8}header.site nav.main a:nth-child(10){--k:9}nav.main a:nth-child(9){--k:8}nav.main a:nth-child(10){--k:9}
   header.site nav.main.open a:first-child{border-top:1px solid var(--rule)}
   header.site nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}
   header.site nav.main a.dw{display:block}header.site nav.main a[aria-current]::after{content:none}
@@ -201,10 +201,10 @@ header.site{container:site/inline-size;max-width:100vw}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
 /* the mark under a nav word overhangs both ends by the same tracking, rather than only the right */
-@media (min-width:1024px){nav.main a{padding-left:.14em;margin-left:-.14em}}
-/* In the bar: the lockup alone on the left, the five sections and the two switches together on the right. The section the
+@media (min-width:1280px){nav.main a{padding-left:.14em;margin-left:-.14em}}
+/* In the bar: the lockup alone on the left, the eight sections and the two switches together on the right. The section the
    reader is in carries a dimension line (1px bronze between 5px ticks) that stands still; a hover changes colour only. */
-@media (min-width:1024px){
+@media (min-width:1280px){
   nav.main{margin-left:auto;margin-right:clamp(10px,1.6vw,26px)}
   nav.main a{position:relative}
   /* each a 44px target, whatever points at it */
@@ -976,15 +976,15 @@ body.home header.site{position:fixed;left:0;right:0}
 .js header.site.over .motion ~ .theme::before{background:rgba(244,240,232,.28)}
 /* a hover answers in ink, or in ivory over the ink, never in bronze */
 @media (hover:hover) and (pointer:fine){.menu-btn:hover{border-color:var(--fg)}.js header.site.over .menu-btn:hover{border-color:#F4F0E8}.js header.site.over :is(.theme,.motion):hover{color:#F4F0E8}}
-@media (min-width:1024px){.js header.site.over nav.main a[aria-current]{color:#F4F0E8}.js header.site.over nav.main a[aria-current]::after{--dim:#C9A877}}
-@media (max-width:1023px){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
+@media (min-width:1280px){.js header.site.over nav.main a[aria-current]{color:#F4F0E8}.js header.site.over nav.main a[aria-current]::after{--dim:#C9A877}}
+@media (max-width:1279px){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
 /* while the open menu holds the page still, the scrollbar's lane is kept, so the header's buttons never step sideways under
    the pointer; site.js marks .sb only when a scrollbar was taking room as the menu opened, so a page that fits its window
    gains no lane either */
 html.menu-open{overflow:hidden}
 html.menu-open.sb{scrollbar-gutter:stable}
 /* the same drawer colours when larger text folds the nav at a wider screen */
-@media (max-width:63.9375em){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
+@media (max-width:79.9375em){.js header.site.over nav.main{background-color:rgb(var(--hero-rgb));--edge:rgba(244,240,232,.14)}.js header.site.over nav.main a{color:#F4F0E8;border-color:rgba(244,240,232,.14)}.js header.site.over nav.main a[aria-current]{color:#C9A877}}
 /* At the very top of the home page the header is clear over the hero's drawing; once the page moves it takes the ink, so nothing scrolls through it. */
 .js body.home header.site.over.top{background:transparent}
 /* In step with the page (site.js marks .lk and writes --ka and --kb each frame): the bar keeps the sheet's ground, and the
@@ -996,7 +996,7 @@ html.menu-open.sb{scrollbar-gutter:stable}
 header.site.lk::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgb(var(--hero-rgb));clip-path:inset(var(--ka,0px) 0 calc(100% - var(--kb,0px)) 0)}
 .js body.home header.site.lk.top{background:transparent}.js body.home header.site.lk.top::before{visibility:hidden}
 header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!important}
-@media (min-width:1024px){header.site.swap nav.main a{transition:none!important}}
+@media (min-width:1280px){header.site.swap nav.main a{transition:none!important}}
 @media (forced-colors:active){header.site.lk::before{display:none}}
 
 /* Hero: the model */
@@ -1548,7 +1548,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 @media (max-width:520px) and (max-height:700px) and (orientation:portrait){:root{--t-hero:clamp(40px,11.2vw,44px)}.hero .lede{line-height:1.45;margin-top:14px}.hero .row{margin-top:16px}}
 /* the meta rules end where the prose does (29em of the 22px reading face; the meta itself is set at 13px) */
 .page .meta{max-width:638px}
-@media (max-width:1023px),(max-width:63.9375em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
+@media (max-width:1279px),(max-width:79.9375em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
 :root[data-theme="dark"] .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{box-shadow:inset 0 1px 0 rgba(184,151,106,.35),inset 0 -1px 0 rgba(184,151,106,.2)}}
 
@@ -2307,7 +2307,7 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .pc-steps,.pc-terms{padding-bottom:0}
 nav.main a[aria-current="page"]{color:var(--fg)}
 /* in the drawer the current row is marked by its bronze words alone, the same on every page; its separator stays a rule */
-@media (max-width:1023px),(max-width:63.9375em){nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}}
+@media (max-width:1279px),(max-width:79.9375em){nav.main a[aria-current]{color:var(--accent);border-color:var(--rule)}}
 /* the title block marks the sheet you are on: its link stands underlined, in ink */
 .tb a[aria-current="page"]:not(.ss a),.legal a[aria-current="page"]{color:var(--fg);background-size:100% 1px}
 /* The pace chart's labels are set in its 560-unit viewBox, so they shrink with the drawing. Each rule follows the chart's
@@ -2331,7 +2331,7 @@ nav.main a[aria-current="page"]{color:var(--fg)}
   nav.main{height:calc(100svh - 116px - env(safe-area-inset-bottom));padding-bottom:clamp(20px,5svh,40px)}
   /* on a short screen the rows close up, so the whole list fits above the switch before any scrolling, never so close
      that a letter's tail meets the rule below it */
-  nav.main a{line-height:max(1.15em,min(1.7em,7svh));padding-block:min(10px,1.2svh)}
+  nav.main a{line-height:max(1.15em,min(1.55em,5.2svh));padding-block:min(8px,1svh)}
 }
 @media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .motion,html.menu-open .tools::before{animation:motion-in .5s var(--ease) .35s backwards}}
 /* and beside the switch, the handle, to write from the menu itself */
@@ -2432,9 +2432,9 @@ p,li{text-wrap:pretty}
    the header scrolls away with the page rather than stay pinned over the reading on a phone (on the home page it stands above
    the hero, in the hero's ink where the page script still marks it as over the hero, so the drawing's caption stays clear). */
 :is(html:not(.js),html.nosite body.no-js) :is(.menu-btn,.motion,.theme){display:none}
-/* (with no switches beside it, the bar's five sections keep to the right edge, as the full list did) */
-@media (min-width:1024px){:is(html:not(.js),html.nosite body.no-js) nav.main{margin-right:0}}
-@media (max-width:1023px),(max-width:63.9375em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
+/* (with no switches beside it, the bar's eight sections keep to the right edge, as the full list did) */
+@media (min-width:1280px){:is(html:not(.js),html.nosite body.no-js) nav.main{margin-right:0}}
+@media (max-width:1279px),(max-width:79.9375em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
 /* Print: ink on paper, no chrome */
 @media print{
   /* ink on white, whichever theme the reader was in */
@@ -2563,7 +2563,7 @@ p,li{text-wrap:pretty}
 .js header.site.over :is(.theme,.motion).press{color:#F4F0E8}
 nav.main a.press{color:var(--fg);transition:none}
 .js header.site.over nav.main a.press{color:#F4F0E8}
-@media (max-width:1023px),(max-width:63.9375em){nav.main a.press{border-color:var(--fg)}.js header.site.over nav.main a.press{border-color:rgba(244,240,232,.6)}}
+@media (max-width:1279px),(max-width:79.9375em){nav.main a.press{border-color:var(--fg)}.js header.site.over nav.main a.press{border-color:rgba(244,240,232,.6)}}
 .ul.press,.prose a.press,.crumbs a.press,.hd.press,.letter .send .direct.press{color:var(--fg);transition:none}
 .sp-go.press{color:var(--fg);transition:none}
 .sp-go.press svg,.letter .send .direct.press svg{transform:translateX(4px);transition-duration:var(--t-press)}
