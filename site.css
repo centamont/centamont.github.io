@@ -1920,3 +1920,24 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-el .sh{opacity:.4}
 .prose .hp-fig{margin:28px 0 8px}
 @media (max-width:600px){.mk-el.hp{--fu:1.6;aspect-ratio:3/2}}
+.mk-el .far{opacity:.62}
+.mk-el .dt.far{opacity:.35}
+.prose .cmp{margin:clamp(40px,5vw,56px) 0}
+.cmp table{width:100%;border-collapse:collapse;font:400 16px/1.5 var(--body);color:var(--muted);font-variant-numeric:lining-nums}
+.cmp thead th{font:400 var(--t-big)/1.15 var(--display);color:var(--fg);text-align:left;padding:0 0 12px 24px;border-bottom:3px double var(--fg)}
+.cmp thead th:first-child{padding-left:0}
+.cmp tbody :is(th,td){vertical-align:top;border-bottom:1px solid var(--rule);padding:15px 0 17px 24px}
+.cmp tbody th{width:22%;padding-left:0;font:500 13px/1.45 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:left;padding-top:18px;text-wrap:balance}
+.cmp tr.m th{color:var(--accent)}
+.cmp tbody tr:last-child :is(th,td){border-bottom:0}
+.cmp td b{font-weight:500;color:var(--fg)}
+.cmp .cap{margin-top:18px}
+@media (min-width:1140px){.prose .cmp{margin-right:-258px}}
+@media (max-width:560px){
+  .cmp thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .cmp tbody{display:block;border-top:3px double var(--fg)}
+  .cmp tbody tr{display:grid;gap:10px;padding:16px 0 18px;border-bottom:1px solid var(--rule)}
+  .cmp tbody tr:last-child{border-bottom:0}
+  .cmp tbody :is(th,td){display:block;width:auto;border:0;padding:0}
+  .cmp td::before{content:attr(data-c);display:block;font:400 19px/1.25 var(--display);color:var(--fg)}
+}

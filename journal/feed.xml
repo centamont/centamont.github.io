@@ -7,9 +7,18 @@
   <id>https://centamont.com/journal/</id>
   <icon>https://centamont.com/apple-touch-icon.png</icon>
   <logo>https://centamont.com/og.png</logo>
-  <updated>2026-10-14T12:00:00Z</updated>
+  <updated>2026-10-15T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <rights>© 2026 Centamont</rights>
+  <entry>
+    <title>Launching in Miami and New York</title>
+    <link href="https://centamont.com/journal/launching-in-miami-and-new-york.html"/>
+    <id>https://centamont.com/journal/launching-in-miami-and-new-york.html</id>
+    <category term="Developer note"/>
+    <published>2026-10-15T12:00:00Z</published>
+    <updated>2026-10-15T12:00:00Z</updated>
+    <summary>How a new condominium launch compares in Miami and New York: filing, deposits, the pre-sale threshold, closing costs and selling one city to the other.</summary>
+  </entry>
   <entry>
     <title>Buying new construction in New York</title>
     <link href="https://centamont.com/journal/buying-new-construction-new-york.html"/>
