@@ -54,7 +54,7 @@
   --t-spread:clamp(46px,7.2vw,calc(104px + var(--wide) * .015)); --t-chapter:clamp(42px,5.6vw,calc(84px + var(--wide) * .02));
   --t-section:clamp(36px,3.9vw,calc(56px + var(--wide) * .018)); --t-head:clamp(28px,2.8vw,calc(40px + var(--wide) * .012));
   --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
-  --t-num:clamp(96px,10.8vw,168px);
+  --t-num:clamp(80px,7.6vw,124px);
   color-scheme:light;
 }
 /* tablets: the chapter and spread heads keep their rank over the back matter; phones: a ladder of their own, under the h1 */
@@ -463,6 +463,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
 /* the last step is the tower's last runway: a full window, so its last closing view settles before the drawing lets go */
 .step:last-child{min-height:100svh}
+@media (min-width:1041px){.step:last-child{min-height:72svh}}
 /* beside the tower every step is as tall as its words, with the same measured gap between one step and the next, so the
    story reads at an even pace (the last keeps its runway) */
 @media (min-width:1041px){.steps{--pad:clamp(40px,4.5svh,72px)}.step{padding-block:var(--pad)}.step:not(:last-child){min-height:0}}
@@ -581,7 +582,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .step h3{max-width:12em}
   .step:nth-child(4) h3{max-width:7em}
   #launch h3{text-wrap:wrap}
-  .step h3::before{font-size:clamp(36px,21.1svh - 94px,96px);line-height:.7;margin:0 0 6px;opacity:.4}
+  .step h3::before{font-size:clamp(36px,16svh - 64px,72px);line-height:.7;margin:0 0 6px;opacity:.4}
   .step ul{margin-top:0}
   .step li{padding:10px 0;line-height:1.55}
   .steps .step .more{margin-top:12px}
@@ -1131,18 +1132,18 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
-  /* the veil rises only to just under the tower's ground (36px above the headline), so the lobby's light and the ground are clear of it */
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) - 40px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) + 16px))}
-  /* the copy starts as low as the taller drawing wants (51svh), but never so low that the second button leaves the first screen; 458px is the copy's height from the headline to the second button */
-  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+  /* the veil rises only to just under the tower's ground (28px above the headline), so the lobby's light and the ground are clear of it */
+  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}
+  /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 416px is the copy's height from the headline to the second button */
+  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
   .hero h1{max-width:none}
   .hero .coords{display:none}
 }
 /* on a phone the headline sets a touch tighter, and the copy under it closes up a little, so both buttons stand whole above
    the fold of a 390x844 screen (and the first above a 360x640 one) without the drawing giving way */
-@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{line-height:1.55;margin-top:20px}.hero .row{margin-top:24px;gap:10px}.hero .btn{padding-block:15px}}
+@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{font-size:17px;line-height:1.5;margin-top:16px}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}
 /* A tablet held upright has more height than the drawing's 58% takes, which left a band of empty ink between the tower's
-   ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 36px above
+   ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 28px above
    the headline, as on a phone, and the shading starts lower to keep the ground in view. */
 @media (min-width:560px) and (max-width:820px) and (min-height:900px) and (orientation:portrait){
   .hero canvas{height:100%}
@@ -1152,7 +1153,7 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 /* Text enlarged on its own stacks the hero as a phone does (the page script sets .stack): the tower above, the copy below */
 .hero.stack canvas{height:63svh;bottom:auto}
 .hero.stack::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
-.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
 .hero.stack h1{max-width:none}
 .hero.stack .coords{top:80px}
 .hero.stack .coords > :not(.cap){display:none}
