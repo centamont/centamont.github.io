@@ -207,12 +207,15 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   await page.addInitScript(() => { window.__cmForce3D = true; });
   await page.goto('/');
   await expect(page.locator('#heroModel')).toHaveAttribute('data-render', '3d', { timeout: 20000 });
+  // once it has faded in, the sky stands behind it as the canvas's background
+  await expect.poll(() => page.locator('#heroModel').evaluate((c) => c.style.backgroundImage), { timeout: 10000 }).toContain('linear-gradient');
   expect(errors).toEqual([]);
   const plain = await page.context().newPage();
   await plain.goto('/');
   await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '22');
   await plain.waitForTimeout(3000);
   await expect(plain.locator('#heroModel')).not.toHaveAttribute('data-render', '3d');
+  expect(await plain.locator('#heroModel').evaluate((c) => c.style.backgroundImage)).toBe('');
   await plain.close();
 });
 

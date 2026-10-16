@@ -231,7 +231,7 @@ void main() {
 float rbox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
 void main() {
   vec3 p = vPos;
-  float R = length(p.xz), fade = 1.0 - smoothstep(7.0, 16.5, R);
+  float R = length(p.xz), fade = 1.0 - smoothstep(4.5, 16.5, R); fade *= fade;
   float sh = shadow(p, vec3(0.0, 1.0, 0.0));
   vec3 lit = vec3(0.5, 0.48, 0.44) * (uSunCol * max(uSun.y, 0.0) * sh * 0.12 + amb(vec3(0.0, 1.0, 0.0)) * 0.03) * fade;
   float d = rbox(p.xz, vec2(6.45, 4.45), 1.3);
@@ -453,6 +453,120 @@ void main() {
     return { slabs, cols, core, glass, ghost, rails, crown, mast, canopy, deck, cars, ground };
   }
 
+  // ---------------------------------------------------------------- the sky behind
+  // Drawn by the hero's drawing on its own canvas, under everything (model.js calls it while the rendered tower is
+  // shown): the sky over Miami at this hour, kept low in key so the ink page and its type still hold, a haze along the
+  // horizon, thin cloud, the sun's warmth on the side it stands, and a distant, generic skyline round the horizon, lit
+  // after dark. Directions are the drawing's own, so the sky turns with the camera as a real one would.
+  const mixc = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const css = (c, a) => `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${a == null ? 1 : a})`;
+  const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  // thin cloud: a strip of soft noise that wraps round the whole horizon (built once, 512 x 64)
+  let cloudMask = null;
+  function clouds() {
+    if (cloudMask) return cloudMask;
+    const W = 512, H = 64, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'), img = g.createImageData(W, H), d = img.data;
+    const vn = (x, y, px) => {
+      const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+      const r = (i, j) => hash(((i % px) + px) % px + j * 57.13);
+      return (r(xi, yi) * (1 - u) + r(xi + 1, yi) * u) * (1 - v) + (r(xi, yi + 1) * (1 - u) + r(xi + 1, yi + 1) * u) * v;
+    };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let n = 0, a = 0.5, fq = 1;
+      for (let o = 0; o < 5; o++) { n += a * vn((x / W) * 12 * fq, (y / H) * 3 * fq + o * 7.1, 12 * fq); a *= 0.5; fq *= 2; }
+      const band = Math.sin(Math.PI * y / (H - 1)), v = clamp((n - 0.5) / 0.28, 0, 1) * band;
+      const i = (y * W + x) * 4; d[i] = d[i + 1] = d[i + 2] = 255; d[i + 3] = Math.round(255 * v * v * (3 - 2 * v));
+    }
+    g.putImageData(img, 0, 0);
+    return (cloudMask = c);
+  }
+  let cloudTint = null, cloudKey = '';
+  function sky(m) {
+    const sun = m.sunNow, el = sun.el, night = sun.night;
+    const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day, dusk = smooth(clamp(1 - Math.abs(el + 3) / 6, 0, 1)) * (1 - day * 0.6);
+    const ink = m.bg || [20, 22, 26];
+    // (sRGB, in key with the page: a clear day is a deep slate blue over a pale haze, dusk a bronze horizon under indigo)
+    let zen = mixc([20, 34, 56], [24, 30, 50], gold), hor = mixc([96, 114, 132], [168, 120, 84], gold);
+    zen = mixc(mixc(ink, [12, 16, 30], 0.7), zen, day); hor = mixc([56, 46, 42], hor, day);
+    hor = mixc(hor, [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
+    return { zen, hor, ink, day, gold, night, dusk, mid: mixc(mixc(zen, hor, 0.42), [74, 62, 78], gold * 0.5 + dusk * 0.3) };
+  }
+  // (drawn straight onto the drawing, each time it draws: a few broad fills, which a graphics chip lays down in a blink,
+  // and none of them over the whole canvas twice)
+  function backdrop(g, m, alpha) {
+    g.save(); g.globalAlpha = alpha; paint(g, m, m.w, m.h); g.restore();
+  }
+  function paint(g, m, w, h) {
+    const k = m.k, S = sky(m), f = k.f, cy = k.cy, { zen, hor, mid, ink } = S, alpha = g.globalAlpha;
+    // The sky, from about 40 degrees up down to the horizon at cy (elevation e as the tangent), then the ground beyond
+    // the site under the haze, going down to the page's ink. Once the tower is in, these broad fills are the canvas's
+    // own CSS background, which costs the page nothing as the drawing redraws; while it fades in they are drawn here.
+    const ys = (e) => cy - e * f, G = Math.max(40, 0.32 * h);
+    const far = mixc(mixc(hor, ink, 0.55), [58, 60, 62], 0.3 * S.day), near = mixc(ink, [40, 42, 45], S.day);
+    const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], [cy, far], [cy + 0.18 * G, mixc(far, near, 0.7)], [cy + G, mixc(near, ink, 0.5)]];
+    if (alpha < 1 || !m.c) {
+      const y0 = st[0][0], y1 = st[st.length - 1][0], gr = g.createLinearGradient(0, y0, 0, y1);
+      for (const [y, c] of st) gr.addColorStop(clamp((y - y0) / (y1 - y0), 0, 1), css(c));
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    }
+    if (m.c) {
+      const v = alpha < 1 ? '' : 'linear-gradient(180deg,' + st.map(([y, c]) => css(c) + ' ' + y.toFixed(1) + 'px').join() + ')';
+      if (m.skyCss !== v) { m.skyCss = v; m.c.style.backgroundImage = v; }
+    }
+    // a direction's place on screen (or null behind the camera)
+    const scr = (x, y, z) => { const X = k.c * x - k.s * z, Z = k.s * x + k.c * z; return Z > 0.05 ? [k.cx + f * X / Z, cy - f * y / Z, Z] : null; };
+    // the sun's warmth in the sky on its side, once it is low and gold
+    const sv = m.sunNow.v, sl = Math.hypot(sv[0], sv[1], sv[2]) || 1, sp = scr(sv[0] / sl, Math.max(sv[1] / sl, -0.02), sv[2] / sl);
+    const warm = 0.34 * S.gold * (1 - S.night);
+    if (sp && warm > 0.02) {
+      const r = Math.max(w, h) * 0.55, rg = g.createRadialGradient(sp[0], sp[1], 0, sp[0], sp[1], r);
+      const c = mixc([255, 226, 186], [236, 150, 92], S.gold);
+      rg.addColorStop(0, css(c, warm)); rg.addColorStop(0.25, css(c, warm * 0.35)); rg.addColorStop(1, css(c, 0));
+      const gx = Math.max(0, sp[0] - r), gy = Math.max(0, sp[1] - r);
+      g.fillStyle = rg; g.fillRect(gx, gy, Math.min(w, sp[0] + r) - gx, Math.min(h, cy + 0.05 * f, sp[1] + r) - gy);
+    }
+    // thin cloud in two layers, the nearer lower and wider, turning with the view (one turn of the strip is one round
+    // of the horizon), lit from below by a low sun and by the city at night
+    const az = Math.atan2(k.s, k.c), cc = mixc(mixc(hor, [236, 228, 214], 0.18 * S.day), [220, 150, 104], S.gold * 0.5);
+    const key = cc.map(Math.round).join();
+    if (key !== cloudKey) {
+      const mk = clouds(); cloudKey = key;
+      cloudTint = cloudTint || document.createElement('canvas'); cloudTint.width = mk.width; cloudTint.height = mk.height;
+      const t = cloudTint.getContext('2d'); t.globalCompositeOperation = 'copy'; t.fillStyle = css(cc); t.fillRect(0, 0, mk.width, mk.height);
+      t.globalCompositeOperation = 'destination-in'; t.drawImage(mk, 0, 0);
+    }
+    const ca = 0.42 + 0.1 * S.gold - 0.22 * S.night;
+    for (const [e0, e1, sx, a, off] of [[0.2, 0.42, 1, 0.55, 0.37], [0.035, 0.16, 1.6, 1, 0]]) {
+      const tw = TAU * f * sx, y0 = ys(e1), hh = ys(e0) - y0;
+      let x = k.cx - ((az / TAU + off) % 1 + 1) % 1 * tw - tw;
+      g.globalAlpha = alpha * ca * a;
+      for (; x < w; x += tw) if (x + tw > 0) g.drawImage(cloudTint, x, y0, tw, hh);
+    }
+    g.globalAlpha = alpha;
+    // haze along the horizon
+    const hz = g.createLinearGradient(0, cy - 0.06 * f, 0, cy + 0.02 * f);
+    hz.addColorStop(0, css(hor, 0)); hz.addColorStop(0.75, css(hor, 0.45)); hz.addColorStop(1, css(hor, 0));
+    g.fillStyle = hz; g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
+    // a distant, generic skyline round the horizon, in towns: lighter than the ground, darker than the haze behind it
+    const N = 720, sil = mixc(mixc(hor, ink, 0.62), zen, 0.15), lamps = [];
+    g.fillStyle = css(sil); g.beginPath();
+    let open = false;
+    for (let i = 0; i < N; i++) {
+      const a0 = (i / N) * TAU, town = Math.pow(0.5 + 0.5 * Math.sin(a0 * 3 + 1.3) * Math.sin(a0 * 2 + 0.4), 3);
+      const hgt = town * (0.006 + 0.026 * Math.pow(hash(i), 2)) + 0.0015 * hash(i + 9);
+      const p0 = scr(Math.sin(a0), 0, Math.cos(a0)), a1 = ((i + 0.86) / N) * TAU, p1 = scr(Math.sin(a1), 0, Math.cos(a1));
+      if (!p0 || !p1 || p1[0] < -2 || p0[0] > w + 2) { open = false; continue; }
+      // (on a wide hero the left half carries the headline: the towns sink away under it)
+      const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) / p0[2];
+      if (!open) { g.moveTo(p0[0], cy + 1); open = true; }
+      g.lineTo(p0[0], yh); g.lineTo(p1[0], yh); g.lineTo(p1[0], cy + 1);
+      if (S.night > 0.1 && cy - yh > 3) for (let j = 0; j < 3; j++) if (hash(i * 3 + j) > 0.45) lamps.push([p0[0] + (p1[0] - p0[0]) * (0.25 + 0.25 * j), cy - (cy - yh) * (0.2 + 0.7 * hash(i + j * 5))]);
+    }
+    g.fill();
+    if (lamps.length) { g.fillStyle = `rgba(236,196,142,${0.5 * S.night})`; for (const [x, y] of lamps) g.fillRect(x - 0.5, y - 0.5, 1, 1); }
+  }
+
   // ---------------------------------------------------------------- renderer
   window.CentamontTower3D = function (G, opt) {
     const canvas = document.createElement('canvas');
@@ -465,7 +579,7 @@ void main() {
       if (/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(name)) { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); return null; }
     }
     const { FLOORS, SLAB, PODIUM, CROWN, RES0, SCREEN_H } = G;
-    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null };
+    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a) => backdrop(g, m, a) };
     canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R.lost = true; if (opt.onLost) opt.onLost(); });
 
     // compile without stalling the page where the engine can (the programs link in the background)

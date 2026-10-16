@@ -507,7 +507,7 @@
         if (typeof window.CentamontTower3D !== 'function') { if (++tries < 40) setTimeout(start, 250); return; }
         let r = null;
         const phone = matchMedia('(max-width:820px)').matches;
-        try { r = window.CentamontTower3D(Model.geo, { phone, force, q: Math.min(devicePixelRatio || 1, 2), onLost: () => { this.r3 = null; this.r3a = 0; delete this.c.dataset.render; this.touch(); } }); } catch (e) { r = null; }
+        try { r = window.CentamontTower3D(Model.geo, { phone, force, q: Math.min(devicePixelRatio || 1, 2), onLost: () => { this.drop3d(); this.touch(); } }); } catch (e) { r = null; }
         if (!r) return;
         // (its programs link in the background; it takes over once they have)
         const wait = () => { if (r.lost) return; if (!r.poll()) { setTimeout(wait, 50); return; } this.r3 = r; this.r3a = this.drawnAt && !reduce ? 0 : 1; this.r3f = { n: 0, sum: 0, last: 0 }; this.c.dataset.render = '3d'; this.touch(); };
@@ -528,8 +528,14 @@
       const avg = f.sum / f.n; f.n = 0; f.sum = 0;
       if (avg <= 25) return;
       const r = this.r3, q = r.q > 1.5 ? 1.5 : r.q > 1 ? 1 : r.q > 0.75 ? 0.75 : 0;
-      if (q) r.q = q; else { this.r3 = null; this.r3f = null; delete this.c.dataset.render; }
+      if (q) r.q = q; else this.drop3d();
       this.touch();
+    }
+
+    // back to the drawing: the rendered tower and its sky (a CSS background on the canvas, set by tower3d.js) go
+    drop3d() {
+      this.r3 = null; this.r3a = 0; this.r3f = null; delete this.c.dataset.render;
+      this.c.style.backgroundImage = ''; this.skyCss = '';
     }
 
     // Redraw at once, in this frame, if there is anything to draw on.
@@ -919,6 +925,8 @@
       useSet(this.cs);
       const g = this.ctx, w = this.w, h = this.h, dark = this.dark;
       if (!inLens) g.clearRect(0, 0, w, h);
+      // where the tower is rendered, the sky stands behind the whole scene (tower3d.js draws it, fading in with the tower)
+      if (!inLens && this.r3 && !this.r3.lost) this.r3.backdrop(g, this, this.r3a);
       const [lr, lg, lb] = this.line, [sr, sg, sb] = this.sold, [br, bgg, bb] = this.bg, [wr, wg, wb] = this.warm;
       const ink = (a) => `rgba(${lr},${lg},${lb},${a})`;
       const bronze = (a, k = 1) => `rgba(${Math.round(sr * k)},${Math.round(sg * k)},${Math.round(sb * k)},${a})`;
