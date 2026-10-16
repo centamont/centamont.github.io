@@ -454,6 +454,25 @@
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
 
+  // Film loops: a few muted seconds of water and light. Each loads only as it comes into view, plays while it is on
+  // screen and pauses once it leaves; the still beneath it shows until the first frame is ready. With motion reduced
+  // or paused, the still stays.
+  const films = document.querySelectorAll('video.loop');
+  if (films.length && !stillPage) {
+    const fo = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting: on }) => {
+      if (on) {
+        if (!v.dataset.ready) {
+          v.dataset.ready = '1';
+          v.querySelectorAll('source[data-src]').forEach((s) => { s.src = s.dataset.src; });
+          v.addEventListener('playing', () => v.classList.add('on'), { once: true });
+          v.load();
+        }
+        v.play().catch(() => {});
+      } else v.pause();
+    }), { rootMargin: '120px 0px' });
+    films.forEach((v) => { v.muted = true; fo.observe(v); });
+  }
+
   // On paper, everything is drawn and every answer is open, wherever the reader had scrolled to. Answers the reader
   // had closed close again afterwards.
   let opened = [];

@@ -1941,3 +1941,29 @@ nav.main a.press{color:var(--fg);transition:none}
   .cmp tbody :is(th,td){display:block;width:auto;border:0;padding:0}
   .cmp td::before{content:attr(data-c);display:block;font:400 19px/1.25 var(--display);color:var(--fg)}
 }
+.photo{margin:clamp(28px,4vw,48px) 0 clamp(36px,5vw,64px)}
+.photo picture,.photo .frame{display:block;position:relative;overflow:hidden;background:var(--rule)}
+.photo img{display:block;width:100%;height:auto}
+.photo .cap{margin-top:12px}
+.cap .credit{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.film .frame{aspect-ratio:16/7}
+.film .frame picture{position:absolute;inset:0}
+.film .frame img,.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.film video{opacity:0;transition:opacity 1.4s cubic-bezier(.3,0,.15,1)}
+.film video.on{opacity:1}
+.mk-el-fig + .after-el{margin-top:calc(-1 * clamp(8px,2vw,24px))}
+.reel{padding-bottom:clamp(8px,2vw,24px)}
+.reel .photo{margin:0}
+.photos-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(40px,5vw,64px)}
+.photos-pair .photo{margin:0}
+#markets .photos-pair + .links{margin-top:clamp(32px,4vw,48px)}
+.photos-pair .cap{grid-template-columns:minmax(0,1fr)}
+.plate{margin-bottom:0}
+.plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
+.doorway .room{position:absolute;left:5.5%;right:5.5%;top:4.667%;bottom:0;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0;opacity:calc(var(--o) * .3);pointer-events:none}
+.doorway .room img{width:100%;height:100%;object-fit:cover}
+.doorway .room::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,22,26,0) 30%,rgba(20,22,26,.75))}
+@media (max-width:700px){.photos-pair{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){.cap .credit{white-space:normal}}
+@media print{.film video{display:none}}
+.co-row .credits{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:6px;font-size:16px;line-height:1.5;color:var(--muted, inherit)}

@@ -13,7 +13,7 @@ for f in pages:
     for attrs,body in re.findall(r'<script([^>]*)>(.*?)</script>',t,re.S):
         if 'src=' in attrs or 'ld+json' in attrs: continue
         hs.append("'sha256-"+base64.b64encode(hashlib.sha256(body.encode()).digest()).decode()+"'")
-    csp=("default-src 'self'; script-src 'self' "+' '.join(dict.fromkeys(hs))+"; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; "
+    csp=("default-src 'self'; script-src 'self' "+' '.join(dict.fromkeys(hs))+"; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; "
          "object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests")
     tag=f'<meta http-equiv="Content-Security-Policy" content="{csp}">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n'
     t=re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n<meta name="referrer"[^>]*>\n','',t)
