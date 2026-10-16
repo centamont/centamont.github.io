@@ -62,10 +62,10 @@ float shadow(vec3 p, vec3 n) {
   vec3 s = q.xyz / q.w * 0.5 + 0.5;
   if (s.x < 0.0 || s.x > 1.0 || s.y < 0.0 || s.y > 1.0 || s.z > 1.0) return 1.0;
   s.z -= 0.0015;
-  float v = texture(uShadow, s) * 2.0;
-  v += texture(uShadow, s + vec3(uTexel.x, 0.0, 0.0)) + texture(uShadow, s - vec3(uTexel.x, 0.0, 0.0));
-  v += texture(uShadow, s + vec3(0.0, uTexel.y, 0.0)) + texture(uShadow, s - vec3(0.0, uTexel.y, 0.0));
-  return v / 6.0;
+  // a soft edge: nine taps, the middle weighted, so a shadow's edge has a little penumbra
+  float v = 0.0;
+  for (int i = -1; i <= 1; i++) for (int j = -1; j <= 1; j++) v += texture(uShadow, s + vec3(float(i) * uTexel.x, float(j) * uTexel.y, 0.0)) * (i == 0 && j == 0 ? 2.0 : 1.0);
+  return v / 10.0;
 }
 vec3 tone(vec3 c) {
   c *= uExp;
@@ -185,6 +185,9 @@ void main() {
   float sh = shadow(p, n);
   vec3 reflT = mix(vec3(0.8, 0.86, 0.9), uBronze * 1.9, sold);
   vec3 refl = (sky(r) + glint(r) * sh) * reflT;
+  // under each slab the glass sees the soffit, not the sky, and the room's ceiling is in shade
+  float occl = mix(0.5, 1.0, smoothstep(0.0, 0.3, y1 - p.y)) * mix(0.75, 1.0, smoothstep(0.0, 0.12, p.y - y0));
+  refl *= kind > 0.5 ? 1.0 : mix(occl, 1.0, 0.35 * step(r.y, 0.0));
   vec3 inside = room(p, n, -v, u, y0, y1, k * 13.0 + vB.z, lamp, gold, kind > 0.5 ? 1.0 : 0.0);
   // sunlight through the glass brightens a room, so the balconies' shadows lie across the façade
   inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.16;
@@ -208,9 +211,14 @@ void main() {
   float nv = max(dot(n, v), 0.0), F = 0.06 + 0.94 * pow(1.0 - nv, 5.0);
   vec3 r = reflect(-v, n);
   float sh = shadow(p, n);
-  float top = smoothstep(vB.y - 0.03 - fwidth(p.y), vB.y - 0.03, p.y);
+  float top = vB.z > 0.5 ? 0.0 : smoothstep(vB.y - 0.03 - fwidth(p.y), vB.y - 0.03, p.y);
   vec3 c = (sky(r) + glint(r) * sh) * F;
   float a = clamp(0.08 + F * 0.9, 0.0, 0.9);
+  if (vB.z > 0.5) {
+    // a frosted glass screen between two neighbours' terraces
+    c = vec3(0.6, 0.6, 0.58) * (uSunCol * max(abs(dot(n, uSun)), 0.0) * sh * 0.35 + amb(n)) * 0.4 + c;
+    a = 0.38 + 0.3 * F;
+  }
   vec3 rail = vec3(0.35) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n));
   c = mix(c, rail, top); a = mix(a, 1.0, top);
   o = vec4(tone(c) * a, a);
@@ -248,6 +256,17 @@ void main() {
   vec3 c = uBronze * (uSunCol * max(dot(n, uSun), 0.0) * 0.35 + amb(n) * 0.9) + (sky(r) + glint(r)) * uBronze * 1.9 * F;
   float a = (0.42 + 0.45 * F) * sold;
   o = vec4(tone(c) * a, a);
+}`;
+
+  // The light of the sky behind the tower: a soft band of the horizon's colour, strongest low down and fading out
+  // well inside the tower's box, so the building stands in air rather than on the bare sheet. It only adds light.
+  const SKY_FS = COMMON + `
+uniform float uGlow;
+void main() {
+  float u = vB.x, y = vB.y;
+  float g = exp(-u * u * 5.0) * (1.0 - smoothstep(0.7, 0.95, abs(u))) * exp(-pow((y - 0.16) / 0.2, 2.0)) * smoothstep(0.0, 0.06, y);
+  vec3 c = tone(uHor * uGlow * g);
+  o = vec4(c, 0.0);
 }`;
 
   // ---------------------------------------------------------------- matrices
@@ -360,6 +379,16 @@ void main() {
       const r = S.RAILS[k];
       if (r) band(rails, r, k + SLAB, k + SLAB + RAIL_H, (j, s) => [[k, 0, s, 0], [k + SLAB, k + SLAB + RAIL_H, 0, 0]]);
     }
+    // frosted screens between neighbours' terraces, where the two residences of a level meet
+    for (let k = G.RES0; k < CROWN; k++) {
+      const pl = PL[k];
+      for (const j of S.SPLIT) {
+        const g = pl.glass[j], e = pl.slab[j], nx = -(e.z - g.z), nz = e.x - g.x, nl = Math.hypot(nx, nz) || 1, nr = [nx / nl, 0, nz / nl];
+        const A = [k, 0, 0, 0], B = [k + SLAB, k + 1, 1, 0];
+        const q = [[g.x, k + SLAB, g.z], [e.x, k + SLAB, e.z], [e.x, k + 0.92, e.z], [g.x, k + 0.92, g.z]].map((pp) => rails.vert(pp, nr, A, B));
+        rails.quad(q[0], q[1], q[2], q[3]);
+      }
+    }
     // the crown: its screen of fins, and the roof inside it; the mast for the aviation light
     const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H;
     band(crown, S.SCREEN, y0, y1, (j, s) => [[0, 0.9, s, 1], [y0, y1, 0, 0]]);
@@ -447,7 +476,7 @@ void main() {
       gl.linkProgram(p);
       progs[name] = { p, sh, u: null };
     };
-    make('depth', DEPTH_FS); make('solid', SOLID_FS); make('glass', GLASS_FS); make('rail', RAIL_FS); make('ground', GROUND_FS); make('ghost', GHOST_FS);
+    make('depth', DEPTH_FS); make('solid', SOLID_FS); make('glass', GLASS_FS); make('rail', RAIL_FS); make('ground', GROUND_FS); make('ghost', GHOST_FS); make('sky', SKY_FS);
     const linked = () => Object.values(progs).every((q) => gl.getProgramParameter(q.p, par ? par.COMPLETION_STATUS_KHR : gl.LINK_STATUS));
     const finish = () => {
       for (const [name, q] of Object.entries(progs)) {
@@ -470,6 +499,11 @@ void main() {
       [[0, 3, 0], [1, 3, 12], [2, 4, 24], [3, 4, 40]].forEach(([l, sz, off]) => { gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, sz, gl.FLOAT, false, st, off); });
       meshes[name] = { vao, count: M.i.length, type: big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT };
     }
+    // the sky's quad, set facing the eye at each drawing (four vertices, rewritten in place)
+    const skyBuf = gl.createBuffer(), skyVao = gl.createVertexArray(), skyV = new Float32Array(4 * 14);
+    gl.bindVertexArray(skyVao); gl.bindBuffer(gl.ARRAY_BUFFER, skyBuf); gl.bufferData(gl.ARRAY_BUFFER, skyV.byteLength, gl.DYNAMIC_DRAW);
+    [[0, 3, 0], [1, 3, 12], [2, 4, 24], [3, 4, 40]].forEach(([l, sz, off]) => { gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, sz, gl.FLOAT, false, 56, off); });
+    const skyIb = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyIb); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
     gl.bindVertexArray(null);
 
     // the shadow map, and the rooms' lamps and the residences' sales (12 rooms and 2 residences a level)
@@ -487,6 +521,9 @@ void main() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
     const LAMP = lin(G.LAMP), GOLD = lin(G.GOLD);
+    // each room's window, for its glow after dark: the middle of its glass, its outward direction and its width
+    const ROOMS = [];
+    { const S = G.set(6); for (let k = 2; k < FLOORS; k++) { const pl = S.PLANS[k].glass, n = pl.length; for (let r = 0; r < 12; r++) { let x = 0, z = 0, nx = 0, nz = 0, w = 0, c = 0; for (let j = 0; j < n; j++) if (S.RM[j] === r) { const a = pl[j], b = pl[(j + 1) % n], l = Math.hypot(b.x - a.x, b.z - a.z); x += (a.x + b.x) / 2 * l; z += (a.z + b.z) / 2 * l; nx += a.nx + b.nx; nz += a.nz + b.nz; w += l; c++; } if (!c) continue; const nl = Math.hypot(nx, nz) || 1; ROOMS.push({ k, r, x: x / w + nx / nl * 0.05, z: z / w + nz / nl * 0.05, nx: nx / nl, nz: nz / nl, w }); } } }
     let shKey = '', LS = null;
     const hash = G.hash, roomSide = [];
     { const S = G.set(6); for (let k = 0; k < FLOORS; k++) { const row = []; for (let r = 0; r < 12; r++) { const j = S.RM.indexOf(r); row.push(j < 0 ? 0 : S.SIDE[k][j]); } roomSide.push(row); } }
@@ -621,6 +658,18 @@ void main() {
       };
       // (the drawing's camera looks along +z with y up, so a face turned to the eye winds clockwise on screen)
       gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); gl.frontFace(gl.CW);
+      // the sky's light behind it all (added light only, so nothing it touches darkens)
+      {
+        const D = 11, cxw = fw[0] * D, czw = fw[2] * D, Wd = 14, Ht = 26;
+        const cor = [[-1, 0], [1, 0], [1, 1], [-1, 1]];
+        cor.forEach(([u, v], i) => { const o = i * 14; skyV.set([cxw + rt[0] * Wd * u, v * Ht - 0.3, czw + rt[2] * Wd * u, -fw[0], 0, -fw[2], 0, 0, 0, 0, u, v, 0, 0], o); });
+        gl.bindBuffer(gl.ARRAY_BUFFER, skyBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, skyV);
+        const qk = progs.sky; common(qk); gl.uniform1f(qk.u.uGlow, 0.05 + 0.1 * gold + 0.04 * night);
+        gl.uniform1f(qk.u.uLim, 1); gl.uniform3fv(qk.u.uY, [0, 1, 0]);
+        gl.depthMask(false); gl.disable(gl.CULL_FACE); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.bindVertexArray(skyVao); gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        gl.disable(gl.BLEND); gl.depthMask(true);
+      }
       const qs = progs.solid; common(qs);
       for (const nm of ['slabs', 'cols', 'core', 'canopy', 'cars']) draw(qs, nm, lims[nm]);
       gl.disable(gl.CULL_FACE);
@@ -635,7 +684,17 @@ void main() {
       const qh = progs.ghost; common(qh); draw(qh, 'ghost', lims.ghost);
       const ql = progs.rail; common(ql); draw(ql, 'rails', lims.rails);
       gl.depthMask(true); gl.disable(gl.BLEND); gl.disable(gl.SCISSOR_TEST);
-      R.box = { x: x0, y: y0, w: bw, h: bh, sw: pw, sh: ph, sy: 0 };
+      // the lit rooms' glow, for the drawing to lay over the render (it spreads past the glass, as light does)
+      const glows = [];
+      if (night > 0.05) for (const q of ROOMS) {
+        const v = roomData[(q.k * RW + q.r) * 4] / 255;
+        if (v < 0.02 || q.k > C - 1) continue;
+        const ex = e[0] - q.x, ey = e[1] - (q.k + 0.58), ez = e[2] - q.z, el = Math.hypot(ex, ey, ez), face = (q.nx * ex + q.nz * ez) / el;
+        if (face < 0.12) continue;
+        const pp = m.P(q.x, q.k + 0.58, q.z), sc = f / pp[2];
+        glows.push([pp[0], pp[1], q.w * sc * 0.7, sc * 0.75, v * 0.32 * night * Math.sqrt(face), roomData[(q.k * RW + q.r) * 4 + 1] ? 1 : 0]);
+      }
+      R.box = { x: x0, y: y0, w: bw, h: bh, sw: pw, sh: ph, sy: 0, glows };
       return R.box;
     };
     return R;

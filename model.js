@@ -1941,6 +1941,17 @@
       if (r3) {
         const b = r3.render(this);
         if (b) { g.globalAlpha = this.r3a; g.drawImage(r3.canvas, 0, 0, b.sw, b.sh, b.x, b.y, b.w, b.h); g.globalAlpha = 1; }
+        // the lit rooms' glow, as the drawing lays its own (one falloff stretched over each window, added to what is under it)
+        if (b && solid && b.glows.length && g.getTransform && !this.forced) {
+          const T = g.getTransform();
+          g.save(); g.globalCompositeOperation = 'lighter';
+          for (const [x, y, rx, ry, a, gi] of b.glows) {
+            g.fillStyle = this.glowSprite(gi); g.globalAlpha = clamp(a, 0, 1);
+            g.setTransform(T.a * rx, T.b * rx, T.c * ry, T.d * ry, T.a * x + T.c * y + T.e, T.b * x + T.d * y + T.f);
+            g.fillRect(-1, -1, 2, 2);
+          }
+          g.restore();
+        }
         // the aviation light on its mast over the crown, as the drawing lights it
         if (solid && this.G > 0.85) this.beacon(this.P(0, FLOORS + SLAB + crownH + BEACON, 0), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
       }
