@@ -76,12 +76,16 @@ vec3 tone(vec3 c) {
 
   // Concrete, metal, water and leaves: a.y ambient occlusion, a.z a coordinate along the surface, a.w the material.
   const SOLID_FS = COMMON + `
+uniform float uWork;
 void main() {
   vec3 n = normalize(vNrm);
   if (!gl_FrontFacing) n = -n;
   vec3 p = vPos, v = normalize(uEye - p);
   float kind = vA.w, ao = vA.y;
-  vec3 alb = vec3(0.63, 0.62, 0.6);
+  // white-painted slab edges, and the concrete of the soffits, slab tops and core a shade greyer, with the faint
+  // unevenness of poured concrete from one bay to the next
+  vec3 alb = mix(vec3(0.55, 0.545, 0.53), vec3(0.65, 0.64, 0.62), 1.0 - smoothstep(0.3, 0.7, abs(n.y)));
+  alb *= 0.95 + 0.07 * h21(floor(vec2(vA.z * 0.9, p.y * 1.0 + 0.5)));
   if (kind > 4.5) {
     // a car at the drop-off: lacquer (or its glass) over the sky's reflection
     vec3 r = reflect(-v, n);
@@ -115,6 +119,10 @@ void main() {
   }
   float ndl = max(dot(n, uSun), 0.0), sh = ndl > 0.0 ? shadow(p, n) : 0.0;
   vec3 c = alb * (uSunCol * ndl * sh + amb(n) * ao);
+  // the painted edges have a little sheen, so a grazing view catches the sky in them
+  if (kind < 0.5) c += sky(reflect(-v, n)) * (0.03 + 0.5 * pow(1.0 - max(dot(n, v), 0.0), 5.0)) * 0.3 * (1.0 - smoothstep(0.3, 0.7, abs(n.y)));
+  // while the frame rises, the crew's floodlights on the top deck light it and the levels just under it after dark
+  if (uWork > 0.0) c += alb * vec3(1.0, 0.74, 0.46) * uNight * 0.55 * exp(-max(uWork - p.y, 0.0) * 1.1) * step(p.y, uWork + 0.4) * (0.4 + 0.6 * max(n.y, 0.0));
   // after dark the soffits and slab tops take a little of the rooms' light, and the crown is washed from below
   c += alb * uLamp * uNight * (kind > 0.5 && kind < 1.5 ? 0.35 * exp(-(p.y - vB.x) * 1.6) : 0.05 * ao);
   // and the balconies' soffits carry small downlights, lit once the building is in use
@@ -251,10 +259,19 @@ void main() {
   float sold = texelFetch(uRooms, ivec2(12 + int(vB.w + 0.5), int(vA.y + 0.5)), 0).r;
   if (sold < 0.02) discard;
   if (dot(n, v) < 0.0) n = -n;
+  float side = 1.0 - step(0.5, abs(n.y));
   float F = 0.12 + 0.88 * pow(1.0 - max(dot(n, v), 0.0), 5.0);
   vec3 r = reflect(-v, n);
   vec3 c = uBronze * (uSunCol * max(dot(n, uSun), 0.0) * 0.35 + amb(n) * 0.9) + (sky(r) + glint(r)) * uBronze * 1.9 * F;
-  float a = (0.42 + 0.45 * F) * sold;
+  // after dark the bronze keeps a little of the city's light, more where it is seen edge on, and the volumes thin out
+  c += uBronze * uNight * (0.05 + 0.14 * F);
+  // seen through, the floors read as lines, not as a stack of solid plates
+  float a = (0.42 + 0.45 * F) * mix(1.0, 0.72, uNight) * mix(0.45, 1.0, side);
+  // the panes to come: a faint mullion every 0.42 round the sides
+  float fu = fract(vA.z / 0.42), du = min(fu, 1.0 - fu) * 0.42, aa = fwidth(vA.z) * 0.8 + 0.002;
+  float mull = side * (1.0 - smoothstep(0.012, 0.012 + aa, du));
+  c = mix(c, uBronze * (0.3 * amb(n) + uSunCol * max(dot(n, uSun), 0.0) * 0.12 + 0.04 * uNight), mull * 0.7);
+  a = mix(a, min(1.0, a + 0.2), mull) * sold;
   o = vec4(tone(c) * a, a);
 }`;
 
@@ -784,7 +801,7 @@ void main() {
         gl.bindVertexArray(skyVao); gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
         gl.disable(gl.BLEND); gl.depthMask(true);
       }
-      const qs = progs.solid; common(qs);
+      const qs = progs.solid; common(qs); gl.uniform1f(qs.u.uWork, L > 0.5 && L < FLOORS - 0.01 ? L + SLAB : -1);
       for (const nm of ['slabs', 'cols', 'core', 'canopy', 'cars']) draw(qs, nm, lims[nm]);
       gl.disable(gl.CULL_FACE);
       draw(qs, 'deck', lims.deck);
