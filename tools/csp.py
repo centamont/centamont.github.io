@@ -6,7 +6,7 @@
 import re,hashlib,base64,glob,sys
 check='--check' in sys.argv[1:]
 stale=[]
-pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','report.html','south-florida.html','new-york.html','los-angeles.html','dallas.html','austin.html','houston.html']+sorted(glob.glob('journal/*.html'))
+pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','report.html','south-florida.html','new-york.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html']+sorted(glob.glob('journal/*.html'))
 for f in pages:
     t=open(f).read()
     hs=[]
