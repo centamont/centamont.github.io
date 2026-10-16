@@ -54,7 +54,7 @@
   --t-spread:clamp(46px,7.2vw,calc(104px + var(--wide) * .015)); --t-chapter:clamp(42px,5.6vw,calc(84px + var(--wide) * .02));
   --t-section:clamp(36px,3.9vw,calc(56px + var(--wide) * .018)); --t-head:clamp(28px,2.8vw,calc(40px + var(--wide) * .012));
   --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
-  --t-num:clamp(96px,10.8vw,168px);
+  --t-num:clamp(80px,7.6vw,124px);
   color-scheme:light;
 }
 /* tablets: the chapter and spread heads keep their rank over the back matter; phones: a ladder of their own, under the h1 */
@@ -238,7 +238,7 @@ header.site{container:site/inline-size;max-width:100vw}
 }
 @media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
   nav.main.open > a:nth-child(6){border-top:0}
-  nav.main.open .mk-panel a:nth-child(3){border-top:1px solid var(--rule)}
+  nav.main.open .mk-panel > a:nth-child(3){border-top:1px solid var(--rule)}
 }
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk,header.site .mk-panel{display:contents}
@@ -250,6 +250,32 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel a[aria-current]::after{content:none}
   header.site nav.main .mk-panel a:nth-child(1){--k:3}header.site nav.main .mk-panel a:nth-child(2){--k:4}header.site nav.main .mk-panel a:nth-child(3){--k:5}header.site nav.main .mk-panel a:nth-child(4){--k:6}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
+}}
+/* Texas holds three cities. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
+   the drawer the group is one row, the state in the drawer's face and its cities beside it in the bar's capitals, so the
+   drawer keeps its ten rows (and its two columns of five on a phone on its side). */
+@media (min-width:1280px){
+  .mk-st{display:grid}
+  .mk-k{padding:14px 0 3px;font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  nav.main .mk-st a{padding:9px 0 8px 16px;border-bottom:0}
+  .js header.site.over .mk-k{color:rgba(244,240,232,.62)}
+}
+@media (max-width:1279px),(max-width:79.9375em){
+  .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
+  nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
+}
+/* (the narrowest phones close the cities' tracking a little, so Houston stays on the row) */
+@media (max-width:359px){nav.main .mk-st a{letter-spacing:.1em}}
+@media (max-width:1279px) and (max-height:500px),(max-width:79.9375em) and (max-height:500px){.mk-st{padding-block:8px}.mk-k{font-size:28px;line-height:1.25}nav.main .mk-st a{padding-block:4px}}
+@media (min-width:1280px){@container site (max-width:71em){
+  header.site .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  header.site nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  header.site .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
+  header.site nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
 /* the mark under a nav word overhangs both ends by the same tracking, rather than only the right */
@@ -437,6 +463,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
 /* the last step is the tower's last runway: a full window, so its last closing view settles before the drawing lets go */
 .step:last-child{min-height:100svh}
+@media (min-width:1041px){.step:last-child{min-height:72svh}}
 /* beside the tower every step is as tall as its words, with the same measured gap between one step and the next, so the
    story reads at an even pace (the last keeps its runway) */
 @media (min-width:1041px){.steps{--pad:clamp(40px,4.5svh,72px)}.step{padding-block:var(--pad)}.step:not(:last-child){min-height:0}}
@@ -555,7 +582,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .step h3{max-width:12em}
   .step:nth-child(4) h3{max-width:7em}
   #launch h3{text-wrap:wrap}
-  .step h3::before{font-size:clamp(36px,21.1svh - 94px,96px);line-height:.7;margin:0 0 6px;opacity:.4}
+  .step h3::before{font-size:clamp(36px,16svh - 64px,72px);line-height:.7;margin:0 0 6px;opacity:.4}
   .step ul{margin-top:0}
   .step li{padding:10px 0;line-height:1.55}
   .steps .step .more{margin-top:12px}
@@ -1105,18 +1132,18 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
-  /* the veil rises only to just under the tower's ground (36px above the headline), so the lobby's light and the ground are clear of it */
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) - 40px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) + 16px))}
-  /* the copy starts as low as the taller drawing wants (51svh), but never so low that the second button leaves the first screen; 458px is the copy's height from the headline to the second button */
-  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+  /* the veil rises only to just under the tower's ground (28px above the headline), so the lobby's light and the ground are clear of it */
+  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}
+  /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 416px is the copy's height from the headline to the second button */
+  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
   .hero h1{max-width:none}
   .hero .coords{display:none}
 }
 /* on a phone the headline sets a touch tighter, and the copy under it closes up a little, so both buttons stand whole above
    the fold of a 390x844 screen (and the first above a 360x640 one) without the drawing giving way */
-@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{line-height:1.55;margin-top:20px}.hero .row{margin-top:24px;gap:10px}.hero .btn{padding-block:15px}}
+@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{font-size:17px;line-height:1.5;margin-top:16px}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}
 /* A tablet held upright has more height than the drawing's 58% takes, which left a band of empty ink between the tower's
-   ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 36px above
+   ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 28px above
    the headline, as on a phone, and the shading starts lower to keep the ground in view. */
 @media (min-width:560px) and (max-width:820px) and (min-height:900px) and (orientation:portrait){
   .hero canvas{height:100%}
@@ -1126,7 +1153,7 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 /* Text enlarged on its own stacks the hero as a phone does (the page script sets .stack): the tower above, the copy below */
 .hero.stack canvas{height:63svh;bottom:auto}
 .hero.stack::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
-.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
 .hero.stack h1{max-width:none}
 .hero.stack .coords{top:80px}
 .hero.stack .coords > :not(.cap){display:none}

@@ -32,7 +32,7 @@
   --t-spread:clamp(46px,7.2vw,calc(104px + var(--wide) * .015)); --t-chapter:clamp(42px,5.6vw,calc(84px + var(--wide) * .02));
   --t-section:clamp(36px,3.9vw,calc(56px + var(--wide) * .018)); --t-head:clamp(28px,2.8vw,calc(40px + var(--wide) * .012));
   --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
-  --t-num:clamp(96px,10.8vw,168px);
+  --t-num:clamp(80px,7.6vw,124px);
   color-scheme:light;
 }
 @media (min-width:521px) and (max-width:820px){:root{--t-chapter:clamp(40px,7.2vw,56px);--t-spread:clamp(44px,7.6vw,60px)}}
@@ -167,7 +167,7 @@ header.site{container:site/inline-size;max-width:100vw}
 }
 @media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
   nav.main.open > a:nth-child(6){border-top:0}
-  nav.main.open .mk-panel a:nth-child(3){border-top:1px solid var(--rule)}
+  nav.main.open .mk-panel > a:nth-child(3){border-top:1px solid var(--rule)}
 }
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk,header.site .mk-panel{display:contents}
@@ -179,6 +179,28 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel a[aria-current]::after{content:none}
   header.site nav.main .mk-panel a:nth-child(1){--k:3}header.site nav.main .mk-panel a:nth-child(2){--k:4}header.site nav.main .mk-panel a:nth-child(3){--k:5}header.site nav.main .mk-panel a:nth-child(4){--k:6}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
+}}
+@media (min-width:1280px){
+  .mk-st{display:grid}
+  .mk-k{padding:14px 0 3px;font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  nav.main .mk-st a{padding:9px 0 8px 16px;border-bottom:0}
+  .js header.site.over .mk-k{color:rgba(244,240,232,.62)}
+}
+@media (max-width:1279px),(max-width:79.9375em){
+  .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
+  nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
+}
+@media (max-width:359px){nav.main .mk-st a{letter-spacing:.1em}}
+@media (max-width:1279px) and (max-height:500px),(max-width:79.9375em) and (max-height:500px){.mk-st{padding-block:8px}.mk-k{font-size:28px;line-height:1.25}nav.main .mk-st a{padding-block:4px}}
+@media (min-width:1280px){@container site (max-width:71em){
+  header.site .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  header.site nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  header.site .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
+  header.site nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
 @media (min-width:1280px){nav.main a{padding-left:.14em;margin-left:-.14em}}
@@ -325,6 +347,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step{min-height:64svh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding-block:40px;counter-increment:st}
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
 .step:last-child{min-height:100svh}
+@media (min-width:1041px){.step:last-child{min-height:72svh}}
 @media (min-width:1041px){.steps{--pad:clamp(40px,4.5svh,72px)}.step{padding-block:var(--pad)}.step:not(:last-child){min-height:0}}
 @media screen and (min-width:1041px){
   html.js .steps{--hand:clamp(0px,52svh - 405px,2 * var(--pad))}
@@ -387,7 +410,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .step h3{max-width:12em}
   .step:nth-child(4) h3{max-width:7em}
   #launch h3{text-wrap:wrap}
-  .step h3::before{font-size:clamp(36px,21.1svh - 94px,96px);line-height:.7;margin:0 0 6px;opacity:.4}
+  .step h3::before{font-size:clamp(36px,16svh - 64px,72px);line-height:.7;margin:0 0 6px;opacity:.4}
   .step ul{margin-top:0}
   .step li{padding:10px 0;line-height:1.55}
   .steps .step .more{margin-top:12px}
@@ -789,19 +812,19 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) - 40px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 458px,51svh) + var(--rise,0px) + 16px))}
-  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}
+  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
   .hero h1{max-width:none}
   .hero .coords{display:none}
 }
-@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{line-height:1.55;margin-top:20px}.hero .row{margin-top:24px;gap:10px}.hero .btn{padding-block:15px}}
+@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{font-size:17px;line-height:1.5;margin-top:16px}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}
 @media (min-width:560px) and (max-width:820px) and (min-height:900px) and (orientation:portrait){
   .hero canvas{height:100%}
   .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 30%,rgba(var(--hero-rgb),0) 56%)}
 }
 .hero.stack canvas{height:63svh;bottom:auto}
 .hero.stack::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
-.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 458px,51svh) - var(--rise,0px))}
+.hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
 .hero.stack h1{max-width:none}
 .hero.stack .coords{top:80px}
 .hero.stack .coords > :not(.cap){display:none}
