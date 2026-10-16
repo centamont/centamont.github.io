@@ -33,7 +33,7 @@ precision highp float; precision highp sampler2DShadow;
 in vec3 vPos; in vec3 vNrm; in vec4 vA; in vec4 vB;
 out vec4 o;
 uniform vec3 uEye, uSun, uSunCol, uZen, uHor, uGrd, uLamp, uGold, uBronze;
-uniform float uNight, uExp, uShOn;
+uniform float uNight, uExp, uShOn, uOcc;
 uniform mat4 uLS; uniform sampler2DShadow uShadow; uniform vec2 uTexel;
 uniform sampler2D uRooms;
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -82,6 +82,14 @@ void main() {
   vec3 p = vPos, v = normalize(uEye - p);
   float kind = vA.w, ao = vA.y;
   vec3 alb = vec3(0.63, 0.62, 0.6);
+  if (kind > 4.5) {
+    // a car at the drop-off: lacquer (or its glass) over the sky's reflection
+    vec3 r = reflect(-v, n);
+    float F = 0.04 + 0.96 * pow(1.0 - max(dot(n, v), 0.0), 5.0), sh = shadow(p, n);
+    vec3 paint = vB.y > 0.5 ? vec3(0.015) : vB.x > 0.5 ? vec3(0.42, 0.42, 0.43) : vec3(0.025, 0.027, 0.03);
+    vec3 c = paint * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + (sky(r) + glint(r) * sh) * mix(F, 0.25 + 0.6 * F, vB.y);
+    o = vec4(tone(c), 1.0); return;
+  }
   if (kind > 3.5) {
     // a palm frond: leaflets either side of its rib, feathered at their tips
     float t = vA.z, w = abs(vB.x);
@@ -109,6 +117,11 @@ void main() {
   vec3 c = alb * (uSunCol * ndl * sh + amb(n) * ao);
   // after dark the soffits and slab tops take a little of the rooms' light, and the crown is washed from below
   c += alb * uLamp * uNight * (kind > 0.5 && kind < 1.5 ? 0.35 * exp(-(p.y - vB.x) * 1.6) : 0.05 * ao);
+  // and the balconies' soffits carry small downlights, lit once the building is in use
+  if (kind < 0.5 && n.y < -0.5 && ao > 0.7) {
+    vec2 g = fract(p.xz * 1.6) - 0.5;
+    c += uLamp * uNight * uOcc * 2.5 * (1.0 - smoothstep(0.05, 0.11, length(g)));
+  }
   o = vec4(tone(c), 1.0);
 }`;
 
@@ -207,7 +220,6 @@ void main() {
   // out well before the edge of the box), the tower's shadow (where that light is missing), the contact shadow at the
   // podium's foot and, after dark, the light from the lobby. Composited premultiplied: light adds, shade darkens.
   const GROUND_FS = COMMON + `
-uniform float uOcc;
 float rbox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
 void main() {
   vec3 p = vPos;
@@ -221,6 +233,21 @@ void main() {
   vec3 c = tone(lit) - tone(vec3(0.0));
   float a = ao * 0.5 * fade;
   o = vec4(c * (1.0 - a), a);
+}`;
+
+  // Residences sold before their glass is in: each stands where it will be, in the bronze of its glass, seen through,
+  // so the sales can be read in the rising frame (the drawing draws them as bronze solids).
+  const GHOST_FS = COMMON + `
+void main() {
+  vec3 n = normalize(vNrm), p = vPos, v = normalize(uEye - p);
+  float sold = texelFetch(uRooms, ivec2(12 + int(vB.w + 0.5), int(vA.y + 0.5)), 0).r;
+  if (sold < 0.02) discard;
+  if (dot(n, v) < 0.0) n = -n;
+  float F = 0.12 + 0.88 * pow(1.0 - max(dot(n, v), 0.0), 5.0);
+  vec3 r = reflect(-v, n);
+  vec3 c = uBronze * (uSunCol * max(dot(n, uSun), 0.0) * 0.35 + amb(n) * 0.9) + (sky(r) + glint(r)) * uBronze * 1.9 * F;
+  float a = (0.42 + 0.45 * F) * sold;
+  o = vec4(tone(c) * a, a);
 }`;
 
   // ---------------------------------------------------------------- matrices
@@ -315,6 +342,19 @@ void main() {
       const pl = PL[k].glass, y0 = k + SLAB, y1 = k === 0 ? 2 : k + 1, kind = k < 2 ? 1 : k < PODIUM ? 2 : 0;
       band(glass, pl, y0, y1, (j, s) => [[k === 0 ? 1 : k, k, s, kind], [y0, y1, S.RM[j % pl.length], S.SIDE[k][j % pl.length]]]);
     }
+    // the same bands, for the residences sold before their glass is in (shown from the frame's top down: threshold -k)
+    const ghost = new Mesh();
+    for (let k = G.RES0; k < FLOORS; k++) {
+      const pl = PL[k].glass, y0 = k + SLAB, y1 = k + 1;
+      band(ghost, pl, y0, y1, (j, s) => [[-k, k, s, 0], [y0, y1, 0, S.SIDE[k][j % pl.length]]]);
+      for (const y of [y0, y1]) {
+        let cx = 0, cz = 0; pl.forEach((q) => { cx += q.x / pl.length; cz += q.z / pl.length; });
+        for (let j = 0; j < pl.length; j++) {
+          const a = pl[j], b = pl[(j + 1) % pl.length], sd = S.SIDE[k][j], A = [-k, k, 0, 0], B = [y0, y1, 0, sd], nr = [0, y === y1 ? 1 : -1, 0];
+          ghost.tri(ghost.vert([cx, y, cz], nr, A, B), ghost.vert([a.x, y, a.z], nr, A, B), ghost.vert([b.x, y, b.z], nr, A, B));
+        }
+      }
+    }
     // glass balustrades on every terrace, the podium's roof and the roof included
     for (let k = PODIUM; k <= FLOORS; k++) {
       const r = S.RAILS[k];
@@ -362,9 +402,26 @@ void main() {
         }
       }
     }
+    // two cars at the drop-off under the porte-cochère, once the building is in use
+    const cars = new Mesh();
+    const box = (cx, cy, cz, hx, hy, hz, b) => {
+      const a = [0, 1, 0, 5];
+      for (const [nx, ny, nz] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+        const u = ny ? [1, 0, 0] : [0, 1, 0], w = [ny * u[2] - nz * u[1], nz * u[0] - nx * u[2], nx * u[1] - ny * u[0]];
+        const c = [cx + nx * hx, cy + ny * hy, cz + nz * hz], e = [u[0] * hx + u[1] * hy + u[2] * hz, w[0] * hx + w[1] * hy + w[2] * hz];
+        const P = (s, t) => [c[0] + u[0] * e[0] * s + w[0] * e[1] * t, c[1] + u[1] * e[0] * s + w[1] * e[1] * t, c[2] + u[2] * e[0] * s + w[2] * e[1] * t];
+        const q = [P(-1, -1), P(1, -1), P(1, 1), P(-1, 1)].map((pp) => cars.vert(pp, [nx, ny, nz], a, b));
+        cars.quad(q[0], q[1], q[2], q[3]);
+      }
+    };
+    for (const [x, z, col] of [[-1.15, -5.55, 0], [1.75, -5.7, 1]]) {
+      box(x, 0.13, z, 0.64, 0.1, 0.25, [col, 0, 0, 0]);
+      box(x - 0.06, 0.29, z, 0.36, 0.07, 0.21, [col, 1, 0, 0]);
+      box(x - 0.06, 0.365, z, 0.33, 0.006, 0.19, [col, 0, 0, 0]);
+    }
     const ground = new Mesh();
     { const R = 30, a = [0, 1, 0, 0], b = [0, 0, 0, 0], nr = [0, 1, 0]; const q = [[-R, -R], [R, -R], [R, R], [-R, R]].map(([x, z]) => ground.vert([x, 0, z], nr, a, b)); ground.quad(q[3], q[2], q[1], q[0]); }
-    return { slabs, cols, core, glass, rails, crown, mast, canopy, deck, ground };
+    return { slabs, cols, core, glass, ghost, rails, crown, mast, canopy, deck, cars, ground };
   }
 
   // ---------------------------------------------------------------- renderer
@@ -390,7 +447,7 @@ void main() {
       gl.linkProgram(p);
       progs[name] = { p, sh, u: null };
     };
-    make('depth', DEPTH_FS); make('solid', SOLID_FS); make('glass', GLASS_FS); make('rail', RAIL_FS); make('ground', GROUND_FS);
+    make('depth', DEPTH_FS); make('solid', SOLID_FS); make('glass', GLASS_FS); make('rail', RAIL_FS); make('ground', GROUND_FS); make('ghost', GHOST_FS);
     const linked = () => Object.values(progs).every((q) => gl.getProgramParameter(q.p, par ? par.COMPLETION_STATUS_KHR : gl.LINK_STATUS));
     const finish = () => {
       for (const [name, q] of Object.entries(progs)) {
@@ -519,10 +576,11 @@ void main() {
       // shadows, only when the sun or the building has changed
       const shOn = kd > 0.02 && sv[1] > 0.01;
       const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, mast: Gc > 0.85 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
+      lims.ghost = -C + 0.001; lims.cars = (m.occ || 0) > 0.5 ? 1 : -1;
       lims.rails = C >= FLOORS - 0.001 && Gc > 0.5 ? FLOORS : C - 0.999;
       const crownY = [FLOORS + SLAB, Ge, 0], mastY = [0, 1, FLOORS + SLAB + SCREEN_H * Ge];
       if (shOn) {
-        const key = sv.map((v) => v.toFixed(3)).join() + [L, C, Gc, coreTop].map((v) => v.toFixed(3)).join();
+        const key = sv.map((v) => v.toFixed(3)).join() + [L, C, Gc, coreTop, lims.cars].map((v) => v.toFixed(3)).join();
         if (key !== shKey) {
           shKey = key;
           const d = Math.hypot(...sv), dir = sv.map((v) => v / d);
@@ -532,7 +590,7 @@ void main() {
           gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.clear(gl.DEPTH_BUFFER_BIT); gl.disable(gl.CULL_FACE);
           gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(2, 4);
           gl.useProgram(qd.p); gl.uniformMatrix4fv(qd.u.uVP, false, LS);
-          for (const nm of ['slabs', 'cols', 'core', 'glass', 'canopy', 'deck']) draw(qd, nm, lims[nm]);
+          for (const nm of ['slabs', 'cols', 'core', 'glass', 'canopy', 'deck', 'cars']) draw(qd, nm, lims[nm]);
           draw(qd, 'crown', lims.crown, crownY);
           gl.disable(gl.POLYGON_OFFSET_FILL);
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -564,7 +622,7 @@ void main() {
       // (the drawing's camera looks along +z with y up, so a face turned to the eye winds clockwise on screen)
       gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); gl.frontFace(gl.CW);
       const qs = progs.solid; common(qs);
-      for (const nm of ['slabs', 'cols', 'core', 'canopy']) draw(qs, nm, lims[nm]);
+      for (const nm of ['slabs', 'cols', 'core', 'canopy', 'cars']) draw(qs, nm, lims[nm]);
       gl.disable(gl.CULL_FACE);
       draw(qs, 'deck', lims.deck);
       draw(qs, 'crown', lims.crown, crownY);
@@ -574,6 +632,7 @@ void main() {
       gl.disable(gl.CULL_FACE);
       gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
       const qr = progs.ground; common(qr); draw(qr, 'ground', 1);
+      const qh = progs.ghost; common(qh); draw(qh, 'ghost', lims.ghost);
       const ql = progs.rail; common(ql); draw(ql, 'rails', lims.rails);
       gl.depthMask(true); gl.disable(gl.BLEND); gl.disable(gl.SCISSOR_TEST);
       R.box = { x: x0, y: y0, w: bw, h: bh, sw: pw, sh: ph, sy: 0 };

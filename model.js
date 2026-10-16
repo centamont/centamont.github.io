@@ -1352,7 +1352,7 @@
       const craneOn = this.o.crane && this.crane > 0.01 && !inLens;
       const craneBehind = this.P(MAST[0], eye[1], MAST[1])[2] > this.P(0, eye[1], 0)[2];
       if (craneOn && craneBehind) this.drawCrane(false);
-      if (!inLens && this.S > 0.001) { const ks = []; for (let k = RES0; k < RES1; k++) if (k >= L - 0.001 && !(k < coreTop && k > L + 0.001)) ks.push(k); offplan(ks, true); }
+      if (!inLens && this.S > 0.001 && !solid) { const ks = []; for (let k = RES0; k < RES1; k++) if (k >= L - 0.001 && !(k < coreTop && k > L + 0.001)) ks.push(k); offplan(ks, true); }
 
       // (the storeys closed in by their glass, below the open frame)
       const clad = Math.min(Math.floor(C + 0.001), FLOORS);
