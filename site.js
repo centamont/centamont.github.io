@@ -32,6 +32,31 @@
     document.addEventListener('click', (e) => { if (nav.classList.contains('open') && !e.target.closest('header.site')) close(); });
   }
 
+  // Markets: in the bar, one word opens the four markets as a list hanging from the header (a click or a key, or a mouse
+  // resting on it); in the drawer the four stand as rows, and this does nothing. The home page's markets section gives
+  // the word the bar's mark while it is read.
+  const mk = document.querySelector('.mk');
+  if (mk) {
+    const mb = mk.querySelector('.mk-btn'), inBar = () => getComputedStyle(mb).display !== 'none';
+    let hover = false, wait = 0;
+    const set = (o) => { mk.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o)); if (!o) hover = false; };
+    mb.addEventListener('click', () => { if (hover) { hover = false; set(true); } else set(!mk.classList.contains('open')); });
+    mb.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); set(true); mk.querySelector('.mk-panel a').focus(); } });
+    mk.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mk.classList.contains('open')) { e.stopPropagation(); set(false); mb.focus(); return; }
+      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && e.target.closest('.mk-panel') && inBar()) {
+        const ls = [...mk.querySelectorAll('.mk-panel a')], i = ls.indexOf(e.target) + (e.key === 'ArrowDown' ? 1 : -1);
+        e.preventDefault(); (i < 0 ? mb : ls[Math.min(i, ls.length - 1)]).focus();
+      }
+    });
+    mk.addEventListener('focusout', (e) => { if (!mk.contains(e.relatedTarget)) set(false); });
+    document.addEventListener('click', (e) => { if (!e.target.closest('.mk')) set(false); });
+    mk.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'mouse' || !inBar()) return; clearTimeout(wait); if (!mk.classList.contains('open')) { hover = true; set(true); } });
+    mk.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse' || !hover) return; wait = setTimeout(() => { if (hover) set(false); }, 240); });
+    const ms = document.getElementById('markets');
+    if (ms && 'IntersectionObserver' in window) new IntersectionObserver((es) => es.forEach((e) => mk.classList.toggle('here', e.isIntersecting)), { rootMargin: '-45% 0px -54% 0px' }).observe(ms);
+  }
+
   // The header takes the ground beneath it: over an ink ground (the hero, the private door, the name, the private-clients
   // threshold) it is drawn in that ink, and on the sheet in ivory. The ink is a layer of its own (site.css,
   // header.site.lk::before). Over the hero it is cut each frame to the part of the bar that stands over the hero, so the
@@ -450,8 +475,9 @@
   ['pointerup', 'pointercancel', 'dragstart'].forEach((t) => document.addEventListener(t, letGo, { capture: true, passive: true }));
   addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
 
-  // Drawings that draw themselves once they arrive.
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.25 });
+  // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so
+  // by the time it stands in the middle of the screen it is finished, and a reader scrolling past never meets one half drawn.
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
 
   // Film loops: a few muted seconds of water and light. Each loads only as it comes into view, plays while it is on
