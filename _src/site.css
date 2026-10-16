@@ -2240,10 +2240,13 @@ html.js .pc-nojs{display:none}
 .ji-t{grid-area:t;font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;max-width:none;letter-spacing:normal;transition:transform .6s var(--ease)}
 .ji-s{grid-area:s;margin:10px 0 0;max-width:46ch;font-size:18px;line-height:1.6;color:var(--muted)}
 .ji .pl{grid-area:p;align-self:start;margin-top:6px}
+/* each note's own photograph, small, where the row's drawing used to sit; the drawings stay inside the notes */
+.ji .ji-ph{grid-area:p;align-self:start;display:block;width:168px;aspect-ratio:3/2;margin-top:8px;overflow:hidden;background:var(--rule)}
+.ji .ji-ph img{display:block;width:100%;height:100%;object-fit:cover}
 @media (max-width:1000px){.ji a{grid-template-columns:3em minmax(0,1fr) 168px}}
-@media (max-width:820px){.ji a{grid-template-columns:3em minmax(0,1fr) 120px}.ji .pl{width:120px;height:69px}}
+@media (max-width:820px){.ji a{grid-template-columns:3em minmax(0,1fr) 120px}.ji .pl{width:120px;height:69px}.ji .ji-ph{width:120px}}
 /* phones: the plate goes above the title, the full width of the row */
-@media (max-width:600px){.ji a{grid-template-columns:3em minmax(0,1fr);grid-template-areas:"p p" "n t" ". s" ". d"}.ji .pl{width:100%;height:120px;margin:0 0 22px}}
+@media (max-width:600px){.ji a{grid-template-columns:3em minmax(0,1fr);grid-template-areas:"p p" "n t" ". s" ". d"}.ji .pl{width:100%;height:120px;margin:0 0 22px}.ji .ji-ph{width:100%;aspect-ratio:2/1;margin:0 0 22px}}
 @media (max-width:420px){.ji a{grid-template-columns:2.2em minmax(0,1fr);column-gap:16px}}
 /* The plates: line drawings of each note's figure, in percentages of the plate, so a wider plate keeps its hatches and pens */
 .pl{display:block;width:168px;height:96px;overflow:visible}
@@ -2718,6 +2721,13 @@ nav.main a.press{color:var(--fg);transition:none}
 .photos-pair .photo{margin:0}
 #markets .photos-pair + .links{margin-top:clamp(32px,4vw,48px)}
 .photos-pair .cap{grid-template-columns:minmax(0,1fr)}
+/* private clients: three quiet rooms and views, marked as illustrative above the row so no one reads them as a listing */
+.pc-photos{margin-top:clamp(56px,7vw,104px)}
+.pc-photos .lab{margin:0 0 16px;font:500 13px/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,40px)}
+.trio .photo{margin:0}
+.trio .cap{grid-template-columns:minmax(0,1fr)}
+@media (max-width:700px){.trio{grid-template-columns:minmax(0,1fr)}}
 .plate{margin-bottom:0}
 .plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
 /* the room beyond the private-client door: window light on linen, seen only as the leaves open */
