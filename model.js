@@ -454,6 +454,7 @@
       this.sp = null; this.spAt = null; this.rb = null; this._glow = null; this._glowK = null; this._nf = null;
       this._gs = null; this._gsK = null; this._gsP = null; this._gsS = null; this._gsSK = null; this._rs = null; this._rsK = null; this._rsP = null; this._pool = null; this._poolK = null;
       this._hatch = new WeakMap(); this._frs = [];
+      this.r3 = null; this.r3a = 0; this.r3f = null; // the rendered tower (tower3d.js), how far it has faded in, and its frame-time watch
       // Without a 2D context (an old engine, a blocked or exhausted GPU) the model stands down quietly: every call
       // becomes a no-op and the page around it carries on.
       try { this.ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null; } catch (e) { this.ctx = null; }
@@ -464,6 +465,7 @@
       // the sun moves on every five minutes; that redraws once and never wakes a resting orbit
       setInterval(() => { if (this.sunT == null) { this.sunNow = miamiSun(); this.dirty = true; this.kick(); } }, 300000);
       this.colors();
+      if (this.o.real3d) this.load3d();
       // (sized by its resize observer in the first frame, where the page is laid out anyway, rather than now, while the
       // page starts; without an observer, now)
       if (!hasRO) this.size();
@@ -487,6 +489,47 @@
       }
       // a hidden tab draws nothing; coming back, the clock starts afresh
       document.addEventListener('visibilitychange', () => { if (!document.hidden) { this.t0 = 0; this.kick(); } });
+    }
+
+    // The hero's tower can be rendered in real light (tower3d.js, WebGL2) rather than drawn. The renderer starts only
+    // once the page has loaded and gone quiet, so it never holds up the page, and only where it can run without
+    // slowing anything: not with high contrast on, not to save data, not on a device short of memory or cores, not on
+    // an engine without WebGL2 or one that would render it in software. Until it is ready, and wherever it is not,
+    // the drawing stands in, and if it ever proves slow on a device it steps down its resolution, then gives the
+    // tower back to the drawing.
+    load3d() {
+      const nav = navigator, force = window.__cmForce3D === true;
+      if (!force && (this.forced || (nav.connection && nav.connection.saveData) || (nav.deviceMemory && nav.deviceMemory < 3) || (nav.hardwareConcurrency && nav.hardwareConcurrency < 4))) return;
+      if (typeof WebGL2RenderingContext !== 'function') return;
+      // (the renderer's script, tower3d.js, arrives on its own at low priority; it only defines what is used here)
+      let tries = 0;
+      const start = () => {
+        if (typeof window.CentamontTower3D !== 'function') { if (++tries < 40) setTimeout(start, 250); return; }
+        let r = null;
+        const phone = matchMedia('(max-width:820px)').matches;
+        try { r = window.CentamontTower3D(Model.geo, { phone, force, q: Math.min(devicePixelRatio || 1, 2), onLost: () => { this.r3 = null; this.r3a = 0; delete this.c.dataset.render; this.touch(); } }); } catch (e) { r = null; }
+        if (!r) return;
+        // (its programs link in the background; it takes over once they have)
+        const wait = () => { if (r.lost) return; if (!r.poll()) { setTimeout(wait, 50); return; } this.r3 = r; this.r3a = this.drawnAt && !reduce ? 0 : 1; this.r3f = { n: 0, sum: 0, last: 0 }; this.c.dataset.render = '3d'; this.touch(); };
+        wait();
+      };
+      const idle = () => (window.requestIdleCallback ? requestIdleCallback(start, { timeout: 2500 }) : setTimeout(start, 200));
+      if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+    }
+
+    // While it renders, the frames of a moving tower are timed: a device that keeps falling short of about 40 frames a
+    // second steps the rendering down (1.5x, 1x, 0.75x of a CSS pixel), and past that hands the tower back to the drawing.
+    watch3d(t) {
+      const f = this.r3f;
+      if (!f) return;
+      if (f.last && t - f.last < 250) { f.sum += t - f.last; f.n++; }
+      f.last = t;
+      if (f.n < 40) return;
+      const avg = f.sum / f.n; f.n = 0; f.sum = 0;
+      if (avg <= 25) return;
+      const r = this.r3, q = r.q > 1.5 ? 1.5 : r.q > 1 ? 1 : r.q > 0.75 ? 0.75 : 0;
+      if (q) r.q = q; else { this.r3 = null; this.r3f = null; delete this.c.dataset.render; }
+      this.touch();
     }
 
     // Redraw at once, in this frame, if there is anything to draw on.
@@ -645,6 +688,9 @@
       // it is not a change anyone made, so it never holds off the orbit's rest.
       if (occT && !this.doneAt) this.doneAt = reduce ? -Infinity : t;
       else if (!occT && this.doneAt) this.doneAt = 0;
+      // the rendered tower fades in over the drawing's own tower in 0.6 s (at once with motion off, or before anything shows)
+      const fading = !!this.r3 && this.r3a < 1;
+      if (fading) { this.r3a = reduce ? 1 : Math.min(1, this.r3a + dt / 600); this.dirty = true; }
       const casting = this.doneAt > 0 && t - this.doneAt < CASCADE && this.dark && !this.o.sun && this.sunNow.night > 0.05;
       // the sun, let go, going back to now (eased in and out over 0.8 s)
       const back = this.sunBack;
@@ -687,7 +733,7 @@
       }
       this.tx = ease(this.tx || 0, this.mx * 0.12, 330);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 330);
-      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.occ === occT && this.Ra === relT && this.Rd === relT && this.E === envT && this.gd === gdT && !casting && !back && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
+      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.occ === occT && this.Ra === relT && this.Rd === relT && this.E === envT && this.gd === gdT && !casting && !fading && !back && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
       const orbiting = !reduce && !!this.o.orbit && this.orb !== 0;
       // Anything that moves draws every frame (and the frame after it stops). A settled tower on its slow orbit
       // turns about a tenth of a pixel between frames, so it is drawn twelve times a second whatever the display's
@@ -702,6 +748,7 @@
         if (!idle || t - (this.drawnLast || 0) >= IDLE - 12) {
           if (this.dirty || this.moved || !settled || orbiting) {
             const c0 = performance.now(); this.draw(); this.drawnLast = t;
+            if (this.r3f) { if (!idle) this.watch3d(t); else this.r3f.last = 0; }
             // (the first two drawings warm up and are not counted)
             if ((this.nd = (this.nd || 0) + 1) > 2) {
               const c = performance.now() - c0; this.cost = this.cost == null ? c : this.cost * 0.85 + c * 0.15; this.slow = this.cost > (this.slow ? 7 : 10);
@@ -920,7 +967,11 @@
       const mixW = (t0, w0) => { const q = Math.round(clamp(t0, 0, 1) * Q), qw = Math.round(clamp(w0, 0, 1) * 16); if (!qw) return mix(t0); return memo(40000 + q * 20 + qw, () => { const t = q / Q, u = qw / 16, c = (b, l, wm) => Math.round(b + (l + (wm - l) * u - b) * t); return `rgb(${c(br, lr, wr)},${c(bgg, lg, wg)},${c(bb, lb, wb)})`; }); };
       const now = performance.now();
       // lamp glows after dark, gathered while the rooms are drawn and laid over everything once the tower stands
-      const glows = dark && !inLens && !this.forced && night > 0.05 ? [] : null;
+      // The rendered tower (tower3d.js), where it runs: while it fades in, it is laid over the whole drawing; once it has,
+      // it stands in for the drawn tower, its shadow and its lamps' glow, and the drawing keeps the ground, the crane, the
+      // sketch of the floors still to come, the people, the ruler and the labels.
+      const r3 = !inLens && this.r3 && !this.r3.lost ? this.r3 : null, solid = !!r3 && this.r3a >= 1;
+      const glows = dark && !inLens && !this.forced && night > 0.05 && !solid ? [] : null;
       // The lights-on cascade: seconds since the building was finished (99 once it long has been, -1 while it is not),
       // and how far on a lamp that comes on d seconds into it is (each takes 0.18 s)
       const casT = this.doneAt === -Infinity ? 99 : this.doneAt ? (now - this.doneAt) / 1000 : -1, cas = (d) => clamp((casT - d) / 0.18, 0, 1);
@@ -1124,7 +1175,7 @@
           g.stroke();
         }
       })();
-      if (L > 0.01) {
+      if (L > 0.01 && !solid) {
         // The tower's shadow. On ink it is the sun's, and goes with it: it fades through dusk (its bearing easing toward
         // the draughtsman's light over the left shoulder as it does) and is gone by the end of civil dusk, when the base
         // is seated by its contact shadow and the lobby's pool of light. The ivory sheet keeps the draughtsman's shadow.
@@ -1355,7 +1406,7 @@
         return v;
       };
 
-      for (const l of layers) {
+      if (!solid) for (const l of layers) {
         if (this.xray && l.kind !== 'floor') {
           // inside the loupe, slabs are drawn as their edge lines only, in the drawing set's bronze
           // (the podium roof is the transfer slab that carries the tower's columns onto the podium's grid: drawn heavier)
@@ -1831,7 +1882,7 @@
       // The pen comes up to full weight as the drawing grows, and nothing in the line moves as it does.
       const silCol = (a) => (dark ? ink((0.7 - 0.3 * night) * a) : ink(0.8 * a)), silW = dark ? 1.2 + 0.2 * fine : 1.3 + 0.26 * fine;
       const topK = L > 0.01 ? Math.min(Math.floor(L + 0.001), FLOORS) : -1;
-      if (C > 0.01 && topK >= 0 && !this.xray) (() => {
+      if (C > 0.01 && topK >= 0 && !this.xray && !solid) (() => {
         const hs = [], hide = [], tips = [];
         // (hid: 1 when the band's top chain always lies inside the band above, 2 when its bottom chain lies inside the one
         // below; tip: 1 for a balcony slab or the crown, whose share of the line is drawn with the lighter pen on a small
@@ -1887,6 +1938,12 @@
         g.restore();
       }
 
+      if (r3) {
+        const b = r3.render(this);
+        if (b) { g.globalAlpha = this.r3a; g.drawImage(r3.canvas, 0, 0, b.sw, b.sh, b.x, b.y, b.w, b.h); g.globalAlpha = 1; }
+        // the aviation light on its mast over the crown, as the drawing lights it
+        if (solid && this.G > 0.85) this.beacon(this.P(0, FLOORS + SLAB + crownH + BEACON, 0), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+      }
       if (craneOn && !craneBehind) this.drawCrane(true);
       palmsFront.forEach((p) => this.drawPalm(p));
       g.globalAlpha = this.occ; figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
@@ -2333,5 +2390,7 @@
     }
   }
 
+  // What the rendered tower (tower3d.js) is built from: the same plans, structure, site and stacking plan as the drawing.
+  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, hash, craneAt, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
 })();

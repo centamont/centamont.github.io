@@ -197,6 +197,25 @@ test('first visit plays the intro, then reveals the page', async ({ page }) => {
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '22');
 });
 
+// The hero's tower is rendered in WebGL2 (tower3d.js) where a real GPU can afford it; the test browser's GPU is emulated
+// in software, which the renderer declines, so the test asks for it outright. It takes over from the drawing without an
+// error, and the drawing alone still stands where it is not asked for.
+test('hero tower renders in 3D where it can, and is drawn where it cannot', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'one engine is enough');
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.addInitScript(() => { window.__cmForce3D = true; });
+  await page.goto('/');
+  await expect(page.locator('#heroModel')).toHaveAttribute('data-render', '3d', { timeout: 20000 });
+  expect(errors).toEqual([]);
+  const plain = await page.context().newPage();
+  await plain.goto('/');
+  await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '22');
+  await plain.waitForTimeout(3000);
+  await expect(plain.locator('#heroModel')).not.toHaveAttribute('data-render', '3d');
+  await plain.close();
+});
+
 test('day and night toggle remembers the choice', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
@@ -379,7 +398,7 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
