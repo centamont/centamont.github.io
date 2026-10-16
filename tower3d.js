@@ -191,7 +191,9 @@ void main() {
   float nv = max(dot(pn, v), 0.0);
   float F0 = mix(0.12, 0.2, sold), F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
   float sh = shadow(p, n);
-  vec3 reflT = mix(vec3(0.8, 0.86, 0.9), uBronze * 1.9, sold);
+  // (the bronze a little less saturated by day, as tinted glass reads in daylight; full after dark, round the lamps)
+  vec3 bz = mix(vec3(dot(uBronze, vec3(0.3, 0.59, 0.11))), uBronze, 0.78 + 0.22 * uNight);
+  vec3 reflT = mix(vec3(0.8, 0.86, 0.9), bz * 1.9, sold);
   vec3 refl = (sky(r) + glint(r) * sh) * reflT;
   // under each slab the glass sees the soffit, not the sky, and the room's ceiling is in shade
   float occl = mix(0.5, 1.0, smoothstep(0.0, 0.3, y1 - p.y)) * mix(0.75, 1.0, smoothstep(0.0, 0.12, p.y - y0));
@@ -199,7 +201,7 @@ void main() {
   vec3 inside = room(p, n, -v, u, y0, y1, k * 13.0 + vB.z, lamp, gold, kind > 0.5 ? 1.0 : 0.0);
   // sunlight through the glass brightens a room, so the balconies' shadows lie across the façade
   inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.16;
-  vec3 transT = mix(vec3(0.55, 0.62, 0.63), uBronze * 0.95, sold);
+  vec3 transT = mix(vec3(0.55, 0.62, 0.63), bz * 0.95, sold);
   vec3 c = inside * transT * (1.0 - F) + refl * F;
   // after dark a sold home's bronze glass still holds a little of the city's warm light
   c += uBronze * uNight * sold * 0.05;
@@ -241,7 +243,7 @@ void main() {
   vec3 p = vPos;
   float R = length(p.xz), fade = 1.0 - smoothstep(4.5, 16.5, R); fade *= fade;
   float sh = shadow(p, vec3(0.0, 1.0, 0.0));
-  vec3 lit = vec3(0.5, 0.48, 0.44) * (uSunCol * max(uSun.y, 0.0) * sh * 0.12 + amb(vec3(0.0, 1.0, 0.0)) * 0.03) * fade;
+  vec3 lit = vec3(0.5, 0.48, 0.44) * (uSunCol * max(uSun.y, 0.0) * sh * 0.09 + amb(vec3(0.0, 1.0, 0.0)) * 0.03) * fade;
   float d = rbox(p.xz, vec2(6.45, 4.45), 1.3);
   float ao = (1.0 - smoothstep(0.0, 1.4, max(d, 0.0))) * step(-0.05, d);
   vec2 e = p.xz - vec2(0.0, -5.6);
@@ -520,7 +522,7 @@ void main() {
     // the site under the haze, going down to the page's ink. Once the tower is in, these broad fills are the canvas's
     // own CSS background, which costs the page nothing as the drawing redraws; while it fades in they are drawn here.
     const ys = (e) => cy - e * f, G = Math.max(40, 0.32 * h);
-    const far = mixc(mixc(hor, ink, 0.55), [58, 60, 62], 0.3 * S.day), near = mixc(ink, [40, 42, 45], S.day);
+    const far = mixc(mixc(hor, ink, 0.55), [58, 60, 62], 0.3 * S.day), near = mixc(ink, [52, 54, 57], S.day);
     const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], [cy, far], [cy + 0.18 * G, mixc(far, near, 0.7)], [cy + G, mixc(near, ink, 0.5)]];
     if (alpha < 1 || !m.c) {
       const y0 = st[0][0], y1 = st[st.length - 1][0], gr = g.createLinearGradient(0, y0, 0, y1);
@@ -669,7 +671,7 @@ void main() {
         for (let r = 0; r < 12; r++) {
           let v = 0, g = 0;
           const sd = roomSide[k][r];
-          if (k < 2) v = Math.max(0.55 * (1 - night) + 0.8 * (0.7 + 0.3 * night) * cas(0), 0.3);
+          if (k < 2) v = Math.max(0.3 * (1 - night) + 0.8 * (0.3 + 0.7 * night) * cas(0), 0.2); // (by day the lobby is lit, but under the daylight)
           else if (k < PODIUM) { if (hash(k, r, 21) < 0.5) v = (on ? 0.75 * (0.6 + 0.4 * hash(r, k, 3)) * nl * cas(0.15 + 0.35 * hash(k, r, 4)) : 0) + 0.12 * (1 - night); }
           else if (on && sold(k, sd) > 0.5) { if (hash(k, sd, 12) >= 0.12 && hash(k, r, 9) < 0.28 * night) { v = (0.6 + 0.4 * hash(r, k, 3)) * nl * cas(1.6 * hash(k, r, 3) + (k >= CROWN ? 0.4 : 0)); g = 1; } }
           else if (on && modelK && sd === 1 && r === G.MODEL_ROOM) v = nl * cas(1.6 * hash(k, r, 3));
