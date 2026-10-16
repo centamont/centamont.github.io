@@ -44,7 +44,7 @@ assets=['site.css','site.js','model.js','instrument.js']
 h=hashlib.sha256()
 for a in assets: h.update(built.encode() if a=='site.css' else open(a,'rb').read())
 token=h.hexdigest()[:8]
-pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','report.html','south-florida.html','new-york.html','los-angeles.html','dallas.html']+sorted(glob.glob('journal/*.html'))
+pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','report.html','south-florida.html','new-york.html','los-angeles.html','dallas.html','austin.html','houston.html']+sorted(glob.glob('journal/*.html'))
 ref=re.compile(r'((?:href|src)="[^"]*?(?:'+'|'.join(re.escape(a) for a in assets)+r'))(?:\?v=[0-9a-f]*)?"')
 for f in pages:
     t=open(f).read()
