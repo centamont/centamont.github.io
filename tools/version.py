@@ -1,5 +1,5 @@
 # Builds the stylesheet pages load and stamps every page's links to site.css, site.js, model.js and instrument.js
-# with one shared ?v= token, so a returning visitor never pairs new HTML with a stylesheet or script still in the
+# with one shared ?v= token (and tower3d.js, the hero's rendered tower), so a returning visitor never pairs new HTML with a stylesheet or script still in the
 # browser's cache.
 # The styles are written and commented in _src/site.css (Jekyll never publishes an underscore folder). This tool
 # writes site.css from it with the comments and blank lines taken out, so the stylesheet that blocks every page's
@@ -40,7 +40,7 @@ if check:
     if open('site.css').read()!=built: stale.append('site.css'); print('site.css stale: run python3 tools/version.py')
 else: open('site.css','w').write(built)
 
-assets=['site.css','site.js','model.js','instrument.js']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js']
 h=hashlib.sha256()
 for a in assets: h.update(built.encode() if a=='site.css' else open(a,'rb').read())
 token=h.hexdigest()[:8]
