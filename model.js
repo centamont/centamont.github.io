@@ -10,6 +10,12 @@
   const RES0 = PODIUM, RES1 = FLOORS, LEVELS = RES1 - RES0;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
   const TAU = Math.PI * 2;
+  // the drawing's few words, in the page's language (the Spanish and Portuguese pages set it on <html>)
+  const LANG = document.documentElement.lang;
+  const WORDS = ({
+    es: { roof: 'CUBIERTA', release: 'PRIMERA ETAPA', rise: 'AMANECER', set: 'ATARDECER', frame: 'ESTRUCTURA', time: 'es-US' },
+    'pt-BR': { roof: 'COBERTURA', release: 'PRIMEIRA ETAPA', rise: 'NASCER DO SOL', set: 'PÔR DO SOL', frame: 'ESTRUTURA', time: 'pt-BR' },
+  })[LANG] || { roof: 'ROOF', release: 'FIRST RELEASE', rise: 'SUNRISE', set: 'SUNSET', frame: 'STRUCTURE', time: 'en-US' };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const hash = (a, b, c = 0) => { const x = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return x - Math.floor(x); };
   const smooth = (t) => t * t * (3 - 2 * t);
@@ -925,8 +931,8 @@
       // the label sits clear of the drawing, with a halo of the ground colour
       const ly = L.y > this.h * 0.6 ? L.y - L.r - 26 : L.y + L.r + 16;
       g.font = '500 13px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
-      g.lineWidth = 4; g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineJoin = 'round'; g.strokeText('STRUCTURE  ×1.7', L.x, ly); g.lineJoin = 'miter';
-      g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.fillText('STRUCTURE  ×1.7', L.x, ly);
+      g.lineWidth = 4; g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineJoin = 'round'; g.strokeText(WORDS.frame + '  ×1.7', L.x, ly); g.lineJoin = 'miter';
+      g.fillStyle = `rgba(${sr},${sg},${sb},0.95)`; g.fillText(WORDS.frame + '  ×1.7', L.x, ly);
     }
 
     // (A few large parts of the scene are drawn by inner functions of their own, called where they stand: the site grid,
@@ -2012,7 +2018,7 @@
           if (a <= 0.01) continue;
           const t = 'L' + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
         }
-        labs.push(['ROOF', fx(xl, 'ROOF'), ys[FLOORS], ra]);
+        labs.push([WORDS.roof, fx(xl, WORDS.roof), ys[FLOORS], ra]);
       }
       // A shadow passes behind the ruler: where one runs under it, the ruler's line, its ticks and its names stand on a
       // hairline of clear ground, cut from the shadow alone (a halo, as a map clears the ground round its names), so no tick
@@ -2067,7 +2073,7 @@
       if (this.Ra > 0.005 && this.o.release > 0 && !inLens) (() => {
         const k0 = this.relLevel(this.o.release);
         const xb = sx(-9.15), xk = sx(-8.8), yt = ys[FLOORS], yb = ys[k0], e = smooth(this.Rd), ye = yt + (yb - yt) * e;
-        const lab = 'FIRST RELEASE', z = this.o.labelSize;
+        const lab = WORDS.release, z = this.o.labelSize;
         g.save(); g.font = '500 ' + z + 'px Jost, sans-serif';
         if ('letterSpacing' in g) g.letterSpacing = '1.5px';
         const tw = g.measureText(lab).width, along = this.relAlong(w, this.u, Math.abs(yb - yt), tw);
@@ -2123,7 +2129,7 @@
       const g = this.ctx, z = this.o.labelSize;
       g.save(); g.font = '500 ' + z + 'px Jost, sans-serif';
       if ('letterSpacing' in g) g.letterSpacing = '1.5px';
-      const tw = g.measureText('FIRST RELEASE').width;
+      const tw = g.measureText(WORDS.release).width;
       g.restore();
       return tw;
     }
@@ -2239,7 +2245,7 @@
             if (rise === null && a.el <= H0 && b.el > H0) rise = cross(a, b);
             else if (rise !== null && a.el > H0 && b.el <= H0) set = cross(a, b);
           }
-          const fmt = (ms) => { try { return new Date(Math.round(ms / 6e4) * 6e4).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+          const fmt = (ms) => { try { return new Date(Math.round(ms / 6e4) * 6e4).toLocaleTimeString(WORDS.time, { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
           const arc = rise === null || set === null ? [] : [{ t: rise, el: H0 }].concat(pts.filter((q) => q.t > rise && q.t < set), [{ t: set, el: H0 }]);
           this.sp = { day, arc, rise: arc.length ? fmt(rise) : '', set: arc.length ? fmt(set) : '' };
         }
@@ -2300,8 +2306,9 @@
       g.font = '500 13px Jost, sans-serif';
       const fits = (a, b) => g.measureText(a).width + g.measureText(b).width + 16 < W + 16;
       const put = (a, b, y) => { g.textAlign = 'left'; g.fillText(a, x0 - 8, y); g.textAlign = 'right'; g.fillText(b, x1 + 8, y); };
-      if (fits('SUNRISE ' + rt, 'SUNSET ' + st)) put('SUNRISE ' + rt, 'SUNSET ' + st, base + 9);
-      else if (!hits(42) && fits('SUNRISE', 'SUNSET') && fits(rt, st)) { put('SUNRISE', 'SUNSET', base + 9); put(rt, st, base + 26); }
+      const SR = WORDS.rise, SS = WORDS.set;
+      if (fits(SR + ' ' + rt, SS + ' ' + st)) put(SR + ' ' + rt, SS + ' ' + st, base + 9);
+      else if (!hits(42) && fits(SR, SS) && fits(rt, st)) { put(SR, SS, base + 9); put(rt, st, base + 26); }
       else if (fits(rt, st)) put(rt, st, base + 9);
       const pk = arc.reduce((a, q) => (q.el > a.el ? q : a), arc[0]);
       g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
