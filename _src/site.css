@@ -857,6 +857,19 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 }
 
 /* People */
+/* On the home page the advisors keep their head alone, with one way on to their own page, the link under the intro on its
+   column; the seat plan, the standard and the invitation live on advisors.html. */
+.head.seat .links{margin-top:6px}
+@media (min-width:821px){.head.seat .links{grid-column:8/-1;grid-row:2}}
+/* The advisors' page: the seat plan opens the sheet under the title, the full measure, and the standard follows in the
+   page's two columns, the lead line on the left, the three tests and the invitation on the right. */
+.adv-plan{padding-top:clamp(40px,5vw,72px)}
+@media (min-width:821px){
+  .adv .people .table{grid-area:1/1/2/13}
+  .adv .people .col{grid-area:2/1/3/13;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:22px;align-items:start}
+  .adv .people .col > .big{grid-column:1/span 6;grid-row:1/span 2;margin:0}
+  .adv .people .col > :not(.big){grid-column:8/-1}
+}
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
 .people > *{min-width:0}
 .people .head{grid-template-columns:1fr;align-items:start}
@@ -1981,9 +1994,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .ss a:focus-visible .t,.ss a[aria-current] .t{background-size:100% 1px}
 @media (hover:hover) and (pointer:fine){.ss a:hover .t{background-size:100% 1px}}
 .tb .ss a[aria-current]{color:var(--fg)}
-/* where the cell is wide enough for two columns of three, the set takes them */
+/* where the cell is wide enough for two columns, the set takes them, four and three */
 .t-ss{container-type:inline-size}
-@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(3,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
+@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(4,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
 /* a date keeps whole, taking the next line as one piece where its line is full; only text set far larger than the cell (a
    browser's text zoom) breaks it, so it never runs on into the next cell. The sheet number's revision does the same. */
 .t-dr time,.sn small{display:inline-block;max-width:100%}
@@ -1996,7 +2009,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    nothing here is drawn to one, is left off. Every link keeps a 43px target, set edge to edge. */
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk ss" "fo ss"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}
-  /* the set registers with the two cells beside it: 01 to 03 level with the ways in, and 04 to 06 level with the channels,
+  /* the set registers with the two cells beside it: 01 to 03 level with the ways in, and 04 on level with the channels,
      the step between them as deep as the cell edge and the label that open the channels (12 + 1 + 10 + 18.2 + 4px) */
   .ss li:nth-child(4){margin-top:calc(12px + 1px + 10px + 13px * 1.4 + 4px)}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
