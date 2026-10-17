@@ -620,7 +620,8 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
 @media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
 @media (max-width:1040px){.begin{grid-template-columns:minmax(0,1fr);gap:28px}.b-l,.b-r{display:contents}.begin h3{order:1}.begin ol{order:2}.spec{order:3;max-width:560px}.begin .close{order:4;margin-top:0}}
-@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px}}
+/* on a phone the three steps close up a little, each still parted by its rule */
+@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px;padding-block:16px}.begin ol > li:first-child{padding-top:0}}
 
 /* The specimen sheet, drawn without figures: the report's own stacking plan, its pace against the plan, and the key.
    The whole drawing is one link to the report. */
@@ -2015,6 +2016,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
+/* (and under 340px, at the labels' 14px, the cells open 2px more each side and the labels track at .08em, for the same reason) */
+@media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}
 /* and from 360 to 379px the sheet's name tracks a little closer, so 'Private clients' keeps both words, clear of its cell's edge */
 @media (min-width:360px) and (max-width:379px){.st{letter-spacing:.12em}}
 @media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}}
