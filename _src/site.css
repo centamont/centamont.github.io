@@ -257,7 +257,11 @@ header.site{container:site/inline-size;max-width:100vw}
    the drawer each group is one row of the same height, the state a quiet label over its cities in the bar's capitals (side by
    side, the state in the drawer's face, South Florida, Tampa and Naples would not fit a phone's width), so the drawer keeps
    its ten rows (and its two columns of five on a phone on its side). */
+/* With eleven cities a single column of the bar's list ran past the foot of a laptop's window (from about 690px tall down),
+   so the four states sit two by two, Florida and New York over California and Texas, in half the height; past that the
+   list scrolls inside itself rather than losing its last cities below the window's edge. */
 @media (min-width:1280px){
+  .mk-panel{grid-template-columns:repeat(2,max-content);column-gap:48px;align-items:start;max-height:calc(100svh - 80px);overflow-y:auto;overscroll-behavior:contain}
   .mk-st{display:grid}
   .mk-k{padding:14px 0 3px;font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   nav.main .mk-st a{padding:9px 0 8px 16px;border-bottom:0}
