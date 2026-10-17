@@ -34,7 +34,7 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=43d21bda">
+<link rel="stylesheet" href="site.css?v=eb16f53a">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -42,10 +42,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=43d21bda" defer></script>
-<script src="model.js?v=43d21bda" defer></script>
-<script src="instrument.js?v=43d21bda" defer></script>
-<script src="tower3d.js?v=43d21bda" async fetchpriority="low"></script>
+<script src="site.js?v=eb16f53a" defer></script>
+<script src="model.js?v=eb16f53a" defer></script>
+<script src="instrument.js?v=eb16f53a" defer></script>
+<script src="tower3d.js?v=eb16f53a" async fetchpriority="low"></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -90,7 +90,7 @@ addEventListener('beforeprint',function(){finish(true)})})();
       <a class="dw" href="#services">What we do</a>
       <a href="#developers">Developers</a>
       <a href="#clients">Private clients</a>
-      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Markets<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><a href="south-florida.html">Florida</a> <a href="new-york.html">New York</a> <a href="los-angeles.html">California</a> <span class="mk-st" role="group" aria-labelledby="mkTx"><span class="mk-k" id="mkTx">Texas</span> <a href="dallas.html">Dallas</a> <a href="austin.html">Austin</a> <a href="houston.html">Houston</a></span></div></div>
+      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Markets<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><a href="south-florida.html">Florida</a> <a href="new-york.html">New York</a> <span class="mk-st" role="group" aria-labelledby="mkCa"><span class="mk-k" id="mkCa">California</span> <a href="los-angeles.html">Los Angeles</a> <a href="san-francisco.html">San Francisco</a></span> <span class="mk-st" role="group" aria-labelledby="mkTx"><span class="mk-k" id="mkTx">Texas</span> <a href="dallas.html">Dallas</a> <a href="austin.html">Austin</a> <a href="houston.html">Houston</a></span></div></div>
       <a href="#journal">Journal</a>
       <a class="dw" href="#people">Advisors</a>
       <a href="#contact">Contact</a>
@@ -377,7 +377,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
 <figure class="photo wide-v"><picture><source type="image/avif" srcset="media/miami-bay-960.avif 960w, media/miami-bay-1600.avif 1600w, media/miami-bay-2220.avif 2220w" sizes="(max-width:700px) calc(100vw - 40px), 700px"><source type="image/webp" srcset="media/miami-bay-960.webp 960w, media/miami-bay-1600.webp 1600w, media/miami-bay-2220.webp 2220w" sizes="(max-width:700px) calc(100vw - 40px), 700px"><img src="media/miami-bay-1600.jpg" srcset="media/miami-bay-960.jpg 960w, media/miami-bay-1600.jpg 1600w, media/miami-bay-2220.jpg 2220w" sizes="(max-width:700px) calc(100vw - 40px), 700px" width="1600" height="800" alt="The towers of Miami seen across the still water of Biscayne Bay at dusk." loading="lazy" decoding="async"></picture><figcaption class="cap"><span>Miami across Biscayne Bay.</span><span class="credit">Photograph: Everaldo Coelho, Unsplash</span></figcaption></figure>
 <figure class="photo tall-v"><picture><source type="image/avif" srcset="media/hoboken-960.avif 960w, media/hoboken-1600.avif 1600w, media/hoboken-2400.avif 2400w" sizes="(max-width:700px) calc(100vw - 40px), 1100px"><source type="image/webp" srcset="media/hoboken-960.webp 960w, media/hoboken-1600.webp 1600w, media/hoboken-2400.webp 2400w" sizes="(max-width:700px) calc(100vw - 40px), 1100px"><img src="media/hoboken-1600.jpg" srcset="media/hoboken-960.jpg 960w, media/hoboken-1600.jpg 1600w, media/hoboken-2400.jpg 2400w" sizes="(max-width:700px) calc(100vw - 40px), 1100px" width="1600" height="800" alt="Lower Manhattan seen across the Hudson River in low evening light." loading="lazy" decoding="async"></picture><figcaption class="cap"><span>Lower Manhattan across the Hudson, from Hoboken.</span><span class="credit">Photograph: Mike Chavarri, Unsplash</span></figcaption></figure>
     </div>
-    <p class="links"><a class="more" href="south-florida.html">South Florida in detail</a><a class="more" href="new-york.html">New York in detail</a><a class="more" href="los-angeles.html">Los Angeles</a><a class="more" href="dallas.html">Dallas</a><a class="more" href="austin.html">Austin</a><a class="more" href="houston.html">Houston</a></p>
+    <p class="links"><a class="more" href="south-florida.html">South Florida in detail</a><a class="more" href="new-york.html">New York in detail</a><a class="more" href="los-angeles.html">Los Angeles</a><a class="more" href="dallas.html">Dallas</a><a class="more" href="austin.html">Austin</a><a class="more" href="houston.html">Houston</a><a class="more" href="san-francisco.html">San Francisco</a></p>
     <p class="ask">Planning a building in one of these markets? <a class="ul" href="#contact">Write to the partners</a>.</p>
   </div>
 </section>

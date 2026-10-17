@@ -234,11 +234,12 @@ header.site{container:site/inline-size;max-width:100vw}
   nav.main .mk-panel a:first-child{margin-top:0}nav.main .mk-panel a:last-child{margin-bottom:0}
   nav.main.open .mk-panel a:first-child{border-top:0}
   nav.main .mk-panel a:nth-child(1){--k:3}nav.main .mk-panel a:nth-child(2){--k:4}nav.main .mk-panel a:nth-child(3){--k:5}nav.main .mk-panel a:nth-child(4){--k:6}
+  nav.main .mk-panel > .mk-st:nth-child(3){--k:5}
   nav.main > a:nth-child(5){--k:7}nav.main > a:nth-child(6){--k:8}nav.main > a:nth-child(7){--k:9}
 }
 @media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
   nav.main.open > a:nth-child(6){border-top:0}
-  nav.main.open .mk-panel > a:nth-child(3){border-top:1px solid var(--rule)}
+  nav.main.open .mk-panel > :nth-child(3){border-top:1px solid var(--rule)}
 }
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk,header.site .mk-panel{display:contents}
@@ -249,11 +250,13 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel a{padding:min(8px,1svh) 0;border-bottom:1px solid var(--rule)}
   header.site nav.main .mk-panel a[aria-current]::after{content:none}
   header.site nav.main .mk-panel a:nth-child(1){--k:3}header.site nav.main .mk-panel a:nth-child(2){--k:4}header.site nav.main .mk-panel a:nth-child(3){--k:5}header.site nav.main .mk-panel a:nth-child(4){--k:6}
+  header.site nav.main .mk-panel > .mk-st:nth-child(3){--k:5}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
 }}
-/* Texas holds three cities. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
-   the drawer the group is one row, the state in the drawer's face and its cities beside it in the bar's capitals, so the
-   drawer keeps its ten rows (and its two columns of five on a phone on its side). */
+/* California holds two cities and Texas three. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
+   the drawer each group is one row of the same height, the state a quiet label over its cities in the bar's capitals (side by
+   side, the state in the drawer's face, Los Angeles and San Francisco would not fit a phone's width), so the drawer keeps
+   its ten rows (and its two columns of five on a phone on its side). */
 @media (min-width:1280px){
   .mk-st{display:grid}
   .mk-k{padding:14px 0 3px;font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
@@ -261,20 +264,20 @@ header.site{container:site/inline-size;max-width:100vw}
   .js header.site.over .mk-k{color:rgba(244,240,232,.62)}
 }
 @media (max-width:1279px),(max-width:79.9375em){
-  .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
   nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
-  .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
-  nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  .mk-k{flex-basis:100%;padding:2px 0 0;font-family:var(--body);font-weight:400;font-size:var(--t-label);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:6px 0 3px;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
   .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
 }
-/* (the narrowest phones close the cities' tracking a little, so Houston stays on the row) */
+/* (the narrowest phones close the cities' tracking a little) */
 @media (max-width:359px){nav.main .mk-st a{letter-spacing:.1em}}
-@media (max-width:1279px) and (max-height:500px),(max-width:79.9375em) and (max-height:500px){.mk-st{padding-block:8px}.mk-k{font-size:28px;line-height:1.25}nav.main .mk-st a{padding-block:4px}}
+@media (max-width:1279px) and (max-height:500px),(max-width:79.9375em) and (max-height:500px){.mk-st{padding-block:5px}nav.main .mk-st a{padding-block:4px 2px}}
 @media (min-width:1280px){@container site (max-width:71em){
-  header.site .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);padding-block:min(8px,1svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
+  header.site .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
   header.site nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
-  header.site .mk-k{padding:0;font-family:var(--display);font-weight:300;font-size:clamp(24px,min(7vw,4.6svh),42px);line-height:min(1.55em,5.3svh);letter-spacing:-.01em;text-transform:none;color:var(--muted)}
-  header.site nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
+  header.site .mk-k{flex-basis:100%;padding:2px 0 0;font-family:var(--body);font-weight:400;font-size:var(--t-label);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  header.site nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:6px 0 3px;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
   .js header.site.over .mk-st{border-color:rgba(244,240,232,.14)}.js header.site.over .mk-k{color:rgba(244,240,232,.72)}
 }}
 @media (max-width:420px){.mark{--sym:19px;--wm:11px}}
