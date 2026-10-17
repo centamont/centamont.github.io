@@ -668,15 +668,20 @@ void main() {
     hz.addColorStop(0, css(hor, 0)); hz.addColorStop(0.75, css(hor, 0.45)); hz.addColorStop(1, css(hor, 0));
     g.fillStyle = hz; g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
     // a distant, generic skyline round the horizon, in towns: lighter than the ground, darker than the haze behind it
-    const N = 720, sil = mixc(mixc(hor, ink, 0.45), zen, 0.15), lamps = [];
+    const N = 720, sil = mixc(mixc(hor, ink, 0.4), zen, 0.15), lamps = [];
     skyl.length = 0; skyl.sil = sil; skyl.lamps = lamps;
-    g.fillStyle = css(sil); g.beginPath();
+    // (in aerial perspective: the towers fade into the haze toward their feet)
+    const sg = g.createLinearGradient(0, cy - 0.04 * f, 0, cy);
+    sg.addColorStop(0, css(sil)); sg.addColorStop(1, css(mixc(sil, hor, 0.45)));
+    g.fillStyle = sg; g.beginPath();
     let open = false;
     for (let i = 0; i < N; i++) {
       const a0 = (i / N) * TAU, town = Math.pow(0.5 + 0.5 * Math.sin(a0 * 3 + 1.3) * Math.sin(a0 * 2 + 0.4), 3);
       // (mostly low and broken, with a slender tower here and there standing well clear of the rest, and gaps between)
-      const r = hash(i), tall = r > 0.93 ? 1 : 0, hgt = town * (tall ? 0.022 + 0.016 * hash(i + 3) : 0.004 + 0.012 * r * r) + 0.0012 * hash(i + 9);
-      const a1 = ((i + (tall ? 0.45 : 0.6 + 0.38 * hash(i + 5))) / N) * TAU, p0 = scr(Math.sin(a0), 0, Math.cos(a0)), p1 = scr(Math.sin(a1), 0, Math.cos(a1));
+      // (the low city runs on in clusters that rise and fall together, with a slender tower here and there above it)
+      const r = hash(i), tall = r > 0.94 ? 1 : 0, cl = 0.5 + 0.5 * Math.sin(i * 0.37 + 2 * Math.sin(i * 0.11));
+      const hgt = town * (tall ? 0.02 + 0.016 * hash(i + 3) : 0.003 + 0.009 * cl * cl + 0.004 * r * r) + 0.001 * hash(i + 9);
+      const a1 = ((i + (tall ? 0.5 : hash(i + 5) > 0.85 ? 0.7 : 1.02)) / N) * TAU, p0 = scr(Math.sin(a0), 0, Math.cos(a0)), p1 = scr(Math.sin(a1), 0, Math.cos(a1));
       if (!p0 || !p1 || p1[0] < -2 || p0[0] > w + 2) { open = false; continue; }
       // (on a wide hero the left half carries the headline: the towns sink away under it)
       const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) / p0[2];
