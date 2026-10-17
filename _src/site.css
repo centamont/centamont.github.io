@@ -2720,6 +2720,9 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts dd{margin:0;font-size:17px;line-height:1.6;color:var(--read)}
 .mk-facts sup,.prose p sup{font-size:.62em;line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
+/* footnote numerals are tiny; a 24px hit area around each keeps them easy to tap on a phone */
+.mk-facts sup a,.prose p sup a{position:relative}
+.mk-facts sup a::after,.prose p sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
 @media (max-width:600px){.mk-facts > div{grid-template-columns:minmax(0,1fr)}}
 .prose .mk-src{font-size:15px}
 .prose .mk-src li{scroll-margin-top:96px}
