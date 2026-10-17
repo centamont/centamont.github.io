@@ -253,7 +253,7 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel > .mk-st:nth-child(1){--k:3}header.site nav.main .mk-panel > .mk-st:nth-child(2){--k:4}header.site nav.main .mk-panel > .mk-st:nth-child(3){--k:5}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
 }}
-/* Florida and Texas hold three cities and California two. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
+/* Florida, California and Texas each hold three cities, and New York two. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
    the drawer each group is one row of the same height, the state a quiet label over its cities in the bar's capitals (side by
    side, the state in the drawer's face, South Florida, Tampa and Naples would not fit a phone's width), so the drawer keeps
    its ten rows (and its two columns of five on a phone on its side). */
