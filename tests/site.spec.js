@@ -309,6 +309,18 @@ test('the market sheets are dated and every figure cites a source on its page', 
   }
 });
 
+// The header names the three languages; each translated page links to its own counterparts, and marks its own language.
+test('the header switches between English, Spanish and Portuguese', async ({ page }) => {
+  test.skip(test.info().project.name !== 'desktop', 'on a phone it waits inside the menu');
+  await page.goto('/south-florida.html');
+  await expect(page.locator('header .lang a[aria-current]')).toHaveAttribute('lang', 'en');
+  await page.locator('header .lang a[hreflang="es"]').click({ force: true });
+  await expect(page).toHaveURL(/\/es\/sur-de-florida\.html$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.locator('header .lang a[hreflang="pt-BR"]')).toHaveAttribute('href', '/pt/sul-da-florida.html');
+  await expect(page.locator('header .lang a[hreflang="en"]')).toHaveAttribute('href', '/south-florida.html');
+});
+
 // The specimen short list shows three residences and says its figures are invented.
 test('the specimen short list shows three residences and says it is invented', async ({ page }) => {
   await page.goto('/shortlist.html');
@@ -530,7 +542,8 @@ test('phones can pause the motion from the menu', async ({ page, isMobile }) => 
   await expect(page.getByRole('button', { name: 'Pause motion' })).toBeVisible();
   // it sits in the menu's keyboard loop: from the last link, Tab reaches it
   await page.locator('nav.main a').last().focus();
-  await page.keyboard.press('Tab');
+  // (past the three language links, which head the open menu)
+  for (let i = 0; i < 4 && !(await page.locator('#motionBtn').evaluate((b) => b === document.activeElement)); i++) await page.keyboard.press('Tab');
   await expect(page.locator('#motionBtn')).toBeFocused();
   await page.locator('#motionBtn').click();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
