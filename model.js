@@ -47,10 +47,11 @@
       // than the one below with a slower counter-swell over them, so their crests climb the façade on a long diagonal.
       // The plan slims as it rises and the swells deepen, from slim edges over the podium to deep terraces under the
       // crown, where the two penthouse levels draw in behind the deepest of them and the tide breaks into the crown.
-      const t = Math.min(1, (k - PODIUM) / (CROWN - PODIUM)), sc = 1 - 0.12 * t, amp = 0.45 + 0.75 * Math.pow(t, 1.5);
+      // (and over the last three levels the tide breaks: their terraces sweep out deeper, into the crown's brim)
+      const t = Math.min(1, (k - PODIUM) / (CROWN - PODIUM)), sc = 1 - 0.12 * t, amp = 0.45 + 0.75 * Math.pow(t, 1.5) + 0.55 * Math.pow(clamp((k - CROWN + 3) / 3, 0, 1), 2);
       const swell = (p) => { const a = Math.atan2(p.z, p.x); return Math.pow(clamp(0.5 + 0.34 * Math.sin(2 * a + k * 0.24) + 0.2 * Math.sin(a - k * 0.13), 0, 1), 1.5); };
       if (k < CROWN) { glass = rrect(3.1 * sc, 2.6 * sc, 1.7 * sc, na, 3); off = (p) => 0.15 + amp * swell(p); }
-      else { glass = rrect(2.5, 2.05, 1.4, na, 3); off = (p) => 0.4 + 1.0 * swell(p); }
+      else { glass = rrect(2.5, 2.05, 1.4, na, 3); off = (p) => 0.5 + 1.6 * swell(p); }
     }
     const rot = k < PODIUM ? 0 : 0.12 * Math.min(1, (k - PODIUM) / (CROWN - PODIUM));
     const c = Math.cos(rot), s = Math.sin(rot);
@@ -131,6 +132,8 @@
   // (all of it from 10 px a level down).
   const craneAt = (L, g = 0, u = 99) => ({ top: Math.max(7, L + 3.2) + (FLOORS + SLAB + SCREEN_H + 1.8 + Math.max(1, 1.3 * clamp((18 - u) / 8, 0, 1)) - FLOORS - 3.2) * g, ang: -2.75 + 0.45 * Math.sin((L - FLOORS) * 0.38) });
   // [x, z, height, lean, lean direction]
+  // the sea wall round the point the site stands on (a rounded square in plan, 33 out from the tower), the bay beyond
+  const SHORE = (() => { const o = [], A = 33, r = 9; for (let q = 0; q < 4; q++) for (let i = 0; i <= 6; i++) { const a = (q + i / 6) * Math.PI / 2, cx = (q === 0 || q === 3 ? 1 : -1) * (A - r), cz = (q < 2 ? 1 : -1) * (A - r); o.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); } return o; })();
   const PALMS = [[-8.3, -6.1, 3.9, 0.5, 3.6], [-6.3, -7.1, 4.2, 0.45, 4.4], [5.0, -7.3, 3.6, 0.4, 5.2], [-8.6, 5.6, 3.5, 0.4, 2.4], [8.4, 5.8, 3.7, 0.5, 0.4], [-0.6, 6.7, 3.3, 0.35, 1.4], [9.0, 0.6, 3.1, 0.3, 0.1]];
   // People at the entrance, for scale (a level is about 3.8 m): [x, z, height]. Two stand under the porte-cochère.
   const FIGS = [[-1.3, -5.5, 0.47], [-0.95, -5.6, 0.44], [1.5, -5.15, 0.46], [2.5, -7.2, 0.46], [-5.4, -7.25, 0.45], [6.1, -6.8, 0.47]];
@@ -1145,6 +1148,13 @@
           else if (b < n) { const t = (n - b) / (a - b); x1 += (x0 - x1) * t; z1 += (z0 - z1) * t; }
           seg(this.P(x0, 0, z0), this.P(x1, 0, z1));
         };
+        // Where the tower is rendered, the site stands on a point in the bay: the land is laid over the water the
+        // renderer has drawn to the horizon, out to a sea wall round it, and the survey grid stays on the land
+        if (r3 && dark && this.o.site !== false) {
+          const pw = nearCut(SHORE, this.k, 1), sp = pw.map(([x, z]) => this.P(x, 0, z));
+          g.save(); g.globalAlpha = this.r3a; r3.land(g, this, sp); g.restore();
+          g.lineWidth = 1; g.strokeStyle = ink(0.34); g.beginPath(); sp.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); if (pw === SHORE) g.closePath(); g.stroke();
+        }
         g.lineWidth = 1;
         for (let i = 0; i <= 30; i += 3) {
           g.strokeStyle = ink(0.07 * bo * (1 - i / 34)); g.beginPath();
