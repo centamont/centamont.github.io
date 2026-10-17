@@ -2897,6 +2897,8 @@ main{overflow-x:clip}
 .opener{margin-block:clamp(40px,5vw,72px) clamp(40px,5vw,64px)}
 .opener .frame,.opener > picture{aspect-ratio:16/7}
 .opener > picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* an opener whose subject sits high in the frame (the foreground below it is clutter) keeps its upper part in the 16:7 window */
+.opener > picture img.hi{object-position:50% 24%}
 .opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
 .js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
 .js .opener.in :is(.frame,picture){clip-path:inset(0)}
@@ -2920,6 +2922,10 @@ main{overflow-x:clip}
 .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,40px)}
 .trio .photo{margin:0}
 .trio .cap{grid-template-columns:minmax(0,1fr)}
+/* three credits side by side are too long for one line each, so they wrap inside their own column */
+.trio .cap .credit{white-space:normal}
+/* an upright photo in a reading column stays the width of a book page, not the column */
+.photo.portrait{max-width:440px}
 @media (max-width:700px){.trio{grid-template-columns:minmax(0,1fr)}}
 .plate{margin-bottom:0}
 .plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
