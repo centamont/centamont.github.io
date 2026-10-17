@@ -360,7 +360,7 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
 // Editing an inline script without updating that page's hash would silently switch it off.
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
-  const pages = ['/', '/privacy.html', '/404.html', '/colophon.html', '/private-clients.html', '/report.html', '/south-florida.html', '/new-york.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html',
+  const pages = ['/', '/privacy.html', '/404.html', '/colophon.html', '/private-clients.html', '/report.html', '/south-florida.html', '/new-york.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html'];
   const refused = [];
@@ -405,7 +405,7 @@ test('assets carry the current version', async ({}, info) => {
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
-  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'south-florida.html', 'new-york.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'south-florida.html', 'new-york.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html'];
   let refs = 0;
   for (const p of pages) {
@@ -421,7 +421,7 @@ test('assets carry the current version', async ({}, info) => {
 // points at it by url(#id) takes the wrong one.
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'south-florida.html', 'new-york.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'report.html', 'south-florida.html', 'new-york.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html'];
   for (const p of pages) {
     const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
