@@ -1,5 +1,5 @@
 # Builds the stylesheet pages load and stamps every page's links to site.css, site.js, model.js and instrument.js
-# with one shared ?v= token (and tower3d.js, the hero's rendered tower), so a returning visitor never pairs new HTML with a stylesheet or script still in the
+# with one shared ?v= token (and tower3d.js, the hero's rendered tower, and planner.js, the launch planner's), so a returning visitor never pairs new HTML with a stylesheet or script still in the
 # browser's cache.
 # The styles are written and commented in _src/site.css (Jekyll never publishes an underscore folder). This tool
 # writes site.css from it with the comments and blank lines taken out, so the stylesheet that blocks every page's
@@ -40,11 +40,11 @@ if check:
     if open('site.css').read()!=built: stale.append('site.css'); print('site.css stale: run python3 tools/version.py')
 else: open('site.css','w').write(built)
 
-assets=['site.css','site.js','model.js','instrument.js','tower3d.js']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js']
 h=hashlib.sha256()
 for a in assets: h.update(built.encode() if a=='site.css' else open(a,'rb').read())
 token=h.hexdigest()[:8]
-pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','advisors.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html']+sorted(glob.glob('journal/*.html'))
+pages=['index.html','privacy.html','404.html','colophon.html','private-clients.html','advisors.html','planner.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html']+sorted(glob.glob('journal/*.html'))
 ref=re.compile(r'((?:href|src)="[^"]*?(?:'+'|'.join(re.escape(a) for a in assets)+r'))(?:\?v=[0-9a-f]*)?"')
 for f in pages:
     t=open(f).read()
