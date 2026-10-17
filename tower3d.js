@@ -112,7 +112,7 @@ void main() {
   float kind = vA.w, ao = vA.y;
   // white-painted slab edges, and the concrete of the soffits, slab tops and core a shade greyer, with the faint
   // unevenness of poured concrete from one bay to the next
-  vec3 alb = mix(vec3(0.55, 0.545, 0.53), vec3(0.65, 0.64, 0.62), 1.0 - smoothstep(0.3, 0.7, abs(n.y)));
+  vec3 alb = mix(vec3(0.56, 0.55, 0.525), vec3(0.67, 0.655, 0.625), 1.0 - smoothstep(0.3, 0.7, abs(n.y)));
   alb *= 0.95 + 0.07 * h21(floor(vec2(vA.z * 0.9, p.y * 1.0 + 0.5)));
   if (kind > 4.5) {
     // a car at the drop-off: lacquer (or its glass) over the sky's reflection
@@ -147,6 +147,8 @@ void main() {
   }
   float ndl = max(dot(n, uSun), 0.0), sh = ndl > 0.0 ? shadow(p, n) : 0.0;
   vec3 c = alb * (uSunCol * ndl * sh + amb(n) * ao);
+  // by day the sun comes back up off the terraces and the plaza, so the soffits glow warm rather than going grey
+  c += alb * uSunCol * vec3(1.0, 0.9, 0.78) * 0.11 * max(-n.y, 0.0) * ao * max(uSun.y, 0.0);
   // the painted edges have a little sheen, so a grazing view catches the sky in them
   if (kind < 0.5) c += sky(reflect(-v, n)) * (0.03 + 0.5 * pow(1.0 - max(dot(n, v), 0.0), 5.0)) * 0.3 * (1.0 - smoothstep(0.3, 0.7, abs(n.y)));
   // while the frame rises, the crew's floodlights on the top deck light it and the levels just under it after dark
@@ -256,7 +258,7 @@ void main() {
   float nv = max(dot(n, v), 0.0), F = 0.06 + 0.94 * pow(1.0 - nv, 5.0);
   vec3 r = reflect(-v, n);
   float sh = shadow(p, n);
-  float top = vB.z > 0.5 ? 0.0 : smoothstep(vB.y - 0.03 - fwidth(p.y), vB.y - 0.03, p.y);
+  float top = vB.z > 0.5 ? 0.0 : smoothstep(vB.y - 0.04 - fwidth(p.y), vB.y - 0.04, p.y);
   vec3 c = (sky(r) + glint(r) * sh) * F;
   float a = clamp(0.08 + F * 0.9, 0.0, 0.9);
   if (vB.z > 0.5) {
@@ -264,7 +266,8 @@ void main() {
     c = vec3(0.6, 0.6, 0.58) * (uSunCol * max(abs(dot(n, uSun)), 0.0) * sh * 0.35 + amb(n)) * 0.4 + c;
     a = 0.38 + 0.3 * F;
   }
-  vec3 rail = vec3(0.35) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n));
+  // (the handrail is a bronze cap, brushed, so it holds a thin line of the sky along its top)
+  vec3 rail = uBronze * 0.55 * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + sky(r) * uBronze * (0.12 + 0.5 * F);
   c = mix(c, rail, top); a = mix(a, 1.0, top);
   o = vec4(tone(c) * a, a);
 }`;
@@ -394,7 +397,7 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, BEACON, PORTE, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
     const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), mast = new Mesh(), canopy = new Mesh(), deck = new Mesh();
@@ -465,13 +468,28 @@ void main() {
         rails.quad(q[0], q[1], q[2], q[3]);
       }
     }
-    // the crown: its screen of fins, and the roof inside it; the mast for the aviation light
-    const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H;
-    band(crown, S.SCREEN, y0, y1, (j, s) => [[0, 0.9, s, 1], [y0, y1, 0, 0]]);
-    cap(crown, S.SCREEN, S.SCREEN.map((p) => ({ x: p.x * 0.6, z: p.z * 0.6 })), y1, true, [0, 0, 0, 0], 0.9, 0.85);
+    // the crown: its screen of fins, rising to its crest over the bay, and the plant's roof well down inside it; the mast
+    // for the aviation light (each fin's own height is its top, so the lantern's glow fills it to the top whatever it is)
+    const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H, sc = S.SCREEN, ns = sc.length;
+    {
+      let s = 0;
+      for (let j = 0; j < ns; j++) {
+        const p = sc[j], q = sc[(j + 1) % ns], len = Math.hypot(q.x - p.x, q.z - p.z), tp = y0 + CREST(p), tq = y0 + CREST(q);
+        const a0 = [0, 0.9, s, 1], a1 = [0, 0.9, s + len, 1], b0 = [y0, tp, 0, 0], b1 = [y0, tq, 0, 0];
+        const v0 = crown.vert([p.x, y0, p.z], [p.nx, 0, p.nz], a0, b0), v1 = crown.vert([q.x, y0, q.z], [q.nx, 0, q.nz], a1, b1);
+        const v2 = crown.vert([q.x, tq, q.z], [q.nx, 0, q.nz], a1, b1), v3 = crown.vert([p.x, tp, p.z], [p.nx, 0, p.nz], a0, b0);
+        crown.quad(v0, v3, v2, v1);
+        // (and its inner face, so the screen reads as a thin open crown from above rather than a box)
+        const w0 = crown.vert([p.x, y0, p.z], [-p.nx, 0, -p.nz], a0, b0), w1 = crown.vert([q.x, y0, q.z], [-q.nx, 0, -q.nz], a1, b1);
+        const w2 = crown.vert([q.x, tq, q.z], [-q.nx, 0, -q.nz], a1, b1), w3 = crown.vert([p.x, tp, p.z], [-p.nx, 0, -p.nz], a0, b0);
+        crown.quad(w0, w1, w2, w3);
+        s += len;
+      }
+    }
+    cap(crown, sc, sc.map((p) => ({ x: p.x * 0.6, z: p.z * 0.6 })), y0 + 0.35 * SCREEN_H, true, [0, 0, 0, 0], 0.9, 0.85);
     post(mast, 0, 0, 0.035, 0, BEACON, [0, 0.9, 0, 3]);
     // the porte-cochère: a thin roof on two slender posts, its soffit high enough for a coach
-    const cr = CANOPY.map((p) => ({ x: p.x * 0.75, z: (p.z + 5.25) * 0.75 - 5.25 }));
+    const cr = CANOPY.map((p) => ({ x: p.x * 0.75, z: (p.z + 5.5) * 0.75 - 5.5 }));
     band(canopy, CANOPY, PORTE, PORTE + 0.1, () => [[0, 1, 0, 0], [PORTE, PORTE + 0.1, 0, 0]]);
     cap(canopy, CANOPY, cr, PORTE + 0.1, true, [0, 0, 0, 0], 0.95, 0.9);
     cap(canopy, CANOPY, cr, PORTE, false, [0, 0, 0, 0], 0.75, 0.7);
@@ -563,7 +581,7 @@ void main() {
     const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day, dusk = smooth(clamp(1 - Math.abs(el + 3) / 6, 0, 1)) * (1 - day * 0.6);
     const ink = m.bg || [20, 22, 26];
     // (sRGB, in key with the page: a clear day is a deep slate blue over a pale haze, dusk a bronze horizon under indigo)
-    let zen = mixc([20, 34, 56], [24, 30, 50], gold), hor = mixc([96, 114, 132], [168, 120, 84], gold);
+    let zen = mixc([24, 42, 70], [24, 30, 50], gold), hor = mixc([134, 150, 166], [168, 120, 84], gold);
     zen = mixc(mixc(ink, [12, 16, 30], 0.7), zen, day); hor = mixc([56, 46, 42], hor, day);
     hor = mixc(hor, [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
     return { zen, hor, ink, day, gold, night, dusk, mid: mixc(mixc(zen, hor, 0.42), [74, 62, 78], gold * 0.5 + dusk * 0.3) };
@@ -779,7 +797,7 @@ void main() {
       // light: the sun's direction and colour, the sky's, by this hour (the drawing's sun, scrubbed or not)
       const sun = m.sunNow, sv = sun.v, el = sun.el, night = sun.night, kd = 1 - night;
       const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day;
-      const sunCol = [1, 0.95, 0.88].map((c, i) => (c * (1 - gold) + [1, 0.6, 0.34][i] * gold) * (3.0 - 0.9 * gold) * kd);
+      const sunCol = [1, 0.95, 0.88].map((c, i) => (c * (1 - gold) + [1, 0.6, 0.34][i] * gold) * (3.5 - 1.3 * gold) * kd);
       const mixv = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
       const zen = mixv([0.006, 0.008, 0.016], mixv([0.16, 0.3, 0.62], [0.2, 0.25, 0.42], gold), day);
       const hor = mixv([0.03, 0.026, 0.028], mixv([0.62, 0.7, 0.8], [0.95, 0.6, 0.42], gold), day);
