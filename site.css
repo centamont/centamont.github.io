@@ -258,7 +258,8 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .facade path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu,1.1));stroke-linejoin:round}
 .facade .pf{stroke-width:calc(var(--lw-profile) * var(--fu,1.1))}
 .facade .dt{stroke-width:calc(var(--lw-detail) * var(--fu,1.1))}
-.facade g path{stroke-width:calc(var(--lw-object) * var(--fu,1.1) / 3.6)}
+.facade :is(.w,.k){fill:currentColor;stroke:none}
+.facade .br{stroke:var(--sold-line)}
 .facade .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu,1.1));opacity:.5}
 .facade .b{fill:var(--sold);stroke:none;opacity:.45;transition:opacity .5s var(--ease)}
 .facade .lt{fill:var(--sold);stroke:none;opacity:0;transition:opacity .6s var(--ease)}
@@ -267,6 +268,8 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .js .facade.in .b{animation:facade-b .9s var(--ease) .7s backwards}
 @keyframes facade-b{from{opacity:0}}
 .js .facade:not(.in) .b{opacity:0}
+.js .facade:not(.in) :is(.w,.k){opacity:0}
+.js .facade.in :is(.w,.k){animation:facade-b .9s var(--ease) .5s backwards}
 .practices:has(.pr:nth-of-type(1):focus-within) .lt:nth-of-type(1),
 .practices:has(.pr:nth-of-type(2):focus-within) .lt:nth-of-type(2),
 .practices:has(.pr:nth-of-type(3):focus-within) .lt:nth-of-type(3){opacity:.14}
@@ -281,24 +284,16 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .practices:has(.pr:nth-of-type(2):hover) g:nth-of-type(2) .b,
 .practices:has(.pr:nth-of-type(3):hover) g:nth-of-type(3) .b{opacity:1}
 }
-@media (prefers-reduced-motion:reduce){.js .facade path{stroke-dashoffset:0;transition:none}.js .facade .b,.js .facade:not(.in) .b,.js .facade.in .b{opacity:.45;animation:none}}
+@media (prefers-reduced-motion:reduce){.js .facade path{stroke-dashoffset:0;transition:none}.js .facade .b,.js .facade:not(.in) .b,.js .facade.in .b{opacity:.45;animation:none}.js .facade :is(.w,.k),.js .facade.in :is(.w,.k){opacity:1;animation:none}}
 :root[data-motion="off"] .facade path{stroke-dashoffset:0;transition:none}
 :root[data-motion="off"] .facade:not(.in) .b{opacity:.45}
+:root[data-motion="off"] .facade :is(.w,.k){opacity:1;animation:none}
 .pr{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:clamp(28px,3vw,40px) clamp(16px,2.4vw,36px) 0}
 .pr > *{min-width:0;max-width:100%}
 .pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
 .pr:focus-within::after{transform:none}
 @media (hover:hover) and (pointer:fine){.pr:hover::after{transform:none}}
-.pr .num{height:clamp(52px,4.8vw,68px);margin-bottom:clamp(18px,2vw,26px)}
-.nm{display:block;width:auto;overflow:visible;fill:var(--accent);color:var(--accent)}
-.nm .ln{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-detail) * var(--fu,1.1));vector-effect:non-scaling-stroke;opacity:.7}
-.js .nm .ln{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .8s var(--ease-ink)}
-.js .nm .bar{transform:scaleX(0);transform-box:fill-box;transform-origin:50% 50%;transition:transform .7s var(--ease-display) .25s}
-.js .nm .st{transform:scaleY(0);transform-box:fill-box;transform-origin:50% 100%;transition:transform .8s var(--ease-display) calc(.5s + var(--i,0) * 110ms)}
-.js .nm.in .ln{stroke-dashoffset:0}.js .nm.in :is(.bar,.st){transform:none}
-@media (prefers-reduced-motion:reduce){.js .nm .ln{stroke-dashoffset:0;transition:none}.js .nm :is(.bar,.st){transform:none;transition:none}}
-:root[data-motion="off"] .nm .ln{stroke-dashoffset:0;transition:none}
-:root[data-motion="off"] .nm :is(.bar,.st){transform:none;transition:none}
+.pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
 .pr h3{font-size:var(--t-head)}
 .pr p{color:var(--muted);margin-top:14px}
 .pr p{margin-bottom:12px}
@@ -309,14 +304,14 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   .practices{grid-template-columns:minmax(0,1fr)}
   .facade .pf{stroke-width:calc(var(--lw-object) * var(--fu,1.1))}
   .pr{padding:28px 0;border-bottom:1px solid var(--rule)}.pr::after{top:auto;bottom:-1px}
-  .bays{display:block;position:relative;height:22px;margin:10px 0 0;color:var(--muted)}
-  .bays span{position:absolute;top:0;transform:translateX(-50%);transition:color var(--t-ui) var(--ease-out)}
-  .bays .nm{height:22px;fill:currentColor;color:inherit}
+  .bays{display:block;position:relative;height:20px;margin:8px 0 0;font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted)}
+  .bays span{position:absolute;top:0;transform:translateX(-50%);padding-left:.04em;transition:color var(--t-ui) var(--ease-out)}
   .bays span:nth-child(1){left:17.29%}.bays span:nth-child(2){left:50%}.bays span:nth-child(3){left:82.71%}
   .practices:has(.pr:nth-of-type(1):focus-within) .bays span:nth-child(1),
   .practices:has(.pr:nth-of-type(2):focus-within) .bays span:nth-child(2),
   .practices:has(.pr:nth-of-type(3):focus-within) .bays span:nth-child(3){color:var(--fg)}
-  .pr .num{height:36px;margin-bottom:16px}
+  .pr .num{font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted);margin-bottom:12px}
+  .practices .pr:is(:focus-within,:hover) .num{font-style:normal}
 }
 @media (max-width:820px) and (hover:hover) and (pointer:fine){
   .practices:has(.pr:nth-of-type(1):hover) .bays span:nth-child(1),
@@ -442,7 +437,6 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin ol > li > b{font-weight:500}
 .begin ol > li > span:not(.seq){color:var(--muted);grid-column:2}
 .seq{font-family:var(--display);font-weight:300;font-size:32px;line-height:1;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
-.seq.nm{height:30px;margin-bottom:-4px}
 .begin .close{display:grid;gap:14px;margin-top:-4px}
 .begin .close .btn{justify-self:start}
 .begin .close p{font-size:16px;line-height:1.55;color:var(--muted);max-width:32em}
@@ -1826,10 +1820,9 @@ p,li{text-wrap:pretty}
   .js .tx-rise .w{overflow:visible}.js .tx-rise .w > i{transform:none!important}
   .head .intro::before{transform:none!important}
   html.js .cut .ln > span,.hero h1 .ln > span{transform:none!important}
-  .js .facade path,.js .nm .ln,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
+  .js .facade path,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
   .ruler .crack{opacity:1!important}
-  .js .nm :is(.bar,.st){transform:none!important}
-  .js .facade .b{opacity:.45!important}.js .mk-el text{opacity:1!important}.js .tl li,.js .tl ol::before,.js .wy .tr i{opacity:1!important;transform:none!important}
+  .js .facade .b{opacity:.45!important}.js .facade :is(.w,.k){opacity:1!important}.js .mk-el text{opacity:1!important}.js .tl li,.js .tl ol::before,.js .wy .tr i{opacity:1!important;transform:none!important}
   .doorway{--o:1!important}
   .leaf{background:var(--band)!important}
   .dbar .s,.rp-funnel .bar i,.rp-src .bar i,.js .ruler line{transform:none!important}
