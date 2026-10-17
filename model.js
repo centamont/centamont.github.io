@@ -2419,7 +2419,8 @@
     }
   }
 
-  // What the rendered tower (tower3d.js) is built from: the same plans, structure, site and stacking plan as the drawing.
-  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, hash, craneAt, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
+  // What the rendered tower (tower3d.js) and the sales curve's small elevation (instrument.js) are built from: the same
+  // plans, structure, site and stacking plan as the drawing.
+  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
 })();
