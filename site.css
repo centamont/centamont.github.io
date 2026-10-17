@@ -760,8 +760,29 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 .motion ~ .theme{position:relative;margin-left:-12px}
 .motion ~ .theme::before{content:"";position:absolute;left:-.5px;top:14px;width:1px;height:16px;background:var(--rule)}
 @media (max-width:520px){.motion ~ .theme{margin-left:0}.motion ~ .theme::before{content:none}}
+.lang{position:relative;display:flex;align-items:center;padding-right:8px}
+.lang::after{content:"";position:absolute;right:0;top:14px;width:1px;height:16px;background:var(--rule)}
+.lang a{display:grid;place-items:center;min-width:34px;height:44px;padding-inline:3px;font:500 13px/1 var(--body);letter-spacing:.14em;text-indent:.14em;text-decoration:none;color:var(--faint);transition:color var(--t-ui) var(--ease-out)}
+.lang a span[aria-hidden]{padding-bottom:4px;border-bottom:1px solid transparent}
+.lang a[aria-current]{color:var(--fg)}
+.lang a[aria-current] span[aria-hidden]{border-bottom-color:var(--accent)}
+.lang a:focus-visible{color:var(--fg);outline-offset:-6px}
+@media (hover:hover) and (pointer:fine){.lang a:hover{color:var(--fg)}}
+.js header.site.over .lang a{color:rgba(244,240,232,.72)}
+.js header.site.over .lang a[aria-current],.js header.site.over .lang a:focus-visible{color:#F4F0E8}
+.js header.site.over .lang::after{background:rgba(244,240,232,.28)}
+@media (hover:hover) and (pointer:fine){.js header.site.over .lang a:hover{color:#F4F0E8}}
+@media (max-width:599px){
+  .lang{display:none}
+  html.menu-open .lang{display:flex;position:fixed;left:var(--gutter);top:64px;z-index:2;height:52px;padding:0;gap:18px}
+  .lang a{min-width:0;padding-inline:0;text-indent:0}
+  html.menu-open .lang::after{content:none}
+  html.menu-open header.site nav.main{padding-top:calc(52px + clamp(12px,3svh,24px))}
+}
+@media (max-width:599px) and (prefers-reduced-motion:no-preference){html.menu-open .lang{animation:motion-in .5s var(--ease) .35s backwards}}
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
+@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
 :root[data-motion="off"]{scroll-behavior:auto}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
 .theme .sun{display:none}
