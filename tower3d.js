@@ -161,6 +161,8 @@ void main() {
   } else if (kind > 0.5) {
     // the crown's screen: fins round the roof plant, each catching the light on one face
     float f = fract(vA.z / 0.24);
+    // (open between the blades above a low sill, so the lounge and the sky show through)
+    if (abs(f - 0.5) < 0.2 && p.y - vB.x > 0.1) discard;
     vec3 t = vec3(-n.z, 0.0, n.x);
     n = normalize(n + t * (f < 0.5 ? 0.9 : -0.9));
     alb = vec3(0.42, 0.41, 0.4);
@@ -184,7 +186,7 @@ void main() {
     c += uLamp * vec3(1.0, 0.82, 0.6) * uNight * uOcc * (0.24 * gap * mid * mid + 0.05 * mid);
   }
   // and the balconies' soffits carry small downlights, lit once the building is in use
-  if (kind < 0.5 && n.y < -0.5 && ao > 0.7) {
+  if (kind < 0.5 && n.y < -0.5 && ao > 0.7 && p.y < 34.0) {
     vec2 g = fract(p.xz * 1.6) - 0.5;
     c += uLamp * uNight * uOcc * 2.5 * (1.0 - smoothstep(0.05, 0.11, length(g)));
   }
@@ -235,6 +237,11 @@ void main() {
   float sold = texelFetch(uRooms, ivec2(12 + int(vB.w + 0.5), int(k + 0.5)), 0).r;
   float lamp = rm.r * 1.6, gold = rm.g;
   if (kind > 0.5) sold = 0.0;
+  // a sold home is lived in: its rooms warm-lit behind clear glass, some brighter than others, by day as well as after
+  // dark; the bronze stays at its slab edge, where the frit runs
+  float hr = h21(vec2(vB.z, k * 3.1));
+  lamp = max(lamp, sold * mix(0.22, 0.75, uNight) * (hr < mix(0.3, 0.5, uNight) ? 0.08 : 0.45 + 0.55 * hr));
+  gold = max(gold, sold);
   // panes: a mullion every 0.42 (some 1.6 m), each pane set very slightly out of true, as real glass is
   float MW = kind > 0.5 ? 0.62 : 0.42, cu = u / MW, cell = floor(cu), fu = fract(cu);
   vec3 t = vec3(-n.z, 0.0, n.x);
@@ -242,16 +249,16 @@ void main() {
   float aa = fwidth(u) * 0.8 + 0.002, du = min(fu, 1.0 - fu) * MW;
   float mull = 1.0 - smoothstep(0.016, 0.016 + aa, du);
   float ay = fwidth(p.y) * 0.8 + 0.002;
-  float frit = smoothstep(y1 - 0.085 - ay, y1 - 0.085, p.y) + (1.0 - smoothstep(y0 + 0.02, y0 + 0.02 + ay, p.y));
+  float fh = mix(0.085, 0.17, sold), frit = smoothstep(y1 - fh - ay, y1 - fh, p.y) + (1.0 - smoothstep(y0 + 0.02, y0 + 0.02 + ay, p.y));
   if (kind > 0.5) frit = 1.0 - smoothstep(y0 + 0.03, y0 + 0.03 + ay, p.y);
   // the glass: what it reflects over what lies behind it
   vec3 r = reflect(-v, pn);
   float nv = max(dot(pn, v), 0.0);
-  float F0 = mix(0.15, 0.25, sold), F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
+  float F0 = 0.15, F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
   float sh = shadow(p, n);
   // (the bronze a little less saturated by day, as tinted glass reads in daylight; full after dark, round the lamps)
   vec3 bz = mix(vec3(dot(uBronze, vec3(0.3, 0.59, 0.11))), uBronze, 0.78 + 0.22 * uNight);
-  vec3 reflT = mix(vec3(0.8, 0.86, 0.9), bz * 1.9, sold);
+  vec3 reflT = vec3(0.8, 0.86, 0.9);
   vec3 refl = (sky(r) + glint(r) * sh) * reflT;
   // under each slab the glass sees the soffit, not the sky, and the room's ceiling is in shade
   float occl = mix(0.5, 1.0, smoothstep(0.0, 0.3, y1 - p.y)) * mix(0.75, 1.0, smoothstep(0.0, 0.12, p.y - y0));
@@ -259,13 +266,14 @@ void main() {
   vec3 inside = room(p, n, -v, u, y0, y1, k * 13.0 + vB.z, lamp, gold, kind > 0.5 ? 1.0 : 0.0);
   // sunlight through the glass brightens a room, so the balconies' shadows lie across the façade
   inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.3;
-  vec3 transT = mix(vec3(0.55, 0.62, 0.63), bz * 0.95, sold);
+  vec3 transT = mix(vec3(0.55, 0.62, 0.63), vec3(0.66, 0.64, 0.6), sold);
   vec3 c = inside * transT * (1.0 - F) + refl * F;
-  // after dark a sold home's bronze glass still holds a little of the city's warm light
-  c += uBronze * uNight * sold * 0.05;
   // mullions and the frit at each ceiling: dark bronze aluminium in the same light
   vec3 metal = vec3(0.09, 0.085, 0.08) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + refl * 0.08;
-  vec3 fritC = mix(vec3(0.1, 0.1, 0.1), uBronze * 0.5, sold) * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.5 + amb(n)) + refl * F * 0.6;
+  vec3 fritC = vec3(0.1) * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.5 + amb(n)) + refl * F * 0.6;
+  // (sold: the band at the slab is bronze metal, brushed, holding the sky's line and a little of the room's light)
+  vec3 bzC = bz * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.8 + amb(n) * 1.6) + sky(r) * bz * (0.25 + 0.6 * F) + bz * uNight * 0.06 + bz * lamp * 0.12;
+  fritC = mix(fritC, bzC, sold);
   c = mix(c, fritC, clamp(frit, 0.0, 1.0));
   c = mix(c, metal, mull);
   o = vec4(tone(c), 1.0);
@@ -287,8 +295,11 @@ void main() {
     c = vec3(0.6, 0.6, 0.58) * (uSunCol * max(abs(dot(n, uSun)), 0.0) * sh * 0.35 + amb(n)) * 0.4 + c;
     a = 0.38 + 0.3 * F;
   }
-  // (the handrail is a bronze cap, brushed, so it holds a thin line of the sky along its top)
-  vec3 rail = uBronze * 0.55 * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + sky(r) * uBronze * (0.12 + 0.5 * F);
+  // (the handrail is a brushed metal cap holding a thin line of the sky along its top: dark bronze aluminium, as the
+  // mullions are, and bronze itself along a sold home's terrace, the edge that tells the sales from the street)
+  float sold = vB.w > 0.5 ? step(0.5, texelFetch(uRooms, ivec2(11 + int(vB.w + 0.5), int(vA.x + 0.5)), 0).r) : 0.0;
+  vec3 mt = mix(vec3(0.16, 0.15, 0.14), uBronze, sold);
+  vec3 rail = mt * mix(0.4, 0.6, sold) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + sky(r) * mt * (0.12 + 0.5 * F) + uBronze * uNight * sold * 0.08;
   c = mix(c, rail, top); a = mix(a, 1.0, top);
   o = vec4(tone(c) * a, a);
 }`;
@@ -311,7 +322,18 @@ void main() {
   lit += uLamp * uNight * uOcc * 0.22 * exp(-dot(e, e * vec2(0.25, 0.6)));
   vec3 c = tone(lit) - tone(vec3(0.0));
   float a = ao * 0.5 * min(fade, 1.0);
-  o = vec4(c * (1.0 - a), a);
+  // the grounds, laid over the survey sheet and thinning into it: honed stone paving round the podium in a grid of
+  // joints, the drive's dark loop to the porte-cochère, and lawn beyond, each lit by the sun (in the tower's shadow)
+  // and by the sky; the sheet's grid and site lines show through them faintly
+  float pv = rbox(p.xz, vec2(9.4, 7.8), 3.0), dv = abs(rbox(p.xz - vec2(0.0, -6.4), vec2(4.6, 1.15), 1.1)) - 0.5;
+  vec2 jt = abs(fract(p.xz / 0.75) - 0.5);
+  float joint = smoothstep(0.465, 0.5, max(jt.x, jt.y));
+  vec3 alb = mix(vec3(0.022, 0.03, 0.02) * (0.8 + 0.4 * vn(p.xz * 0.7)), vec3(0.36, 0.335, 0.3) * (1.0 - 0.22 * joint), step(pv, 0.0));
+  alb = mix(alb, vec3(0.055, 0.055, 0.058), step(dv, 0.0));
+  vec3 lt = uSunCol * max(uSun.y, 0.0) * sh + amb(vec3(0.0, 1.0, 0.0)) * 0.8 + uLamp * uNight * uOcc * 0.3 * exp(-dot(e, e * vec2(0.12, 0.3)));
+  float am = 0.82 * (1.0 - smoothstep(9.0, 15.5, R)) * (1.0 - 0.5 * uNight);
+  vec3 mc = tone(alb * lt);
+  o = vec4(mix(c, mc, am) * (1.0 - a), 1.0 - (1.0 - am) * (1.0 - a));
 }`;
 
   // Residences sold before their glass is in: each stands where it will be, in the bronze of its glass, seen through,
@@ -418,10 +440,10 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, PORTE, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
-    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), mast = new Mesh(), canopy = new Mesh(), deck = new Mesh();
+    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), canopy = new Mesh(), deck = new Mesh();
     // slabs: the edge band, the top and the soffit (k 1 is the mezzanine, hidden inside the lobby's glass)
     // From the podium's roof up, each slab ends in a thin nose: a short white face over an underside that rounds back
     // and up from the soffit, so the edge reads as a blade (the plinth and the lobby's eyebrow keep a square edge).
@@ -477,7 +499,15 @@ void main() {
     // glass balustrades on every terrace, the podium's roof and the roof included
     for (let k = PODIUM; k <= FLOORS; k++) {
       const r = S.RAILS[k];
-      if (r) band(rails, r, k + SLAB, k + SLAB + RAIL_H, (j, s) => [[k, 0, s, 0], [k + SLAB, k + SLAB + RAIL_H, 0, 0]]);
+      // (each point carries the residence whose terrace it edges, one more than its side, found by the nearest stretch
+      // of that level's glass, so a sold home's handrail can turn bronze; 0 off the residential levels)
+      const gl = PL[idx(k)].glass, sd = (q) => {
+        if (k < G.RES0 || k >= FLOORS) return 0;
+        let best = 1e9, side = 0;
+        for (let j = 0; j < gl.length; j++) { const a = gl[j], b = gl[(j + 1) % gl.length], d = Math.hypot((a.x + b.x) / 2 - q.x, (a.z + b.z) / 2 - q.z); if (d < best) { best = d; side = S.SIDE[k][j] + 1; } }
+        return side;
+      };
+      if (r) band(rails, r, k + SLAB, k + SLAB + RAIL_H, (j, s) => [[k, 0, s, 0], [k + SLAB, k + SLAB + RAIL_H, 0, sd(r[j])]]);
     }
     // frosted screens between neighbours' terraces, where the two residences of a level meet
     for (let k = G.RES0; k < CROWN; k++) {
@@ -489,9 +519,10 @@ void main() {
         rails.quad(q[0], q[1], q[2], q[3]);
       }
     }
-    // the crown: its screen of fins, rising to its crest over the bay, and the plant's roof well down inside it; the mast
-    // for the aviation light (each fin's own height is its top, so the lantern's glow fills it to the top whatever it is)
-    const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H, sc = S.SCREEN, ns = sc.length;
+    // the crown: its screen of fins, rising to its crest over the bay (each fin's own height is its top, so the
+    // lantern's glow fills it to the top whatever it is)
+    const y0 = FLOORS + SLAB, sc = S.SCREEN, ns = sc.length;
+    const CH = sc.reduce((v, p) => v + CREST(p), 0) / ns;
     {
       let s = 0;
       for (let j = 0; j < ns; j++) {
@@ -507,13 +538,47 @@ void main() {
         s += len;
       }
     }
-    cap(crown, sc, sc.map((p) => ({ x: p.x * 0.6, z: p.z * 0.6 })), y0 + 0.35 * SCREEN_H, true, [0, 0, 0, 0], 0.9, 0.85);
-    post(mast, 0, 0, 0.035, 0, BEACON, [0, 0.9, 0, 3]);
-    // the porte-cochère: a thin roof on two slender posts, its soffit high enough for a coach
-    const cr = CANOPY.map((p) => ({ x: p.x * 0.75, z: (p.z + 5.5) * 0.75 - 5.5 }));
-    band(canopy, CANOPY, PORTE, PORTE + 0.2, () => [[0, 1, 0, 0], [PORTE, PORTE + 0.2, 0, 0]]);
-    cap(canopy, CANOPY, cr, PORTE + 0.2, true, [0, 0, 0, 0], 0.95, 0.9);
-    cap(canopy, CANOPY, cr, PORTE, false, [0, 0, 0, 0], 0.75, 0.7);
+    // Inside the screen, the sky lounge: a storey of glass set back on the roof (lit as the lobby is), the terrace
+    // round it open to the sky between the fins, and over both a thin roof that floats on the fins' tops, sloping with
+    // the crest and reaching a little past them, so the tide ends in a lantern rather than a drum
+    {
+      const lr = sc.map((p) => ({ x: p.x * 0.78, z: p.z * 0.78, nx: p.nx, nz: p.nz })), LH = 0.92;
+      band(glass, lr, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
+      const br = sc.map((p) => ({ x: p.x + p.nx * 0.24, z: p.z + p.nz * 0.24 })), hb = sc.map((p) => y0 + CREST(p)), T = 0.11;
+      const top = [], bot = [], eT = [], eB = [], a = [0, 0.92, 0, 0], b = [0, 0, 0, 0];
+      const cT = crown.vert([0, y0 + CH + T, 0], [0, 1, 0], a, b), cB = crown.vert([0, y0 + CH, 0], [0, -1, 0], a, b);
+      let s = 0;
+      for (let j = 0; j < ns; j++) {
+        const q = br[j], p = sc[j], sj = [0, 0.92, s, 0];
+        top.push(crown.vert([q.x, hb[j] + T, q.z], [0, 1, 0], a, b));
+        bot.push(crown.vert([q.x, hb[j], q.z], [0, -1, 0], a, b));
+        eT.push(crown.vert([q.x, hb[j] + T, q.z], [p.nx, 0, p.nz], sj, b));
+        eB.push(crown.vert([q.x, hb[j], q.z], [p.nx, 0, p.nz], sj, b));
+        s += Math.hypot(sc[(j + 1) % ns].x - p.x, sc[(j + 1) % ns].z - p.z);
+      }
+      for (let j = 0; j < ns; j++) {
+        const j2 = (j + 1) % ns;
+        crown.tri(cT, top[j2], top[j]); crown.tri(cB, bot[j], bot[j2]);
+        crown.quad(eB[j], eT[j], eT[j2], eB[j2]);
+      }
+    }
+    // the porte-cochère: a leaf of a roof on two slender posts, its soffit high enough for a coach, its edge the
+    // terraces' blade (a thin face over an underside that rounds back and up), so the tower's line comes down to the door
+    const cr = CANOPY.map((p) => ({ x: p.x * 0.6, z: (p.z + 5.5) * 0.6 - 5.5 }));
+    {
+      const CT = 0.34, tuck = CANOPY.map((p) => ({ x: p.x - p.nx * CT, z: p.z - p.nz * CT })), n = CANOPY.length, r = Math.SQRT1_2;
+      const a = [0, 1, 0, 0], b = [PORTE, PORTE + 0.2, 0, 0], ao = [0, 0.8, 0, 0];
+      band(canopy, CANOPY, PORTE + 0.12, PORTE + 0.2, () => [a, b]);
+      cap(canopy, CANOPY, cr, PORTE + 0.2, true, [0, 0, 0, 0], 0.95, 0.9);
+      const o = [], i = [];
+      for (let j = 0; j < n; j++) {
+        const p = CANOPY[j], q = tuck[j];
+        o.push(canopy.vert([p.x, PORTE + 0.12, p.z], [p.nx * r, -r, p.nz * r], ao, b));
+        i.push(canopy.vert([q.x, PORTE - 0.02, q.z], [p.nx * 0.15, -0.99, p.nz * 0.15], ao, b));
+      }
+      for (let j = 0; j < n; j++) { const j2 = (j + 1) % n; canopy.quad(o[j], o[j2], i[j2], i[j]); }
+      cap(canopy, tuck, cr, PORTE - 0.02, false, [0, 0, 0, 0], 0.75, 0.7);
+    }
     for (const x of [-2.1, 2.1]) post(canopy, x, -5.85, 0.05, 0, PORTE, [0, 0.9, 0, 0]);
     // the amenity deck's pool, beside the tower on the podium's roof
     {
@@ -568,7 +633,7 @@ void main() {
     }
     const ground = new Mesh();
     { const R = 30, a = [0, 1, 0, 0], b = [0, 0, 0, 0], nr = [0, 1, 0]; const q = [[-R, -R], [R, -R], [R, R], [-R, R]].map(([x, z]) => ground.vert([x, 0, z], nr, a, b)); ground.quad(q[3], q[2], q[1], q[0]); }
-    return { slabs, cols, core, glass, ghost, rails, crown, mast, canopy, deck, cars, ground };
+    return { slabs, cols, core, glass, ghost, rails, crown, canopy, deck, cars, ground };
   }
 
   // ---------------------------------------------------------------- the sky behind
@@ -947,10 +1012,10 @@ void main() {
 
       // shadows, only when the sun or the building has changed
       const shOn = kd > 0.02 && sv[1] > 0.01;
-      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, mast: Gc > 0.85 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
+      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
       lims.ghost = -C + 0.001; lims.cars = (m.occ || 0) > 0.5 ? 1 : -1;
       lims.rails = C >= FLOORS - 0.001 && Gc > 0.5 ? FLOORS : C - 0.999;
-      const crownY = [FLOORS + SLAB, Ge, 0], mastY = [0, 1, FLOORS + SLAB + SCREEN_H * Ge];
+      const crownY = [FLOORS + SLAB, Ge, 0];
       if (shOn) {
         const key = sv.map((v) => v.toFixed(3)).join() + [L, C, Gc, coreTop, lims.cars].map((v) => v.toFixed(3)).join();
         if (key !== shKey) {
@@ -1011,7 +1076,6 @@ void main() {
       gl.disable(gl.CULL_FACE);
       draw(qs, 'deck', lims.deck);
       draw(qs, 'crown', lims.crown, crownY);
-      draw(qs, 'mast', lims.mast, mastY);
       gl.enable(gl.CULL_FACE);
       const qg = progs.glass; common(qg); draw(qg, 'glass', lims.glass);
       gl.disable(gl.CULL_FACE);
