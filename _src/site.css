@@ -391,7 +391,20 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
 .pr:focus-within::after{transform:none}
 @media (hover:hover) and (pointer:fine){.pr:hover::after{transform:none}}
-.pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
+.pr .num{height:clamp(52px,4.8vw,68px);margin-bottom:clamp(18px,2vw,26px)}
+/* A drawn roman numeral (tools/numerals.py writes them): a small portico whose columns are the numeral's strokes, cut
+   with the stonecutter's stress, thick stems and hairline bars, between an architrave and a base, with a cornice line
+   above and a ground line below, as the facade has. It is set as the facade is drawn: the two lines rule across, the
+   architrave and base are laid, then the columns rise one after another. */
+.nm{display:block;width:auto;overflow:visible;fill:var(--accent);color:var(--accent)}
+.nm .ln{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-detail) * var(--fu,1.1));vector-effect:non-scaling-stroke;opacity:.7}
+.js .nm .ln{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .8s var(--ease-ink)}
+.js .nm .bar{transform:scaleX(0);transform-box:fill-box;transform-origin:50% 50%;transition:transform .7s var(--ease-display) .25s}
+.js .nm .st{transform:scaleY(0);transform-box:fill-box;transform-origin:50% 100%;transition:transform .8s var(--ease-display) calc(.5s + var(--i,0) * 110ms)}
+.js .nm.in .ln{stroke-dashoffset:0}.js .nm.in :is(.bar,.st){transform:none}
+@media (prefers-reduced-motion:reduce){.js .nm .ln{stroke-dashoffset:0;transition:none}.js .nm :is(.bar,.st){transform:none;transition:none}}
+:root[data-motion="off"] .nm .ln{stroke-dashoffset:0;transition:none}
+:root[data-motion="off"] .nm :is(.bar,.st){transform:none;transition:none}
 .pr h3{font-size:var(--t-head)}
 .pr p{color:var(--muted);margin-top:14px}
 .pr p{margin-bottom:12px}
@@ -400,22 +413,21 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 @media (min-width:821px){.pr{display:grid;grid-row:2/span 4;grid-template-rows:subgrid;justify-items:start;align-content:start}}
 /* Where the practices stack (a tablet and a phone) the facade stays inside the page's gutters, its profile lines and double
    rules drawn at the hairline: one building of three bays, the index of the three practices. Under its ground each bay is
-   lettered with its practice's numeral, I, II and III, and each practice carries the same numeral over its heading as a
-   quiet label: the display face at 20px (in the label face a roman numeral would read as a row of bars), in muted, as
-   bronze is kept for what is sold; a practice in hand lights its bay and its letter. */
+   lettered with its practice's drawn numeral, I, II and III, small and in muted, and each practice carries the same
+   numeral over its heading in bronze, as it does on a wide screen; a practice in hand lights its bay and its letter. */
 .bays{display:none}
 @media (max-width:820px){
   .practices{grid-template-columns:minmax(0,1fr)}
   .facade .pf{stroke-width:calc(var(--lw-object) * var(--fu,1.1))}
   .pr{padding:28px 0;border-bottom:1px solid var(--rule)}.pr::after{top:auto;bottom:-1px}
-  .bays{display:block;position:relative;height:20px;margin:8px 0 0;font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted)}
-  .bays span{position:absolute;top:0;transform:translateX(-50%);padding-left:.04em;transition:color var(--t-ui) var(--ease-out)}
+  .bays{display:block;position:relative;height:22px;margin:10px 0 0;color:var(--muted)}
+  .bays span{position:absolute;top:0;transform:translateX(-50%);transition:color var(--t-ui) var(--ease-out)}
+  .bays .nm{height:22px;fill:currentColor;color:inherit}
   .bays span:nth-child(1){left:17.29%}.bays span:nth-child(2){left:50%}.bays span:nth-child(3){left:82.71%}
   .practices:has(.pr:nth-of-type(1):focus-within) .bays span:nth-child(1),
   .practices:has(.pr:nth-of-type(2):focus-within) .bays span:nth-child(2),
   .practices:has(.pr:nth-of-type(3):focus-within) .bays span:nth-child(3){color:var(--fg)}
-  .pr .num{font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted);margin-bottom:12px}
-  .practices .pr:is(:focus-within,:hover) .num{font-style:normal}
+  .pr .num{height:36px;margin-bottom:16px}
 }
 @media (max-width:820px) and (hover:hover) and (pointer:fine){
   .practices:has(.pr:nth-of-type(1):hover) .bays span:nth-child(1),
@@ -613,6 +625,8 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 /* a sequence numeral, hung in its own column: shared by every numbered run of rows (the column is 56px, or 3.12em of the
    row's text where the reader sets the text larger, so the numeral never runs into its words) */
 .seq{font-family:var(--display);font-weight:300;font-size:32px;line-height:1;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
+/* where the run is lettered in roman numerals, the drawn numeral stands in the column, its base on the heading's line */
+.seq.nm{height:30px;margin-bottom:-4px}
 .begin .close{display:grid;gap:14px;margin-top:-4px}
 .begin .close .btn{justify-self:start}
 .begin .close p{font-size:16px;line-height:1.55;color:var(--muted);max-width:32em}
@@ -2551,8 +2565,9 @@ p,li{text-wrap:pretty}
   .js .tx-rise .w{overflow:visible}.js .tx-rise .w > i{transform:none!important}
   .head .intro::before{transform:none!important}
   html.js .cut .ln > span,.hero h1 .ln > span{transform:none!important}
-  .js .facade path,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
+  .js .facade path,.js .nm .ln,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
   .ruler .crack{opacity:1!important}
+  .js .nm :is(.bar,.st){transform:none!important}
   .js .facade .b{opacity:.45!important}.js .mk-el text{opacity:1!important}.js .tl li,.js .tl ol::before,.js .wy .tr i{opacity:1!important;transform:none!important}
   .doorway{--o:1!important}
   .leaf{background:var(--band)!important}
