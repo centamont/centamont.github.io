@@ -136,11 +136,11 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
     const s = document.querySelectorAll('#steps .step')[3];
     window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight / 2 - innerHeight / 2);
   });
-  // Selling: the lender's 50% threshold is met (20 of 38 residences under contract), then ground breaks (the podium framed)
+  // Selling: the lender's 50% threshold is met (32 of 62 residences under contract), then ground breaks (the podium framed)
   await expect.poll(built).toBe(3);
-  await expect.poll(sold).toBe(20);
+  await expect.poll(sold).toBe(32);
   // and the gauge reads what the drawing shows once it settles
-  await expect.poll(() => page.locator('#gS').textContent()).toBe('20');
+  await expect.poll(() => page.locator('#gS').textContent()).toBe('32');
   await expect.poll(() => page.locator('#gB').textContent()).toBe('03');
   await page.waitForTimeout(1200);
   await page.screenshot({ path: info.outputPath('rising.png') });
@@ -150,8 +150,8 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
     window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight / 2 - innerHeight / 2);
   });
   // every residence sold, the penthouses with them; the podium and crown levels are never for sale
-  await expect.poll(sold).toBe(38);
-  await expect.poll(() => page.locator('#gS').textContent()).toBe('38');
+  await expect.poll(sold).toBe(62);
+  await expect.poll(() => page.locator('#gS').textContent()).toBe('62');
 });
 
 for (const [path, heading] of [
@@ -198,7 +198,7 @@ test('first visit plays the intro, then reveals the page', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveClass(/intro-on/);
   await expect(page.locator('html')).not.toHaveClass(/intro-on/, { timeout: 5000 });
-  await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '22');
+  await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
 // The hero's tower is rendered in WebGL2 (tower3d.js) where a real GPU can afford it; the test browser's GPU is emulated
@@ -216,7 +216,7 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   expect(errors).toEqual([]);
   const plain = await page.context().newPage();
   await plain.goto('/');
-  await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '22');
+  await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '34');
   await plain.waitForTimeout(3000);
   await expect(plain.locator('#heroModel')).not.toHaveAttribute('data-render', '3d');
   expect(await plain.locator('#heroModel').evaluate((c) => c.style.backgroundImage)).toBe('');
