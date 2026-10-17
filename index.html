@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-oe/+2HvwSmnkWFMBhr/5cSuQKgPApa7rvWZ9lEqB9G0=' 'sha256-kitWSMRCKbq/PbzFXUZm/IAhUL76WCNeGDD8Pamn5Lc=' 'sha256-plX3BsM5D4ljsWg23lbDm8VJH2oR1k486HJbRd8cmFs=' 'sha256-KOzKL91LIhCoQ8lfVGQxy+PrVKJBPcHhUQVoFs+Yy0s='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-oe/+2HvwSmnkWFMBhr/5cSuQKgPApa7rvWZ9lEqB9G0=' 'sha256-kitWSMRCKbq/PbzFXUZm/IAhUL76WCNeGDD8Pamn5Lc=' 'sha256-plX3BsM5D4ljsWg23lbDm8VJH2oR1k486HJbRd8cmFs=' 'sha256-hmr++NskU7gJrFdyuiPpzERj405kmLzwNpOu0qwxiSQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -38,7 +38,7 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=573bda41">
+<link rel="stylesheet" href="site.css?v=3c3d3c48">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -46,10 +46,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=573bda41" defer></script>
-<script src="model.js?v=573bda41" defer></script>
-<script src="instrument.js?v=573bda41" defer></script>
-<script src="tower3d.js?v=573bda41" async fetchpriority="low"></script>
+<script src="site.js?v=3c3d3c48" defer></script>
+<script src="model.js?v=3c3d3c48" defer></script>
+<script src="instrument.js?v=3c3d3c48" defer></script>
+<script src="tower3d.js?v=3c3d3c48" async fetchpriority="low"></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -171,7 +171,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
 
     <div class="rise">
       <figure class="elev" aria-hidden="true">
-        <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/22</i></span><span class="gs"><em>Under contract</em> <b id="gS">00</b><i id="gR">/38</i><span class="meter"><span class="fill" id="gM"></span><span class="lim"><small>Lender’s threshold · 50%</small></span></span></span></div>
+        <div class="gauge"><span><em>Levels framed</em> <b id="gB">00</b><i>/34</i></span><span class="gs"><em>Under contract</em> <b id="gS">00</b><i id="gR">/62</i><span class="meter"><span class="fill" id="gM"></span><span class="lim"><small>Lender’s threshold · 50%</small></span></span></span></div>
         <canvas id="tower"></canvas>
         <figcaption><span>Illustration, not a real project</span><b id="stageName">First sketch</b></figcaption>
       </figure>
@@ -188,28 +188,28 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
           <p>No template. Positioning, buyer targets and campaigns are designed around your project. A founder sits on your account from the first meeting to the last closing, with no hand-off to juniors after signing.</p>
           <p class="vh">Illustration: the tower’s envelope, with the first release planned on the top floors.</p>
         </li>
-        <li class="step" id="launch" data-built="0" data-sold="11" data-name="First 90 days">
+        <li class="step" id="launch" data-built="0" data-sold="18" data-name="First 90 days">
           <h3>Launch day, with everything already&nbsp;running.</h3>
           <p>The project website and search, the journal and market updates, social media and the business press: all of it is live before the first reservation.</p>
           <p>A small, senior sales team works the launch, each member owning a buyer segment, under one set of rules and one stream of data.</p>
-          <p class="vh">Illustration: 11 of 38 residences under contract in the first 90 days, before construction begins.</p>
+          <p class="vh">Illustration: 18 of 62 residences under contract in the first 90 days, before construction begins.</p>
         </li>
-        <li class="step" data-built="3" data-sold="20" data-name="Selling">
+        <li class="step" data-built="3" data-sold="32" data-name="Selling">
           <h3>The numbers, every&nbsp;week.</h3>
           <p>Inquiries, tours, reservations, contracts and pricing moves arrive in one weekly report. You always know where the building stands and what we are changing next.</p>
           <a class="more" href="report.html">See a specimen report</a>
-          <p class="vh">Illustration: 20 of 38 residences under contract, past the lender’s 50 percent threshold, so ground breaks; 3 of 22 levels framed.</p>
+          <p class="vh">Illustration: 32 of 62 residences under contract, past the lender’s 50 percent threshold, so ground breaks; 3 of 34 levels framed.</p>
         </li>
-        <li class="step" data-built="22" data-sold="25" data-name="Top-off">
+        <li class="step" data-built="34" data-sold="41" data-name="Top-off">
           <h3>Topped off, and still a step&nbsp;ahead.</h3>
           <p>As the structure rises, pricing and releases move with demand, so the last floors are priced as carefully as the first.</p>
-          <p class="vh">Illustration: the structure tops off at 22 levels with the façade still closing; 25 of 38 residences under contract.</p>
+          <p class="vh">Illustration: the structure tops off at 34 levels with the façade still closing; 41 of 62 residences under contract.</p>
         </li>
-        <li class="step" data-built="22" data-sold="38" data-name="Last closing">
+        <li class="step" data-built="34" data-sold="62" data-name="Last closing">
           <div class="coda">
           <h3>The last closing is not the last of&nbsp;us.</h3>
           <p>We stay in touch with every buyer who would like us to, so the next building begins with people who already know us.</p>
-          <p class="vh">Illustration: the building is complete and all 38 residences have closed.</p>
+          <p class="vh">Illustration: the building is complete and all 62 residences have closed.</p>
           </div>
         </li>
       </ol>
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // tower above, the copy under it (site.css, .hero.stack). At the set size this never applies.
   let stack=false;
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
-  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?{phi:-.1,dist:58,ty:12,scale:1.38,offsetX:.08}:{phi:.1,dist:46,ty:mid?14.6:13.5,scale:wide?1.5:1.38,offsetX:wide?.25:mid?.28:.22}};
+  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?{phi:-.1,dist:62,ty:17.5,scale:1.38,offsetX:.08}:{phi:.1,dist:64,ty:mid?21.3:19.7,scale:wide?1.5:1.38,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
   // The hero is lit by this hour's sun, so it is seen from where the sun models it: by day the camera starts 35 degrees off
   // the sun's bearing and turns away from it as it builds and orbits, coming to rest up to 80 degrees off, so a lit face
@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded',function(){
     // sizes the tower, needs the most). Where the column leaves a wide margin beside it, the tower gives up no more than
     // a fifth of its size for that, and past it only keeps off the screen's edge. The sun's path ends on the labels' line.
     const W=heroM.w,col=wrap.offsetLeft+wrap.offsetWidth-parseFloat(getComputedStyle(wrap).paddingRight),box=()=>heroM.fit(heroCam.th,v.phi,{measure:true});
-    const textR=narrow&&!side()?-1e9:Math.max(...[...hero.querySelectorAll('h1,.lede,.row .btn')].map(e=>e.getBoundingClientRect().right))+40;let b=box();
+    const textR=narrow&&!side()?-1e9:Math.max(...[...hero.querySelectorAll('h1,.lede,.row .btn,.row .write')].map(e=>e.getBoundingClientRect().right))+64;let b=box();
     for(const [edge,floor] of [[Math.min(W-18,col),W-col>100?.8:.55],[W-18,.55]]){let over=b.x1-edge;if(over<=.5)continue;
       const sh=Math.min(over,Math.max(0,b.x0-textR));heroM.o.offsetX-=sh/W;over-=sh;
       for(let i=0;i<8&&over>.5&&heroM.o.scale>v.scale*floor+1e-6;i++){b=box();heroM.o.scale*=Math.max(floor*v.scale/heroM.o.scale,1-over/(b.x1-b.x0));const b2=box();heroM.o.offsetX+=(b.x0-b2.x0)/W;over=box().x1-edge}
@@ -699,12 +699,12 @@ document.addEventListener('DOMContentLoaded',function(){
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.
-  // The hero tower then sells as the curve below has it by completion (28 of its 38 residences, about three quarters),
+  // The hero tower then sells as the curve below has it by completion (46 of its 62 residences, about three quarters),
   // its sold residences standing in the sketch before the frame rises into them: the pre-sale threshold is met as ground breaks.
   // It starts as the halves part. Until then it is drawn once, under the curtain, and holds still; if they have already
   // parted (a slow connection), it starts now, behind the open page. Without the curtain's script there is no intro.
   const intro=window.CentamontIntro;let started=false;
-  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:300);setTimeout(()=>heroM.set(22,14,false),reduce?0:900)}hero.classList.add('lit')};
+  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:300);setTimeout(()=>heroM.set(34,23,false),reduce?0:900)}hero.classList.add('lit')};
   if(!intro)root.classList.remove('intro-on');
   if(intro&&!intro.open&&root.classList.contains('intro-on')){if(heroM)heroM.hold(true);intro.go=startHero}else startHero();
   // The open menu covers the page below the header, so its drawings run no frames until it closes (the hero only once
@@ -725,8 +725,8 @@ document.addEventListener('DOMContentLoaded',function(){
   // at par: residences sell off plan from launch, the lender's pre-sale threshold is met, then ground breaks.
   // Bronze is the stacking plan: the two penthouse levels sell with the rest, while the podium (lobby and amenities)
   // and the crown (the plant screen and roof) are never for sale. The gauge reads the drawing itself.
-  // Step figures (data-sold, residences of 38) are the curve's at par: 11 at month 3, 20 when the threshold is met in
-  // month 14, 25 at its top-off (month 24), every one by the last closing; the hero stands at completion, 28 (month 30).
+  // Step figures (data-sold, residences of 62) are the curve's at par: 18 at month 3, 32 when the threshold is met in
+  // month 14, 41 at its top-off (month 24), every one by the last closing; the hero stands at completion, 46 (month 30).
   const steps=[...document.querySelectorAll('#steps .step')],name=document.getElementById('stageName');
   const gauge=document.querySelector('.rise .gauge'),gB=document.getElementById('gB'),gS=document.getElementById('gS'),gM=document.getElementById('gM'),pad=v=>String(v).padStart(2,'0');
   const RES=+document.getElementById('gR').textContent.replace('/',''),LIM=.5; // residences; the curve's default threshold
@@ -753,12 +753,12 @@ document.addEventListener('DOMContentLoaded',function(){
   // Read forward at reading pace, each step plays one idea at a time, the camera always first (ms after arrival;
   // "when" waits for the drawing). Skimming, jumping or reading back goes straight to the step's state.
   // Top-off: the frame climbs at a pace the counter can be read at, and sales move as it rises (the curve between the
-  // threshold, month 14, and its top-off, month 24, read level by level: 21 residences by L08, 23 by L15, 25 by L20),
+  // threshold, month 14, and its top-off, month 24, read level by level: 35 residences by L12, 38 by L22, 41 by L31),
   // then the crown is set; the façade is six storeys behind and the crane still up. Last closing: the crane leaves, the
   // glass closes over the top at the frame's pace, then the last residences sell.
   const BEATS=[[],[{at:250,e:true},{at:900,rel:'rel'}],[{at:450,s:'s'}],[{at:450,s:'s'},{at:1250,when:m=>m.S>=st.s,b:'b',c:'c'}],
-    [{at:200,b:'b',rate:6.8},{at:200,when:m=>m.L>=8,s:10.5},{at:200,when:m=>m.L>=15,s:11.5},{at:200,when:m=>m.L>=20,s:'s'}],
-    [{at:0,c:'c',rate:6.5},{at:0,when:m=>m.C>=21.99,s:'s'}]];
+    [{at:200,b:'b',rate:6.8},{at:200,when:m=>m.L>=12,s:17.5},{at:200,when:m=>m.L>=22,s:19},{at:200,when:m=>m.L>=31,s:'s'}],
+    [{at:0,c:'c',rate:6.5},{at:0,when:m=>m.C>=33.99,s:'s'}]];
   let cur=-1,last=0,timers=[],plan=[],bt0=0,reading=false,st={...data[0]};
   const motionOff=()=>reduce||root.dataset.motion==='off';
   const put=d=>{Object.assign(st,d);if(!towerM)return;if(d.rate)towerM.o.rate=d.rate;if('rel' in d)towerM.release(d.rel);towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c)};
