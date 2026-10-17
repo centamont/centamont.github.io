@@ -45,8 +45,9 @@
     } else if (k < CROWN) {
       const t = (k - PODIUM) / (CROWN - PODIUM), s = 1 - 0.07 * t;
       glass = rrect(3.3 * s, 2.7 * s, 1.35, na, 3);
-      // Balconies swell and recede around the tower, a little further along on every floor.
-      off = (p) => 0.22 + 0.4 * (0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.4));
+      // Balconies swell and recede around the tower, a little further along on every floor: deep terraces where the
+      // wave crests, a slim edge between, so the swells read as a slow spiral up the tower.
+      off = (p) => 0.18 + 0.62 * Math.pow(0.5 + 0.5 * Math.sin(2 * Math.atan2(p.z, p.x) + k * 0.4), 1.6);
     } else {
       // the two penthouse levels step back behind deep terraces, as deep as the balconies below at their fullest
       // (traced with as many points as a tower floor, so the line between its two residences falls mid-face as below)
