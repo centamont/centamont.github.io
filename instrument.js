@@ -145,14 +145,70 @@ document.addEventListener('DOMContentLoaded', function () {
     const list = (a) => a.slice(0, -1).join('; ') + '; and ' + a[a.length - 1];
     const key = document.querySelector('.cv-key .k-par');
 
-    // a small elevation of the tower, as in the story above: three podium floors and nineteen tapering residential ones,
-    // the two penthouse levels at the top included. Only residences sell, from the top down, so the podium never fills.
+    // A small model of the hero tower beside the share, built from its own plans (model.js) and seen as an architect's
+    // model is, from a little above and to the southeast, lit from the southwest: the podium on its site plate, nineteen
+    // residential levels turning a little as they rise, their terraces deepening and narrowing in a slow spiral, the two
+    // penthouse levels set back behind deep terraces, and the lantern of the crown. Each level holds two residences, the
+    // bay side on the right and the city side on the left, and they sell in the hero's own order (penthouses and upper
+    // floors first, the bay side ahead), so the bronze edge reads as a record of sales. The podium and crown never sell.
     const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
-    const POD = 3, RES = 19;
+    const G = window.CentamontModel && window.CentamontModel.geo;
+    const RES = G ? (G.RES1 - G.RES0) * 2 : 38, homes = [];
     let lastN = 0;
-    if (tw) for (let k = 0; k < 22; k++) {
-      const wdt = k < POD ? 36 : k < POD + RES ? 20 - (k - POD) * 0.22 : 14, r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      r.setAttribute('x', (40 - wdt) / 2); r.setAttribute('y', 110 - (k + 1) * 4.9); r.setAttribute('width', wdt); r.setAttribute('height', 4.1); tw.appendChild(r);
+    if (tw && G) {
+      const A = 0.32, ca = Math.cos(A), sa = Math.sin(A), E = 0.17, ce = Math.cos(E), se = Math.sin(E);
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      const P = (p, y) => { const X = p.x * ca + p.z * sa, Y = -(y * ce + (-p.x * sa + p.z * ca) * se); x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); return X.toFixed(3) + ' ' + Y.toFixed(3); };
+      const poly = (pts, cls, g = tw) => el('path', { d: 'M' + pts.join('L') + 'Z', class: cls }, g);
+      // a face turned to the eye, and how much of the sun it takes
+      const faces = (nx, nz) => -nx * sa + nz * ca < -0.02, lit = (nx, nz) => Math.max(0, -0.62 * nx - 0.78 * nz);
+      // a ring's faces turned to the eye, in runs, each run a single residence when `side` tells them apart
+      const runs = (ring, side) => {
+        const n = ring.length, seg = (j) => { const p = ring[j], q = ring[(j + 1) % n]; return { j, p, q, nx: (p.nx + q.nx) / 2, nz: (p.nz + q.nz) / 2, s: side ? side(p, q) : 0 }; };
+        let i0 = 0; while (i0 < n && faces(seg(i0).nx, seg(i0).nz)) i0++;
+        const out = []; let cur = null;
+        for (let t = 1; t <= n; t++) {
+          const g = seg((i0 + t) % n);
+          if (!faces(g.nx, g.nz)) { cur = null; continue; }
+          if (!cur || cur.s !== g.s) out.push(cur = { s: g.s, segs: [] });
+          cur.segs.push(g);
+        }
+        return out;
+      };
+      const ribbon = (segs, ya, yb, cls, g) => poly([...segs.map((o) => P(o.p, yb)), P(segs[segs.length - 1].q, yb), P(segs[segs.length - 1].q, ya), ...segs.slice().reverse().map((o) => P(o.p, ya))], cls, g);
+      const band = (ring, ya, yb, cls, side, shade) => runs(ring, side).map((r) => {
+        const path = ribbon(r.segs, ya, yb, cls);
+        if (shade) for (const o of r.segs) { const d = 1 - lit(o.nx, o.nz); if (d > 0.08) ribbon([o], ya, yb, 'tw-shade').style.opacity = (0.9 * d * d).toFixed(2); }
+        return { path, s: r.s };
+      });
+      const deck = (ring, y, cls) => poly(ring.map((p) => P(p, y)), cls);
+      const plans = Array.from({ length: G.FLOORS }, (_, k) => G.plan(k, 3));
+      const bay = (p, q) => (p.lx + q.lx > 0 ? 0 : 1);
+      const slabOf = (k) => (k === 1 ? null : k === G.RES0 || k === G.CROWN || k === G.FLOORS ? plans[k - 1].slab : plans[k].slab);
+      // the site plate, a little wider than the podium, and the podium's plinth
+      const plate = plans[0].glass.map((p) => ({ x: p.x + p.nx * 1.3, z: p.z + p.nz * 1.3, nx: p.nx, nz: p.nz }));
+      deck(plate, 0, 'tw-plate'); band(plate, -0.22, 0, 'tw-edge');
+      // level by level from the ground up (from above, each level hides only what lies below and behind it): the slab's
+      // edge, its deck or terrace, the terrace's glass balustrade, then the glass, a residence at a time
+      for (let k = 0; k <= G.FLOORS; k++) {
+        const ring = slabOf(k);
+        if (ring) { band(ring, k, k + G.SLAB, 'tw-edge'); deck(ring, k + G.SLAB, 'tw-deck'); if (k >= G.RES0) band(ring.map((p) => ({ ...p, x: p.x - p.nx * 0.05, z: p.z - p.nz * 0.05 })), k + G.SLAB, k + G.SLAB + G.RAIL_H, 'tw-rail'); }
+        if (k === 1 || k === G.FLOORS) continue; // (the lobby is two storeys of glass, its mezzanine well back inside)
+        const g = plans[k].glass, ya = k + G.SLAB, yb = k === 0 ? 2 : k + 1;
+        for (const r of band(g, ya, yb, k < G.RES0 ? 'tw-pod' : 'tw-res', k < G.RES0 ? null : bay, true)) if (k >= G.RES0) homes.push({ r: r.path, rank: G.RANK[k * 2 + r.s] });
+        // the lobby's mullions
+        if (k === 0) runs(g).forEach((r) => r.segs.forEach((o, i) => { if (i % 2 === 0) poly([P(o.p, ya), P(o.p, yb)], 'tw-mull'); }));
+      }
+      // the crown: a lantern of fins round the roof plant, its lid, and the beacon's mast
+      const top = G.FLOORS + G.SLAB, ht = top + G.SCREEN_H, scr = plans[G.FLOORS - 1].glass.map((p) => ({ x: p.x - p.nx * 0.2, z: p.z - p.nz * 0.2, nx: p.nx, nz: p.nz, lx: p.lx }));
+      band(scr, top, ht, 'tw-screen', null, true);
+      runs(scr).forEach((r) => r.segs.forEach((o, i) => { if (i % 2 === 0) poly([P(o.p, top), P(o.p, ht)], 'tw-fin'); }));
+      band(scr, ht - 0.1, ht, 'tw-edge'); deck(scr, ht, 'tw-lid');
+      const c = { x: 0, z: 0 };
+      poly([P(c, ht), P(c, ht + G.BEACON)], 'tw-fin');
+      const [bx, by] = P(c, ht + G.BEACON).split(' ');
+      el('circle', { cx: bx, cy: by, r: 0.17, class: 'tw-beacon' }, tw);
+      tw.setAttribute('viewBox', [x0 - 0.3, y0 - 0.4, x1 - x0 + 0.6, y1 - y0 + 0.6].map((v) => v.toFixed(2)).join(' '));
     }
     function draw() {
       const p = +price.value, T = +loan.value / 100, s = model(p), base = model(0);
@@ -226,8 +282,8 @@ document.addEventListener('DOMContentLoaded', function () {
       out('cvDone').textContent = Math.round(done * 100) + '%';
       // and the same reading in one line just above a phone's plot
       out('cvNowM').textContent = hit > -1 ? 'Month ' + hit : 'Threshold not met'; out('cvNowD').textContent = Math.round(done * 100) + '%';
-      // the same share of the building, filled floor by floor in a small elevation beside the figure
-      if (tw) { const n = Math.round(done * RES); tw.querySelectorAll('rect').forEach((r, k) => { const d = POD + RES - 1 - k; r.classList.toggle('on', k >= POD && d >= 0 && d < n); r.style.transitionDelay = (reduceM || k < POD || d < 0 ? 0 : Math.abs(d - lastN) * 22) + 'ms'; }); lastN = n; }
+      // the same share of the building, its residences sold in the hero's order in the small elevation beside the figure
+      if (homes.length) { const n = Math.round(done * RES); for (const h of homes) { h.r.classList.toggle('on', h.rank < n); h.r.style.transitionDelay = (reduceM ? 0 : Math.abs(h.rank - lastN) * 14) + 'ms'; } lastN = n; }
       let say;
       const unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - base[DONE]) * 100);
       if (p === 0) say = 'At par, about ' + Math.round(done * 100) + ' percent of the building is under contract by completion' + (hit > -1 ? '.' : ', and the threshold is not met within ' + M + ' months.');
