@@ -240,7 +240,7 @@ void main() {
   // a sold home is lived in: its rooms warm-lit behind clear glass, some brighter than others, by day as well as after
   // dark; the bronze stays at its slab edge, where the frit runs
   float hr = h21(vec2(vB.z, k * 3.1));
-  lamp = max(lamp, sold * mix(0.22, 0.75, uNight) * (hr < 0.3 ? 0.12 : 0.5 + 0.5 * hr));
+  lamp = max(lamp, sold * mix(0.22, 0.75, uNight) * (hr < mix(0.3, 0.5, uNight) ? 0.08 : 0.45 + 0.55 * hr));
   gold = max(gold, sold);
   // panes: a mullion every 0.42 (some 1.6 m), each pane set very slightly out of true, as real glass is
   float MW = kind > 0.5 ? 0.62 : 0.42, cu = u / MW, cell = floor(cu), fu = fract(cu);
@@ -440,10 +440,10 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, PORTE, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
-    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), mast = new Mesh(), canopy = new Mesh(), deck = new Mesh();
+    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), canopy = new Mesh(), deck = new Mesh();
     // slabs: the edge band, the top and the soffit (k 1 is the mezzanine, hidden inside the lobby's glass)
     // From the podium's roof up, each slab ends in a thin nose: a short white face over an underside that rounds back
     // and up from the soffit, so the edge reads as a blade (the plinth and the lobby's eyebrow keep a square edge).
@@ -519,9 +519,9 @@ void main() {
         rails.quad(q[0], q[1], q[2], q[3]);
       }
     }
-    // the crown: its screen of fins, rising to its crest over the bay, and the plant's roof well down inside it; the mast
-    // for the aviation light (each fin's own height is its top, so the lantern's glow fills it to the top whatever it is)
-    const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H, sc = S.SCREEN, ns = sc.length;
+    // the crown: its screen of fins, rising to its crest over the bay (each fin's own height is its top, so the
+    // lantern's glow fills it to the top whatever it is)
+    const y0 = FLOORS + SLAB, sc = S.SCREEN, ns = sc.length;
     const CH = sc.reduce((v, p) => v + CREST(p), 0) / ns;
     {
       let s = 0;
@@ -562,8 +562,6 @@ void main() {
         crown.quad(eB[j], eT[j], eT[j2], eB[j2]);
       }
     }
-    // the mast for the aviation light, from the middle of the roof to the same height as before
-    post(mast, 0, 0, 0.035, 0, SCREEN_H - CH + BEACON, [0, 0.9, 0, 3]);
     // the porte-cochère: a leaf of a roof on two slender posts, its soffit high enough for a coach, its edge the
     // terraces' blade (a thin face over an underside that rounds back and up), so the tower's line comes down to the door
     const cr = CANOPY.map((p) => ({ x: p.x * 0.6, z: (p.z + 5.5) * 0.6 - 5.5 }));
@@ -635,7 +633,7 @@ void main() {
     }
     const ground = new Mesh();
     { const R = 30, a = [0, 1, 0, 0], b = [0, 0, 0, 0], nr = [0, 1, 0]; const q = [[-R, -R], [R, -R], [R, R], [-R, R]].map(([x, z]) => ground.vert([x, 0, z], nr, a, b)); ground.quad(q[3], q[2], q[1], q[0]); }
-    return { slabs, cols, core, glass, ghost, rails, crown, mast, canopy, deck, cars, ground };
+    return { slabs, cols, core, glass, ghost, rails, crown, canopy, deck, cars, ground };
   }
 
   // ---------------------------------------------------------------- the sky behind
@@ -925,7 +923,6 @@ void main() {
     const ROOMS = [];
     { const S = G.set(6); for (let k = 2; k < FLOORS; k++) { const pl = S.PLANS[k].glass, n = pl.length; for (let r = 0; r < 12; r++) { let x = 0, z = 0, nx = 0, nz = 0, w = 0, c = 0; for (let j = 0; j < n; j++) if (S.RM[j] === r) { const a = pl[j], b = pl[(j + 1) % n], l = Math.hypot(b.x - a.x, b.z - a.z); x += (a.x + b.x) / 2 * l; z += (a.z + b.z) / 2 * l; nx += a.nx + b.nx; nz += a.nz + b.nz; w += l; c++; } if (!c) continue; const nl = Math.hypot(nx, nz) || 1; ROOMS.push({ k, r, x: x / w + nx / nl * 0.05, z: z / w + nz / nl * 0.05, nx: nx / nl, nz: nz / nl, w }); } } }
     let shKey = '', LS = null;
-    const CHm = ((sc) => sc.reduce((v, p) => v + G.CREST(p), 0) / sc.length)(G.set(6).SCREEN);
     const hash = G.hash, roomSide = [];
     { const S = G.set(6); for (let k = 0; k < FLOORS; k++) { const row = []; for (let r = 0; r < 12; r++) { const j = S.RM.indexOf(r); row.push(j < 0 ? 0 : S.SIDE[k][j]); } roomSide.push(row); } }
 
@@ -1015,10 +1012,10 @@ void main() {
 
       // shadows, only when the sun or the building has changed
       const shOn = kd > 0.02 && sv[1] > 0.01;
-      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, mast: Gc > 0.85 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
+      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
       lims.ghost = -C + 0.001; lims.cars = (m.occ || 0) > 0.5 ? 1 : -1;
       lims.rails = C >= FLOORS - 0.001 && Gc > 0.5 ? FLOORS : C - 0.999;
-      const crownY = [FLOORS + SLAB, Ge, 0], mastY = [0, 1, FLOORS + SLAB + CHm * Ge];
+      const crownY = [FLOORS + SLAB, Ge, 0];
       if (shOn) {
         const key = sv.map((v) => v.toFixed(3)).join() + [L, C, Gc, coreTop, lims.cars].map((v) => v.toFixed(3)).join();
         if (key !== shKey) {
@@ -1079,7 +1076,6 @@ void main() {
       gl.disable(gl.CULL_FACE);
       draw(qs, 'deck', lims.deck);
       draw(qs, 'crown', lims.crown, crownY);
-      draw(qs, 'mast', lims.mast, mastY);
       gl.enable(gl.CULL_FACE);
       const qg = progs.glass; common(qg); draw(qg, 'glass', lims.glass);
       gl.disable(gl.CULL_FACE);

@@ -1981,8 +1981,10 @@
           }
           g.restore();
         }
-        // the aviation light on its mast over the crown, as the drawing lights it
-        if (solid && this.G > 0.85) this.beacon(this.P(0, FLOORS + SLAB + crownH + BEACON, 0), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+        // the aviation light, as the drawing lights it: on the rendered crown it sits on the floating roof's high edge
+        // over the bay, where an obstruction light would be fixed, rather than on a mast
+        const tp = SCREEN.reduce((a, q) => (CREST(q) > CREST(a) ? q : a));
+        if (solid && this.G > 0.85) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
       }
       if (craneOn && !craneBehind) this.drawCrane(true);
       palmsFront.forEach((p) => this.drawPalm(p));
