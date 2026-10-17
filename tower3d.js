@@ -11,6 +11,13 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const smooth = (t) => t * t * (3 - 2 * t);
   const lin = (c) => c.map((v) => Math.pow(v / 255, 2.2));
+  // the inverse of the shaders' tone(): the linear radiance a screen value comes from (exposure 0.9)
+  const untone = (y) => {
+    const t = Math.pow(clamp(y, 0, 0.98), 2.2), f = (x) => (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
+    let a = 0, b = 16;
+    for (let i = 0; i < 24; i++) { const mid = (a + b) / 2; if (f(mid) < t) a = mid; else b = mid; }
+    return (a + b) / 2 / 0.9;
+  };
 
   // ---------------------------------------------------------------- shaders
   // One vertex shader for every mesh. A vertex is shown while its threshold (a.x) is at or under the mesh's limit, so a
@@ -36,6 +43,9 @@ uniform vec3 uEye, uSun, uSunCol, uZen, uHor, uGrd, uLamp, uGold, uBronze;
 uniform float uNight, uExp, uShOn, uOcc;
 uniform mat4 uLS; uniform sampler2DShadow uShadow; uniform vec2 uTexel;
 uniform sampler2D uRooms;
+// the air between the camera and the building: a faint veil of the sky's own haze, a little more over the far side
+uniform vec3 uAirC; uniform float uAir, uAirD;
+float gAir = 1.0;
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float gCity = 1.0; // the city's lit windows in what is reflected (off for the unclad residences)
 float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0)), f.x), f.y); }
@@ -81,6 +91,7 @@ float shadow(vec3 p, vec3 n) {
   return v / 10.0;
 }
 vec3 tone(vec3 c) {
+  c = mix(c, uAirC, gAir * uAir * clamp(length(uEye - vPos) / uAirD, 0.75, 1.3));
   c *= uExp;
   c = (c * (2.51 * c + 0.03)) / (c * (2.43 * c + 0.59) + 0.14);
   return pow(clamp(c, 0.0, 1.0), vec3(1.0 / 2.2));
@@ -253,8 +264,10 @@ void main() {
   const GROUND_FS = COMMON + `
 float rbox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
 void main() {
+  gAir = 0.0;
   vec3 p = vPos;
-  float R = length(p.xz), fade = 1.0 - smoothstep(4.5, 16.5, R); fade *= fade;
+  // (a soft, bell-shaped falloff, so the lit ground reads as light thinning out, never as the rim of a pool of light)
+  float R = length(p.xz), fade = 1.4 * exp(-R * R / 60.0) * (1.0 - smoothstep(12.0, 16.5, R));
   float sh = shadow(p, vec3(0.0, 1.0, 0.0));
   vec3 lit = vec3(0.5, 0.48, 0.44) * (uSunCol * max(uSun.y, 0.0) * sh * 0.09 + amb(vec3(0.0, 1.0, 0.0)) * 0.03) * fade;
   float d = rbox(p.xz, vec2(6.45, 4.45), 1.3);
@@ -262,7 +275,7 @@ void main() {
   vec2 e = p.xz - vec2(0.0, -5.6);
   lit += uLamp * uNight * uOcc * 0.22 * exp(-dot(e, e * vec2(0.25, 0.6)));
   vec3 c = tone(lit) - tone(vec3(0.0));
-  float a = ao * 0.5 * fade;
+  float a = ao * 0.5 * min(fade, 1.0);
   o = vec4(c * (1.0 - a), a);
 }`;
 
@@ -296,6 +309,7 @@ void main() {
   const SKY_FS = COMMON + `
 uniform float uGlow;
 void main() {
+  gAir = 0.0;
   float u = vB.x, y = vB.y;
   float g = exp(-u * u * 5.0) * (1.0 - smoothstep(0.7, 0.95, abs(u))) * exp(-pow((y - 0.16) / 0.2, 2.0)) * smoothstep(0.0, 0.06, y);
   vec3 c = tone(uHor * uGlow * g);
@@ -742,6 +756,8 @@ void main() {
       const hor = mixv([0.03, 0.026, 0.028], mixv([0.62, 0.7, 0.8], [0.95, 0.6, 0.42], gold), day);
       const grd = mixv([0.006, 0.006, 0.006], [0.1, 0.095, 0.085], day);
       const bronze = lin(m.sold || [184, 151, 106]);
+      // the veil's colour: the radiance that the tone curve takes to the backdrop's haze behind the tower
+      const sp = sky(m), air = { c: mixc(sp.hor, sp.mid, 0.5).map((v) => untone(v / 255)), f: 0.11 * sp.day + 0.05 * (1 - sp.day) };
       const cascT = m.doneAt === -Infinity ? 99 : m.doneAt ? (performance.now() - m.doneAt) / 1000 : -1, cas = (d) => clamp((cascT - d) / 0.18, 0, 1);
       rooms(m, night, cas);
 
@@ -798,6 +814,7 @@ void main() {
         gl.uniform3fv(u.uSunCol, sunCol); gl.uniform3fv(u.uZen, zen); gl.uniform3fv(u.uHor, hor); gl.uniform3fv(u.uGrd, grd);
         gl.uniform3fv(u.uLamp, LAMP.map((c) => c * 1.3)); if (u.uGold) gl.uniform3fv(u.uGold, GOLD.map((c) => c * 1.3)); if (u.uBronze) gl.uniform3fv(u.uBronze, bronze);
         gl.uniform1f(u.uNight, night); gl.uniform1f(u.uExp, 0.9); gl.uniform1f(u.uShOn, shOn ? 1 : 0);
+        if (u.uAirC) { gl.uniform3fv(u.uAirC, air.c); gl.uniform1f(u.uAir, air.f); gl.uniform1f(u.uAirD, k.d); }
         if (u.uLS) gl.uniformMatrix4fv(u.uLS, false, LS || VP);
         if (u.uShadow) gl.uniform1i(u.uShadow, 0); if (u.uRooms) gl.uniform1i(u.uRooms, 1);
         if (u.uTexel) gl.uniform2f(u.uTexel, 1.2 / SM, 1.2 / SM);
