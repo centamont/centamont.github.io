@@ -263,10 +263,14 @@ test('a click skips the intro', async ({ page }) => {
 
 test('the drawings arrive and say what they show', async ({ page }) => {
   await page.goto('/');
-  for (const sel of ['.doorway', '#chart', '.deposit', '.table', '#ruler']) {
+  for (const sel of ['.doorway', '#chart', '.deposit', '#ruler']) {
     await page.locator(sel).scrollIntoViewIfNeeded();
     await expect(page.locator(sel)).toHaveClass(/\bin\b/);
   }
+  await page.goto('/advisors.html');
+  await page.locator('.table').scrollIntoViewIfNeeded();
+  await expect(page.locator('.table')).toHaveClass(/\bin\b/);
+  await page.goto('/');
   await expect(page.locator('.deposit figcaption')).toContainText('illustrative');
   await expect(page.locator('#chart figcaption')).toContainText('simplified');
 });
