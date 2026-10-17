@@ -50,10 +50,23 @@ float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); 
 float gCity = 1.0; // the city's lit windows in what is reflected (off for the unclad residences)
 float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0)), f.x), f.y); }
 // the sky over Miami at this hour, with its cloud, and the city standing round the plaza in it (what the glass reflects)
+vec3 heaven(vec3 d);
+// Biscayne Bay round the site: the sky mirrored in water, strongly at a grazing look and hardly at all looking
+// down into it, its surface broken by a little swell; the far shore's lamps after dark
+vec3 bay(vec3 d) {
+  float c = clamp(-d.y, 0.0, 1.0), F = 0.02 + 0.98 * pow(1.0 - c, 5.0);
+  vec3 m = normalize(vec3(d.x, max(-d.y, 0.004) * (1.0 + 0.35 * (vn(d.xz / max(c, 0.02) * 3.0) - 0.5)), d.z));
+  vec3 deep = uGrd * 0.3 + vec3(0.004, 0.012, 0.014) * (1.0 - uNight);
+  return mix(deep, heaven(m), clamp(F * 1.3, 0.0, 1.0)) + uLamp * uNight * 0.02 * exp(-c * 30.0);
+}
 vec3 sky(vec3 d) {
   float y = d.y, az = atan(d.x, d.z), cell = floor(az * 14.0), hh = 0.012 + 0.075 * pow(h21(vec2(cell, 3.0)), 2.2);
-  // the streets below: the sun on them by day, their lamps after dark
-  if (y < -0.12 - 0.1 * h21(vec2(cell, 5.0))) return uGrd * (0.6 + 0.4 * exp(y * 6.0)) + uSunCol * max(uSun.y, 0.0) * 0.025 + uLamp * uNight * 0.035;
+  // the site stands on a point in the bay: the shore across is far off and its towers stand low, the water comes up
+  // to the horizon, and only looking steeply down does the glass see the site's own ground
+  hh *= 0.4;
+  if (y < 0.0 && y > -0.42) return bay(d);
+  // the ground below: the sun on it by day, its lamps after dark
+  if (y < 0.0) return uGrd * (0.6 + 0.4 * exp(y * 6.0)) + uSunCol * max(uSun.y, 0.0) * 0.025 + uLamp * uNight * 0.035;
   if (y < hh) {
     // the neighbours' façades, their windows lit at random after dark; the sun on the faces turned to it
     // (the near ones, below the horizon, show only a faint glow: their windows would read as glitter on the glass)
@@ -63,6 +76,11 @@ vec3 sky(vec3 d) {
     b += uLamp * uNight * (0.22 * gCity * lit * step(0.3, w) * step(0.35, f) * step(0.0, y) + 0.04);
     return b;
   }
+  return heaven(d);
+}
+// the open sky, with its cloud
+vec3 heaven(vec3 d) {
+  float y = d.y;
   vec3 s = mix(uHor, uZen, pow(clamp(y, 0.0, 1.0), 0.55));
   float sd = max(dot(d, uSun), 0.0);
   s += uSunCol * (0.035 * pow(sd, 6.0) + 0.06 * pow(sd, 40.0));
@@ -114,6 +132,8 @@ void main() {
   // unevenness of poured concrete from one bay to the next
   vec3 alb = mix(vec3(0.56, 0.55, 0.525), vec3(0.67, 0.655, 0.625), 1.0 - smoothstep(0.3, 0.7, abs(n.y)));
   alb *= 0.95 + 0.07 * h21(floor(vec2(vA.z * 0.9, p.y * 1.0 + 0.5)));
+  // the podium's bands are honed travertine, warmer than the tower's white, with the stone's faint bedding
+  if (kind < 0.5 && p.y < 3.3) alb = vec3(0.6, 0.54, 0.45) * (0.93 + 0.07 * vn(vec2(vA.z * 6.0, p.y * 60.0)));
   if (kind > 4.5) {
     // a car at the drop-off: lacquer (or its glass) over the sky's reflection
     vec3 r = reflect(-v, n);
@@ -125,11 +145,12 @@ void main() {
   if (kind > 3.5) {
     // a palm frond: leaflets either side of its rib, feathered at their tips
     float t = vA.z, w = abs(vB.x);
-    if (w > 0.14 && fract(t * 16.0 + w * 1.6) > 0.5 + 0.35 * (1.0 - w)) discard;
-    alb = mix(vec3(0.05, 0.085, 0.035), vec3(0.11, 0.14, 0.06), t);
+    if (w > 0.12 && fract(t * 30.0 + w * 2.2) > 0.48 + 0.4 * (1.0 - w)) discard;
+    alb = mix(vec3(0.025, 0.04, 0.02), vec3(0.055, 0.07, 0.032), t) * (0.8 + 0.4 * h21(vec2(floor(t * 30.0), sign(vB.x))));
     if (dot(n, v) < 0.0) n = -n;
   } else if (kind > 2.5) {
-    alb = vec3(0.26, 0.23, 0.2); // a palm's trunk
+    // a palm's trunk, pale grey and faintly ringed, under its green crownshaft
+    alb = vB.y > 0.5 ? vec3(0.09, 0.13, 0.06) : vec3(0.36, 0.34, 0.31) * (0.9 + 0.1 * step(0.5, fract(vA.z * 46.0)));
   } else if (kind > 1.5) {
     // the pool on the amenity deck: deep water under the sky's reflection
     vec3 r = reflect(-v, vec3(0.0, 1.0, 0.0));
@@ -140,6 +161,8 @@ void main() {
   } else if (kind > 0.5) {
     // the crown's screen: fins round the roof plant, each catching the light on one face
     float f = fract(vA.z / 0.24);
+    // (open between the blades above a low sill, so the lounge and the sky show through)
+    if (abs(f - 0.5) < 0.2 && p.y - vB.x > 0.1) discard;
     vec3 t = vec3(-n.z, 0.0, n.x);
     n = normalize(n + t * (f < 0.5 ? 0.9 : -0.9));
     alb = vec3(0.42, 0.41, 0.4);
@@ -163,7 +186,7 @@ void main() {
     c += uLamp * vec3(1.0, 0.82, 0.6) * uNight * uOcc * (0.24 * gap * mid * mid + 0.05 * mid);
   }
   // and the balconies' soffits carry small downlights, lit once the building is in use
-  if (kind < 0.5 && n.y < -0.5 && ao > 0.7) {
+  if (kind < 0.5 && n.y < -0.5 && ao > 0.7 && p.y < 34.0) {
     vec2 g = fract(p.xz * 1.6) - 0.5;
     c += uLamp * uNight * uOcc * 2.5 * (1.0 - smoothstep(0.05, 0.11, length(g)));
   }
@@ -214,6 +237,11 @@ void main() {
   float sold = texelFetch(uRooms, ivec2(12 + int(vB.w + 0.5), int(k + 0.5)), 0).r;
   float lamp = rm.r * 1.6, gold = rm.g;
   if (kind > 0.5) sold = 0.0;
+  // a sold home is lived in: its rooms warm-lit behind clear glass, some brighter than others, by day as well as after
+  // dark; the bronze stays at its slab edge, where the frit runs
+  float hr = h21(vec2(vB.z, k * 3.1));
+  lamp = max(lamp, sold * mix(0.22, 0.75, uNight) * (hr < mix(0.3, 0.5, uNight) ? 0.08 : 0.45 + 0.55 * hr));
+  gold = max(gold, sold);
   // panes: a mullion every 0.42 (some 1.6 m), each pane set very slightly out of true, as real glass is
   float MW = kind > 0.5 ? 0.62 : 0.42, cu = u / MW, cell = floor(cu), fu = fract(cu);
   vec3 t = vec3(-n.z, 0.0, n.x);
@@ -221,30 +249,31 @@ void main() {
   float aa = fwidth(u) * 0.8 + 0.002, du = min(fu, 1.0 - fu) * MW;
   float mull = 1.0 - smoothstep(0.016, 0.016 + aa, du);
   float ay = fwidth(p.y) * 0.8 + 0.002;
-  float frit = smoothstep(y1 - 0.085 - ay, y1 - 0.085, p.y) + (1.0 - smoothstep(y0 + 0.02, y0 + 0.02 + ay, p.y));
+  float fh = mix(0.085, 0.17, sold), frit = smoothstep(y1 - fh - ay, y1 - fh, p.y) + (1.0 - smoothstep(y0 + 0.02, y0 + 0.02 + ay, p.y));
   if (kind > 0.5) frit = 1.0 - smoothstep(y0 + 0.03, y0 + 0.03 + ay, p.y);
   // the glass: what it reflects over what lies behind it
   vec3 r = reflect(-v, pn);
   float nv = max(dot(pn, v), 0.0);
-  float F0 = mix(0.15, 0.25, sold), F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
+  float F0 = 0.15, F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
   float sh = shadow(p, n);
   // (the bronze a little less saturated by day, as tinted glass reads in daylight; full after dark, round the lamps)
   vec3 bz = mix(vec3(dot(uBronze, vec3(0.3, 0.59, 0.11))), uBronze, 0.78 + 0.22 * uNight);
-  vec3 reflT = mix(vec3(0.8, 0.86, 0.9), bz * 1.9, sold);
+  vec3 reflT = vec3(0.8, 0.86, 0.9);
   vec3 refl = (sky(r) + glint(r) * sh) * reflT;
   // under each slab the glass sees the soffit, not the sky, and the room's ceiling is in shade
   float occl = mix(0.5, 1.0, smoothstep(0.0, 0.3, y1 - p.y)) * mix(0.75, 1.0, smoothstep(0.0, 0.12, p.y - y0));
   refl *= kind > 0.5 ? 1.0 : mix(occl, 1.0, 0.35 * step(r.y, 0.0));
   vec3 inside = room(p, n, -v, u, y0, y1, k * 13.0 + vB.z, lamp, gold, kind > 0.5 ? 1.0 : 0.0);
   // sunlight through the glass brightens a room, so the balconies' shadows lie across the façade
-  inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.16;
-  vec3 transT = mix(vec3(0.55, 0.62, 0.63), bz * 0.95, sold);
+  inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.3;
+  vec3 transT = mix(vec3(0.55, 0.62, 0.63), vec3(0.66, 0.64, 0.6), sold);
   vec3 c = inside * transT * (1.0 - F) + refl * F;
-  // after dark a sold home's bronze glass still holds a little of the city's warm light
-  c += uBronze * uNight * sold * 0.05;
   // mullions and the frit at each ceiling: dark bronze aluminium in the same light
   vec3 metal = vec3(0.09, 0.085, 0.08) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + refl * 0.08;
-  vec3 fritC = mix(vec3(0.1, 0.1, 0.1), uBronze * 0.5, sold) * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.5 + amb(n)) + refl * F * 0.6;
+  vec3 fritC = vec3(0.1) * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.5 + amb(n)) + refl * F * 0.6;
+  // (sold: the band at the slab is bronze metal, brushed, holding the sky's line and a little of the room's light)
+  vec3 bzC = bz * (uSunCol * max(dot(n, uSun), 0.0) * sh * 0.8 + amb(n) * 1.6) + sky(r) * bz * (0.25 + 0.6 * F) + bz * uNight * 0.06 + bz * lamp * 0.12;
+  fritC = mix(fritC, bzC, sold);
   c = mix(c, fritC, clamp(frit, 0.0, 1.0));
   c = mix(c, metal, mull);
   o = vec4(tone(c), 1.0);
@@ -266,8 +295,11 @@ void main() {
     c = vec3(0.6, 0.6, 0.58) * (uSunCol * max(abs(dot(n, uSun)), 0.0) * sh * 0.35 + amb(n)) * 0.4 + c;
     a = 0.38 + 0.3 * F;
   }
-  // (the handrail is a bronze cap, brushed, so it holds a thin line of the sky along its top)
-  vec3 rail = uBronze * 0.55 * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + sky(r) * uBronze * (0.12 + 0.5 * F);
+  // (the handrail is a brushed metal cap holding a thin line of the sky along its top: dark bronze aluminium, as the
+  // mullions are, and bronze itself along a sold home's terrace, the edge that tells the sales from the street)
+  float sold = vB.w > 0.5 ? step(0.5, texelFetch(uRooms, ivec2(11 + int(vB.w + 0.5), int(vA.x + 0.5)), 0).r) : 0.0;
+  vec3 mt = mix(vec3(0.16, 0.15, 0.14), uBronze, sold);
+  vec3 rail = mt * mix(0.4, 0.6, sold) * (uSunCol * max(dot(n, uSun), 0.0) * sh + amb(n)) + sky(r) * mt * (0.12 + 0.5 * F) + uBronze * uNight * sold * 0.08;
   c = mix(c, rail, top); a = mix(a, 1.0, top);
   o = vec4(tone(c) * a, a);
 }`;
@@ -290,7 +322,18 @@ void main() {
   lit += uLamp * uNight * uOcc * 0.22 * exp(-dot(e, e * vec2(0.25, 0.6)));
   vec3 c = tone(lit) - tone(vec3(0.0));
   float a = ao * 0.5 * min(fade, 1.0);
-  o = vec4(c * (1.0 - a), a);
+  // the grounds, laid over the survey sheet and thinning into it: honed stone paving round the podium in a grid of
+  // joints, the drive's dark loop to the porte-cochère, and lawn beyond, each lit by the sun (in the tower's shadow)
+  // and by the sky; the sheet's grid and site lines show through them faintly
+  float pv = rbox(p.xz, vec2(9.4, 7.8), 3.0), dv = abs(rbox(p.xz - vec2(0.0, -6.4), vec2(4.6, 1.15), 1.1)) - 0.5;
+  vec2 jt = abs(fract(p.xz / 0.75) - 0.5);
+  float joint = smoothstep(0.465, 0.5, max(jt.x, jt.y));
+  vec3 alb = mix(vec3(0.022, 0.03, 0.02) * (0.8 + 0.4 * vn(p.xz * 0.7)), vec3(0.36, 0.335, 0.3) * (1.0 - 0.22 * joint), step(pv, 0.0));
+  alb = mix(alb, vec3(0.055, 0.055, 0.058), step(dv, 0.0));
+  vec3 lt = uSunCol * max(uSun.y, 0.0) * sh + amb(vec3(0.0, 1.0, 0.0)) * 0.8 + uLamp * uNight * uOcc * 0.3 * exp(-dot(e, e * vec2(0.12, 0.3)));
+  float am = 0.82 * (1.0 - smoothstep(9.0, 15.5, R)) * (1.0 - 0.5 * uNight);
+  vec3 mc = tone(alb * lt);
+  o = vec4(mix(c, mc, am) * (1.0 - a), 1.0 - (1.0 - am) * (1.0 - a));
 }`;
 
   // Residences sold before their glass is in: each stands where it will be, in the bronze of its glass, seen through,
@@ -397,10 +440,10 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, PORTE, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
-    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), mast = new Mesh(), canopy = new Mesh(), deck = new Mesh();
+    const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), canopy = new Mesh(), deck = new Mesh();
     // slabs: the edge band, the top and the soffit (k 1 is the mezzanine, hidden inside the lobby's glass)
     // From the podium's roof up, each slab ends in a thin nose: a short white face over an underside that rounds back
     // and up from the soffit, so the edge reads as a blade (the plinth and the lobby's eyebrow keep a square edge).
@@ -456,7 +499,15 @@ void main() {
     // glass balustrades on every terrace, the podium's roof and the roof included
     for (let k = PODIUM; k <= FLOORS; k++) {
       const r = S.RAILS[k];
-      if (r) band(rails, r, k + SLAB, k + SLAB + RAIL_H, (j, s) => [[k, 0, s, 0], [k + SLAB, k + SLAB + RAIL_H, 0, 0]]);
+      // (each point carries the residence whose terrace it edges, one more than its side, found by the nearest stretch
+      // of that level's glass, so a sold home's handrail can turn bronze; 0 off the residential levels)
+      const gl = PL[idx(k)].glass, sd = (q) => {
+        if (k < G.RES0 || k >= FLOORS) return 0;
+        let best = 1e9, side = 0;
+        for (let j = 0; j < gl.length; j++) { const a = gl[j], b = gl[(j + 1) % gl.length], d = Math.hypot((a.x + b.x) / 2 - q.x, (a.z + b.z) / 2 - q.z); if (d < best) { best = d; side = S.SIDE[k][j] + 1; } }
+        return side;
+      };
+      if (r) band(rails, r, k + SLAB, k + SLAB + RAIL_H, (j, s) => [[k, 0, s, 0], [k + SLAB, k + SLAB + RAIL_H, 0, sd(r[j])]]);
     }
     // frosted screens between neighbours' terraces, where the two residences of a level meet
     for (let k = G.RES0; k < CROWN; k++) {
@@ -468,9 +519,10 @@ void main() {
         rails.quad(q[0], q[1], q[2], q[3]);
       }
     }
-    // the crown: its screen of fins, rising to its crest over the bay, and the plant's roof well down inside it; the mast
-    // for the aviation light (each fin's own height is its top, so the lantern's glow fills it to the top whatever it is)
-    const y0 = FLOORS + SLAB, y1 = y0 + SCREEN_H, sc = S.SCREEN, ns = sc.length;
+    // the crown: its screen of fins, rising to its crest over the bay (each fin's own height is its top, so the
+    // lantern's glow fills it to the top whatever it is)
+    const y0 = FLOORS + SLAB, sc = S.SCREEN, ns = sc.length;
+    const CH = sc.reduce((v, p) => v + CREST(p), 0) / ns;
     {
       let s = 0;
       for (let j = 0; j < ns; j++) {
@@ -486,13 +538,47 @@ void main() {
         s += len;
       }
     }
-    cap(crown, sc, sc.map((p) => ({ x: p.x * 0.6, z: p.z * 0.6 })), y0 + 0.35 * SCREEN_H, true, [0, 0, 0, 0], 0.9, 0.85);
-    post(mast, 0, 0, 0.035, 0, BEACON, [0, 0.9, 0, 3]);
-    // the porte-cochère: a thin roof on two slender posts, its soffit high enough for a coach
-    const cr = CANOPY.map((p) => ({ x: p.x * 0.75, z: (p.z + 5.5) * 0.75 - 5.5 }));
-    band(canopy, CANOPY, PORTE, PORTE + 0.1, () => [[0, 1, 0, 0], [PORTE, PORTE + 0.1, 0, 0]]);
-    cap(canopy, CANOPY, cr, PORTE + 0.1, true, [0, 0, 0, 0], 0.95, 0.9);
-    cap(canopy, CANOPY, cr, PORTE, false, [0, 0, 0, 0], 0.75, 0.7);
+    // Inside the screen, the sky lounge: a storey of glass set back on the roof (lit as the lobby is), the terrace
+    // round it open to the sky between the fins, and over both a thin roof that floats on the fins' tops, sloping with
+    // the crest and reaching a little past them, so the tide ends in a lantern rather than a drum
+    {
+      const lr = sc.map((p) => ({ x: p.x * 0.78, z: p.z * 0.78, nx: p.nx, nz: p.nz })), LH = 0.92;
+      band(glass, lr, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
+      const br = sc.map((p) => ({ x: p.x + p.nx * 0.24, z: p.z + p.nz * 0.24 })), hb = sc.map((p) => y0 + CREST(p)), T = 0.11;
+      const top = [], bot = [], eT = [], eB = [], a = [0, 0.92, 0, 0], b = [0, 0, 0, 0];
+      const cT = crown.vert([0, y0 + CH + T, 0], [0, 1, 0], a, b), cB = crown.vert([0, y0 + CH, 0], [0, -1, 0], a, b);
+      let s = 0;
+      for (let j = 0; j < ns; j++) {
+        const q = br[j], p = sc[j], sj = [0, 0.92, s, 0];
+        top.push(crown.vert([q.x, hb[j] + T, q.z], [0, 1, 0], a, b));
+        bot.push(crown.vert([q.x, hb[j], q.z], [0, -1, 0], a, b));
+        eT.push(crown.vert([q.x, hb[j] + T, q.z], [p.nx, 0, p.nz], sj, b));
+        eB.push(crown.vert([q.x, hb[j], q.z], [p.nx, 0, p.nz], sj, b));
+        s += Math.hypot(sc[(j + 1) % ns].x - p.x, sc[(j + 1) % ns].z - p.z);
+      }
+      for (let j = 0; j < ns; j++) {
+        const j2 = (j + 1) % ns;
+        crown.tri(cT, top[j2], top[j]); crown.tri(cB, bot[j], bot[j2]);
+        crown.quad(eB[j], eT[j], eT[j2], eB[j2]);
+      }
+    }
+    // the porte-cochère: a leaf of a roof on two slender posts, its soffit high enough for a coach, its edge the
+    // terraces' blade (a thin face over an underside that rounds back and up), so the tower's line comes down to the door
+    const cr = CANOPY.map((p) => ({ x: p.x * 0.6, z: (p.z + 5.5) * 0.6 - 5.5 }));
+    {
+      const CT = 0.34, tuck = CANOPY.map((p) => ({ x: p.x - p.nx * CT, z: p.z - p.nz * CT })), n = CANOPY.length, r = Math.SQRT1_2;
+      const a = [0, 1, 0, 0], b = [PORTE, PORTE + 0.2, 0, 0], ao = [0, 0.8, 0, 0];
+      band(canopy, CANOPY, PORTE + 0.12, PORTE + 0.2, () => [a, b]);
+      cap(canopy, CANOPY, cr, PORTE + 0.2, true, [0, 0, 0, 0], 0.95, 0.9);
+      const o = [], i = [];
+      for (let j = 0; j < n; j++) {
+        const p = CANOPY[j], q = tuck[j];
+        o.push(canopy.vert([p.x, PORTE + 0.12, p.z], [p.nx * r, -r, p.nz * r], ao, b));
+        i.push(canopy.vert([q.x, PORTE - 0.02, q.z], [p.nx * 0.15, -0.99, p.nz * 0.15], ao, b));
+      }
+      for (let j = 0; j < n; j++) { const j2 = (j + 1) % n; canopy.quad(o[j], o[j2], i[j2], i[j]); }
+      cap(canopy, tuck, cr, PORTE - 0.02, false, [0, 0, 0, 0], 0.75, 0.7);
+    }
     for (const x of [-2.1, 2.1]) post(canopy, x, -5.85, 0.05, 0, PORTE, [0, 0.9, 0, 0]);
     // the amenity deck's pool, beside the tower on the podium's roof
     {
@@ -505,17 +591,20 @@ void main() {
       const tx = x + lean * Math.cos(turn), tz = z + lean * Math.sin(turn), ring = [];
       for (let i = 0; i <= 8; i++) {
         const t = i / 8, e = t * t, cx = x + (tx - x) * e, cz = z + (tz - z) * e, r = 0.1 - 0.035 * t, row = [];
-        for (let m = 0; m < 6; m++) { const a = (m / 6) * TAU, nx = Math.cos(a), nz = Math.sin(a); row.push(deck.vert([cx + nx * r, hgt * t, cz + nz * r], [nx, 0, nz], [0, 0.9, t, 3], [0, 0, 0, 0])); }
+        // (a royal palm: a smooth grey trunk swelling a little low down, under the green crownshaft at its top)
+        const cs = t > 0.8 ? 1 : 0, rr = cs ? 0.085 : r * (1 + 0.25 * Math.exp(-t * 6));
+        for (let m = 0; m < 6; m++) { const a = (m / 6) * TAU, nx = Math.cos(a), nz = Math.sin(a); row.push(deck.vert([cx + nx * rr, hgt * (cs && i === 8 ? 1.02 : t), cz + nz * rr], [nx, 0, nz], [0, 0.9, t, 3], [0, cs, 0, 0])); }
         ring.push(row);
       }
       for (let i = 0; i < 8; i++) for (let m = 0; m < 6; m++) deck.quad(ring[i][m], ring[i][(m + 1) % 6], ring[i + 1][(m + 1) % 6], ring[i + 1][m]);
-      for (let f = 0; f < 11; f++) {
-        const a = turn + (f * TAU) / 11 + 0.4 * Math.sin(f * 2.3), len = 1.25 + (0.5 * ((f * 7) % 4)) / 3, up = f % 3 === 0 ? 0.9 : 0.5;
-        const ca = Math.cos(a), sa = Math.sin(a), pt = (t) => [tx + ca * len * t, hgt + len * (up * t - 1.05 * t * t), tz + sa * len * t];
+      // its fronds in two tiers, the upper rising and arching over, the lower spreading and hanging down
+      for (let f = 0; f < 16; f++) {
+        const hi = f % 2 === 0, a = turn + (f * TAU) / 16 + 0.3 * Math.sin(f * 2.3), len = (hi ? 1.45 : 1.7) + 0.35 * hash(f + x * 3.1), up = hi ? 1.1 : 0.35, dr = hi ? 1.25 : 1.05;
+        const ca = Math.cos(a), sa = Math.sin(a), pt = (t) => [tx + ca * len * t, hgt + len * (up * t - dr * t * t), tz + sa * len * t];
         let prev = null;
-        for (let i = 0; i <= 7; i++) {
-          const t = i / 7, p = pt(t), w = 0.34 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.15 + 0.05)), 0.7) + 0.02;
-          const slope = up - 2.1 * t, nr = [-ca * slope, 1, -sa * slope], nl = Math.hypot(...nr);
+        for (let i = 0; i <= 10; i++) {
+          const t = i / 10, p = pt(t), w = 0.3 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.1 + 0.05)), 0.6) + 0.02;
+          const slope = up - 2 * dr * t, nr = [-ca * slope, 1, -sa * slope], nl = Math.hypot(...nr);
           const n2 = nr.map((q) => q / nl);
           const l = deck.vert([p[0] - sa * w, p[1] - 0.04, p[2] + ca * w], n2, [0, 1, t, 4], [-1, 0, 0, 0]);
           const r = deck.vert([p[0] + sa * w, p[1] - 0.04, p[2] - ca * w], n2, [0, 1, t, 4], [1, 0, 0, 0]);
@@ -544,7 +633,7 @@ void main() {
     }
     const ground = new Mesh();
     { const R = 30, a = [0, 1, 0, 0], b = [0, 0, 0, 0], nr = [0, 1, 0]; const q = [[-R, -R], [R, -R], [R, R], [-R, R]].map(([x, z]) => ground.vert([x, 0, z], nr, a, b)); ground.quad(q[3], q[2], q[1], q[0]); }
-    return { slabs, cols, core, glass, ghost, rails, crown, mast, canopy, deck, cars, ground };
+    return { slabs, cols, core, glass, ghost, rails, crown, canopy, deck, cars, ground };
   }
 
   // ---------------------------------------------------------------- the sky behind
@@ -597,8 +686,9 @@ void main() {
     // the site under the haze, going down to the page's ink. Once the tower is in, these broad fills are the canvas's
     // own CSS background, which costs the page nothing as the drawing redraws; while it fades in they are drawn here.
     const ys = (e) => cy - e * f, G = Math.max(40, 0.32 * h);
-    const far = mixc(mixc(hor, ink, 0.55), [58, 60, 62], 0.3 * S.day), near = mixc(ink, [52, 54, 57], S.day);
-    const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], [cy, far], [cy + 0.18 * G, mixc(far, near, 0.7)], [cy + G, mixc(near, ink, 0.5)]];
+    // (below the horizon, the bay: see water)
+    const D = Math.max(1, h - cy), wc = waterStops(S);
+    const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], ...wc.map(([t, c]) => [cy + t * D, c])];
     if (alpha < 1 || !m.c) {
       const y0 = st[0][0], y1 = st[st.length - 1][0], gr = g.createLinearGradient(0, y0, 0, y1);
       for (const [y, c] of st) gr.addColorStop(clamp((y - y0) / (y1 - y0), 0, 1), css(c));
@@ -643,22 +733,122 @@ void main() {
     hz.addColorStop(0, css(hor, 0)); hz.addColorStop(0.75, css(hor, 0.45)); hz.addColorStop(1, css(hor, 0));
     g.fillStyle = hz; g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
     // a distant, generic skyline round the horizon, in towns: lighter than the ground, darker than the haze behind it
-    const N = 720, sil = mixc(mixc(hor, ink, 0.62), zen, 0.15), lamps = [];
-    g.fillStyle = css(sil); g.beginPath();
+    const N = 720, sil = mixc(mixc(hor, ink, 0.4), zen, 0.15), lamps = [];
+    skyl.length = 0; skyl.sil = sil; skyl.lamps = lamps;
+    // (in aerial perspective: the towers fade into the haze toward their feet)
+    const sg = g.createLinearGradient(0, cy - 0.04 * f, 0, cy);
+    sg.addColorStop(0, css(sil)); sg.addColorStop(1, css(mixc(sil, hor, 0.45)));
+    g.fillStyle = sg; g.beginPath();
     let open = false;
     for (let i = 0; i < N; i++) {
       const a0 = (i / N) * TAU, town = Math.pow(0.5 + 0.5 * Math.sin(a0 * 3 + 1.3) * Math.sin(a0 * 2 + 0.4), 3);
-      const hgt = town * (0.006 + 0.026 * Math.pow(hash(i), 2)) + 0.0015 * hash(i + 9);
-      const p0 = scr(Math.sin(a0), 0, Math.cos(a0)), a1 = ((i + 0.86) / N) * TAU, p1 = scr(Math.sin(a1), 0, Math.cos(a1));
+      // (mostly low and broken, with a slender tower here and there standing well clear of the rest, and gaps between)
+      // (the low city runs on in clusters that rise and fall together, with a slender tower here and there above it)
+      const r = hash(i), tall = r > 0.94 ? 1 : 0, cl = 0.5 + 0.5 * Math.sin(i * 0.37 + 2 * Math.sin(i * 0.11));
+      const hgt = town * (tall ? 0.02 + 0.016 * hash(i + 3) : 0.003 + 0.009 * cl * cl + 0.004 * r * r) + 0.001 * hash(i + 9);
+      const a1 = ((i + (tall ? 0.5 : hash(i + 5) > 0.85 ? 0.7 : 1.02)) / N) * TAU, p0 = scr(Math.sin(a0), 0, Math.cos(a0)), p1 = scr(Math.sin(a1), 0, Math.cos(a1));
       if (!p0 || !p1 || p1[0] < -2 || p0[0] > w + 2) { open = false; continue; }
       // (on a wide hero the left half carries the headline: the towns sink away under it)
       const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) / p0[2];
       if (!open) { g.moveTo(p0[0], cy + 1); open = true; }
-      g.lineTo(p0[0], yh); g.lineTo(p1[0], yh); g.lineTo(p1[0], cy + 1);
+      g.lineTo(p0[0], cy + 1); g.lineTo(p0[0], yh); g.lineTo(p1[0], yh); g.lineTo(p1[0], cy + 1);
+      if (cy - yh > 0.5) skyl.push(p0[0], p1[0], cy - yh);
       if (S.night > 0.1 && cy - yh > 3) for (let j = 0; j < 3; j++) if (hash(i * 3 + j) > 0.45) lamps.push([p0[0] + (p1[0] - p0[0]) * (0.25 + 0.25 * j), cy - (cy - yh) * (0.2 + 0.7 * hash(i + j * 5))]);
     }
     g.fill();
     if (lamps.length) { g.fillStyle = `rgba(236,196,142,${0.5 * S.night})`; for (const [x, y] of lamps) g.fillRect(x - 0.5, y - 0.5, 1, 1); }
+    water(g, m, S, w, h);
+  }
+
+  // The bay: drawn by the hero's drawing over the ground east of the site (pts, its outline on screen), after the sky.
+  // The water mirrors the sky over it, brightest at the horizon where it is seen at a graze and deepening toward the
+  // page's ink below; a fine swell breaks it into lines that close up toward the horizon, turning with the view as the
+  // cloud does; the far shore stands in it upside down and fainter; under a low sun a path of light runs to the eye.
+  const skyl = [];
+  let ripMask = null, ripTint = null, ripKey = '';
+  function ripples() {
+    if (ripMask) return ripMask;
+    const W = 1024, H = 128, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff';
+    // rows a little further apart as they come nearer (the strip is laid from the horizon down), each a string of
+    // short dashes, longer and fainter far off
+    for (let r = 0, y = 0.6; y < H; r++) {
+      const t = y / H, n = Math.round(60 + 140 * (1 - t));
+      for (let i = 0; i < n; i++) {
+        const x = hash(r * 31.7 + i * 1.3) * W, len = (4 + 26 * hash(r + i * 7.1)) * (1.6 - t);
+        g.globalAlpha = 0.25 + 0.75 * hash(i * 3.3 + r);
+        g.fillRect(x, y, len, Math.max(0.6, 1.4 * t)); if (x + len > W) g.fillRect(x - W, y, len, Math.max(0.6, 1.4 * t));
+      }
+      y += 0.7 + 5.5 * t * t;
+    }
+    return (ripMask = c);
+  }
+  // the water's own colour from the horizon down (t, a share of the height below it): the sky it mirrors
+  const waterStops = (S) => {
+    const { zen, hor, ink } = S;
+    return [[0, mixc(hor, ink, 0.06)], [0.035, mixc(mixc(hor, zen, 0.45), ink, 0.18)], [0.16, mixc(zen, ink, 0.35)], [0.5, mixc(zen, ink, 0.62)], [1, mixc(zen, ink, 0.85)]];
+  };
+  function water(g, m, S, w, h) {
+    const k = m.k, f = k.f, cy = k.cy, { hor, ink } = S, alpha = g.globalAlpha, D = Math.max(1, h - cy);
+    if (alpha < 1 || !m.c) {
+      const gr = g.createLinearGradient(0, cy, 0, h);
+      for (const [t, c] of waterStops(S)) gr.addColorStop(t, css(c));
+      g.fillStyle = gr; g.fillRect(0, cy, w, D);
+    }
+    g.save();
+    // the far shore upside down in it, and its lamps drawn out into streaks after dark
+    const rg = g.createLinearGradient(0, cy, 0, cy + 0.03 * f);
+    rg.addColorStop(0, css(mixc(skyl.sil || hor, ink, 0.25), 0.4)); rg.addColorStop(1, css(mixc(skyl.sil || hor, ink, 0.25), 0));
+    g.fillStyle = rg;
+    for (let i = 0; i < skyl.length; i += 3) g.fillRect(skyl[i], cy, skyl[i + 1] - skyl[i], skyl[i + 2] * 0.6);
+    if (skyl.lamps && skyl.lamps.length) { g.fillStyle = `rgba(236,196,142,${0.22 * S.night})`; for (const [x, y] of skyl.lamps) g.fillRect(x - 0.5, cy + (cy - y) * 0.8, 1, 2 + (cy - y) * 0.9); }
+    // the swell, tinted with the light it carries
+    const rc = mixc(mixc(hor, [236, 228, 214], 0.25 * S.day), [220, 160, 110], S.gold * 0.6), key = rc.map(Math.round).join();
+    if (key !== ripKey) {
+      const mk = ripples(); ripKey = key;
+      ripTint = ripTint || document.createElement('canvas'); ripTint.width = mk.width; ripTint.height = mk.height;
+      const t = ripTint.getContext('2d'); t.globalCompositeOperation = 'copy'; t.fillStyle = css(rc); t.fillRect(0, 0, mk.width, mk.height);
+      t.globalCompositeOperation = 'destination-in'; t.drawImage(mk, 0, 0);
+    }
+    const az = Math.atan2(k.s, k.c), tw = TAU * f * 0.9, rh = Math.min(D, 0.55 * f);
+    let x0 = k.cx - ((az / TAU) % 1 + 1) % 1 * tw - tw;
+    // (on a wide hero the left half carries the headline and its lede: the swell stays out from under them)
+    const ra = alpha * (0.24 + 0.12 * S.day - 0.1 * S.night), xl = w > 820 ? 0.46 * w : 0;
+    const bands = xl ? Array.from({ length: 9 }, (_, i) => [(i + 1) / 9, xl + (i * 0.14 * w) / 8, i < 8 ? xl + ((i + 1) * 0.14 * w) / 8 : w]) : [[1, 0, w]];
+    for (const [a0, xa, xb] of bands) {
+      g.save(); g.beginPath(); g.rect(xa, cy, xb - xa, rh); g.clip(); g.globalAlpha = ra * a0;
+      for (let x = x0; x < w; x += tw) if (x + tw > 0) g.drawImage(ripTint, x, cy, tw, rh);
+      g.restore();
+    }
+    // the sun's path on the water, under a sun in front of the eye
+    const sv = m.sunNow.v, sl = Math.hypot(sv[0], sv[1], sv[2]) || 1, X = k.c * sv[0] - k.s * sv[2], Z = k.s * sv[0] + k.c * sv[2];
+    const glow = (0.25 * S.day + 0.6 * S.gold) * (1 - S.night);
+    if (Z > 0.05 && glow > 0.02) {
+      const sx = k.cx + (f * X) / Z, cw = (0.03 + 0.08 * (1 - sv[1] / sl)) * f;
+      g.save(); g.beginPath(); g.rect(sx - cw, cy, 2 * cw, rh); g.clip();
+      g.globalAlpha = alpha * glow;
+      for (let x = x0; x < w; x += tw) if (x + tw > 0) g.drawImage(ripTint, x, cy, tw, rh);
+      g.restore();
+      const cg = g.createRadialGradient(sx, cy, 0, sx, cy, cw * 2.2);
+      cg.addColorStop(0, css(rc, 0.18 * glow)); cg.addColorStop(1, css(rc, 0));
+      g.globalAlpha = alpha; g.fillStyle = cg; g.fillRect(sx - cw * 2.2, cy, cw * 4.4, cw * 2.2);
+    }
+    // and the haze where the water meets the sky
+    g.globalAlpha = alpha;
+    const hz = g.createLinearGradient(0, cy, 0, cy + 0.02 * f);
+    hz.addColorStop(0, css(hor, 0.35)); hz.addColorStop(1, css(hor, 0));
+    g.fillStyle = hz; g.fillRect(0, cy, w, 0.02 * f);
+    g.restore();
+  }
+
+  // the ground of the site and the land round it, drawn over the bay by the hero's drawing (pts, its outline on screen)
+  function land(g, m, pts) {
+    if (pts.length < 3) return;
+    const S = sky(m), k = m.k, cy = k.cy, h = m.h, near = mixc(S.ink, [46, 48, 51], S.day), far = mixc(mixc(S.hor, S.ink, 0.6), near, 0.5);
+    const gr = g.createLinearGradient(0, cy, 0, h);
+    gr.addColorStop(0, css(far)); gr.addColorStop(0.25, css(near)); gr.addColorStop(1, css(mixc(near, S.ink, 0.5)));
+    g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); g.fillStyle = gr; g.fill();
   }
 
   // ---------------------------------------------------------------- renderer
@@ -673,7 +863,7 @@ void main() {
       if (/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(name)) { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); return null; }
     }
     const { FLOORS, SLAB, PODIUM, CROWN, RES0, SCREEN_H } = G;
-    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a) => backdrop(g, m, a) };
+    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a) => backdrop(g, m, a), land: (g, m, p) => land(g, m, p) };
     canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R.lost = true; if (opt.onLost) opt.onLost(); });
 
     // compile without stalling the page where the engine can (the programs link in the background)
@@ -822,10 +1012,10 @@ void main() {
 
       // shadows, only when the sun or the building has changed
       const shOn = kd > 0.02 && sv[1] > 0.01;
-      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, mast: Gc > 0.85 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
+      const lims = { slabs: L + 0.001, cols: L - 0.999, core: coreTop - 0.999, glass: C - 0.999, crown: Gc > 0.01 ? 1 : -1, canopy: L >= 2 ? 1 : -1, deck: L > PODIUM + 0.5 ? 1 : -1 };
       lims.ghost = -C + 0.001; lims.cars = (m.occ || 0) > 0.5 ? 1 : -1;
       lims.rails = C >= FLOORS - 0.001 && Gc > 0.5 ? FLOORS : C - 0.999;
-      const crownY = [FLOORS + SLAB, Ge, 0], mastY = [0, 1, FLOORS + SLAB + SCREEN_H * Ge];
+      const crownY = [FLOORS + SLAB, Ge, 0];
       if (shOn) {
         const key = sv.map((v) => v.toFixed(3)).join() + [L, C, Gc, coreTop, lims.cars].map((v) => v.toFixed(3)).join();
         if (key !== shKey) {
@@ -886,7 +1076,6 @@ void main() {
       gl.disable(gl.CULL_FACE);
       draw(qs, 'deck', lims.deck);
       draw(qs, 'crown', lims.crown, crownY);
-      draw(qs, 'mast', lims.mast, mastY);
       gl.enable(gl.CULL_FACE);
       const qg = progs.glass; common(qg); draw(qg, 'glass', lims.glass);
       gl.disable(gl.CULL_FACE);
