@@ -1236,7 +1236,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-dott{fill:var(--fg);font:400 19px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
 .js .cv-fig:not(.in) .cv-line{stroke-dasharray:1400;stroke-dashoffset:1400}
 .cv-fig.in .cv-line{stroke-dasharray:1400;stroke-dashoffset:0;transition:stroke-dashoffset 1.6s var(--ease-ink)}
-@media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}.cv-txt{display:contents}.cv-txt,.cv-fig,.cv-p,.cv-read,.cv-say,.cv-l{grid-area:auto}.cv-fig{position:relative;top:auto;margin-bottom:0}.cv-read{position:static;margin-top:0}.cv-p{margin-top:-4px}.cv-fig figcaption{order:-1;margin-bottom:6px}.cv-now{display:block;margin:0;font-family:var(--display);font-size:21px;line-height:1.3;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}.cv-read dd{font-size:26px}.cv-read{grid-template-rows:auto auto}.cv-read div{grid-row:span 2;grid-template-rows:subgrid;row-gap:0;padding-top:12px}.cv-done dd{align-items:flex-end}.cv-done .cv-tower{width:16px;height:44px}}
+@media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}.cv-txt{display:contents}.cv-txt,.cv-fig,.cv-p,.cv-read,.cv-say,.cv-l{grid-area:auto}.cv-fig{position:relative;top:auto;margin-bottom:0}.cv-read{position:static;margin-top:0}.cv-p{margin-top:-4px}.cv-fig figcaption{order:-1;margin-bottom:6px}.cv-now{display:block;margin:0;font-family:var(--display);font-size:21px;line-height:1.3;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}.cv-read dd{font-size:26px}.cv-read{grid-template-rows:auto auto}.cv-read div{grid-row:span 2;grid-template-rows:subgrid;row-gap:0;padding-top:12px}.cv-done dd{align-items:flex-end}}
 @media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.cv-fig{grid-template-columns:minmax(0,1fr)}.cv-fig > :is(figcaption,.cv-key){grid-column:1 / -1}.cv-fig > .cv-key{order:0;flex-direction:row;gap:6px 22px;border-top:0;padding-top:0;font-weight:400}}
 html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){display:none}
 .letter{margin-top:clamp(56px,7vw,96px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(22px,3vw,32px)}.letter > *{min-width:0}
@@ -1290,8 +1290,10 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 @media (max-width:339px){.letter .send .btn{letter-spacing:.08em}}
 .cv-txt h3{font-size:var(--t-head);max-width:14ch}
 .cv-done dd{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.cv-tower{width:22px;height:60px;flex:none;overflow:visible;margin-bottom:0}
-@media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{gap:22px 32px;grid-template-rows:repeat(5,auto) 1fr}.cv-read{grid-area:5 / 1;position:static;margin-top:0}.cv-fig{top:calc(var(--hdr) + 8px);margin-bottom:0;transition:top 300ms var(--ease-out)}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0;align-self:baseline}}
+.cv-done{container:cvdone/inline-size}
+.cv-tower{width:auto;height:68px;flex:none;overflow:visible;margin:0}
+@container cvdone (min-width:262px){.cv-tower{height:112px;margin-top:-34px}}
+@media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{gap:22px 32px;grid-template-rows:repeat(5,auto) 1fr}.cv-read{grid-area:5 / 1;position:static;margin-top:0}.cv-fig{top:calc(var(--hdr) + 8px);margin-bottom:0;transition:top 300ms var(--ease-out)}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0;align-self:baseline}.cv-read .cv-done .cv-tower{height:68px;margin-top:0}}
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){
   .curve{--cvt:32px;grid-template-rows:repeat(5,auto) 1fr}
   .cv-txt{display:contents}
@@ -1306,9 +1308,20 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
   .cv-ctl input{scroll-margin-top:140px}
 }
 @media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{--cvt:8px;grid-template-rows:repeat(6,auto) 1fr}.cv-read{grid-area:6 / 1}}
-.cv-tower rect{fill:none;stroke:var(--faint);stroke-opacity:.45;stroke-width:.8;transition:fill .5s var(--ease),stroke .5s var(--ease)}
-.cv-tower rect.on{fill:var(--sold);stroke:var(--sold);stroke-opacity:1}
-@media (prefers-reduced-motion:reduce){.cv-tower rect{transition:none}}
+.cv-tower .tw-res,.cv-tower .tw-pod,.cv-tower .tw-screen{fill:var(--faint);fill-opacity:.16;transition:fill .5s var(--ease),fill-opacity .5s var(--ease)}
+.cv-tower .tw-pod{fill-opacity:.1}
+.cv-tower .tw-res.on{fill:var(--sold);fill-opacity:1}
+.cv-tower .tw-shade{fill:var(--fg);fill-opacity:.3}
+.cv-tower .tw-edge{fill:var(--fg);fill-opacity:.62}
+.cv-tower .tw-deck{fill:var(--bg)}
+.cv-tower .tw-lid{fill:var(--fg);fill-opacity:.25}
+.cv-tower .tw-plate{fill:var(--fg);fill-opacity:.06}
+.cv-tower .tw-rail{fill:var(--fg);fill-opacity:.08}
+.cv-tower .tw-mull,.cv-tower .tw-fin{fill:none;stroke:var(--fg);stroke-width:.6;vector-effect:non-scaling-stroke}
+.cv-tower .tw-mull{stroke-opacity:.3}
+.cv-tower .tw-fin{stroke-opacity:.55}
+.cv-tower .tw-beacon{fill:var(--sold)}
+@media (prefers-reduced-motion:reduce){.cv-tower .tw-res{transition:none}}
 @media (max-width:520px){.letter .as{gap:8px 22px}.letter .as label{font-size:22px}}
 @media (max-width:520px),(pointer:coarse){.letter .sheet input,.letter .sheet select{padding-block:10px 1px;margin-block:-9px 0}.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline-offset:0}}
 .cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -1849,7 +1862,7 @@ p,li{text-wrap:pretty}
   a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
 }
 @media print and (min-width:901px){.curve{grid-template-rows:auto 1fr}.cv-say{grid-row:2}.cv-fig{margin-bottom:0}.cv-read{grid-row:3;margin-top:0}}
-@media (forced-colors:active){body::after{display:none}.cv-tower rect.on{forced-color-adjust:none;fill:CanvasText}
+@media (forced-colors:active){body::after{display:none}.cv-tower .tw-res.on{forced-color-adjust:none;fill:CanvasText}
   .table :is(rect,path){stroke:CanvasText}.table .ch.on .rl{fill:CanvasText}
   .co-ln path,.co-mk svg :is(path,circle),.grade :is(line,pattern path){stroke:CanvasText}.co-mk .q,.co-mk text{fill:CanvasText}
   .mk-tk{forced-color-adjust:none;--tc:CanvasText;--sheet:Canvas}
