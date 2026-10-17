@@ -39,17 +39,18 @@
   // (na: the chords to each rounded corner, 3 on a small drawing and 6 on a large one: see useSet below)
   function floorPlan(k, na) {
     let glass, off;
+    const swell = (p) => { const a = Math.atan2(p.z, p.x); return Math.pow(clamp(0.5 + 0.34 * Math.sin(2 * a + k * 0.24) + 0.2 * Math.sin(a - k * 0.13), 0, 1), 2.2); };
     if (k < PODIUM) {
-      // the lobby's glass comes down to a shallow plinth; the podium levels above carry eyebrow slabs
-      glass = rrect(6.2, 4.2, 1.1, na, 3); off = () => (k === 0 ? 0.08 : 0.22);
+      // the lobby's glass comes down to a shallow plinth; the podium levels above carry eyebrow slabs that already
+      // swell as the tower's terraces do, so the tide starts at the street
+      glass = rrect(6.2, 4.2, 1.1, na, 3); off = (p) => (k === 0 ? 0.08 : 0.22 + 0.7 * swell(p));
     } else {
       // The tide: the terraces run round the tower as contour lines, two swells to a level, each a little further round
       // than the one below with a slower counter-swell over them, so their crests climb the façade on a long diagonal.
       // The plan slims as it rises and the swells deepen, from slim edges over the podium to deep terraces under the
       // crown, where the two penthouse levels draw in behind the deepest of them and the tide breaks into the crown.
       // (and over the last three levels the tide breaks: their terraces sweep out deeper, into the crown's brim)
-      const t = Math.min(1, (k - PODIUM) / (CROWN - PODIUM)), sc = 1 - 0.12 * t, amp = 0.45 + 0.75 * Math.pow(t, 1.5) + 0.55 * Math.pow(clamp((k - CROWN + 3) / 3, 0, 1), 2);
-      const swell = (p) => { const a = Math.atan2(p.z, p.x); return Math.pow(clamp(0.5 + 0.34 * Math.sin(2 * a + k * 0.24) + 0.2 * Math.sin(a - k * 0.13), 0, 1), 1.5); };
+      const t = Math.min(1, (k - PODIUM) / (CROWN - PODIUM)), sc = 1 - 0.12 * t, amp = 0.4 + 1.25 * Math.pow(t, 1.3) + 0.55 * Math.pow(clamp((k - CROWN + 3) / 3, 0, 1), 2);
       if (k < CROWN) { glass = rrect(3.1 * sc, 2.6 * sc, 1.7 * sc, na, 3); off = (p) => 0.15 + amp * swell(p); }
       else { glass = rrect(2.5, 2.05, 1.4, na, 3); off = (p) => 0.5 + 1.6 * swell(p); }
     }
