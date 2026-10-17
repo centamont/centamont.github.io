@@ -2508,6 +2508,9 @@ p,li{text-wrap:pretty}
 :root[data-theme="dark"] .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}}
 .legal .sep{font-style:normal}
+/* the fair-housing mark: the house and equals sign drawn in the line's own ink at cap height, its words beside it */
+.legal .eho{display:inline-flex;align-items:center;gap:.45em;vertical-align:bottom}
+.legal .eho svg{flex:none;width:1.15em;height:1.15em;margin-top:-.12em}
 /* phones: two by two on the title block's two columns, the notice and the fair-housing statement side by side, and under
    them the two links side by side, each a 44px target */
 @media (max-width:600px){.legal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:0;padding-block:10px 12px;line-height:1.5}.legal > span:last-child{display:contents}.legal .sep{display:none}.legal .nw{white-space:normal}
