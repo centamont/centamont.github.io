@@ -78,7 +78,11 @@ vec3 sky(vec3 d) {
 }
 // the sun's own glint, kept apart so a shadow can take it away
 vec3 glint(vec3 r) { float sd = max(dot(r, uSun), 0.0); return uSunCol * (6.0 * pow(sd, 900.0) + 0.25 * pow(sd, 90.0)); }
-vec3 amb(vec3 n) { return mix(uGrd * 0.9, mix(uHor, uZen, 0.55), 0.5 + 0.5 * n.y) * 0.62; }
+// (the sky is brighter, and warmer when the sun is low, on the sun's side: a face turned from it sees the cooler sky)
+vec3 amb(vec3 n) {
+  float sd = dot(normalize(n.xz + 1e-4), normalize(uSun.xz + 1e-4)) * (1.0 - abs(n.y));
+  return mix(uGrd * 0.9, mix(uZen, uHor, 0.45 + 0.3 * sd), 0.5 + 0.5 * n.y) * 0.62;
+}
 float shadow(vec3 p, vec3 n) {
   if (uShOn < 0.5) return 1.0;
   vec4 q = uLS * vec4(p + n * 0.04, 1.0);
@@ -149,6 +153,13 @@ void main() {
   if (uWork > 0.0) c += alb * vec3(1.0, 0.74, 0.46) * uNight * 0.55 * exp(-max(uWork - p.y, 0.0) * 1.1) * step(p.y, uWork + 0.4) * (0.4 + 0.6 * max(n.y, 0.0));
   // after dark the soffits and slab tops take a little of the rooms' light, and the crown is washed from below
   c += alb * uLamp * uNight * (kind > 0.5 && kind < 1.5 ? 0.35 * exp(-(p.y - vB.x) * 1.6) : 0.05 * ao);
+  // and once the building is in use the crown is a lantern after dark: warm light from the roof behind the screen
+  // showing between its fins, strongest at their middle height
+  if (kind > 0.5 && kind < 1.5) {
+    float f = fract(vA.z / 0.24), h = clamp((p.y - vB.x) / max(vB.y - vB.x, 0.01), 0.0, 1.0);
+    float gap = 1.0 - smoothstep(0.03, 0.2, abs(f - 0.5)), mid = sin(3.14159 * h);
+    c += uLamp * vec3(1.0, 0.82, 0.6) * uNight * uOcc * (0.24 * gap * mid * mid + 0.05 * mid);
+  }
   // and the balconies' soffits carry small downlights, lit once the building is in use
   if (kind < 0.5 && n.y < -0.5 && ao > 0.7) {
     vec2 g = fract(p.xz * 1.6) - 0.5;
@@ -388,12 +399,30 @@ void main() {
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
     const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), mast = new Mesh(), canopy = new Mesh(), deck = new Mesh();
     // slabs: the edge band, the top and the soffit (k 1 is the mezzanine, hidden inside the lobby's glass)
+    // From the podium's roof up, each slab ends in a thin nose: a short white face over an underside that rounds back
+    // and up from the soffit, so the edge reads as a blade (the plinth and the lobby's eyebrow keep a square edge).
+    const NOSE = 0.075, TUCK = 0.15;
     for (let k = 0; k <= FLOORS; k++) {
       if (k === 1) continue;
-      const pl = PL[idx(k)], a = [k, 1, 0, 0];
-      band(slabs, pl.slab, k, k + SLAB, () => [a, [k, k + SLAB, 0, 0]]);
+      const pl = PL[idx(k)], a = [k, 1, 0, 0], b = [k, k + SLAB, 0, 0];
+      if (k < PODIUM) {
+        band(slabs, pl.slab, k, k + SLAB, () => [a, b]);
+        cap(slabs, pl.slab, pl.glass, k + SLAB, true, a, 0.95, 0.6);
+        if (k > 0) cap(slabs, pl.slab, pl.glass, k, false, a, 0.8, 0.35);
+        continue;
+      }
+      const tuck = pl.slab.map((p) => ({ x: p.x - p.nx * TUCK, z: p.z - p.nz * TUCK, nx: p.nx, nz: p.nz }));
+      band(slabs, pl.slab, k + NOSE, k + SLAB, () => [a, b]);
       cap(slabs, pl.slab, pl.glass, k + SLAB, true, a, 0.95, 0.6);
-      if (k > 0) cap(slabs, pl.slab, pl.glass, k, false, a, 0.8, 0.35);
+      // (the underside: normals turning from out-and-down at the nose to straight down at the soffit, so it shades round)
+      const n = pl.slab.length, ao = [k, 0.68, 0, 0], o = [], i = [], r = Math.SQRT1_2;
+      for (let j = 0; j < n; j++) {
+        const p = pl.slab[j], q = tuck[j];
+        o.push(slabs.vert([p.x, k + NOSE, p.z], [p.nx * r, -r, p.nz * r], ao, b));
+        i.push(slabs.vert([q.x, k, q.z], [p.nx * 0.15, -0.99, p.nz * 0.15], ao, b));
+      }
+      for (let j = 0; j < n; j++) { const j2 = (j + 1) % n; slabs.quad(o[j], o[j2], i[j2], i[j]); }
+      cap(slabs, tuck, pl.glass, k, false, a, 0.8, 0.35);
     }
     // the columns of the open frame, and the core that leads it
     for (let k = PODIUM; k < FLOORS; k++) for (const c of COLS) post(cols, c.x, c.z, 0.09, k + SLAB, k + 1, [k, 0.8, 0, 0]);
