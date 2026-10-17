@@ -37,21 +37,34 @@ uniform float uNight, uExp, uShOn, uOcc;
 uniform mat4 uLS; uniform sampler2DShadow uShadow; uniform vec2 uTexel;
 uniform sampler2D uRooms;
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-// the sky over Miami at this hour, and the city's skyline standing round the horizon in it (what the glass reflects)
+float gCity = 1.0; // the city's lit windows in what is reflected (off for the unclad residences)
+float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0)), f.x), f.y); }
+// the sky over Miami at this hour, with its cloud, and the city standing round the plaza in it (what the glass reflects)
 vec3 sky(vec3 d) {
-  float y = d.y;
-  if (y < 0.0) return uGrd * (0.6 + 0.4 * exp(y * 6.0));
-  float az = atan(d.x, d.z), cell = floor(az * 14.0), hh = 0.012 + 0.075 * pow(h21(vec2(cell, 3.0)), 2.2);
+  float y = d.y, az = atan(d.x, d.z), cell = floor(az * 14.0), hh = 0.012 + 0.075 * pow(h21(vec2(cell, 3.0)), 2.2);
+  // the streets below: the sun on them by day, their lamps after dark
+  if (y < -0.12 - 0.1 * h21(vec2(cell, 5.0))) return uGrd * (0.6 + 0.4 * exp(y * 6.0)) + uSunCol * max(uSun.y, 0.0) * 0.025 + uLamp * uNight * 0.035;
+  if (y < hh) {
+    // the neighbours' façades, their windows lit at random after dark; the sun on the faces turned to it
+    // (the near ones, below the horizon, show only a faint glow: their windows would read as glitter on the glass)
+    float w = fract(az * 260.0), f = fract(y * 420.0), lit = step(0.72, h21(vec2(floor(az * 260.0), floor(y * 420.0))));
+    vec3 b = uHor * (0.32 + 0.18 * h21(vec2(cell, 9.0)));
+    b += uSunCol * 0.05 * max(-dot(normalize(d.xz), normalize(uSun.xz + 1e-4)), 0.0) * h21(vec2(cell, 11.0));
+    b += uLamp * uNight * (0.22 * gCity * lit * step(0.3, w) * step(0.35, f) * step(0.0, y) + 0.04);
+    return b;
+  }
   vec3 s = mix(uHor, uZen, pow(clamp(y, 0.0, 1.0), 0.55));
   float sd = max(dot(d, uSun), 0.0);
   s += uSunCol * (0.035 * pow(sd, 6.0) + 0.06 * pow(sd, 40.0));
-  if (y < hh) {
-    float w = fract(az * 260.0), f = fract(y * 420.0), lit = step(0.72, h21(vec2(floor(az * 260.0), floor(y * 420.0))));
-    vec3 b = uHor * (0.32 + 0.18 * h21(vec2(cell, 9.0)));
-    b += uLamp * uNight * 0.22 * lit * step(0.3, w) * step(0.35, f);
-    return b;
-  }
-  return s;
+  // after dark, the city's own glow low in the sky
+  s += uLamp * uNight * 0.03 * exp(-y * 5.0);
+  // drifting cloud on a plane overhead, thinning towards the horizon: lit white by day, by the sun's colour when it
+  // is low, and from below by the city after dark
+  vec2 q = d.xz / (y + 0.06);
+  float cl = vn(q * vec2(0.9, 0.35)) * 0.65 + vn(q * 2.1 + 3.1) * 0.35;
+  float cov = smoothstep(0.45, 0.75, cl) * smoothstep(0.02, 0.14, y) * (1.0 - 0.5 * smoothstep(0.3, 0.8, y));
+  vec3 cc = vec3(dot(uHor, vec3(0.3, 0.59, 0.11))) * 1.3 + uSunCol * 0.06 * (0.4 + 0.6 * sd) + uLamp * uNight * 0.05;
+  return mix(s, cc, cov * 0.6);
 }
 // the sun's own glint, kept apart so a shadow can take it away
 vec3 glint(vec3 r) { float sd = max(dot(r, uSun), 0.0); return uSunCol * (6.0 * pow(sd, 900.0) + 0.25 * pow(sd, 90.0)); }
@@ -144,7 +157,7 @@ vec3 room(vec3 p, vec3 n, vec3 d, float u, float y0, float y1, float seed, float
   float W = mix(1.3, 2.6, big), H = y1 - y0, D = mix(1.25, 2.4, big);
   float cx = u / W, ci = floor(cx), lx = fract(cx) * W, ly = clamp(p.y - y0, 0.001, H - 0.001);
   float r1 = h21(vec2(ci, seed)), r2 = h21(vec2(seed, ci + 7.0)), r3 = h21(vec2(ci + 3.0, seed * 1.7));
-  vec3 dayL = amb(vec3(0.0, 0.3, 0.0)) * (1.0 - uNight) * 0.45;
+  vec3 dayL = amb(vec3(0.0, 0.3, 0.0)) * (1.0 - uNight) * 0.3;
   vec3 lampC = mix(uLamp, uGold, gold);
   // blinds, lowered a little or a lot in about half the rooms
   float bf = r3 < 0.45 ? 0.0 : 0.15 + 0.6 * r2;
@@ -180,7 +193,7 @@ void main() {
   // panes: a mullion every 0.42 (some 1.6 m), each pane set very slightly out of true, as real glass is
   float MW = kind > 0.5 ? 0.62 : 0.42, cu = u / MW, cell = floor(cu), fu = fract(cu);
   vec3 t = vec3(-n.z, 0.0, n.x);
-  vec3 pn = normalize(n + t * (h21(vec2(cell, k)) - 0.5) * 0.035 + vec3(0.0, (h21(vec2(k, cell)) - 0.5) * 0.03, 0.0));
+  vec3 pn = normalize(n + t * (h21(vec2(cell, k)) - 0.5) * 0.06 + vec3(0.0, (h21(vec2(k, cell)) - 0.5) * 0.05, 0.0));
   float aa = fwidth(u) * 0.8 + 0.002, du = min(fu, 1.0 - fu) * MW;
   float mull = 1.0 - smoothstep(0.016, 0.016 + aa, du);
   float ay = fwidth(p.y) * 0.8 + 0.002;
@@ -189,7 +202,7 @@ void main() {
   // the glass: what it reflects over what lies behind it
   vec3 r = reflect(-v, pn);
   float nv = max(dot(pn, v), 0.0);
-  float F0 = mix(0.12, 0.2, sold), F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
+  float F0 = mix(0.15, 0.25, sold), F = F0 + (1.0 - F0) * pow(1.0 - nv, 5.0);
   float sh = shadow(p, n);
   // (the bronze a little less saturated by day, as tinted glass reads in daylight; full after dark, round the lamps)
   vec3 bz = mix(vec3(dot(uBronze, vec3(0.3, 0.59, 0.11))), uBronze, 0.78 + 0.22 * uNight);
@@ -264,6 +277,7 @@ void main() {
   float side = 1.0 - step(0.5, abs(n.y));
   float F = 0.12 + 0.88 * pow(1.0 - max(dot(n, v), 0.0), 5.0);
   vec3 r = reflect(-v, n);
+  gCity = 0.0;
   vec3 c = uBronze * (uSunCol * max(dot(n, uSun), 0.0) * 0.35 + amb(n) * 0.9) + (sky(r) + glint(r)) * uBronze * 1.9 * F;
   // after dark the bronze keeps a little of the city's light, more where it is seen edge on, and the volumes thin out
   c += uBronze * uNight * (0.05 + 0.14 * F);

@@ -2013,6 +2013,15 @@
           g.restore();
         }
       })();
+      // Over the rendered sky, the far skyline and the horizon's haze are cleared round a name they run behind, the same
+      // halo: the sky's own gradient is the canvas's CSS background, so clearing the canvas there shows the sky itself.
+      if (labs.length && this.skyCss && !inLens) {
+        const cy = this.k.cy, z = this.o.labelSize;
+        g.save(); g.globalCompositeOperation = 'destination-out'; g.lineWidth = 5; g.lineJoin = 'round'; g.strokeStyle = '#000';
+        g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
+        for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a; g.strokeText(t, x, y); }
+        g.restore();
+      }
       g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, ys[0]); g.lineTo(xa, ys[FLOORS]);
       for (let i = 0; i <= FLOORS; i++) if (named(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
       g.stroke();
