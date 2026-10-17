@@ -447,7 +447,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const preset = (v) => { const r = ['dev', 'buy', 'adv'].includes(v) && form.querySelector('input[name="as"][value="' + v + '"]'); if (!r) return; r.checked = true; show(); };
     try {
       const q = new URLSearchParams(location.search), v = q.get('as');
-      if (v) { preset(v); q.delete('as'); history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); }
+      // (the launch planner's link also carries the building's size and neighborhood into the developer's letter)
+      if (v) {
+        preset(v); q.delete('as');
+        if (v === 'dev') [['units', /^\d{1,4}$/], ['where', /^[^<>]{1,60}$/]].forEach(([k, ok]) => { const t = (q.get(k) || '').trim(), i = form.elements[k]; if (i && ok.test(t)) i.value = t; q.delete(k); });
+        history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);
+      }
     } catch (e) {}
     document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
     // Enter in a blank should not send the letter
