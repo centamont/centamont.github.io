@@ -157,6 +157,8 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
 for (const [path, heading] of [
   ['/journal/buying-pre-construction-florida.html', /Buying pre.construction in Florida/],
   ['/journal/buying-pre-construction-new-york.html', /Buying pre.construction in New York/],
+  ['/journal/buying-pre-construction-texas.html', /Buying pre.construction in Texas/],
+  ['/journal/buying-new-construction-california.html', /Buying new construction in California/],
   ['/new-york.html', 'New York City'],
   ['/hamptons.html', 'The Hamptons'],
   ['/privacy.html', 'Privacy'],
@@ -385,7 +387,8 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
   const pages = ['/', '/privacy.html', '/404.html', '/colophon.html', '/private-clients.html', '/planner.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
-    '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html'];
+    '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
+    '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html'];
   const refused = [];
   await page.addInitScript(() => document.addEventListener('securitypolicyviolation', (e) => console.error('CSP refused ' + e.violatedDirective + ' ' + e.blockedURI)));
   page.on('console', (m) => m.text().startsWith('CSP refused') && refused.push(page.url() + ' ' + m.text()));
@@ -429,7 +432,7 @@ test('assets carry the current version', async ({}, info) => {
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
   const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'planner.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'journal/index.html',
-    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html'];
+    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
   let refs = 0;
   for (const p of pages) {
     for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|site\.js|model\.js|instrument\.js)(\?v=[0-9a-f]*)?"/g)) {
@@ -445,7 +448,7 @@ test('assets carry the current version', async ({}, info) => {
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   const pages = ['index.html', 'privacy.html', '404.html', 'colophon.html', 'private-clients.html', 'planner.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'journal/index.html',
-    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html'];
+    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
   for (const p of pages) {
     const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
     expect(ids.filter((v, i) => ids.indexOf(v) !== i), `${p} repeats an id`).toEqual([]);
@@ -458,7 +461,7 @@ test('journal dates agree everywhere they are written', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   const feed = readFileSync('journal/feed.xml', 'utf8');
   const sitemap = readFileSync('sitemap.xml', 'utf8');
-  const notes = ['buying-pre-construction-florida.html', 'buying-new-construction-florida.html', 'buying-pre-construction-new-york.html', 'buying-new-construction-new-york.html', 'launch-price-and-the-pre-sale-threshold.html', 'what-a-weekly-sales-report-should-measure.html', 'launching-in-miami-and-new-york.html'];
+  const notes = ['buying-pre-construction-florida.html', 'buying-new-construction-florida.html', 'buying-pre-construction-new-york.html', 'buying-new-construction-new-york.html', 'launch-price-and-the-pre-sale-threshold.html', 'what-a-weekly-sales-report-should-measure.html', 'launching-in-miami-and-new-york.html', 'buying-pre-construction-texas.html', 'buying-new-construction-texas.html', 'buying-pre-construction-california.html', 'buying-new-construction-california.html'];
   for (const n of notes) {
     const html = readFileSync('journal/' + n, 'utf8');
     const url = 'https://centamont.com/journal/' + n;
