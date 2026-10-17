@@ -253,7 +253,7 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel > .mk-st:nth-child(1){--k:3}header.site nav.main .mk-panel > .mk-st:nth-child(2){--k:4}header.site nav.main .mk-panel > .mk-st:nth-child(3){--k:5}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
 }}
-/* Florida and Texas hold three cities and California two. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
+/* Florida, California and Texas each hold three cities, and New York two. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
    the drawer each group is one row of the same height, the state a quiet label over its cities in the bar's capitals (side by
    side, the state in the drawer's face, South Florida, Tampa and Naples would not fit a phone's width), so the drawer keeps
    its ten rows (and its two columns of five on a phone on its side). */
@@ -2514,6 +2514,9 @@ p,li{text-wrap:pretty}
 :root[data-theme="dark"] .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{box-shadow:inset 0 -1px 0 rgba(184,151,106,.42)}}
 .legal .sep{font-style:normal}
+/* the fair-housing mark: the house and equals sign drawn in the line's own ink at cap height, its words beside it */
+.legal .eho{display:inline-flex;align-items:center;gap:.45em;vertical-align:bottom}
+.legal .eho svg{flex:none;width:1.15em;height:1.15em;margin-top:-.12em}
 /* phones: two by two on the title block's two columns, the notice and the fair-housing statement side by side, and under
    them the two links side by side, each a 44px target */
 @media (max-width:600px){.legal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:0;padding-block:10px 12px;line-height:1.5}.legal > span:last-child{display:contents}.legal .sep{display:none}.legal .nw{white-space:normal}
