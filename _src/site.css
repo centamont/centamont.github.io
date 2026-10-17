@@ -17,16 +17,21 @@
 @font-face{font-family:'Jost fallback';font-style:normal;font-weight:300 400;src:local('Arial'),local('ArialMT'),local('Liberation Sans'),local('LiberationSans');size-adjust:95.6%;ascent-override:111.7%;descent-override:39.1%;line-gap-override:0%}
 @font-face{font-family:'Jost fallback';font-style:normal;font-weight:500 700;src:local('Arial'),local('ArialMT'),local('Liberation Sans'),local('LiberationSans');size-adjust:95.3%;ascent-override:112.3%;descent-override:39.3%;line-gap-override:0%}
 
-/* An architect's elevation sheet: ivory vellum, ink linework, bronze for what has sold. */
+/* An architect's elevation sheet: ivory vellum, ink linework, bronze for what has sold, patina for what is open now. */
 :root{
   --ink:#14161A; --ivory:#F4F0E8; --bronze:#B8976A;
+  /* one bronze, five steps on the same hue: night accent, fill, line on ivory, text on ivory, edge at night */
+  --bronze-300:#C9A877; --bronze-500:#B8976A; --bronze-600:#9C7C50; --bronze-700:#7A5F3A; --bronze-800:#554836;
+  /* patina, the grey-green bronze turns after a century outdoors: the rare second color, 3-5% of any surface, for markets
+     open now and journal marks; never on buttons, links or prices. Deep by day (7.2:1 on ivory), light at night (6.6:1) */
+  --patina-700:#3F534C; --patina-300:#8FA39A; --patina:var(--patina-700);
   --bg:#F4F0E8; --sheet:#FAF7F1; --fg:#14161A; --muted:#4A463F; --faint:#6E675D; --rule:#D6CDBB;
   /* a drawing's gridlines and tracks: the rule by day; at night a step lighter, so they keep the same faint presence on the dark sheet */
   --grid:#D6CDBB;
-  --accent:#7A5F3A; --seal:#14161A; --sold:#B8976A; --line:#14161A;
+  --accent:var(--bronze-700); --seal:#14161A; --sold:var(--bronze-500); --line:#14161A;
   /* bronze that must read as an edge or a line on ivory (a field's rule, a data line) takes a deeper bronze by day, 3:1 or more;
      the fill bronze stays for fills. At night the fill bronze already reads. */
-  --sold-line:#9C7C50; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%237A5F3A'/%3E%3C/svg%3E");
+  --sold-line:var(--bronze-600); --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%237A5F3A'/%3E%3C/svg%3E");
   --band:#14161A; --band-fg:#F4F0E8; --band-muted:#CFC8BA; --band-rule:#34363A;
   /* the hero's ink as channels, so its gradients, the header over it and the intro curtain all match it by day and by night */
   --hero-rgb:20,22,26; --hero-lede:#D9D2C5;
@@ -62,11 +67,11 @@
 @media (max-width:520px){:root{--t-hero:clamp(44px,12.3vw,50px);--t-display:clamp(44px,12.3vw,50px);--t-spread:clamp(38px,10.8vw,44px);--t-chapter:clamp(34px,10vw,40px);--t-section:clamp(34px,10vw,40px);--t-head:clamp(26px,7.4vw,30px);--t-big:21px}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
-  --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC; --sold-line:#B8976A; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
+  --accent:var(--bronze-300); --seal:var(--bronze-300); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-500); --patina:var(--patina-300); --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17191D; --sheet:#1C1F24; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
-  --accent:#C9A877; --seal:#C9A877; --sold:#B8976A; --line:#EDE7DC; --sold-line:#B8976A; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
+  --accent:var(--bronze-300); --seal:var(--bronze-300); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-500); --patina:var(--patina-300); --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23C9A877'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -789,7 +794,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .lv .when{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 /* the status follows the market's name in the markup (a meta line goes below its title); in the ruled phone table it keeps its column at the left */
 .lv .when{grid-column:1;grid-row:1}.lv h3{grid-column:2;grid-row:1}
-.lv.now .when{color:var(--accent)}
+.lv.now .when{color:var(--patina)}
 .lv h3{font-size:var(--t-head);font-weight:300}
 .lv.now h3{font-style:italic;font-weight:400}
 .lv p{color:var(--muted)}
@@ -1000,8 +1005,8 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
    foot of the peak; the vein is the only bronze in the opening, so the mountain stands on the graphite page as it does on
    the ivory, without edges of its own. By day --band-edge is unset and all of it is the band's ink. */
 .seam i{background:linear-gradient(0deg,var(--band) 1px,var(--band-edge,var(--band)) 1px 2px,var(--band) 2px)}
-:root[data-theme="dark"]{--band-edge:#554836}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band-edge:#554836}}
+:root[data-theme="dark"]{--band-edge:var(--bronze-800)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band-edge:var(--bronze-800)}}
 html:not(.js) .seam{display:none}
 
 /* Contact: the page closes at display scale */
@@ -1302,12 +1307,12 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
 .js .chart .pt:not(.landed){stroke:var(--rule)}
 /* what opens now is the only continuous line: the reach along the coast, three points, the locator around them */
-.chart .rch{fill:none;stroke:var(--sold-line);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
-.chart .loc{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.chart .rch{fill:none;stroke:var(--patina);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
+.chart .loc{fill:none;stroke:var(--patina);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
-/* New York opens with South Florida: its two points take the survey's bronze, drawn in with the reach between them */
-.chart .ov .pt.now{fill:var(--sold);stroke:var(--sheet);transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
+/* New York opens with South Florida: its two points take the survey's patina, drawn in with the reach between them */
+.chart .ov .pt.now{fill:var(--patina);stroke:var(--sheet);transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
 .js .chart :is(.lb,.lk):not(.landed){fill:var(--faint)}
 .chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 /* then, the world: the International route ends on a world key that marks the overview's own frame */
@@ -1326,10 +1331,10 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .sv .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
 .chart .sv :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .sv .nh{fill:var(--fg)}
-.chart .sv .now-k{fill:var(--accent);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
-.chart .sv .cp{r:calc(4px * var(--u,1));fill:var(--sold);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1));transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
+.chart .sv .now-k{fill:var(--patina);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
+.chart .sv .cp{r:calc(4px * var(--u,1));fill:var(--patina);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1));transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
 .chart .sv .cl text{fill:var(--fg);font:italic 400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
-.chart .ring{r:calc(4px * var(--u,1));fill:none;stroke:var(--sold);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
+.chart .ring{r:calc(4px * var(--u,1));fill:none;stroke:var(--patina);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
 .chart.pulse .ring{animation:ring 2.4s var(--ease) both}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
 /* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. */
@@ -1365,7 +1370,7 @@ figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
 .cap .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .cap .key svg{width:28px;height:6px;overflow:visible}
 .cap .key path{fill:none;stroke:var(--fg)}
-.cap .k-now{stroke:var(--sold-line)!important;stroke-width:3px;stroke-linecap:round}
+.cap .k-now{stroke:var(--patina)!important;stroke-width:3px;stroke-linecap:round}
 .cap .k-plan{stroke-width:1.25px;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
 .cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
 @media (max-width:600px){.cap{grid-template-columns:minmax(0,1fr)}}
@@ -2260,7 +2265,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .pc-door .crumbs a:focus-visible{color:var(--band-fg)}
 @media (hover:hover) and (pointer:fine){.pc-door .crumbs a:hover{color:var(--band-fg)}}
 .page.pc .pc-door h1{color:#F4F0E8;font-size:clamp(42px,6vw,88px)}
-.page.pc .pc-door .standfirst{color:#D9D2C5;font-size:var(--t-big,clamp(21px,1.8vw,26px))}
+.page.pc .pc-door .standfirst{color:var(--hero-lede);font-size:var(--t-big,clamp(21px,1.8vw,26px))}
 .pc-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,6vw,96px);align-items:end}
 .pc-top > *{min-width:0}
 /* the breadcrumb at the head of the text column, the title and standfirst at its foot, level with the door's sill */
@@ -2414,7 +2419,7 @@ html.js .pc-nojs{display:none}
 .ji-defs{position:absolute;width:0;height:0;overflow:hidden}
 .ji{list-style:none;margin:clamp(48px,6vw,88px) 0 0;padding:0;border-top:1px solid var(--fg)}
 .ji a{display:grid;grid-template-columns:4em minmax(0,1fr) 168px;grid-template-areas:"n t p" ". s p" ". d p";align-items:baseline;column-gap:24px;padding:clamp(26px,3vw,40px) 0;border-bottom:1px solid var(--rule);color:inherit;text-decoration:none}
-.ji-n{grid-area:n;font-family:var(--display);font-size:28px;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
+.ji-n{grid-area:n;font-family:var(--display);font-size:28px;color:var(--patina);font-variant-numeric:lining-nums tabular-nums}
 .ji-d{grid-area:d;margin-top:14px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
 /* each title is the note's heading (an h2, so a screen reader can step from note to note), set as it was before */
 .ji-t{grid-area:t;font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,52px);line-height:1.08;max-width:none;letter-spacing:normal;transition:transform .6s var(--ease)}
