@@ -620,7 +620,8 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
 @media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
 @media (max-width:1040px){.begin{grid-template-columns:minmax(0,1fr);gap:28px}.b-l,.b-r{display:contents}.begin h3{order:1}.begin ol{order:2}.spec{order:3;max-width:560px}.begin .close{order:4;margin-top:0}}
-@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px}}
+/* on a phone the three steps close up a little, each still parted by its rule */
+@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px;padding-block:16px}.begin ol > li:first-child{padding-top:0}}
 
 /* The specimen sheet, drawn without figures: the report's own stacking plan, its pace against the plan, and the key.
    The whole drawing is one link to the report. */
@@ -857,6 +858,19 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 }
 
 /* People */
+/* On the home page the advisors keep their head alone, with one way on to their own page, the link under the intro on its
+   column; the seat plan, the standard and the invitation live on advisors.html. */
+.head.seat .links{margin-top:6px}
+@media (min-width:821px){.head.seat .links{grid-column:8/-1;grid-row:2}}
+/* The advisors' page: the seat plan opens the sheet under the title, the full measure, and the standard follows in the
+   page's two columns, the lead line on the left, the three tests and the invitation on the right. */
+.adv-plan{padding-top:clamp(40px,5vw,72px)}
+@media (min-width:821px){
+  .adv .people .table{grid-area:1/1/2/13}
+  .adv .people .col{grid-area:2/1/3/13;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:22px;align-items:start}
+  .adv .people .col > .big{grid-column:1/span 6;grid-row:1/span 2;margin:0}
+  .adv .people .col > :not(.big){grid-column:8/-1}
+}
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
 .people > *{min-width:0}
 .people .head{grid-template-columns:1fr;align-items:start}
@@ -1981,9 +1995,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .ss a:focus-visible .t,.ss a[aria-current] .t{background-size:100% 1px}
 @media (hover:hover) and (pointer:fine){.ss a:hover .t{background-size:100% 1px}}
 .tb .ss a[aria-current]{color:var(--fg)}
-/* where the cell is wide enough for two columns of three, the set takes them */
+/* where the cell is wide enough for two columns, the set takes them, four and three */
 .t-ss{container-type:inline-size}
-@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(3,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
+@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(4,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
 /* a date keeps whole, taking the next line as one piece where its line is full; only text set far larger than the cell (a
    browser's text zoom) breaks it, so it never runs on into the next cell. The sheet number's revision does the same. */
 .t-dr time,.sn small{display:inline-block;max-width:100%}
@@ -1996,12 +2010,14 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    nothing here is drawn to one, is left off. Every link keeps a 43px target, set edge to edge. */
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk ss" "fo ss"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}
-  /* the set registers with the two cells beside it: 01 to 03 level with the ways in, and 04 to 06 level with the channels,
+  /* the set registers with the two cells beside it: 01 to 03 level with the ways in, and 04 on level with the channels,
      the step between them as deep as the cell edge and the label that open the channels (12 + 1 + 10 + 18.2 + 4px) */
   .ss li:nth-child(4){margin-top:calc(12px + 1px + 10px + 13px * 1.4 + 4px)}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
+/* (and under 340px, at the labels' 14px, the cells open 2px more each side and the labels track at .08em, for the same reason) */
+@media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}
 /* and from 360 to 379px the sheet's name tracks a little closer, so 'Private clients' keeps both words, clear of its cell's edge */
 @media (min-width:360px) and (max-width:379px){.st{letter-spacing:.12em}}
 @media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}}

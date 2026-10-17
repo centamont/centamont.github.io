@@ -439,7 +439,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
 @media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
 @media (max-width:1040px){.begin{grid-template-columns:minmax(0,1fr);gap:28px}.b-l,.b-r{display:contents}.begin h3{order:1}.begin ol{order:2}.spec{order:3;max-width:560px}.begin .close{order:4;margin-top:0}}
-@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px}}
+@media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px;padding-block:16px}.begin ol > li:first-child{padding-top:0}}
 .spec{position:relative;display:grid;gap:12px;color:inherit;text-decoration:none}
 .sp-go::after{content:"";position:absolute;inset:0}
 .sp-go:focus-visible{outline:0}
@@ -618,6 +618,15 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
   #journal .feature{grid-template-columns:minmax(0,3fr) minmax(0,5fr);grid-template-rows:auto 1fr;gap:24px clamp(32px,4.4vw,64px)}
   #journal .deposit{grid-area:1 / 2 / span 2}
   #journal .feature .links{grid-area:2 / 1;align-self:start;margin:-6px 0 0}
+}
+.head.seat .links{margin-top:6px}
+@media (min-width:821px){.head.seat .links{grid-column:8/-1;grid-row:2}}
+.adv-plan{padding-top:clamp(40px,5vw,72px)}
+@media (min-width:821px){
+  .adv .people .table{grid-area:1/1/2/13}
+  .adv .people .col{grid-area:2/1/3/13;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:22px;align-items:start}
+  .adv .people .col > .big{grid-column:1/span 6;grid-row:1/span 2;margin:0}
+  .adv .people .col > :not(.big){grid-column:8/-1}
 }
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
 .people > *{min-width:0}
@@ -1410,7 +1419,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 @media (hover:hover) and (pointer:fine){.ss a:hover .t{background-size:100% 1px}}
 .tb .ss a[aria-current]{color:var(--fg)}
 .t-ss{container-type:inline-size}
-@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(3,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
+@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(4,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
 .t-dr time,.sn small{display:inline-block;max-width:100%}
 .sn{max-width:100%}
 .legal .totop{white-space:nowrap}
@@ -1419,6 +1428,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}
   .ss li:nth-child(4){margin-top:calc(12px + 1px + 10px + 13px * 1.4 + 4px)}}
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
+@media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}
 @media (min-width:360px) and (max-width:379px){.st{letter-spacing:.12em}}
 @media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}}
 .page.wide .wrap{max-width:var(--max)}

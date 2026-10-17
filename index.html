@@ -34,7 +34,7 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=4c3a3d94">
+<link rel="stylesheet" href="site.css?v=3adf1a42">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -42,10 +42,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=4c3a3d94" defer></script>
-<script src="model.js?v=4c3a3d94" defer></script>
-<script src="instrument.js?v=4c3a3d94" defer></script>
-<script src="tower3d.js?v=4c3a3d94" async fetchpriority="low"></script>
+<script src="site.js?v=3adf1a42" defer></script>
+<script src="model.js?v=3adf1a42" defer></script>
+<script src="instrument.js?v=3adf1a42" defer></script>
+<script src="tower3d.js?v=3adf1a42" async fetchpriority="low"></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -92,7 +92,7 @@ addEventListener('beforeprint',function(){finish(true)})})();
       <a href="#clients">Private clients</a>
       <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Markets<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><span class="mk-st" role="group" aria-labelledby="mkFl"><span class="mk-k" id="mkFl">Florida</span> <a href="south-florida.html">South Florida</a> <a href="tampa.html">Tampa</a> <a href="naples.html">Naples</a></span> <a href="new-york.html">New York</a> <span class="mk-st" role="group" aria-labelledby="mkCa"><span class="mk-k" id="mkCa">California</span> <a href="los-angeles.html">Los Angeles</a> <a href="san-francisco.html">San Francisco</a></span> <span class="mk-st" role="group" aria-labelledby="mkTx"><span class="mk-k" id="mkTx">Texas</span> <a href="dallas.html">Dallas</a> <a href="austin.html">Austin</a> <a href="houston.html">Houston</a></span></div></div>
       <a href="#journal">Journal</a>
-      <a class="dw" href="#people">Advisors</a>
+      <a class="dw" href="advisors.html">Advisors</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="tools">
@@ -419,24 +419,11 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
 </section>
 
 <section id="people">
-  <div class="wrap people">
-    <div class="head quiet">
+  <div class="wrap">
+    <div class="head quiet seat">
       <h2>A seat here is earned, <span class="nw">and re-earned.</span></h2>
       <p class="intro">No more than ten advisors per market at launch, never more than twenty. Each one owns a buyer segment and meets a written standard, reviewed every&nbsp;quarter.</p>
-    </div>
-    <figure class="table" data-draw aria-hidden="true">
-      <svg class="full" viewBox="0 0 1500 322" focusable="false"><path class="leaf" d="M430 48H174V120H430M1070 48H1326V120H1070"/><rect class="top" x="430" y="48" width="640" height="72"/><rect class="top in" x="434" y="52" width="632" height="64"/><path class="jt" d="M430 40V128M1070 40V128"/><g class="ch t" style="--k:14"><rect x="218" y="8" width="40" height="34"/><rect class="rl" x="218" y="8" width="40" height="4"/></g><g class="ch b" style="--k:16"><rect x="218" y="126" width="40" height="34"/><rect class="rl" x="218" y="156" width="40" height="4"/></g><g class="ch t" style="--k:10"><rect x="346" y="8" width="40" height="34"/><rect class="rl" x="346" y="8" width="40" height="4"/></g><g class="ch b" style="--k:12"><rect x="346" y="126" width="40" height="34"/><rect class="rl" x="346" y="156" width="40" height="4"/></g><g class="ch t on" style="--k:6"><rect x="474" y="8" width="40" height="34"/><rect class="rl" x="474" y="8" width="40" height="4"/></g><g class="ch b on" style="--k:8"><rect x="474" y="126" width="40" height="34"/><rect class="rl" x="474" y="156" width="40" height="4"/></g><g class="ch t on" style="--k:2"><rect x="602" y="8" width="40" height="34"/><rect class="rl" x="602" y="8" width="40" height="4"/></g><g class="ch b on" style="--k:4"><rect x="602" y="126" width="40" height="34"/><rect class="rl" x="602" y="156" width="40" height="4"/></g><g class="ch t on" style="--k:0"><rect x="730" y="8" width="40" height="34"/><rect class="rl" x="730" y="8" width="40" height="4"/></g><g class="ch b on" style="--k:1"><rect x="730" y="126" width="40" height="34"/><rect class="rl" x="730" y="156" width="40" height="4"/></g><g class="ch t on" style="--k:3"><rect x="858" y="8" width="40" height="34"/><rect class="rl" x="858" y="8" width="40" height="4"/></g><g class="ch b on" style="--k:5"><rect x="858" y="126" width="40" height="34"/><rect class="rl" x="858" y="156" width="40" height="4"/></g><g class="ch t on" style="--k:7"><rect x="986" y="8" width="40" height="34"/><rect class="rl" x="986" y="8" width="40" height="4"/></g><g class="ch b on" style="--k:9"><rect x="986" y="126" width="40" height="34"/><rect class="rl" x="986" y="156" width="40" height="4"/></g><g class="ch t" style="--k:11"><rect x="1114" y="8" width="40" height="34"/><rect class="rl" x="1114" y="8" width="40" height="4"/></g><g class="ch b" style="--k:13"><rect x="1114" y="126" width="40" height="34"/><rect class="rl" x="1114" y="156" width="40" height="4"/></g><g class="ch t" style="--k:15"><rect x="1242" y="8" width="40" height="34"/><rect class="rl" x="1242" y="8" width="40" height="4"/></g><g class="ch b" style="--k:17"><rect x="1242" y="126" width="40" height="34"/><rect class="rl" x="1242" y="156" width="40" height="4"/></g><g class="ch l" style="--k:18"><rect x="134" y="64" width="34" height="40"/><rect class="rl" x="134" y="64" width="4" height="40"/></g><g class="ch r" style="--k:19"><rect x="1332" y="64" width="34" height="40"/><rect class="rl" x="1362" y="64" width="4" height="40"/></g><g class="dim di"><path class="ex" d="M430 128V238M1070 128V238"/><path class="dl" d="M424 232H1076"/><path class="tk" d="M424 238l12 -12M1064 238l12 -12"/></g><g class="dim do"><path class="ex" d="M134 110V318M1366 110V318"/><path class="dl" d="M128 312H1372"/><path class="tk" d="M128 318l12 -12M1360 318l12 -12"/></g></svg>
-      <svg class="ph" viewBox="0 0 162 416" width="162" height="416" focusable="false"><path class="leaf" d="M57 113V37H105V113M57 303V379H105V303"/><rect class="top" x="57" y="113" width="48" height="190"/><rect class="top in" x="61" y="117" width="40" height="182"/><path class="jt" d="M49 113H113M49 303H113"/><g class="ch l" style="--k:14"><rect x="30" y="43" width="22" height="26"/><rect class="rl" x="30" y="43" width="3" height="26"/></g><g class="ch r" style="--k:16"><rect x="110" y="43" width="22" height="26"/><rect class="rl" x="129" y="43" width="3" height="26"/></g><g class="ch l" style="--k:10"><rect x="30" y="81" width="22" height="26"/><rect class="rl" x="30" y="81" width="3" height="26"/></g><g class="ch r" style="--k:12"><rect x="110" y="81" width="22" height="26"/><rect class="rl" x="129" y="81" width="3" height="26"/></g><g class="ch l on" style="--k:6"><rect x="30" y="119" width="22" height="26"/><rect class="rl" x="30" y="119" width="3" height="26"/></g><g class="ch r on" style="--k:8"><rect x="110" y="119" width="22" height="26"/><rect class="rl" x="129" y="119" width="3" height="26"/></g><g class="ch l on" style="--k:2"><rect x="30" y="157" width="22" height="26"/><rect class="rl" x="30" y="157" width="3" height="26"/></g><g class="ch r on" style="--k:4"><rect x="110" y="157" width="22" height="26"/><rect class="rl" x="129" y="157" width="3" height="26"/></g><g class="ch l on" style="--k:0"><rect x="30" y="195" width="22" height="26"/><rect class="rl" x="30" y="195" width="3" height="26"/></g><g class="ch r on" style="--k:1"><rect x="110" y="195" width="22" height="26"/><rect class="rl" x="129" y="195" width="3" height="26"/></g><g class="ch l on" style="--k:3"><rect x="30" y="233" width="22" height="26"/><rect class="rl" x="30" y="233" width="3" height="26"/></g><g class="ch r on" style="--k:5"><rect x="110" y="233" width="22" height="26"/><rect class="rl" x="129" y="233" width="3" height="26"/></g><g class="ch l on" style="--k:7"><rect x="30" y="271" width="22" height="26"/><rect class="rl" x="30" y="271" width="3" height="26"/></g><g class="ch r on" style="--k:9"><rect x="110" y="271" width="22" height="26"/><rect class="rl" x="129" y="271" width="3" height="26"/></g><g class="ch l" style="--k:11"><rect x="30" y="309" width="22" height="26"/><rect class="rl" x="30" y="309" width="3" height="26"/></g><g class="ch r" style="--k:13"><rect x="110" y="309" width="22" height="26"/><rect class="rl" x="129" y="309" width="3" height="26"/></g><g class="ch l" style="--k:15"><rect x="30" y="347" width="22" height="26"/><rect class="rl" x="30" y="347" width="3" height="26"/></g><g class="ch r" style="--k:17"><rect x="110" y="347" width="22" height="26"/><rect class="rl" x="129" y="347" width="3" height="26"/></g><g class="ch t" style="--k:18"><rect x="68" y="10" width="26" height="22"/><rect class="rl" x="68" y="10" width="26" height="3"/></g><g class="ch b" style="--k:19"><rect x="68" y="384" width="26" height="22"/><rect class="rl" x="68" y="403" width="26" height="3"/></g><g class="dim di"><path class="ex" d="M45 113H2M45 303H2"/><path class="dl" d="M8 107V309"/><path class="tk" d="M2 119l12 -12M2 309l12 -12"/></g><g class="dim do"><path class="ex" d="M100 10H160M100 406H160"/><path class="dl" d="M154 4V412"/><path class="tk" d="M148 16l12 -12M148 412l12 -12"/></g></svg>
-      <figcaption><span class="dm di"><b>10</b> seats per market at launch</span><span class="dm do"><b>20</b> at most, ever</span></figcaption>
-    </figure>
-    <div class="col" data-draw>
-      <p class="big">We don’t post openings. Advisors join by invitation or referral.</p>
-      <ul>
-        <li>A review of verified, closed production</li>
-        <li>An interview with both partners</li>
-        <li>A live sales plan for a real project</li>
-      </ul>
-      <p>If you are a top producer in your niche and would like an invitation, <a class="ul nw" href="#contact" data-as="adv">write to the partners</a>.</p>
+      <p class="links"><a class="more" href="advisors.html">How an advisor joins</a></p>
     </div>
   </div>
 </section>
@@ -530,8 +517,8 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
       <div class="t-of"><dt>Office</dt><dd>Miami, Florida</dd></div>
       <div class="t-dr"><dt>Drawn</dt><dd class="num">October 2026</dd></div>
       <div class="t-sc"><dt>Scale</dt><dd>Not to scale</dd></div>
-      <div class="t-sh"><dt>Sheet</dt><dd><span class="sn">01</span><span class="st dots"><span class="nw">Index</span> <span class="nw">of 06</span></span></dd></div>
-      <div class="t-wk"><dt>Work with us</dt><dd><ul><li><a href="#developers">Developers</a></li><li><a href="private-clients.html">Private clients<span class="vh"> page</span></a></li><li><a href="#people">Advisors</a></li></ul></dd></div>
+      <div class="t-sh"><dt>Sheet</dt><dd><span class="sn">01</span><span class="st dots"><span class="nw">Index</span> <span class="nw">of 07</span></span></dd></div>
+      <div class="t-wk"><dt>Work with us</dt><dd><ul><li><a href="#developers">Developers</a></li><li><a href="private-clients.html">Private clients<span class="vh"> page</span></a></li><li><a href="advisors.html">Advisors</a></li></ul></dd></div>
       <div class="t-ss"><dt>Sheets</dt><dd><ul class="ss">
         <li><a href="./" aria-current="page"><span class="n">01</span><span class="t">Index</span></a></li>
         <li><a href="journal/"><span class="n">02</span><span class="t">Journal</span></a></li>
@@ -539,6 +526,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
         <li><a href="privacy.html"><span class="n">04</span><span class="t">Privacy</span></a></li>
         <li><a href="private-clients.html"><span class="n">05</span><span class="t">Private clients</span></a></li>
         <li><a href="colophon.html"><span class="n">06</span><span class="t">Colophon</span></a></li>
+        <li><a href="advisors.html"><span class="n">07</span><span class="t">Advisors</span></a></li>
       </ul></dd></div>
       <div class="t-fo"><dt>Follow</dt><dd><ul>
         <li><a href="https://www.instagram.com/centamont" target="_blank" rel="noopener">Instagram<span class="vh"> (opens in a new tab)</span></a></li>
