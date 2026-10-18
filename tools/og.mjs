@@ -36,6 +36,20 @@ const CARDS = [
     ],
   },
   {
+    // the card the developer and markets pages share: the index card without its sheet line
+    base: 'og-site.png', out: { es: 'es/og-site.png', pt: 'pt/og-site.png' },
+    patches: [[70, 200, 885, 300, INK], [70, 532, 880, 34, INK]],
+    words: {
+      en: { head: ['The finest new buildings,', 'sold <em>with intent.</em>'], sub: 'New development and private client advisory' },
+      es: { head: ['Los mejores', 'edificios nuevos,', 'vendidos <em>con propósito.</em>'], sub: 'Asesoría en nuevos desarrollos y a clientes privados' },
+      pt: { head: ['Os melhores', 'edifícios novos,', 'vendidos <em>com propósito.</em>'], sub: 'Assessoria em lançamentos e a clientes privados' },
+    },
+    lines: (w) => [
+      ...w.head.map((t, i, a) => ({ t, x: 77, base: 492 - 94 * (a.length - 1 - i), size: 92, face: 'display', weight: 300, color: IVORY, em: BRONZE, ls: '-.02em', emw: 400, emls: '.015em', emml: '7px' })),
+      { t: w.sub, x: 80, base: 559, size: 22, face: 'body', weight: 400, color: '#CFC8BA', ls: '.14em', upper: true },
+    ],
+  },
+  {
     base: 'og-clients.jpg', out: { es: 'es/og-clientes-privados.jpg', pt: 'pt/og-clientes-privados.jpg' },
     patches: [[70, 180, 715, 316, INK], [70, 532, 715, 34, INK], [70, 598, 540, 24, INK]],
     words: {

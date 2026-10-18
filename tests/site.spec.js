@@ -1,6 +1,7 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
@@ -162,6 +163,7 @@ for (const [path, heading] of [
   ['/new-york.html', 'New York City'],
   ['/hamptons.html', 'The Hamptons'],
   ['/privacy.html', 'Privacy'],
+  ['/terms.html', 'Terms of use'],
   ['/404.html', 'This page was never built'],
 ]) {
   test(`${path} renders cleanly`, async ({ page }, info) => {
@@ -304,6 +306,28 @@ test('the intro waits for no one on a phone or a deep link', async ({ page }, in
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
+// Both buttons stand above the fold of the first screen, in every language (the Spanish and Portuguese lines run longer),
+// on phones and desktops alike, once the headline and its row have risen into place.
+test('the hero buttons stand above the fold', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'each window size is opened here, so one project covers them all');
+  test.setTimeout(120000);
+  for (const [width, height] of [[390, 844], [412, 915], [1024, 768], [1180, 820], [1280, 720], [1440, 900]]) {
+    const phone = width <= 820;
+    const ctx = await browser.newContext({ viewport: { width, height }, isMobile: phone, hasTouch: phone, baseURL: info.project.use.baseURL });
+    await ctx.addInitScript(() => sessionStorage.setItem('cm-intro', '1'));
+    const page = await ctx.newPage();
+    for (const path of ['/', '/es/', '/pt/']) {
+      await page.goto(path);
+      await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
+      const row = page.locator('.hero .row');
+      await row.evaluate((r) => Promise.all([r, ...r.parentElement.querySelectorAll('h1 .ln > span, .lede')].flatMap((e) => e.getAnimations()).map((a) => a.finished)));
+      const bottom = await row.evaluate((r) => Math.max(...[...r.querySelectorAll('.btn')].map((b) => b.getBoundingClientRect().bottom), r.getBoundingClientRect().bottom));
+      expect(bottom, `${path} at ${width}x${height}`).toBeLessThanOrEqual(height);
+    }
+    await ctx.close();
+  }
+});
+
 test('the drawings arrive and say what they show', async ({ page }) => {
   await page.goto('/');
   for (const sel of ['.doorway', '#chart', '#ruler']) {
@@ -391,6 +415,28 @@ test('only the home pages load the home styles', async ({}, info) => {
   }
 });
 
+// Every page loads site.css, then only the sheets its template uses: the practice's pages (the home pages, developers,
+// private clients, advisors, the markets hub, and their Spanish and Portuguese twins) practice.css, the market pages market.css, the reading pages (the journal,
+// the buyer guides, privacy, terms, the not-found page) reading.css, and the specimen sheets sheet.css. A new page has to be
+// placed in one of these, and every stylesheet a page names has to exist.
+test('each page loads site.css and its own template sheet, and nothing else', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const market = ['south-florida', 'new-york', 'hamptons', 'los-angeles', 'dallas', 'austin', 'houston', 'san-francisco', 'tampa', 'naples', 'orange-county', 'es/sur-de-florida', 'pt/sul-da-florida', 'es/nueva-york', 'pt/nova-york'].map((p) => p + '.html');
+  const practice = ['developers', 'private-clients', 'es/clientes-privados', 'pt/clientes-privados', 'advisors', 'markets', 'es/desarrolladores', 'pt/incorporadoras', 'es/mercados', 'pt/mercados'].map((p) => p + '.html');
+  const homes = ['index.html', 'es/index.html', 'pt/index.html'];
+  const sheets = ['report', 'planner', 'shortlist', 'project-site'].map((p) => p + '.html');
+  const reading = (p) => p.startsWith('journal/') || ['privacy.html', 'terms.html', '404.html'].includes(p) || /^(es|pt)\/comprar-/.test(p);
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const p of pages) {
+    const want = homes.includes(p) ? ['site.css', 'practice.css', 'home.css'] : practice.includes(p) ? ['site.css', 'practice.css'] : market.includes(p) ? ['site.css', 'market.css']
+      : sheets.includes(p) ? ['site.css', 'sheet.css'] : reading(p) ? ['site.css', 'reading.css'] : null;
+    expect(want, `${p} belongs to no template: place it in this test and link its sheet`).not.toBeNull();
+    const links = [...readFileSync(p, 'utf8').matchAll(/<link rel="stylesheet" href="([^"?]*)(?:\?[^"]*)?"/g)].map((m) => m[1]);
+    expect(links.map((h) => h.split('/').pop()), p).toEqual(want);
+    for (const h of links) expect(existsSync(h.startsWith('/') ? h.slice(1) : join(dirname(p), h)), `${p} links ${h}, which does not exist`).toBe(true);
+  }
+});
+
 // Each translated page and its English original name one another: in the header's language switch and in the head.
 test('translated pages and their originals link to one another', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
@@ -398,7 +444,9 @@ test('translated pages and their originals link to one another', async ({}, info
     ['south-florida.html', 'es/sur-de-florida.html', 'pt/sul-da-florida.html'],
     ['new-york.html', 'es/nueva-york.html', 'pt/nova-york.html'],
     ['journal/buying-pre-construction-florida.html', 'es/comprar-preconstruccion-florida.html', 'pt/comprar-na-planta-florida.html'],
-    ['journal/buying-new-construction-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-imovel-novo-florida.html']];
+    ['journal/buying-new-construction-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-imovel-novo-florida.html'],
+    ['developers.html', 'es/desarrolladores.html', 'pt/incorporadoras.html'],
+    ['markets.html', 'es/mercados.html', 'pt/mercados.html']];
   for (const set of sets) for (const p of set) {
     const html = readFileSync(p, 'utf8');
     const lang = (html.match(/<nav class="lang"[\s\S]*?<\/nav>/) || [''])[0];
@@ -518,6 +566,32 @@ test('the letter copies and opens Instagram without a clipboard permission', asy
   }
 });
 
+// The Spanish and Portuguese developer pages write the developer's letter in their own language, reminder included.
+test('the developer letter composes in Spanish and Portuguese', async ({ page, context, browserName }) => {
+  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
+  page.on('popup', (p) => p.close().catch(() => {}));
+  for (const [path, ask, copied, letter] of [
+    ['/es/desarrolladores.html', 'Complete primero su nombre', 'Su carta está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development'],
+    ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'Sua carta foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development']]) {
+    await page.goto(path);
+    await page.locator('#letter').scrollIntoViewIfNeeded();
+    await expect(page.locator('#letter fieldset.as')).toBeHidden();
+    await page.locator('#letter input[name="where"]').fill('Edgewater');
+    await page.locator('#letter input[name="units"]').fill('60');
+    await page.locator('#letter input[name="company"]').fill('Ruiz Development');
+    await page.locator('#letter button[data-to="ig"]').click();
+    await expect(page.locator('#letterNote')).toContainText(ask);
+    await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+    await page.locator('#letter button[data-to="ig"]').click();
+    await expect(page.locator('#letterNote')).toContainText('Instagram');
+    if (browserName === 'chromium') {
+      await expect(page.locator('#letterNote')).toContainText(copied);
+      await context.grantPermissions(['clipboard-read']);
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(letter);
+    }
+  }
+});
+
 // The private-clients page writes its own letter, already set to a buyer, without the sales curve beside it.
 test('the buyer letter on private clients composes and copies', async ({ page, context, browserName }) => {
   await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
@@ -541,7 +615,9 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
 // Editing an inline script without updating that page's hash would silently switch it off.
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
-  const pages = ['/', '/privacy.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html',
+  // some fifty pages, each loaded and scrolled, so the walk gets more than the default half minute
+  test.setTimeout(120000);
+  const pages = ['/', '/privacy.html', '/terms.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
     '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html', '/journal/deposit-escrow-for-new-condominiums.html', '/journal/reading-the-pace-of-sales.html', '/journal/working-with-outside-brokers.html', '/journal/releasing-inventory-in-a-new-building.html'];
@@ -582,29 +658,29 @@ test('the report bars draw on a short phone screen', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.rp-funnel .bar i, .rp-src .bar i')].every((i) => getComputedStyle(i).transform === 'none'))).toBe(true);
 });
 
-// The stylesheet is written, with its notes, in _src/site.css; tools/version.py builds the site.css pages load without them.
-// A hand edit to site.css, or a source change without a rebuild, would ship styles that differ from the source.
+// The stylesheets and shared scripts are written, with their notes, in _src/; tools/version.py builds the copies pages load
+// without them. A hand edit to a built file, or a source change without a rebuild, would ship what differs from the source.
 test('the stylesheet is built from its source', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   let out = '';
   try { execFileSync('python3', ['tools/version.py', '--check'], { encoding: 'utf8' }); }
   catch (e) { out = String(e.stdout || e.message); }
-  expect(out, 'site.css or a ?v= token is stale: run python3 tools/version.py').toBe('');
+  expect(out, 'a built stylesheet or script, or a ?v= token, is stale: run python3 tools/version.py').toBe('');
 });
 
 // Stylesheet and scripts are linked with one shared ?v= token taken from their contents (tools/version.py), so a
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
@@ -616,7 +692,7 @@ test('assets carry the current version', async ({}, info) => {
 // points at it by url(#id) takes the wrong one.
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   for (const p of pages) {
     const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
@@ -787,6 +863,7 @@ test.describe('every page in the sitemap', () => {
 
   test('every internal link on every page lands on a real page and section', async ({ page, request }, info) => {
     test.skip(info.project.name !== 'desktop', 'the same links on every device, so once');
+    test.setTimeout(90000);
     const bodies = new Map();
     const get = async (p) => { if (!bodies.has(p)) { const r = await request.get(p); bodies.set(p, [r.status(), await r.text()]); } return bodies.get(p); };
     for (const path of pages) {
@@ -854,7 +931,7 @@ test.describe('every page in the sitemap', () => {
 // The developer and markets pages set their sections as ruled rows; a stylesheet change that drops those rules would
 // leave them as bare stacked text, so the grid itself is checked.
 test('the developer and markets pages keep their ruled rows', async ({ page }) => {
-  for (const path of ['/developers.html', '/markets.html']) {
+  for (const path of ['/developers.html', '/markets.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html']) {
     await page.goto(path);
     await expect(page.locator('.co-row').first()).toHaveCSS('display', 'grid');
   }
