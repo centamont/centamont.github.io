@@ -272,6 +272,40 @@
     addEventListener('scroll', end, { passive: true }); addEventListener('resize', end); end();
   }
 
+  // On a wide screen a reading page (a market, a journal note, the privacy page) keeps its sections in the left margin:
+  // a short list that stays in view, the section being read marked (site.css, .toc, shown from 1320px). It is built
+  // from the page's own headings, so a page with fewer than three has none.
+  const page = document.querySelector('main.page:not(.wide) > .wrap'), heads = page ? [...page.querySelectorAll('h2')] : [];
+  if (heads.length >= 3) {
+    const lang = (root.lang || 'en').slice(0, 2), slug = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const toc = document.createElement('nav'), box = document.createElement('div'), list = document.createElement('ol'), links = new Map();
+    toc.className = 'toc';
+    toc.setAttribute('aria-label', { es: 'En esta página', pt: 'Nesta página' }[lang] || 'On this page');
+    const k = document.createElement('p');
+    k.className = 'toc-k'; k.setAttribute('aria-hidden', 'true'); k.textContent = toc.getAttribute('aria-label');
+    box.appendChild(k);
+    heads.forEach((h) => {
+      if (!h.id) { let id = slug(h.textContent), n = 2; while (document.getElementById(id)) id = slug(h.textContent) + '-' + n++; h.id = id; }
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = '#' + h.id; a.textContent = h.textContent.replace(/\s+/g, ' ').trim();
+      li.appendChild(a); list.appendChild(li); links.set(h, a);
+    });
+    box.appendChild(list); toc.appendChild(box);
+    page.prepend(toc);
+    // it starts level with the first section, below the page's opening film
+    const place = () => toc.style.setProperty('--toc-top', Math.round(heads[0].getBoundingClientRect().top - page.getBoundingClientRect().top) + 'px');
+    place(); addEventListener('resize', place); addEventListener('load', place); if (document.fonts) document.fonts.ready.then(place);
+    // the section being read: the last heading above the upper third of the screen
+    const mark = () => {
+      let at = heads[0];
+      for (const h of heads) if (h.getBoundingClientRect().top < innerHeight / 3) at = h;
+      links.forEach((a, h) => { if (h === at) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    };
+    let queued = false;
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); }); } }, { passive: true });
+    mark();
+  }
+
   // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
   // the crack draws, and once the foot of the band is in view it splits and parts onto Contact.
   // With motion off, everything is shown struck and parted.

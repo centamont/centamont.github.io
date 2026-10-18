@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const done = r.s[r.C], xd = x(r.C), yd = y(done), yt = y(1);
       const sl = (yy) => `M${xd - 4} ${yy + 4} L${xd + 4} ${yy - 4}`, room = 1 - done >= 0.03 && yd - yt > 18;
       const dl = room ? el('path', { class: 'cv-dim', d: `M${xd} ${yd - 6} L${xd} ${yt} ${sl(yt)} ${sl(yd - 6)}` }, svg) : null;
-      el('circle', { class: 'cv-ring', r: 3.5, cx: xd, cy: yd }, svg);
+      el('circle', { class: 'cv-dimr', r: 3.5, cx: xd, cy: yd }, svg);
       if (room) {
         const t = el('text', { class: 'cv-dimt' }, svg, Math.round((1 - done) * 100) + '% for sale'), ym = (yd + yt) / 2 + 5;
         // (a dimension with no room for its figure is left out)
