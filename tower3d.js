@@ -826,8 +826,9 @@ void main() {
     }
     const az = Math.atan2(k.s, k.c), tw = TAU * f * 0.9, rh = Math.min(D, 0.55 * f);
     let x0 = k.cx - ((az / TAU) % 1 + 1) % 1 * tw - tw;
-    // (on a wide hero the left half carries the headline and its lede: the swell stays out from under them)
-    const ra = alpha * (0.24 + 0.12 * S.day - 0.1 * S.night), xl = w > 820 ? 0.46 * w : 0;
+    // (on a wide hero the left half carries the headline and its lede: the swell stays out from under them; under the
+    // photograph, whose own bay carries its swell, the drawn water beside it lies still, sa being how far it has come in)
+    const still = 1 - (m.sa || 0), ra = alpha * still * (0.24 + 0.12 * S.day - 0.1 * S.night), xl = w > 820 ? 0.46 * w : 0;
     const bands = xl ? Array.from({ length: 9 }, (_, i) => [(i + 1) / 9, xl + (i * 0.14 * w) / 8, i < 8 ? xl + ((i + 1) * 0.14 * w) / 8 : w]) : [[1, 0, w]];
     for (const [a0, xa, xb] of bands) {
       g.save(); g.beginPath(); g.rect(xa, cy, xb - xa, rh); g.clip(); g.globalAlpha = ra * a0;
@@ -840,7 +841,7 @@ void main() {
     if (Z > 0.05 && glow > 0.02) {
       const sx = k.cx + (f * X) / Z, cw = (0.03 + 0.08 * (1 - sv[1] / sl)) * f;
       g.save(); g.beginPath(); g.rect(sx - cw, cy, 2 * cw, rh); g.clip();
-      g.globalAlpha = alpha * glow;
+      g.globalAlpha = alpha * still * glow;
       for (let x = x0; x < w; x += tw) if (x + tw > 0) g.drawImage(ripTint, x, cy, tw, rh);
       g.restore();
       const cg = g.createRadialGradient(sx, cy, 0, sx, cy, cw * 2.2);

@@ -1377,10 +1377,11 @@
       // Construction lines: a draughtsman's pencil guides, laid down before the ink and left faintly behind it. The datum
       // lines run level from the ruler's numbered ticks (L05, L10, L15, L20 and the roof) across the drawing, so each
       // passes through its tick; the verticals mark the tower's width.
+      // (Under the photograph, which is no drawing, they go as it comes in.)
       const DATUM = [...Array.from({ length: Math.floor(FLOORS / 5) }, (_, i) => 4 + 5 * i), FLOORS], xg = clamp(sx(8), 12, w - 12); // (ending inside the canvas on a narrow drawing)
-      if (this.o.guides && this.drawnAt && !inLens && ruler) {
+      if (this.o.guides && this.drawnAt && !inLens && ruler && this.sa < 1) {
         const age = reduce ? 9 : (now - this.drawnAt) / 1000;
-        const a = (dark ? 0.3 : 0.26) * (age < 2.5 ? 1 : Math.max(0.35, 1 - (age - 2.5) / 3));
+        const a = (1 - this.sa) * (dark ? 0.3 : 0.26) * (age < 2.5 ? 1 : Math.max(0.35, 1 - (age - 2.5) / 3));
         g.strokeStyle = ink(a); g.lineWidth = 0.5; g.beginPath();
         const lines = DATUM.map((i) => [[xt, ys[i]], [xg, ys[i]]]);
         for (const X of [-6.6, -3.7, 3.7, 6.6]) lines.push([this.P(kc * X, -1.5, -ks * X), this.P(kc * X, FLOORS + 4, -ks * X)]);
@@ -2103,6 +2104,11 @@
       // floor L34, and the roof above it is named. Every fifth level is numbered, with a longer tick.
       const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
       // the levels' names: [name, x, y, strength]
+      // (over the photograph, the line itself stops at the lowest numbered level above the horizon, rather than running on
+      // down through its palms: yb is where it ends, and no tick is drawn below it)
+      let iLo = 0;
+      if (this.sa > 0) { iLo = FLOORS; for (let i = 0; i <= FLOORS; i++) if (named(i) && ys[i] <= this.k.cy - 6) { iLo = i; break; } }
+      const yb = ys[0] + (ys[iLo] - ys[0]) * this.sa, on = (i) => ys[i] <= yb + 0.5;
       const labs = [];
       if (this.o.labels && w > 280) {
         g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif';
@@ -2133,8 +2139,8 @@
           g.save(); g.beginPath();
           for (const p of near) { g.moveTo(p[0][0], p[0][1]); for (let j = 1; j < p.length; j++) g.lineTo(p[j][0], p[j][1]); g.closePath(); }
           g.clip();
-          g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 4.5; g.beginPath(); g.moveTo(xa, ys[0]); g.lineTo(xa, ys[FLOORS]);
-          for (let i = 0; i <= FLOORS; i++) { g.moveTo(xa, ys[i]); g.lineTo(named(i) ? xt : (xa + xt) / 2, ys[i]); }
+          g.strokeStyle = `rgb(${br},${bgg},${bb})`; g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 4.5; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
+          for (let i = 0; i <= FLOORS; i++) if (on(i)) { g.moveTo(xa, ys[i]); g.lineTo(named(i) ? xt : (xa + xt) / 2, ys[i]); }
           g.stroke();
           if (labs.length) {
             g.lineWidth = 5; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
@@ -2152,12 +2158,12 @@
         for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a; g.strokeText(t, x, y); }
         g.restore();
       }
-      g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, ys[0]); g.lineTo(xa, ys[FLOORS]);
-      for (let i = 0; i <= FLOORS; i++) if (named(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
+      g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
+      for (let i = 0; i <= FLOORS; i++) if (named(i) && on(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
       g.stroke();
       // a short tick at every level between the numbered ones
       g.strokeStyle = bronze(0.4 * ra); g.lineWidth = 0.6; g.beginPath();
-      for (let i = 1; i < FLOORS; i++) if (!named(i)) { g.moveTo(xa, ys[i]); g.lineTo((xa + xt) / 2, ys[i]); }
+      for (let i = 1; i < FLOORS; i++) if (!named(i) && on(i)) { g.moveTo(xa, ys[i]); g.lineTo((xa + xt) / 2, ys[i]); }
       g.stroke();
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
