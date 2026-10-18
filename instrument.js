@@ -25,7 +25,8 @@ const cmWords = ({
     figure: (say, marks) => 'Curva de ventas ilustrativa. ' + say + ' Bajo contrato: ' + marks + '.',
     heard: (m, n) => 'Mes ' + m + ', ' + n + ' por ciento bajo contrato.',
     salute: 'Estimados socios:', sign: 'Saludos cordiales,',
-    asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre' },
+    asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
+    of: ', de ', plan: 'Mi plan: ',
     ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
     copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente.'],
     notCopied: ['Su navegador no permitió copiar. Copie la carta de abajo y péguela en el mensaje de ', '.'],
@@ -46,7 +47,8 @@ const cmWords = ({
     figure: (say, marks) => 'Curva de vendas ilustrativa. ' + say + ' Sob contrato: ' + marks + '.',
     heard: (m, n) => 'Mês ' + m + ', ' + n + ' por cento sob contrato.',
     salute: 'Prezados sócios,', sign: 'Atenciosamente,',
-    asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome' },
+    asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
+    of: ', ', plan: 'Meu plano: ',
     ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
     copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente.'],
     notCopied: ['Seu navegador não permitiu a cópia. Copie a carta abaixo e cole-a na mensagem do ', '.'],
@@ -635,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (planUrl && devp) {
       const r = document.createElement('span'), a = document.createElement('a');
       r.className = 'plan-ref'; a.className = 'ul'; a.href = planUrl; a.textContent = planUrl.replace(/^https:\/\//, '');
-      r.append('My plan: ', a); devp.append(' ', r);
+      r.append(cmSay('plan', 'My plan: '), a); devp.append(' ', r);
     }
     document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
     // Enter in a blank should not send the letter
@@ -660,8 +662,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // a dropped clause takes its sentence's full stop with it, so put one back
       let body = c.textContent.replace(/\s+/g, ' ').trim();
       if (!/[.!?…]$/.test(body)) body += '.';
-      const plan = p.querySelector('.plan-ref') ? '\n\nMy plan: ' + planUrl : '';
-      return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? ' of ' + of : '');
+      const plan = p.querySelector('.plan-ref') ? '\n\n' + cmSay('plan', 'My plan: ') + planUrl : '';
+      return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? cmSay('of', ' of ') + of : '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
     // The status note is built from text and, where it names Instagram, one link: nothing is ever parsed as HTML.
