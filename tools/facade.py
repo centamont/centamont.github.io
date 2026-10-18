@@ -10,10 +10,11 @@ bronze line. Every stroked path draws itself in order of its --i.
   I   Development advisory: a typical floor of a residential building on the drafting sheet, before the design is
       final: cut walls, a core, five residences of three sizes, windows, balconies, door swings, a dimension string, a
       north point and a scale bar. The corner residence is priced, in bronze.
-  II  Sales & marketing: the building in elevation, from its sales gallery on the ground to its crown, floor by floor,
-      with a level rule beside it; the floors already sold fill in bronze from the ground up.
+  II  Sales & marketing: the building in elevation, from the arcade of its sales gallery to its open crown, slab by
+      slab, with three terraced set-backs and a level rule beside it; the floors already sold fill in bronze from the
+      ground up.
   III Private client advisory: a door in a rusticated stone front, under an arch of voussoirs and a keystone, between
-      two clipped trees, with the right leaf ajar and the light inside falling across the steps.
+      two tall barred windows, with the right leaf ajar and the light inside falling across the steps.
 """
 import math
 import re
@@ -188,50 +189,61 @@ def plan():
 def tower():
     p = Pen()
     G = 296.5                                       # the facade's ground line
-    PX0, PX1, PY = 510.5, 690.5, 254.5              # the podium, with the sales gallery
-    SX0, SX1 = 566.5, 634.5                         # the shaft
-    UX0, UX1, UY = 572.5, 628.5, 116.5              # the set-back upper floors, from UY up
-    TOP = 98.5                                      # the roof of the floors
+    PX0, PX1, PY = 520.5, 680.5, 252.5              # the podium: an arcade of five bays, the sales gallery behind it
+    SX0, SX1 = 568.5, 632.5                         # the shaft
     FH = 6                                          # floor to floor
-    floors = list(range(int(PY), int(TOP), -FH))    # the floor lines, ground up
-    sold = 17                                       # floors sold
-    # the silhouette in the profile pen
-    sil = (f'M{n(PX0)} {n(G)}V{n(PY)}H{n(SX0)}V{n(UY)}H{n(UX0)}V{n(TOP)}H{n(UX1)}V{n(UY)}H{n(SX1)}'
-           f'V{n(PY)}H{n(PX1)}V{n(G)}')
+    # three set-backs near the top, each a terrace; then the crown, an open lantern of fins over the last floor
+    steps = [(140.5, 4), (122.5, 8), (106.5, 13)]   # (height where the set-back starts, inset each side)
+    TOP = 94.5
+    floors = list(range(int(PY), int(TOP), -FH))
+    sold = 17
+    def edges(y):
+        inset = 0
+        for h, i in steps:
+            if y <= h:
+                inset = i
+        return SX0 + inset, SX1 - inset
+    # the silhouette in the profile pen: podium, shaft, three set-backs, the last floor
+    sil = f'M{n(PX0)} {n(G)}V{n(PY)}H{n(SX0)}'
+    prev = 0
+    for h, i in steps:
+        sil += f'V{n(h)}H{n(SX0 + i)}'
+    sil += f'V{n(TOP)}H{n(SX1 - steps[-1][1])}'
+    for h, i in reversed(steps):
+        nxt = [st for st in steps if st[0] > h]
+        sil += f'V{n(h)}H{n(SX1 - (nxt[-1][1] if nxt else 0))}'
+    sil += f'V{n(PY)}H{n(PX1)}V{n(G)}'
     p.path(sil, 'pf')
-    # the floors sold, in bronze, from the ground up (the light under the lines)
+    # the floors sold, in bronze, from the ground up
     sy = PY - sold * FH
     p.fill(rect(SX0, sy, SX1 - SX0, PY - sy), 'b')
-    # the floor lines
+    # slab edges, one a floor, carried a little past the glass as balconies; the terraces' rails at each set-back
     fl = []
     for y in floors[1:]:
-        x0, x1 = (SX0, SX1) if y > UY else (UX0, UX1)
-        fl.append(hline(x0, x1, y + .5 - .5))
+        x0, x1 = edges(y)
+        fl.append(hline(x0 - 2.5, x1 + 2.5, y))
+    for h, i in steps:
+        fl.append(hline(SX0 + i - 4, SX0 + i, h - 3) + hline(SX1 - i, SX1 - i + 4, h - 3))
     p.path(''.join(fl), 'dt')
-    # the mullions: the shaft's bays, closer on the set-back floors
-    mu = []
-    for k in range(1, 5):
-        x = SX0 + k * (SX1 - SX0) / 5
-        mu.append(vline(x, UY, PY))
-    for k in range(1, 4):
-        x = UX0 + k * (UX1 - UX0) / 4
-        mu.append(vline(x, TOP, UY))
-    p.path(''.join(mu), 'dt')
-    # the crown: a mechanical screen, then a fin and its mast
-    crown = [rect(582.5, 84.5, 36, 12)] + [vline(x + .5, 84.5, 96.5) for x in range(588, 616, 6)]
-    crown += [rect(594.5, 74.5, 12, 10), vline(600.5, 63.5, 74.5)]
-    p.path(''.join(crown))
-    # a balcony edge on each corner of the shaft, every other floor
-    bal = []
-    for y in floors[1:]:
-        if y > UY:
-            bal += [hline(SX0 - 6, SX0, y), hline(SX1, SX1 + 6, y)]
-    p.path(''.join(bal), 'dt')
-    # the podium: the sales gallery's glass, its canopy and doors
-    gal = [hline(PX0, PX1, 262.5), rect(502.5, 258.5, 196, 4)]
-    for x in range(522, 684, 16):
-        gal.append(vline(x + .5, 262.5, G))
-    gal += [rect(588.5, 272.5, 24, 24), vline(600.5, 272.5, G)]
+    # the glass reads between the slabs; two fins divide the shaft in thirds and run up to the first set-back
+    fins = [vline(SX0 + (SX1 - SX0) / 3, steps[0][0], PY), vline(SX1 - (SX1 - SX0) / 3, steps[0][0], PY)]
+    p.path(''.join(fins))
+    # the crown: an open lantern, its fins rising past the roof and bound by a thin ring at the top
+    cx0, cx1 = SX0 + steps[-1][1], SX1 - steps[-1][1]
+    cr = [hline(cx0, cx1, TOP - 18), hline(cx0, cx1, TOP - 15)]
+    for k in range(0, 7):
+        x = cx0 + k * (cx1 - cx0) / 6
+        cr.append(vline(x, TOP, TOP - 22 + (2 if k in (0, 6) else 0)))
+    p.path(''.join(cr))
+    # the podium: an arcade of five arched bays, the gallery's glass and doors behind the middle one
+    gal = [hline(PX0, PX1, PY + 6)]
+    bw = (PX1 - PX0) / 5
+    for k in range(5):
+        x0 = PX0 + k * bw + 5
+        x1 = x0 + bw - 10
+        r = (x1 - x0) / 2
+        gal.append(f'M{n(x0)} {n(G)}V{n(268.5)}A{n(r)} {n(r)} 0 0 1 {n(x1)} {n(268.5)}V{n(G)}')
+    gal += [vline(600.5, 272.5, G), hline(PX0 + 2 * bw + 5, PX0 + 3 * bw - 5, 272.5)]
     p.path(''.join(gal))
     # the level rule beside the tower: a tick a floor, longer every fifth, a bronze bracket over the floors sold
     lr = [vline(664.5, TOP, PY - 2)]
@@ -241,11 +253,6 @@ def tower():
         lr.append(hline(664.5, 664.5 + (8 if k % 5 == 0 else 4), y))
     p.path(''.join(lr), 'dt')
     p.path(f'M655.5 {n(PY)}H659.5V{n(sy)}H655.5', 'br')
-    # people and trees at the gallery, for scale
-    fig = []
-    for x in (548.5, 636.5, 644.5):
-        fig += [circle(x, 285, 1.6), vline(x, 287, G - 1)]
-    p.path(''.join(fig), 'dt')
     return p.out
 
 
@@ -294,8 +301,8 @@ def door():
                 inside = dy < RO + 3 and abs(x - CX) < math.sqrt(max((RO + 3) ** 2 - dy ** 2, 0))
             else:
                 inside = abs(x - CX) < jamb + 3
-            # keep the trees clear
-            if ymid > 236 and (abs(x - 900.5) < 18 or abs(x - 1084.5) < 18):
+            # keep the windows clear
+            if 196 < ymid < 286 and (abs(x - 906.5) < 22 or abs(x - 1078.5) < 22):
                 inside = True
             if not inside:
                 cr.append(vline(x, y0, y1))
@@ -344,12 +351,22 @@ def door():
     for top, hw in STEP:
         st.append(f'M{n(CX - hw)} {n(G)}V{n(top)}H{n(CX + hw)}V{n(G)}')
     p.path(''.join(st))
-    # clipped trees in stone planters, either side of the door
+    # a tall window either side of the door: a stone surround with a flat arch and keystone, a sill on brackets, the
+    # sashes and their glazing bars, and an iron guard across the lower lights
     tr = []
-    for cx in (900.5, 1084.5):
-        tr += [rect(cx - 11, 278.5, 22, 18), hline(cx - 13, cx + 13, 278.5), vline(cx, 262.5, 278.5),
-               circle(cx, 248.5, 14), arc(cx, 248.5, 9, 140, 60)]
-    p.path(''.join(tr))
+    for cx in (906.5, 1078.5):
+        x0, x1, y0, y1 = cx - 14, cx + 14, 206.5, 270.5
+        tr += [rect(x0, y0, 28, y1 - y0), rect(x0 - 4, y0 - 4, 36, y1 - y0 + 4)]
+        tr += [f'M{n(x0 - 6)} {n(y0 - 4)}L{n(x0 - 2)} {n(y0 - 12)}H{n(x1 + 2)}L{n(x1 + 6)} {n(y0 - 4)}',
+               f'M{n(cx - 4)} {n(y0 - 12)}L{n(cx - 3)} {n(y0 - 2)}H{n(cx + 3)}L{n(cx + 4)} {n(y0 - 12)}']
+        tr += [rect(x0 - 7, y1, 42, 3), rect(x0 - 2, y1 + 3, 4, 4), rect(x1 - 2, y1 + 3, 4, 4)]
+        p.path(''.join(tr)); tr = []
+        gb = [hline(x0, x1, (y0 + y1) / 2), vline(cx, y0, y1)]
+        for k in (1, 2):
+            gb.append(hline(x0, x1, y0 + k * (y1 - y0) / 6))
+            gb.append(hline(x0, x1, (y0 + y1) / 2 + k * (y1 - y0) / 6))
+        gb += [hline(x0 - 2, x1 + 2, 252.5)] + [vline(x, 252.5, y1) for x in (x0 + 4, x0 + 9, x0 + 14, x1 - 9, x1 - 4)]
+        p.path(''.join(gb), 'dt')
     # lanterns on the stone, either side of the arch
     ln = []
     for cx in (CX - 76, CX + 76):
@@ -378,13 +395,26 @@ def build():
     return '\n        '.join(groups)
 
 
+def entablature():
+    """Over the bays, an entablature in the classical order: a two-fascia architrave on the frame, a frieze of dentils, a
+    projecting cornice with its crown moulding, and an attic panelled to the three bays."""
+    d = ['M8 44.5H1192M8 42.5H1192', 'M0 34.5H1200V28.5H0Z', 'M2 26.5H1198', 'M40 26.5V16.5H1160V26.5', 'M40 18.5H1160']
+    dt = [''.join(f'M{x} 40.5h4v-6h-4Z' for x in range(12, 1190, 8))]
+    dt += [f'M{x} 18.5V26.5' for x in (400, 800)] + [rect(x, 20.5, w, 4) for x, w in ((48, 344), (408, 384), (808, 344))]
+    return (f'<path class="ent" style="--i:2" pathLength="1" d="{"".join(d)}"/>'
+            f'<path class="ent dt" style="--i:3" pathLength="1" d="{"".join(dt)}"/>')
+
+
 if __name__ == '__main__':
-    page = ROOT / 'index.html'
-    s = page.read_text()
-    a = s.index('<svg class="facade"')
-    b = s.index('</svg>', a)
-    head = s[a:b]
-    g = head.index('<g')
-    s = s[:a] + head[:g] + build() + '\n      ' + s[b:]
-    page.write_text(s)
-    print('facade bays written')
+    for name in ('index.html', 'es/index.html', 'pt/index.html'):
+        page = ROOT / name
+        s = page.read_text()
+        a = s.index('<svg class="facade"')
+        b = s.index('</svg>', a)
+        head = s[a:b]
+        head = re.sub(r'<path style="--i:2" pathLength="1" d="M0 38\.5H1200V30\.5H0ZM40 30\.5V22\.5H1160V30\.5"/>', entablature(), head)
+        head = re.sub(r'<path class="ent".*?/>(?:<path class="ent dt".*?/>)?', lambda m: entablature(), head, count=1)
+        g = head.index('<g')
+        s = s[:a] + head[:g] + build() + '\n      ' + s[b:]
+        page.write_text(s)
+        print(name, 'facade bays written')
