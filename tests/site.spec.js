@@ -305,6 +305,28 @@ test('the intro waits for no one on a phone or a deep link', async ({ page }, in
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
+// Both buttons stand above the fold of the first screen, in every language (the Spanish and Portuguese lines run longer),
+// on phones and desktops alike, once the headline and its row have risen into place.
+test('the hero buttons stand above the fold', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'each window size is opened here, so one project covers them all');
+  test.setTimeout(120000);
+  for (const [width, height] of [[390, 844], [412, 915], [1024, 768], [1180, 820], [1280, 720], [1440, 900]]) {
+    const phone = width <= 820;
+    const ctx = await browser.newContext({ viewport: { width, height }, isMobile: phone, hasTouch: phone, baseURL: info.project.use.baseURL });
+    await ctx.addInitScript(() => sessionStorage.setItem('cm-intro', '1'));
+    const page = await ctx.newPage();
+    for (const path of ['/', '/es/', '/pt/']) {
+      await page.goto(path);
+      await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
+      const row = page.locator('.hero .row');
+      await row.evaluate((r) => Promise.all([r, ...r.parentElement.querySelectorAll('h1 .ln > span, .lede')].flatMap((e) => e.getAnimations()).map((a) => a.finished)));
+      const bottom = await row.evaluate((r) => Math.max(...[...r.querySelectorAll('.btn')].map((b) => b.getBoundingClientRect().bottom), r.getBoundingClientRect().bottom));
+      expect(bottom, `${path} at ${width}x${height}`).toBeLessThanOrEqual(height);
+    }
+    await ctx.close();
+  }
+});
+
 test('the drawings arrive and say what they show', async ({ page }) => {
   await page.goto('/');
   for (const sel of ['.doorway', '#chart', '#ruler']) {
