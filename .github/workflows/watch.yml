@@ -1,0 +1,23 @@
+name: Site watch
+on:
+  schedule:
+    - cron: '17 11 * * *'
+  workflow_dispatch:
+  push:
+    # a change to the watch itself runs it once, so it is proven before it reaches main
+    paths: [ 'tools/watch.py', '.github/workflows/watch.yml' ]
+permissions:
+  contents: read
+jobs:
+  watch:
+    # Compares the live site with main and checks the domain's records; tools/watch.py says what each check covers.
+    # It is not a required check: a failed run emails the account instead of blocking a merge.
+    name: Site watch
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Fetch main
+      run: git fetch --depth=1 origin main
+    - name: Watch
+      run: python3 tools/watch.py

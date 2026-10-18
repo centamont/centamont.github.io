@@ -28,8 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // a plan opened from a link takes its values from the address
   const q = new URLSearchParams(location.search);
   for (const n in S) { const v = q.get(S[n].k); if (v != null && v !== '' && isFinite(v)) R[n].value = Math.min(+R[n].max, Math.max(+R[n].min, +v)); }
-  if (q.get('n')) name.value = q.get('n').slice(0, 60);
-  if (q.get('w')) where.value = q.get('w').slice(0, 60);
+  // a name or a neighborhood from a link: plain words only, never an address, number or message someone else wrote
+  const plain = (v) => /^[\p{L}\p{M}\p{N} .,'’&()/-]{1,60}$/u.test(v) && !/\d{5,}|(\D*\d){7}|[\p{L}\p{N}-]\.\p{L}{2,}/u.test(v);
+  if (plain(q.get('n') || '')) name.value = q.get('n');
+  if (plain(q.get('w') || '')) where.value = q.get('w');
   const now = new Date(), next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
   start.value = /^\d{4}-\d{2}$/.test(q.get('s') || '') ? q.get('s') : iso(next);
