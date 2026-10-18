@@ -677,10 +677,14 @@ void main() {
   }
   // (drawn straight onto the drawing, each time it draws: a few broad fills, which a graphics chip lays down in a blink,
   // and none of them over the whole canvas twice)
-  function backdrop(g, m, alpha) {
-    g.save(); g.globalAlpha = alpha; paint(g, m, m.w, m.h); g.restore();
+  // (o, under the hero's photograph: o.fill lays the broad fills on the canvas even once faded in, rather than as its
+  // CSS background, so light can be added over them (see glow); o.cut [x0, x1, k] lifts the skyline out by k (0 to 1)
+  // from x0 on, fully from x1, where the photograph has its own far city)
+  function backdrop(g, m, alpha, o) {
+    g.save(); g.globalAlpha = alpha; paint(g, m, m.w, m.h, o || {}); g.restore();
   }
-  function paint(g, m, w, h) {
+  function paint(g, m, w, h, o) {
+    const fill = !!o.fill, cut = o.cut;
     const k = m.k, S = sky(m), f = k.f, cy = k.cy, { zen, hor, mid, ink } = S, alpha = g.globalAlpha;
     // The sky, from about 40 degrees up down to the horizon at cy (elevation e as the tangent), then the ground beyond
     // the site under the haze, going down to the page's ink. Once the tower is in, these broad fills are the canvas's
@@ -689,13 +693,13 @@ void main() {
     // (below the horizon, the bay: see water)
     const D = Math.max(1, h - cy), wc = waterStops(S);
     const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], ...wc.map(([t, c]) => [cy + t * D, c])];
-    if (alpha < 1 || !m.c) {
+    if (alpha < 1 || !m.c || fill) {
       const y0 = st[0][0], y1 = st[st.length - 1][0], gr = g.createLinearGradient(0, y0, 0, y1);
       for (const [y, c] of st) gr.addColorStop(clamp((y - y0) / (y1 - y0), 0, 1), css(c));
       g.fillStyle = gr; g.fillRect(0, 0, w, h);
     }
     if (m.c) {
-      const v = alpha < 1 ? '' : 'linear-gradient(180deg,' + st.map(([y, c]) => css(c) + ' ' + y.toFixed(1) + 'px').join() + ')';
+      const v = alpha < 1 || fill ? '' : 'linear-gradient(180deg,' + st.map(([y, c]) => css(c) + ' ' + y.toFixed(1) + 'px').join() + ')';
       if (m.skyCss !== v) { m.skyCss = v; m.c.style.backgroundImage = v; }
     }
     // a direction's place on screen (or null behind the camera)
@@ -732,6 +736,15 @@ void main() {
     const hz = g.createLinearGradient(0, cy - 0.06 * f, 0, cy + 0.02 * f);
     hz.addColorStop(0, css(hor, 0)); hz.addColorStop(0.75, css(hor, 0.45)); hz.addColorStop(1, css(hor, 0));
     g.fillStyle = hz; g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
+    // under the hero's photograph, from the cut on, the haze just over the horizon a little brighter, as the stills were
+    // judged against: a band about 2% of the lens high, coming in over its top 40% and gone just under the horizon
+    if (cut && cut[2] > 0) {
+      const y0 = cy - 0.0207 * f, y1 = cy + 0.0018 * f, lg = g.createLinearGradient(0, y0, 0, y1);
+      lg.addColorStop(0, css(hor.map((v) => v + 60), 0)); lg.addColorStop(0.4, css(hor.map((v) => v + 60), 0.16)); lg.addColorStop(1, css(hor.map((v) => v + 60), 0.16));
+      g.fillStyle = lg;
+      for (let i = 0; i < 8; i++) { const x0 = cut[0] + ((cut[1] - cut[0]) * i) / 8; g.globalAlpha = alpha * cut[2] * smooth((i + 0.5) / 8); g.fillRect(x0, y0, i < 7 ? (cut[1] - cut[0]) / 8 : w - x0, y1 - y0); }
+      g.globalAlpha = alpha;
+    }
     // a distant, generic skyline round the horizon, in towns: lighter than the ground, darker than the haze behind it
     const N = 720, sil = mixc(mixc(hor, ink, 0.4), zen, 0.15), lamps = [];
     skyl.length = 0; skyl.sil = sil; skyl.lamps = lamps;
@@ -749,7 +762,7 @@ void main() {
       const a1 = ((i + (tall ? 0.5 : hash(i + 5) > 0.85 ? 0.7 : 1.02)) / N) * TAU, p0 = scr(Math.sin(a0), 0, Math.cos(a0)), p1 = scr(Math.sin(a1), 0, Math.cos(a1));
       if (!p0 || !p1 || p1[0] < -2 || p0[0] > w + 2) { open = false; continue; }
       // (on a wide hero the left half carries the headline: the towns sink away under it)
-      const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) / p0[2];
+      const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) * (cut ? 1 - cut[2] * smooth(clamp((p0[0] - cut[0]) / (cut[1] - cut[0]), 0, 1)) : 1) / p0[2];
       if (!open) { g.moveTo(p0[0], cy + 1); open = true; }
       g.lineTo(p0[0], cy + 1); g.lineTo(p0[0], yh); g.lineTo(p1[0], yh); g.lineTo(p1[0], cy + 1);
       if (cy - yh > 0.5) skyl.push(p0[0], p1[0], cy - yh);
@@ -757,7 +770,7 @@ void main() {
     }
     g.fill();
     if (lamps.length) { g.fillStyle = `rgba(236,196,142,${0.5 * S.night})`; for (const [x, y] of lamps) g.fillRect(x - 0.5, y - 0.5, 1, 1); }
-    water(g, m, S, w, h);
+    water(g, m, S, w, h, fill);
   }
 
   // The bay: drawn by the hero's drawing over the ground east of the site (pts, its outline on screen), after the sky.
@@ -789,9 +802,9 @@ void main() {
     const { zen, hor, ink } = S;
     return [[0, mixc(hor, ink, 0.06)], [0.035, mixc(mixc(hor, zen, 0.45), ink, 0.18)], [0.16, mixc(zen, ink, 0.35)], [0.5, mixc(zen, ink, 0.62)], [1, mixc(zen, ink, 0.85)]];
   };
-  function water(g, m, S, w, h) {
+  function water(g, m, S, w, h, fill) {
     const k = m.k, f = k.f, cy = k.cy, { hor, ink } = S, alpha = g.globalAlpha, D = Math.max(1, h - cy);
-    if (alpha < 1 || !m.c) {
+    if (alpha < 1 || !m.c || fill) {
       const gr = g.createLinearGradient(0, cy, 0, h);
       for (const [t, c] of waterStops(S)) gr.addColorStop(t, css(c));
       g.fillStyle = gr; g.fillRect(0, cy, w, D);
@@ -851,6 +864,37 @@ void main() {
     g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); g.fillStyle = gr; g.fill();
   }
 
+  // The sky's light behind the tower (SKY_FS, as the renderer draws it with the tower), drawn without WebGL: the same
+  // soft band of the horizon's colour on the same plane, 11 units beyond the tower's axis, 14 either side of it across
+  // the view and from just under the ground to 25.7 up, added to what is under it. It needs the sky laid on the canvas
+  // under it (backdrop with fill): over the canvas's CSS background, added light would only grey it. The band is made
+  // once for each light, at 128 x 64, and stretched over the plane on screen (it faces the eye, so it is a rectangle).
+  let glowTex = null, glowKey = '';
+  function glow(g, m, alpha) {
+    const k = m.k, sun = m.sunNow, el = sun.el, night = sun.night;
+    const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day;
+    const hor = mixc([0.03, 0.026, 0.028], mixc([0.62, 0.7, 0.8], [0.95, 0.6, 0.42], gold), day), G = 0.05 + 0.1 * gold + 0.04 * night;
+    const key = hor.map((v) => v.toFixed(4)).join() + G.toFixed(4);
+    if (key !== glowKey) {
+      glowKey = key;
+      const W = 128, H = 64, c = glowTex || (glowTex = document.createElement('canvas')); c.width = W; c.height = H;
+      const q = c.getContext('2d'), img = q.createImageData(W, H), d = img.data;
+      const tone = (x) => { x *= 0.9; x = (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14); return Math.round(255 * Math.pow(clamp(x, 0, 1), 1 / 2.2)); };
+      for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+        const u = -1 + (2 * (i + 0.5)) / W, y = 1 - (j + 0.5) / H, t = clamp(y / 0.06, 0, 1), a = clamp((Math.abs(u) - 0.7) / 0.25, 0, 1);
+        const v = Math.exp(-u * u * 5) * (1 - a * a * (3 - 2 * a)) * Math.exp(-Math.pow((y - 0.16) / 0.2, 2)) * t * t * (3 - 2 * t) * G, o = (j * W + i) * 4;
+        d[o] = tone(hor[0] * v); d[o + 1] = tone(hor[1] * v); d[o + 2] = tone(hor[2] * v); d[o + 3] = 255;
+      }
+      q.putImageData(img, 0, 0);
+    }
+    const s = k.f / (k.d + 11), y0 = k.cy - (25.7 - k.ey) * s, y1 = k.cy + (0.3 + k.ey) * s;
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = alpha; g.drawImage(glowTex, k.cx - 14 * s, y0, 28 * s, y1 - y0); g.restore();
+  }
+
+  // (the sky, its light behind the tower and the land stand on their own too: under the desktop hero's photograph,
+  // which stands in for the rendered tower, and where WebGL is not to hand)
+  window.CentamontSky = { backdrop, land, glow };
+
   // ---------------------------------------------------------------- renderer
   window.CentamontTower3D = function (G, opt) {
     const canvas = document.createElement('canvas');
@@ -863,7 +907,7 @@ void main() {
       if (/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(name)) { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); return null; }
     }
     const { FLOORS, SLAB, PODIUM, CROWN, RES0, SCREEN_H } = G;
-    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a) => backdrop(g, m, a), land: (g, m, p) => land(g, m, p) };
+    const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a, o) => backdrop(g, m, a, o), land: (g, m, p) => land(g, m, p) };
     canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R.lost = true; if (opt.onLost) opt.onLost(); });
 
     // compile without stalling the page where the engine can (the programs link in the background)

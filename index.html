@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-oe/+2HvwSmnkWFMBhr/5cSuQKgPApa7rvWZ9lEqB9G0=' 'sha256-kitWSMRCKbq/PbzFXUZm/IAhUL76WCNeGDD8Pamn5Lc=' 'sha256-plX3BsM5D4ljsWg23lbDm8VJH2oR1k486HJbRd8cmFs=' 'sha256-auJL+OFINl0kRyG/63Z6SM2xdksTzNGyNg7pvU5hoog='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-oe/+2HvwSmnkWFMBhr/5cSuQKgPApa7rvWZ9lEqB9G0=' 'sha256-kitWSMRCKbq/PbzFXUZm/IAhUL76WCNeGDD8Pamn5Lc=' 'sha256-plX3BsM5D4ljsWg23lbDm8VJH2oR1k486HJbRd8cmFs=' 'sha256-NqLMZ5UTvENxLR0ahn7xP42uHlUBwd8b8Nu1ZGGMreY='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -38,7 +38,7 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=68d2ed23">
+<link rel="stylesheet" href="site.css?v=1ed8f3b7">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -46,10 +46,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!matc
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=68d2ed23" defer></script>
-<script src="model.js?v=68d2ed23" defer></script>
-<script src="instrument.js?v=68d2ed23" defer></script>
-<script src="tower3d.js?v=68d2ed23" async fetchpriority="low"></script>
+<script src="site.js?v=1ed8f3b7" defer></script>
+<script src="model.js?v=1ed8f3b7" defer></script>
+<script src="instrument.js?v=1ed8f3b7" defer></script>
+<script src="tower3d.js?v=1ed8f3b7" async fetchpriority="low"></script>
 </head>
 <body class="no-js home">
 <div class="curtain" aria-hidden="true">
@@ -602,6 +602,11 @@ document.addEventListener('DOMContentLoaded',function(){
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
   const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}:{phi:.13,dist:100,ty:mid?21.3:19.7,scale:wide?2.3:2.1,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
+  // On a desktop that sets the tower beside the headline at its full size, the finished tower is a photograph: a
+  // path-traced still made from this hero's own camera, lit by the sun of the hour it suits (by day, at golden hour,
+  // after dark; model.js, STILLS). The camera then stands where the still was made from: no orbit, no tilt after the
+  // pointer, no ride up the façade. Phones, the stacked hero and narrower windows keep the drawing as it was.
+  const photo=Model&&Model.still&&!matchMedia('(max-width:1180px)').matches&&!side()&&!stacked()?Model.still():null;
   // The hero is lit by this hour's sun, so it is seen from where the sun models it: by day the camera starts 35 degrees off
   // the sun's bearing and turns away from it as it builds and orbits, coming to rest up to 80 degrees off, so a lit face
   // and a shade side both show and the shadow falls in the open. The sun stands on the viewer's left (the shadow falls to
@@ -614,7 +619,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // the first frame still stands 35 degrees off the sun (25 at the narrowest, with the sun just east of south).
   // The shadows' hatch runs along the line of sight at mid-sweep, so it never closes up on the low ground. After dark the
   // camera starts where it always has. (Bearings are compass degrees from the tower to the eye.)
-  const heroCam=(()=>{const o={th:-0.5,orbit:0.0009,idle:0.0003},s=window.CentamontSun&&CentamontSun();if(!s||!(s.night<0.6))return o;
+  const heroCam=(()=>{const o={th:-0.5,orbit:0.0009,idle:0.0003},s=window.CentamontSun&&CentamontSun();if(photo){const th=Model.stills[photo].th;return{th,orbit:0,idle:null,hatch:th*180/Math.PI+180}}if(!s||!(s.night<0.6))return o;
     const A=s.az,lo=124,hi=236,left=A-lo>=50,off=Math.min(79.5,left?A-lo:hi-A),idle=Math.max(0.55,Math.min(2,(off-35-17)/14.3))/1e4,S=17+14.3e4*idle;
     let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
     const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
@@ -648,13 +653,13 @@ document.addEventListener('DOMContentLoaded',function(){
     heroM.o.groundLabel=narrow||side();
     // stacked, the group stands on the centre line and the ruler's labels take the corner the sun's path would use
     heroM.o.sunPath=!narrow||side();
-    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce?0:Math.min(1,scrollY/innerHeight)*9);heroM.touch()};
+    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHeight)*9);heroM.touch()};
   // A drawing that cannot start (no canvas, an old engine) costs only itself: the rest of the page carries on without it.
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
     heroM=make('heroModel',{real3d:true,orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,soldRate:14,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
-    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
+    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/');
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
       if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
@@ -663,7 +668,7 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   if(heroM){
     // the tilt that follows the pointer is motion too: with motion off the drawing holds still
-    if(!reduce)addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
+    if(!reduce&&!photo)addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
     // A loupe over the tower on desktop: it shows the structure behind the glass.
     const heroEl=document.querySelector('.hero');
     // (only beside the headline: a window narrowed to the phone layout puts the tower above it, and the loupe goes)
@@ -716,7 +721,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // carries them past the hero's foot and under the next sheet. A short or zoomed window, whose copy runs well below the
   // fold, keeps the copy still.
   if(heroM&&!reduce){let q=0,lp=-1,sink=true;const row=hero.querySelector('.wrap .row'),fits=()=>{let rb=row?row.offsetHeight:0;for(let e=row;e&&e!==hero;e=e.offsetParent)rb+=e.offsetTop;sink=!row||.42*Math.max(0,hero.offsetTop+rb-innerHeight)<=.58*(hero.offsetHeight-rb);lp=-1;onScroll()};
-    const onScroll=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);if(p===lp)return;lp=p;heroM.o.ty=heroTy+p*9;heroM.touch();hero.style.setProperty('--p',sink?p.toFixed(4):'0')})};
+    const onScroll=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);if(p===lp)return;lp=p;if(!photo){heroM.o.ty=heroTy+p*9;heroM.touch()}hero.style.setProperty('--p',sink?p.toFixed(4):'0')})};
     addEventListener('scroll',onScroll,{passive:true});let fw=innerWidth;addEventListener('resize',()=>{if(innerWidth!==fw){fw=innerWidth;fits()}});
     // (the observer measures the copy in the first frame, where the page is laid out anyway)
     if(window.ResizeObserver){new ResizeObserver(fits).observe(hero);onScroll()}else fits()}
