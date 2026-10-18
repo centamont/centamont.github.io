@@ -1,6 +1,6 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
@@ -494,6 +494,19 @@ test('every page runs under its security policy with nothing refused', async ({ 
     await page.waitForTimeout(300);
   }
   expect(refused).toEqual([]);
+});
+
+// Every page asks the browser to fetch the next page while a link is hovered or pressed, so the click lands at once.
+// Prefetch only: a prerender would start the next page's scripts (the tower) unseen.
+test('every page prefetches the page a visitor is about to open', async ({ page }) => {
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const missing = pages.filter((p) => {
+    const m = readFileSync(p, 'utf8').match(/<script type="speculationrules">(.*?)<\/script>/s);
+    return !m || !JSON.parse(m[1]).prefetch || JSON.parse(m[1]).prerender;
+  });
+  expect(missing).toEqual([]);
+  await page.goto('/');
+  expect(await page.evaluate(() => HTMLScriptElement.supports('speculationrules'))).toBe(true);
 });
 
 // The report sheet is about 3,000px tall, so on a short phone screen it can never be a quarter in view:
