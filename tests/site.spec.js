@@ -416,6 +416,39 @@ test('the specimen short list shows three residences and says it is invented', a
   await expect(page.locator('.standfirst')).toContainText('invented');
 });
 
+// The specimen project site's register form is a demonstration: it checks its fields and confirms on the page, and
+// nothing typed into it ever leaves the browser.
+test('the specimen register form confirms on the page and sends nothing', async ({ page }) => {
+  await page.goto('/project-site.html');
+  await expect(page.locator('.rp-foot')).toContainText('invented');
+  await expect(page.locator('.standfirst')).toContainText('invented');
+  await page.waitForLoadState('networkidle');
+  const sent = [];
+  page.on('request', (r) => sent.push(r.method() + ' ' + r.url()));
+  const form = page.locator('#psForm');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psName')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#psEmailE')).not.toBeEmpty();
+  await expect(page.locator('#psName')).toBeFocused();
+  await page.locator('#psName').fill('Ana Ribeiro');
+  await page.locator('#psEmail').fill('ana@example');
+  await page.locator('#psWant').selectOption('Two bedrooms');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psEmail')).toHaveAttribute('aria-invalid', 'true');
+  await page.locator('#psEmail').fill('ana@example.com');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psDone')).toBeVisible();
+  await expect(page.locator('#psDone')).toBeFocused();
+  await expect(page.locator('#psThanks')).toHaveText('Thank you, Ana.');
+  await expect(page.locator('#psDone')).toContainText('sent nothing');
+  await expect(form).toBeHidden();
+  await page.locator('#psAgain').click();
+  await expect(form).toBeVisible();
+  await expect(page.locator('#psName')).toHaveValue('');
+  await page.waitForTimeout(300);
+  expect(sent).toEqual([]);
+});
+
 test('the sales curve answers the launch price, and says it is illustrative', async ({ page }) => {
   await page.goto('/');
   await page.locator('#curve').scrollIntoViewIfNeeded();
@@ -508,7 +541,7 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
 // Editing an inline script without updating that page's hash would silently switch it off.
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
-  const pages = ['/', '/privacy.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html',
+  const pages = ['/', '/privacy.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
     '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html'];
@@ -563,15 +596,15 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
@@ -583,7 +616,7 @@ test('assets carry the current version', async ({}, info) => {
 // points at it by url(#id) takes the wrong one.
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
   for (const p of pages) {
     const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
