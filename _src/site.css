@@ -1793,8 +1793,14 @@ figcaption,.dkey dd{text-wrap:pretty}
 /* dashed like its legend swatch, so it never reads as the dotted construction line */
 .cv-par{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:4 3;stroke-linecap:butt;opacity:.6}
 .cv-line{fill:none;stroke:var(--sold-line);stroke-width:2}
-.cv-lim{stroke:var(--fg);stroke-width:1;stroke-dasharray:6 5}
+/* the threshold is a datum, drawn in the datum line type as it is in the journal's figure and the report */
+.cv-lim{stroke:var(--fg);stroke-width:1;stroke-dasharray:var(--lt-datum)}
 .cv-limt{fill:var(--fg);font:500 13px var(--body);letter-spacing:.12em;text-transform:uppercase;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
+/* the share still for sale at completion, measured off as a dimension string: an ink line with a slash at each end, from a
+   ring on the curve up to the whole building, its figure set like the journal figure's completion values */
+.cv-dim{fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.cv-ring{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
+.cv-dimt{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
 .cv-dot{fill:var(--sold-line);stroke:var(--sheet);stroke-width:3}
 .cv-dott{fill:var(--fg);font:400 19px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
 .js .cv-fig:not(.in) .cv-line{stroke-dasharray:1400;stroke-dashoffset:1400}
@@ -1928,7 +1934,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
 .cv-key li[hidden]{display:none}
-.cv-key .k-lim{border-top:1px dashed var(--fg)}.cv-key .k-lim-li{display:none}
+.cv-key .k-lim{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 12px,transparent 12px 15px,var(--fg) 15px 17px,transparent 17px 20px)}.cv-key .k-lim-li{display:none}
 /* the phone gap comes after the base rule so it applies; each item gives back its trailing tracking so the gap is the gap */
 .cv-key li,.rp-key li{margin-right:-.14em}
 @media (max-width:520px){.cv-key{display:none}}
@@ -2183,8 +2189,12 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .rp-stack .rp-t{font-size:max(11.5px,calc(33.7px - 5.27vw))}
 .rp-grid{stroke:var(--grid);stroke-dasharray:2 4}
 .rp-axis{stroke:var(--fg)}
-.rp-now{stroke:var(--accent);stroke-dasharray:3 3}
-.rp-plan{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:8 5;opacity:.5}
+.rp-now{stroke:var(--fg);stroke-dasharray:var(--lt-dot);opacity:.55}
+.rp-plan{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:var(--lt-hidden);opacity:.6}
+/* if the pace holds: carried on in the dot line type, for what comes later, to a ring where it meets the threshold */
+.rp-proj{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:var(--lt-dot);stroke-linecap:round}
+.rp-ring{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
+.rp-m{fill:var(--fg);font:italic 400 14px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
 .rp-act{fill:none;stroke:var(--sold-line);stroke-width:2}
 .rp-dot{fill:var(--sold-line);stroke:var(--sheet);stroke-width:3}
 /* the lender's pre-sale threshold, in the datum line type, named in the key under the drawing */
@@ -2203,7 +2213,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .rp-key li{display:flex;align-items:center;gap:8px}
 .rp-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}.rp-key .k-act{border-top-color:var(--sold-line)}
 /* the plan's key is dashed like the plan line itself (8 on, 5 off in the chart), not with the browser's short border dashes */
-.rp-key .k-plan{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 8px,transparent 8px 14px);opacity:.6}
+.rp-key .k-plan{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 4px,transparent 4px 7px);opacity:.6}
 .rp-key .k-lim{height:1px;border:0;background:repeating-linear-gradient(90deg,var(--fg) 0 12px,transparent 12px 15px,var(--fg) 15px 17px,transparent 17px 20px);opacity:.7}
 .rp-key .k-sold{width:14px;height:10px;border:1px solid var(--sold-line);background:var(--sold)}
 .rp-key .k-res{width:14px;height:10px;border:1px solid var(--sold-line);background:repeating-linear-gradient(135deg,var(--sold-line) 0 1px,transparent 1px 4px)}
@@ -2285,7 +2295,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
   .rp-key .k-res{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,CanvasText 0 1px,transparent 1px 4px)}
   .dbar .s.con,.sw.con{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,CanvasText 0 1px,transparent 1px 7px)}
   .dbar .s.often,.sw.often{forced-color-adjust:none;border-color:CanvasText;background:repeating-linear-gradient(135deg,GrayText 0 1px,transparent 1px 7px)}
-  .rp-key .k-plan{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 8px,transparent 8px 14px)}
+  .rp-key .k-plan{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 4px,transparent 4px 7px)}
   .rp-key .k-lim{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 12px,transparent 12px 15px,CanvasText 15px 17px,transparent 17px 20px)}
   .rp-key .k-later{forced-color-adjust:none;background:repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 0/100% 1px no-repeat,repeating-linear-gradient(90deg,CanvasText 0 2px,transparent 2px 4px) 0 100%/100% 1px no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 0 0/1px 100% no-repeat,repeating-linear-gradient(180deg,CanvasText 0 2px,transparent 2px 4px) 100% 0/1px 100% no-repeat}
 }
@@ -2720,7 +2730,7 @@ p,li{text-wrap:pretty}
    left as they are): sold, reserved, open and later cells, the contract lines and their dots. Links keep an underline, since
    the one they draw as a background is removed. */
 @media (forced-colors:active){
-  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line{stroke:CanvasText}
+  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line,.cv-dim,.cv-ring{stroke:CanvasText}
   .rp-c.sold,.rp-dot,.cv-dot{fill:CanvasText}.rp-dot,.cv-dot{stroke:Canvas}
   .ul,.more,.handle,.tb a,.legal a,.prose a,.crumbs a,.sp-go{text-decoration:underline}
 }
@@ -2851,10 +2861,19 @@ nav.main a.press{color:var(--fg);transition:none}
 .ms dd{margin:8px 0 0}
 .ms-n{display:block;font-family:var(--display);font-size:clamp(40px,4vw,52px);font-weight:300;line-height:1;letter-spacing:-.01em;font-variant-numeric:lining-nums;color:var(--fg)}
 .ms-u{display:block;margin-top:6px;font-size:15px;color:var(--muted)}
-.ms-bar{display:block;width:100%;max-width:120px;height:9px;margin-top:12px;overflow:visible}
-.ms-bar line{stroke-width:3}
-.ms-bar .now{stroke:var(--accent)}
-.ms-bar .then{stroke:var(--faint);opacity:.45}
+/* a figure and the one it is measured against, to scale from zero (tools/marketsheet.py): the line in ink runs to the figure
+   now, a tick stands at the figure then with it written under, and where then was the greater a dotted reference line
+   carries on to its tick. No bronze: a market figure is neither sold nor committed */
+.ms-sc{position:relative;display:block;max-width:220px;height:31px;margin-top:14px}
+.ms-sc::after{content:'';position:absolute;left:0;top:0;width:1px;height:13px;background:var(--fg)}
+.ms-sc::before{content:'';position:absolute;left:0;right:0;top:6px;height:1px;background:var(--rule)}
+.ms-sc i{position:absolute;left:0;display:block}
+.ms-sc .now{top:5px;width:var(--now);height:3px;background:var(--fg)}
+.ms-sc .ref{left:var(--now);top:6px;width:calc(var(--then) - var(--now));height:1px;background:repeating-linear-gradient(90deg,var(--fg) 0 1px,transparent 1px 4px)}
+.ms-sc .then{left:var(--then);top:0;width:1px;height:13px;background:var(--fg)}
+.ms-sc b{position:absolute;top:17px;left:0;transform:translateX(-50%);font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--faint);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.ms-sc[style*="--then:100.0%"] b{transform:translateX(-100%)}
+@media (forced-colors:active){.ms-sc{forced-color-adjust:none}.ms-sc :is(.now,.then),.ms-sc::after{background:CanvasText}.ms-sc .ref{background:repeating-linear-gradient(90deg,CanvasText 0 1px,transparent 1px 4px)}.ms-sc b{color:CanvasText}}
 .ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}
 .ms .ms-note sup{font-size:max(12px,.62em);line-height:0}
 .ms .ms-note sup a{position:relative;color:var(--accent);text-decoration:none;padding-inline:2px}
@@ -2933,7 +2952,8 @@ nav.main a.press{color:var(--fg);transition:none}
 .wy .v{font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);white-space:nowrap;font-variant-numeric:tabular-nums}
 .wy .tr{grid-column:1/-1;position:relative;height:13px;margin-top:8px;background:linear-gradient(to right,var(--rule) 1px,transparent 1px) 0 0/calc(100% / 6) 100% repeat-x;border-right:1px solid var(--rule)}
 .wy .tr i{position:absolute;left:0;top:5px;height:3px;background:var(--fg);transform-origin:0 50%}
-.wy .y1{width:calc(100% / 6)}.wy .y2{width:calc(100% / 3)}.wy .y6{width:100%;background:var(--sold-line)!important}
+.wy .y1{width:calc(100% / 6)}.wy .y2{width:calc(100% / 3)}/* (all three in ink: a warranty is neither sold nor committed, so none of them takes bronze) */
+.wy .y6{width:100%}
 .wy .sc{position:relative;height:13px;margin:10px 0 24px;font:500 13px/1 var(--body);letter-spacing:.06em;color:var(--faint);font-variant-numeric:tabular-nums}
 .wy .sc span{--n:0;position:absolute;top:0;left:calc(var(--n) * 100% / 6);transform:translateX(-50%);white-space:nowrap}.wy .sc span:first-child{transform:none}.wy .sc span:last-child{transform:translateX(-100%)}
 .wy .sc span:nth-child(2){--n:1}.wy .sc span:nth-child(3){--n:2}.wy .sc span:nth-child(4){--n:3}.wy .sc span:nth-child(5){--n:4}.wy .sc span:nth-child(6){--n:5}.wy .sc span:nth-child(7){--n:6}
@@ -3126,16 +3146,27 @@ main{overflow-x:clip}
 .lp-stack{display:grid;gap:12px;border-top:1px solid var(--fg);padding-top:14px}
 .lp-stack h2{margin:0;font-family:var(--display);font-size:var(--t-head);font-weight:300;line-height:1.15}
 .lp-lede{margin:0;color:var(--muted);max-width:40em}
-.lp-plan{margin:12px 0 0;display:grid;gap:18px}
-.lp-plan svg{display:block;width:var(--lp-w,100%);max-width:100%;height:auto;max-height:min(80vh,900px);justify-self:center}
+.lp-plan{margin:12px 0 0;display:grid;gap:18px;align-items:end}
+/* (planner.js sets the plan's width, so every building is drawn at one scale) */
+.lp-plan svg{display:block;max-width:100%;height:auto;overflow:visible}
 .lp-u{stroke:var(--sold-line);stroke-width:1;vector-effect:non-scaling-stroke;transition:fill var(--t-ui) var(--ease-out),fill-opacity var(--t-ui) var(--ease-out)}
 .lp-u.pre,.lp-key .pre{fill:var(--sold);fill-opacity:1}
 .lp-u.mid,.lp-key .mid{fill:var(--sold);fill-opacity:.45}
 .lp-u.post,.lp-key .post{fill:var(--sold);fill-opacity:.14}
 .lp-u.open,.lp-key .open{fill:none;stroke:var(--faint)}
-.lp-fl{fill:var(--faint);font:500 11px var(--body);font-variant-numeric:lining-nums tabular-nums}
+.lp-fl{fill:var(--faint);font:500 10.5px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.lp-ln{text-transform:uppercase;letter-spacing:.12em}
+.lp-h{stroke:var(--fg);stroke-width:var(--lw-hatch);vector-effect:non-scaling-stroke;opacity:.5}
 .lp-gr{stroke:var(--fg);stroke-width:1.5;vector-effect:non-scaling-stroke}
 .lp-key{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:8px 28px;font-size:15px;color:var(--muted)}
+/* beside the plan on a wide screen, the key stands as a schedule: ruled rows, each count set in the display face at the
+   right, the four together reading down to the plan's ground line */
+@media (min-width:721px){
+  .lp-plan{grid-template-columns:auto minmax(15em,22em);column-gap:clamp(40px,6vw,96px);justify-content:start}
+  .lp-key{display:grid;gap:0;padding:0;border-top:1px solid var(--fg);margin-bottom:6px}
+  .lp-key li{padding:12px 0;border-bottom:1px solid var(--rule)}
+  .lp-key b{margin-left:auto;font:300 26px/1 var(--display)}
+}
 .lp-key li{display:flex;align-items:center;gap:10px}
 .lp-key i{width:20px;height:14px;border:1px solid var(--sold-line);background:var(--sold)}
 .lp-key .mid{background:color-mix(in srgb,var(--sold) 45%,transparent)}
