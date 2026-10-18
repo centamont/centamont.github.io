@@ -638,7 +638,7 @@ void main() {
 
   // ---------------------------------------------------------------- the sky behind
   // Drawn by the hero's drawing on its own canvas, under everything (model.js calls it while the rendered tower is
-  // shown): the sky over Miami at this hour, kept low in key so the ink page and its type still hold, a haze along the
+  // shown): the sky over Miami at this hour, a true blue by day (the ink veil under the headline keeps its type), a haze along the
   // horizon, thin cloud, the sun's warmth on the side it stands, and a distant, generic skyline round the horizon, lit
   // after dark. Directions are the drawing's own, so the sky turns with the camera as a real one would.
   const mixc = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
@@ -669,8 +669,9 @@ void main() {
     const sun = m.sunNow, el = sun.el, night = sun.night;
     const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day, dusk = smooth(clamp(1 - Math.abs(el + 3) / 6, 0, 1)) * (1 - day * 0.6);
     const ink = m.bg || [20, 22, 26];
-    // (sRGB, in key with the page: a clear day is a deep slate blue over a pale haze, dusk a bronze horizon under indigo)
-    let zen = mixc([24, 42, 70], [24, 30, 50], gold), hor = mixc([134, 150, 166], [168, 120, 84], gold);
+    // (sRGB: a clear day is a deep Miami blue over a pale haze, the page's ink kept by the veil under the headline; dusk
+    // a bronze horizon under indigo)
+    let zen = mixc([30, 58, 96], [24, 30, 50], gold), hor = mixc([160, 176, 190], [168, 120, 84], gold);
     zen = mixc(mixc(ink, [12, 16, 30], 0.7), zen, day); hor = mixc([56, 46, 42], hor, day);
     hor = mixc(hor, [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
     return { zen, hor, ink, day, gold, night, dusk, mid: mixc(mixc(zen, hor, 0.42), [74, 62, 78], gold * 0.5 + dusk * 0.3) };
@@ -735,7 +736,13 @@ void main() {
     // haze along the horizon
     const hz = g.createLinearGradient(0, cy - 0.06 * f, 0, cy + 0.02 * f);
     hz.addColorStop(0, css(hor, 0)); hz.addColorStop(0.75, css(hor, 0.45)); hz.addColorStop(1, css(hor, 0));
-    g.fillStyle = hz; g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
+    g.fillStyle = hz;
+    // (on a wide hero the left half carries the headline: the haze thins away under it, as the towns do)
+    if (w > 820) {
+      const x0 = 0.42 * w, x1 = 0.62 * w;
+      for (let i = 0; i < 8; i++) { const xa = x0 + ((x1 - x0) * i) / 8; g.globalAlpha = alpha * smooth((i + 0.5) / 8); g.fillRect(xa, cy - 0.06 * f, i < 7 ? (x1 - x0) / 8 : w - xa, 0.08 * f); }
+      g.globalAlpha = alpha;
+    } else g.fillRect(0, cy - 0.06 * f, w, 0.08 * f);
     // under the hero's photograph, from the cut on, the haze just over the horizon a little brighter, as the stills were
     // judged against: a band about 2% of the lens high, coming in over its top 40% and gone just under the horizon
     if (cut && cut[2] > 0) {

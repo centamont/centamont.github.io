@@ -327,10 +327,10 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 897, y: 168, w: 843, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    day: { x: 827, y: 168, w: 913, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
     morning: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 898, y: 156, w: 842, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 827, y: 156, w: 913, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 827, y: 151, w: 913, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
@@ -2168,7 +2168,11 @@
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
+        // (over the photograph's bright haze, each name stands on a soft ink halo, so the lowest still read)
+        const halo = this.sa > 0 && this.dark && !this.forced;
+        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 7; }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
+        if (halo) g.restore();
         g.globalAlpha = 1;
       }
       // The first release: a bracket on the façade side of the ruler over the levels that hold it (the bay side's
