@@ -709,6 +709,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
       reminding = '';
+      if (window.cmCount) window.cmCount('letter' + location.pathname);
       const url = 'https://ig.me/m/centamont', where = 'Instagram';
       const t = text();
       // Copy first, while the click still counts as the writer's own and this tab still has the focus. Opening a tab
