@@ -4,6 +4,53 @@
 // sliders that move nothing would be all there is.
 // Beside the sliders the figure stands over its readouts, which follow the price slider in the source (the order a phone
 // shows them in): their heights keep the readouts under the figure, the two held together (site.css, .cv-read).
+
+// The words both instruments write, for the Spanish and Portuguese pages, chosen by the page's lang. English stays in the
+// code where each word is used, and is what a page in any other language reads, or a word missing here. An entry is a
+// string, or a function given the same figures the English sentence is built from.
+const cmWords = ({
+  es: {
+    ground: 'Inicio de obra', top: 'Coronación', done: 'Terminación', axis: 'Meses desde el lanzamiento',
+    build: 'Construcción', par: 'A la par', signed: 'Contratos firmados', lim: 'Umbral de preventa', limShort: 'Umbral',
+    above: (n) => n + '% por encima', below: (n) => n + '% por debajo', month: (m) => 'Mes ' + m, pct: (n) => n + ' por ciento',
+    forSale: (n) => n + '% en venta', notMet: 'No alcanzado', limNotMet: 'Umbral no alcanzado', and: 'y',
+    sayPar: (d, met, M) => 'A la par, alrededor del ' + d + ' por ciento del edificio está bajo contrato al terminar la obra' + (met ? '.' : ', y el umbral no se alcanza en ' + M + ' meses.'),
+    sayOff: (p, d, hit, M, unsold, unsoldPar) => 'Cada residencia se vende un ' + Math.abs(p) + ' por ciento ' + (p > 0 ? 'más cara' : 'más barata') +
+      (p > 0 && (hit < 0 || d > 0) ? ', pero ' : '; ') +
+      (hit < 0 ? 'el umbral no se alcanza en ' + M + ' meses' : d === 0 ? 'el umbral llega el mismo mes' : 'el umbral llega ' + Math.abs(d) + (Math.abs(d) === 1 ? ' mes ' : ' meses ') + (d > 0 ? 'más tarde' : 'antes')) +
+      '. Al terminar la obra, el ' + unsold + ' por ciento sigue en venta, frente al ' + unsoldPar + ' por ciento a la par.',
+    mark: (m, n) => 'mes ' + m + ', ' + n + ' por ciento',
+    figure: (say, marks) => 'Curva de ventas ilustrativa. ' + say + ' Bajo contrato: ' + marks + '.',
+    heard: (m, n) => 'Mes ' + m + ', ' + n + ' por ciento bajo contrato.',
+    salute: 'Estimados socios:', sign: 'Saludos cordiales,',
+    asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', prod: 'las ventas del año pasado', name: 'su nombre' },
+    ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
+    copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente.'],
+    notCopied: ['Su navegador no permitió copiar. Copie la carta de abajo y péguela en el mensaje de ', '.'],
+  },
+  pt: {
+    ground: 'Início da obra', top: 'Estrutura concluída', done: 'Conclusão', axis: 'Meses desde o lançamento',
+    build: 'Construção', par: 'Em paridade', signed: 'Contratos assinados', lim: 'Patamar de pré-venda', limShort: 'Patamar',
+    above: (n) => n + '% acima', below: (n) => n + '% abaixo', month: (m) => 'Mês ' + m, pct: (n) => n + ' por cento',
+    forSale: (n) => n + '% à venda', notMet: 'Não atingido', limNotMet: 'Patamar não atingido', and: 'e',
+    sayPar: (d, met, M) => 'Em paridade, cerca de ' + d + ' por cento do edifício está sob contrato na conclusão da obra' + (met ? '.' : ', e o patamar não é atingido em ' + M + ' meses.'),
+    sayOff: (p, d, hit, M, unsold, unsoldPar) => 'Cada residência é vendida ' + Math.abs(p) + ' por cento ' + (p > 0 ? 'mais cara' : 'mais barata') +
+      (p > 0 && (hit < 0 || d > 0) ? ', mas ' : '; ') +
+      (hit < 0 ? 'o patamar não é atingido em ' + M + ' meses' : d === 0 ? 'o patamar é atingido no mesmo mês' : 'o patamar é atingido ' + Math.abs(d) + (Math.abs(d) === 1 ? ' mês ' : ' meses ') + (d > 0 ? 'mais tarde' : 'mais cedo')) +
+      '. Na conclusão da obra, ' + unsold + ' por cento ainda está à venda, contra ' + unsoldPar + ' por cento em paridade.',
+    mark: (m, n) => 'mês ' + m + ', ' + n + ' por cento',
+    figure: (say, marks) => 'Curva de vendas ilustrativa. ' + say + ' Sob contrato: ' + marks + '.',
+    heard: (m, n) => 'Mês ' + m + ', ' + n + ' por cento sob contrato.',
+    salute: 'Prezados sócios,', sign: 'Atenciosamente,',
+    asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', prod: 'as vendas do ano passado', name: 'o seu nome' },
+    ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
+    copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente.'],
+    notCopied: ['Seu navegador não permitiu a cópia. Copie a carta abaixo e cole-a na mensagem do ', '.'],
+  },
+})[(document.documentElement.lang || 'en').slice(0, 2)] || {};
+// a word in the page's language, or the English given: either may be a function, called with the figures that follow
+const cmSay = (k, en, ...a) => { const v = k in cmWords ? cmWords[k] : en; return typeof v === 'function' ? v(...a) : v; };
+
 (function () {
   const c = document.getElementById('curve'); if (!c) return;
   c.classList.add('ready');
@@ -67,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
       // phase names along the top, each beside its line (a phone names them in a row under the drawing instead)
-      const phases = phone ? [] : [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
+      const phases = phone ? [] : [[BREAK, cmSay('ground', 'Ground broken')], [TOP, cmSay('top', 'Top-off')], [DONE, cmSay('done', 'Completion')]];
       const tl = [];
       phases.forEach(([m, t]) => { const e = el('text', { class: 'ph', 'text-anchor': 'start' }, g, t); tl.push([m, e, e.getComputedTextLength() || t.length * 8]); });
       // Where the last phase name fits to the right of its line, the plot stops short to leave it room; a narrow figure
@@ -130,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const step = W < 420 ? 12 : 6;
       for (let m = 0; m <= M; m += step) { el('line', { class: 'axis', x1: x(m), x2: x(m), y1: Y1, y2: Y1 + 5 }, g); el('text', { x: x(m), y: Y1 + 20, 'text-anchor': m === 0 ? 'start' : m === M ? 'end' : 'middle' }, g, String(m)); }
       // (set 15px above the frame's foot, so it keeps 8px clear of the corner tick under it)
-      el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 37, 'text-anchor': 'end' }, g, 'Months from launch');
+      el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 37, 'text-anchor': 'end' }, g, cmSay('axis', 'Months from launch'));
       build = el('path', { class: 'cv-build', d: `M${x(BREAK)} ${Y1} L${x(DONE)} ${y(1)}` });
       area = el('path', { class: 'cv-area' }); par = el('path', { class: 'cv-par' }); line = el('path', { class: 'cv-line' });
       // what is still for sale at completion, measured off as a dimension string from the curve up to the whole building
@@ -139,12 +186,12 @@ document.addEventListener('DOMContentLoaded', function () {
       dot = el('circle', { class: 'cv-dot', r: 4.5 }); dotT = el('text', { class: 'cv-dott' });
       // with no legend row, a phone names each line in the drawing (placed in draw(), clear of the curves and notes)
       labC = labP = labB = null;
-      if (phone) { labB = el('text', { class: 'cv-lab faint' }, null, 'Construction'); labP = el('text', { class: 'cv-lab' }, null, 'At par'); labC = el('text', { class: 'cv-lab' }, null, 'Contracts signed'); }
+      if (phone) { labB = el('text', { class: 'cv-lab faint' }, null, cmSay('build', 'Construction')); labP = el('text', { class: 'cv-lab' }, null, cmSay('par', 'At par')); labC = el('text', { class: 'cv-lab' }, null, cmSay('signed', 'Contracts signed')); }
     }
 
     const path = (s) => s.map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).toFixed(1)).join(' ');
-    const fmt = (p) => (p === 0 ? 'At par' : (p > 0 ? p + '% above' : -p + '% below'));
-    const list = (a) => a.slice(0, -1).join('; ') + '; and ' + a[a.length - 1];
+    const fmt = (p) => (p === 0 ? cmSay('par', 'At par') : (p > 0 ? cmSay('above', (n) => n + '% above', p) : cmSay('below', (n) => n + '% below', -p)));
+    const list = (a) => a.slice(0, -1).join('; ') + '; ' + cmSay('and', 'and') + ' ' + a[a.length - 1];
     const key = document.querySelector('.cv-key .k-par');
 
     // A small model of the hero tower beside the share, built from its own plans (model.js) and seen as an architect's
@@ -216,13 +263,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const p = +price.value, T = +loan.value / 100, s = model(p), base = model(0);
       out('cvPriceOut').textContent = fmt(p);
       out('cvLoanOut').textContent = loan.value + '%';
-      price.setAttribute('aria-valuetext', fmt(p)); loan.setAttribute('aria-valuetext', loan.value + ' percent');
+      price.setAttribute('aria-valuetext', fmt(p)); loan.setAttribute('aria-valuetext', cmSay('pct', (n) => n + ' percent', loan.value));
       if (key) key.parentNode.hidden = p === 0;
       par.setAttribute('d', p ? path(base) : '');
       line.setAttribute('d', path(s));
       area.setAttribute('d', path(s) + ` L${x(M)} ${Y1} L${x(0)} ${Y1} Z`);
       lim.setAttribute('x1', X0); lim.setAttribute('x2', X1); lim.setAttribute('y1', y(T)); lim.setAttribute('y2', y(T));
-      limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = 'Pre-sale threshold';
+      limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = cmSay('lim', 'Pre-sale threshold');
       const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T);
       // the curves as points a few pixels apart, for keeping notes off them
       const pts = [];
@@ -230,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
       pts.push([x(M), y(s[M])]);
       const crosses = (b) => pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
       if (hit > -1) {
-        const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.textContent = 'Month ' + hit;
+        const right = x(hit) > X1 - 90; dot.setAttribute('cx', x(hit)); dot.setAttribute('cy', y(T)); dot.style.display = ''; dotT.textContent = cmSay('month', (m) => 'Month ' + m, hit);
         // the month note takes the first spot beside the dot, nearest first and below before above, that no curve runs
         // through; failing one, the spot the curves cross least (its halo keeps it legible)
         const sides = right ? [[-10, 'end'], [10, 'start']] : [[10, 'start'], [-10, 'end']], spots = [];
@@ -248,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (left >= 0.03 && yd - yt > 18) {
         const sl = (yy) => `M${xd - 4} ${yy + 4} L${xd + 4} ${yy - 4}`;
         dimL.setAttribute('d', `M${xd} ${yd - 6} L${xd} ${yt} ${sl(yt)} ${sl(yd - 6)}`);
-        dimT.textContent = Math.round(left * 100) + '% for sale';
+        dimT.textContent = cmSay('forSale', (n) => n + '% for sale', Math.round(left * 100));
         const lines = pts.concat(Array.from({ length: 49 }, (_, i) => [x(BREAK + (DONE - BREAK) * i / 48), Y1 - (Y1 - yt) * i / 48]));
         const ym = (yd + yt) / 2 + 5, near = dotT.textContent ? dotT.getBBox() : null;
         let ok = false;
@@ -299,15 +346,15 @@ document.addEventListener('DOMContentLoaded', function () {
           t.setAttribute('x', pickN[0]); t.setAttribute('text-anchor', pickN[1]); t.setAttribute('y', pickN[2]); taken.push(t.getBBox());
         };
         const yT = y(T), pe = y(base[M]), mm = Math.round(M * 0.72), pm = y(base[mm]), se = y(s[M]);
-        name(limT, 'Threshold', [[X0 + 6, 'start', yT - 8], [X1, 'end', yT - 8], [X1, 'end', yT + 18], [X0 + 6, 'start', yT + 18]]);
-        name(labP, p ? 'At par' : '', !p ? [] : p > 0 ? [[X1, 'end', pe - 8], [X1, 'end', pe - 22], [x(mm), 'end', pm - 8], [x(M / 2), 'end', y(base[M / 2]) - 8]] : [[x(mm), 'start', pm + 18], [x(M / 2), 'start', y(base[M / 2]) + 18], [X1, 'end', pe + 18], [X1, 'end', pe + 30]]);
-        name(labB, 'Construction', [[x(DONE) - 8, 'end', y(1) - 6], [x(BREAK) + 22, 'start', Y1 - 8]]);
-        name(labC, 'Contracts signed', [[X1, 'end', Y1 - 8], [X1, 'end', Y1 - 24], [X1, 'end', se - 8], [X1, 'end', se + 18]]);
+        name(limT, cmSay('limShort', 'Threshold'), [[X0 + 6, 'start', yT - 8], [X1, 'end', yT - 8], [X1, 'end', yT + 18], [X0 + 6, 'start', yT + 18]]);
+        name(labP, p ? cmSay('par', 'At par') : '', !p ? [] : p > 0 ? [[X1, 'end', pe - 8], [X1, 'end', pe - 22], [x(mm), 'end', pm - 8], [x(M / 2), 'end', y(base[M / 2]) - 8]] : [[x(mm), 'start', pm + 18], [x(M / 2), 'start', y(base[M / 2]) + 18], [X1, 'end', pe + 18], [X1, 'end', pe + 30]]);
+        name(labB, cmSay('build', 'Construction'), [[x(DONE) - 8, 'end', y(1) - 6], [x(BREAK) + 22, 'start', Y1 - 8]]);
+        name(labC, cmSay('signed', 'Contracts signed'), [[X1, 'end', Y1 - 8], [X1, 'end', Y1 - 24], [X1, 'end', se - 8], [X1, 'end', se + 18]]);
       }
-      out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
+      out('cvMonth').textContent = hit > -1 ? cmSay('month', (m) => 'Month ' + m, hit) : cmSay('notMet', 'Not met');
       out('cvDone').textContent = Math.round(done * 100) + '%';
       // and the same reading in one line just above a phone's plot
-      out('cvNowM').textContent = hit > -1 ? 'Month ' + hit : 'Threshold not met'; out('cvNowD').textContent = Math.round(done * 100) + '%';
+      out('cvNowM').textContent = hit > -1 ? cmSay('month', (m) => 'Month ' + m, hit) : cmSay('limNotMet', 'Threshold not met'); out('cvNowD').textContent = Math.round(done * 100) + '%';
       // the same share of the building, its residences sold in the hero's order in the small elevation beside the figure
       if (homes.length) { const n = Math.round(done * RES); for (const h of homes) { h.r.classList.toggle('on', h.rank < n); h.r.style.transitionDelay = (reduceM ? 0 : Math.abs(h.rank - lastN) * 14) + 'ms'; } lastN = n; }
       let say;
@@ -320,11 +367,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const join = p > 0 && (hit < 0 || d > 0) ? ', but ' : '; ';
         say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + '. At completion, ' + unsold + ' percent is still for sale, against ' + unsoldPar + ' percent at par.';
       }
+      // (a page in another language says the same, in its own words, from the same figures)
+      if (p === 0 && cmWords.sayPar) say = cmWords.sayPar(Math.round(done * 100), hit > -1, M);
+      else if (p !== 0 && cmWords.sayOff) say = cmWords.sayOff(p, hit - baseHit, hit, M, unsold, unsoldPar);
       out('cvSay').textContent = say;
       // the drawing's text alternative also reads the curve itself, every six months
       const marks = [];
-      for (let m = 6; m <= M; m += 6) marks.push('month ' + m + ', ' + Math.round(s[m] * 100) + ' percent');
-      svg.setAttribute('aria-label', 'Illustrative sales curve. ' + say + ' Under contract by ' + list(marks) + '.');
+      for (let m = 6; m <= M; m += 6) marks.push(cmSay('mark', (k, n) => 'month ' + k + ', ' + n + ' percent', m, Math.round(s[m] * 100)));
+      svg.setAttribute('aria-label', cmSay('figure', (t, k) => 'Illustrative sales curve. ' + t + ' Under contract by ' + k + '.', say, list(marks)));
     }
     // a hairline that reads the curve under the pointer
     let hair, hairT, hdot, last = null;
@@ -336,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
       hdot.setAttribute('cx', x(m)); hdot.setAttribute('cy', y(f));
       const right = x(m) > (X0 + X1) / 2;
       hairT.setAttribute('x', right ? x(m) - 10 : x(m) + 10); hairT.setAttribute('text-anchor', right ? 'end' : 'start'); hairT.setAttribute('y', y(1) + 14);
-      hairT.textContent = 'Month ' + m + ' \u00b7 ' + Math.round(f * 100) + '%';
+      hairT.textContent = cmSay('month', (k) => 'Month ' + k, m) + ' \u00b7 ' + Math.round(f * 100) + '%';
     };
     const at = (e) => {
       const r = svg.getBoundingClientRect(), u = (e.clientX - r.left) * W / r.width;
@@ -380,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (last === null) last = opening();
       const m = e.key === 'Home' ? 0 : e.key === 'End' ? M : last + step;
       e.preventDefault(); last = kb = Math.max(0, Math.min(M, m)); read(last);
-      heard.textContent = 'Month ' + last + ', ' + Math.round(model(+price.value)[last] * 100) + ' percent under contract.';
+      heard.textContent = cmSay('heard', (m, n) => 'Month ' + m + ', ' + n + ' percent under contract.', last, Math.round(model(+price.value)[last] * 100));
     });
     const redraw = () => { hair = null; sheet(); draw(); if (last !== null) read(last); };
     // The figure sits well down the page, so it is drawn as the reader comes near it rather than while the page loads
@@ -559,16 +609,16 @@ document.addEventListener('DOMContentLoaded', function () {
       // a dropped clause takes its sentence's full stop with it, so put one back
       let body = c.textContent.replace(/\s+/g, ' ').trim();
       if (!/[.!?…]$/.test(body)) body += '.';
-      return 'Dear partners,\n\n' + body + '\n\nWith regards,\n' + (name || '');
+      return cmSay('salute', 'Dear partners,') + '\n\n' + body + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
     // The status note is built from text and, where it names Instagram, one link: nothing is ever parsed as HTML.
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
-    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
-    const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
-    const ask = (empty) => 'Fill in ' + list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())) + ' first, so the partners know who is writing and why.';
+    const asks = cmWords.asks || { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
+    const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' ' + cmSay('and', 'and') + ' ' + a[a.length - 1]);
+    const ask = (empty) => cmSay('ask', (l) => 'Fill in ' + l + ' first, so the partners know who is writing and why.', list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())));
     // As each named blank is filled, the reminder names only the ones still empty, and goes once none is.
     function remind() {
       if (!reminding) return;
@@ -622,8 +672,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = where; return a; };
       const go = (copied) => {
         box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-        if (copied) say('Your letter is copied. Paste it into the message on ', link(), ', and a partner will reply personally.');
-        else say('Your browser did not allow copying. Copy the letter below and paste it into the message on ', link(), '.');
+        const [a, b] = copied ? cmSay('copied', ['Your letter is copied. Paste it into the message on ', ', and a partner will reply personally.']) : cmSay('notCopied', ['Your browser did not allow copying. Copy the letter below and paste it into the message on ', '.']);
+        say(a, link(), b);
       };
       copying.then(() => go(true), () => go(false));
     });
