@@ -233,6 +233,8 @@ document.addEventListener('DOMContentLoaded', function () {
     ['theme', 'motion'].forEach((k) => { if (q.get(k)) p.set(k, q.get(k)); });
     try { history.replaceState(history.state, '', location.pathname + '?' + p + location.hash); } catch (e) {}
     const lt = new URLSearchParams({ as: 'dev', units: String(n) }); if (where.value.trim()) lt.set('where', where.value.trim());
+    // (and the plan itself, so the letter can close with its link: "My plan: …")
+    const pl = new URLSearchParams(p); pl.delete('theme'); pl.delete('motion'); lt.set('plan', pl.toString());
     $('plWrite').href = './?' + lt + '#contact';
   }
 

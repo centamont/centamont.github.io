@@ -469,8 +469,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const paras = [...form.querySelectorAll('.body')];
     // (a reminder about the blanks of one letter means nothing once another is chosen: it goes, with its marks)
     let mark = () => {};
-    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }); } mark(); };
+    const show = () => { const v = form.querySelector('input[name="as"]:checked').value; paras.forEach((p) => { p.hidden = p.dataset.for !== v; }); form.querySelectorAll('.sign [data-for]').forEach((e) => { e.hidden = e.dataset.for !== v; }); if (reminding) { reminding = ''; note.textContent = ''; form.querySelectorAll('.sheet input').forEach((i) => { i.classList.remove('miss'); i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }); } mark(); };
     let reminding = '';
+    // (the name, and for a developer the company, under the letter)
+    const signed = () => [...form.querySelectorAll('.sign input')].filter((i) => !i.closest('[hidden]'));
+    // A plan carried from the launch planner: its own link, rebuilt here from plain figures only, closes the developer's letter.
+    let planUrl = '';
     // Choosing a voice, the letter rewrites itself softly (site.css): the dimension line under the chosen label travels to
     // it (280 ms), the old paragraph goes (120 ms), then the sheet takes the new one's height (240 ms) as it settles in
     // (220 ms). The focus stays on the voice chosen; with motion reduced or paused the change is instant.
@@ -532,10 +536,25 @@ document.addEventListener('DOMContentLoaded', function () {
       // (the launch planner's link also carries the building's size and neighborhood into the developer's letter)
       if (v) {
         preset(v); q.delete('as');
-        if (v === 'dev') [['units', /^\d{1,4}$/], ['where', /^(?!.*(\d{5,}|[\p{L}\p{N}-]\.\p{L}{2,}))(?!(\D*\d){7})[\p{L}\p{M}\p{N} .,'’&()/-]{1,60}$/u]].forEach(([k, ok]) => { const t = (q.get(k) || '').trim(), i = form.elements[k]; if (i && ok.test(t)) i.value = t; q.delete(k); });
+        const word = /^(?!.*(\d{5,}|[\p{L}\p{N}-]\.\p{L}{2,}))(?!(\D*\d){7})[\p{L}\p{M}\p{N} .,'’&()/-]{1,60}$/u;
+        if (v === 'dev') [['units', /^\d{1,4}$/], ['where', word]].forEach(([k, ok]) => { const t = (q.get(k) || '').trim(), i = form.elements[k]; if (i && ok.test(t)) i.value = t; q.delete(k); });
+        if (v === 'dev' && q.get('plan')) {
+          const from = new URLSearchParams(q.get('plan')), keep = new URLSearchParams();
+          ['u', 'f', 'p', 'c', 'l', 'd', 'g', 'b'].forEach((k) => { const t = from.get(k); if (t && /^-?\d{1,4}(\.\d{1,2})?$/.test(t)) keep.set(k, t); });
+          if (/^\d{4}-\d{2}$/.test(from.get('s') || '')) keep.set('s', from.get('s'));
+          ['n', 'w'].forEach((k) => { const t = (from.get(k) || '').trim(); if (t && word.test(t)) keep.set(k, t); });
+          if (keep.has('u')) planUrl = 'https://centamont.com/planner.html?' + keep;
+        }
+        q.delete('plan');
         history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);
       }
     } catch (e) {}
+    const devp = paras.find((x) => x.dataset.for === 'dev');
+    if (planUrl && devp) {
+      const r = document.createElement('span'), a = document.createElement('a');
+      r.className = 'plan-ref'; a.className = 'ul'; a.href = planUrl; a.textContent = planUrl.replace(/^https:\/\//, '');
+      r.append('My plan: ', a); devp.append(' ', r);
+    }
     document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
     // Enter in a blank should not send the letter
     form.querySelectorAll('.sheet input').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); }));
@@ -554,25 +573,26 @@ document.addEventListener('DOMContentLoaded', function () {
       // an optional clause left blank stays out of the letter
       p.querySelectorAll('[data-opt]').forEach((o, k) => { if (![...o.querySelectorAll('input')].some((i) => i.value.trim())) c.querySelectorAll('[data-opt]')[k].dataset.drop = ''; });
       c.querySelectorAll('input, select').forEach((f, k) => { f.replaceWith(document.createTextNode(src[k].value.trim() || '…')); });
-      c.querySelectorAll('[data-drop]').forEach((o) => o.remove());
-      const name = form.querySelector('input[name="name"]').value.trim();
+      c.querySelectorAll('[data-drop], .plan-ref').forEach((o) => o.remove());
+      const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim();
       // a dropped clause takes its sentence's full stop with it, so put one back
       let body = c.textContent.replace(/\s+/g, ' ').trim();
       if (!/[.!?…]$/.test(body)) body += '.';
-      return 'Dear partners,\n\n' + body + '\n\nWith regards,\n' + (name || '');
+      const plan = p.querySelector('.plan-ref') ? '\n\nMy plan: ' + planUrl : '';
+      return 'Dear partners,\n\n' + body + plan + '\n\nWith regards,\n' + (name || '') + (of ? ' of ' + of : '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
     // The status note is built from text and, where it names Instagram, one link: nothing is ever parsed as HTML.
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
-    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
+    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name', company: 'your company' };
     const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
     const ask = (empty) => 'Fill in ' + list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())) + ' first, so the partners know who is writing and why.';
     // As each named blank is filled, the reminder names only the ones still empty, and goes once none is.
     function remind() {
       if (!reminding) return;
-      const left = [...paras.find((x) => !x.hidden).querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => i.classList.contains('miss'));
+      const left = [...paras.find((x) => !x.hidden).querySelectorAll('input'), ...signed()].filter((i) => i.classList.contains('miss'));
       const t = left.length ? ask(left) : '';
       if (t !== reminding) { reminding = t; note.textContent = t; }
     }
@@ -592,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       if (busy) return;
       const p = paras.find((x) => !x.hidden);
-      const empty = [...p.querySelectorAll('input'), form.querySelector('input[name="name"]')].filter((i) => !i.value.trim() && !i.closest('[data-opt]'));
+      const empty = [...p.querySelectorAll('input'), ...signed()].filter((i) => !i.value.trim() && !i.closest('[data-opt]'));
       if (empty.length) {
         // each blank left empty is marked, and names the reminder as its description
         empty.forEach((i) => { i.classList.add('miss'); i.setAttribute('aria-invalid', 'true'); i.setAttribute('aria-describedby', 'letterNote'); });

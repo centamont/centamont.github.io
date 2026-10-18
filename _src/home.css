@@ -406,6 +406,15 @@ html:not(.js) .step{min-height:auto}
 }
 .name .cut{margin-left:-.045em}
 .pr:last-child{border-bottom:0}
+/* Under the practices, the firm's three arms in one ruled row, a line and a link each. On a phone, where the practices
+   already stand one under another with their links, the row is left off, so it adds nothing to the page's length there. */
+.arms{list-style:none;margin:clamp(40px,4.4vw,64px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule)}
+.arms li{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px clamp(16px,2.4vw,36px) 0}
+.arms li + li{border-left:1px solid var(--rule)}
+.arms b{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+.arms span{font-size:16px;line-height:1.6;color:var(--muted);max-width:36ch}
+.arms .more{margin-top:auto}
+@media (max-width:820px){.arms{display:none}}
 
 /* The rule above each intro draws itself as its section arrives (site.js marks the section .in; without the shared
    script it simply stands drawn) */
