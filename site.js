@@ -27,6 +27,28 @@
     document.body.prepend(a);
   }
 
+  // Visits are counted by GoatCounter, cookie-free: the page's path, its title and the site it came from, no cookie and
+  // nothing stored on the visitor's device. Only on centamont.com, never for a browser driven by a script (the tests),
+  // and never when the browser sends Global Privacy Control or Do Not Track (privacy.html says so). A few moments are
+  // counted as events by name: a letter sent (and from which page), the launch planner put to use, a step from the
+  // planner to the letter, a way out to Instagram, the developer brief downloaded.
+  // window.cmCount(name) counts one; instrument.js and planner.js call it.
+  const counting = /^(www\.)?centamont\.com$/.test(location.hostname) && !navigator.webdriver && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1';
+  const count = (p, ev) => {
+    if (!counting) return;
+    const u = 'https://centamont.goatcounter.com/count?' + new URLSearchParams({ p, t: ev ? p : document.title, r: ev ? '' : document.referrer, e: ev ? 'true' : 'false', rnd: Math.random().toString(36).slice(2, 7) });
+    try { if (navigator.sendBeacon && navigator.sendBeacon(u)) return; } catch (e) {}
+    new Image().src = u;
+  };
+  window.cmCount = (name) => count(name, true);
+  count(location.pathname, false);
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    if (/^https:\/\/(ig\.me|www\.instagram\.com)\//.test(a.href)) window.cmCount('instagram' + location.pathname);
+    else if (/\.pdf(\?|$)/.test(a.getAttribute('href'))) window.cmCount('brief' + location.pathname);
+  }, true);
+
   // Menu
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
   if (nav && btn) {

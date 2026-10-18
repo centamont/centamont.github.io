@@ -243,6 +243,9 @@ document.addEventListener('DOMContentLoaded', function () {
   let raf = 0;
   const soon = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
   form.addEventListener('input', soon);
+  // counted once a visit: the planner put to use, and the step from it to the letter (site.js: window.cmCount)
+  form.addEventListener('input', () => { if (window.cmCount) window.cmCount('planner-used'); }, { once: true });
+  $('plWrite').addEventListener('click', () => { if (window.cmCount) window.cmCount('planner-to-letter'); });
   form.addEventListener('submit', (e) => e.preventDefault());
   let w0 = 0;
   if (window.ResizeObserver) new ResizeObserver(() => { const w = svg.clientWidth; if (w && Math.abs(w - w0) > 2) { w0 = w; soon(); } }).observe(svg);
