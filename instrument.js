@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
       build = el('path', { class: 'cv-build', d: `M${x(BREAK)} ${Y1} L${x(DONE)} ${y(1)}` });
       area = el('path', { class: 'cv-area' }); par = el('path', { class: 'cv-par' }); line = el('path', { class: 'cv-line' });
       // what is still for sale at completion, measured off as a dimension string from the curve up to the whole building
-      dimL = el('path', { class: 'cv-dim' }); ring = el('circle', { class: 'cv-ring', r: 3.5 }); dimT = el('text', { class: 'cv-dimt' });
+      dimL = el('path', { class: 'cv-dim' }); ring = el('circle', { class: 'cv-dimr', r: 3.5 }); dimT = el('text', { class: 'cv-dimt' });
       lim = el('line', { class: 'cv-lim' }); limT = el('text', { class: 'cv-limt', 'text-anchor': 'end' });
       dot = el('circle', { class: 'cv-dot', r: 4.5 }); dotT = el('text', { class: 'cv-dott' });
       // with no legend row, a phone names each line in the drawing (placed in draw(), clear of the curves and notes)
