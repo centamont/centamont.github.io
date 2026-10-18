@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return sold;
     }
 
-    let build, area, par, line, lim, limT, dot, dotT, labC, labP, labB;
+    let build, area, par, line, lim, limT, dot, dotT, labC, labP, labB, dimL, dimT, ring;
     const keyRow = document.querySelector('.cv-key'), fig = svg.closest('.cv-fig');
     // On a phone the drawing names its own lines (there is no legend row) and the phases are named in a row under it.
     const narrow = matchMedia('(max-width:520px)');
@@ -133,6 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
       el('text', { class: 'ph cv-axt', x: X1, y: Y1 + 37, 'text-anchor': 'end' }, g, 'Months from launch');
       build = el('path', { class: 'cv-build', d: `M${x(BREAK)} ${Y1} L${x(DONE)} ${y(1)}` });
       area = el('path', { class: 'cv-area' }); par = el('path', { class: 'cv-par' }); line = el('path', { class: 'cv-line' });
+      // what is still for sale at completion, measured off as a dimension string from the curve up to the whole building
+      dimL = el('path', { class: 'cv-dim' }); ring = el('circle', { class: 'cv-dimr', r: 3.5 }); dimT = el('text', { class: 'cv-dimt' });
       lim = el('line', { class: 'cv-lim' }); limT = el('text', { class: 'cv-limt', 'text-anchor': 'end' });
       dot = el('circle', { class: 'cv-dot', r: 4.5 }); dotT = el('text', { class: 'cv-dott' });
       // with no legend row, a phone names each line in the drawing (placed in draw(), clear of the curves and notes)
@@ -238,13 +240,37 @@ document.addEventListener('DOMContentLoaded', function () {
         dotT.setAttribute('x', x(hit) + dx); dotT.setAttribute('text-anchor', an); dotT.setAttribute('y', y(T) + dy);
       }
       else { dot.style.display = 'none'; dotT.textContent = ''; }
+      // At completion: the share still for sale, its dimension line run up the completion line from the curve to the
+      // whole building, with a slash at each end as on a drawing, and its figure beside it where the curves leave room.
+      const left = 1 - done, xd = x(DONE), yd = y(done), yt = y(1);
+      ring.setAttribute('cx', xd); ring.setAttribute('cy', yd);
+      dimT.textContent = '';
+      if (left >= 0.03 && yd - yt > 18) {
+        const sl = (yy) => `M${xd - 4} ${yy + 4} L${xd + 4} ${yy - 4}`;
+        dimL.setAttribute('d', `M${xd} ${yd - 6} L${xd} ${yt} ${sl(yt)} ${sl(yd - 6)}`);
+        dimT.textContent = Math.round(left * 100) + '% for sale';
+        const lines = pts.concat(Array.from({ length: 49 }, (_, i) => [x(BREAK + (DONE - BREAK) * i / 48), Y1 - (Y1 - yt) * i / 48]));
+        const ym = (yd + yt) / 2 + 5, near = dotT.textContent ? dotT.getBBox() : null;
+        let ok = false;
+        for (const [dx, an] of [[8, 'start'], [-8, 'end']]) {
+          dimT.setAttribute('x', xd + dx); dimT.setAttribute('text-anchor', an); dimT.setAttribute('y', ym);
+          const b = dimT.getBBox();
+          if (b.x < X0 + 2 || b.x + b.width > W - 2) continue;
+          if (lines.some(([px, py]) => px > b.x - 3 && px < b.x + b.width + 3 && py > b.y - 2 && py < b.y + b.height + 2)) continue;
+          if (near && !(near.x > b.x + b.width || near.x + near.width < b.x || near.y > b.y + b.height || near.y + near.height < b.y)) continue;
+          ok = true; break;
+        }
+        // (a dimension with no room for its figure is left out: the reading above the plot gives the share)
+        if (!ok) { dimT.textContent = ''; dimL.setAttribute('d', ''); }
+      } else dimL.setAttribute('d', '');
       // The threshold label takes the first spot, right or left, above or below the line, that no curve or note runs through.
-      const dotB = dotT.textContent ? dotT.getBBox() : null;
+      const dotB0 = dotT.textContent ? dotT.getBBox() : null, dimB = dimT.textContent ? dimT.getBBox() : null;
+      const notes = [dotB0, dimB].filter(Boolean);
       // Failing a clear spot, the label may cross a curve (its halo keeps it legible) but never the month note.
       const spots = [[X1, 'end', -8], [X0 + 6, 'start', -8], [X1, 'end', 18], [X0 + 6, 'start', 18]].map(([lx, anchor, dy]) => {
         limT.setAttribute('x', lx); limT.setAttribute('text-anchor', anchor); limT.setAttribute('y', y(T) + dy);
         const b = limT.getBBox(), curve = crosses(b);
-        const note = !!dotB && !(dotB.x > b.x + b.width || dotB.x + dotB.width < b.x || dotB.y > b.y + b.height || dotB.y + dotB.height < b.y);
+        const note = notes.some((n) => !(n.x > b.x + b.width || n.x + n.width < b.x || n.y > b.y + b.height || n.y + n.height < b.y));
         return { lx, anchor, dy, curve, note };
       });
       const pick = spots.find((o) => !o.curve && !o.note) || spots.find((o) => !o.note) || spots[0];
@@ -258,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const lines = pts.slice();
         for (let i = 0; i <= 48; i++) lines.push([x(BREAK + (DONE - BREAK) * i / 48), Y1 - (Y1 - y(1)) * i / 48]);
         for (let px = X0; px <= X1; px += 4) lines.push([px, y(T)]);
-        const taken = dotB ? [dotB] : [];
+        const taken = notes.slice();
         const name = (t, text, at) => {
           t.textContent = text; let pickN = null, least = Infinity;
           for (const [lx, an, ly] of at) {

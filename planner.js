@@ -84,18 +84,24 @@ document.addEventListener('DOMContentLoaded', function () {
     el('text', { class: 'ph', x: X1, y: Y1 + 38, 'text-anchor': 'end' }, g, 'Months from launch');
     // construction as a band between ground breaking and completion, with each named above its line
     if (r.G > -1) {
-      el('rect', { class: 'lp-band', x: x(r.G), y: Y0 - 6, width: x(r.C) - x(r.G), height: Y1 - Y0 + 6 }, g);
-      const names = [[r.G, phone ? 'Ground' : 'Ground broken'], [r.C, 'Completion']];
+      // (the band stops at the whole building, as the plot does)
+      el('rect', { class: 'lp-band', x: x(r.G), y: y(1), width: x(r.C) - x(r.G), height: Y1 - y(1) }, g);
+      const names = [[r.G, 'Ground broken'], [r.C, 'Completion']];
       if (r.G > o.planned) names.unshift([o.planned, 'Planned']);
-      let lastR = -Infinity, row = 0;
+      // each name beside its own line, right of it where it fits, on the first row where it clears every name already set
+      // and never runs across another phase's line; a name with nowhere clear takes the next row down
+      const rows = [], lines = names.map(([m]) => x(m));
       names.forEach(([m, t], i) => {
-        el('line', { class: i === 0 && r.G > o.planned ? 'phase plan' : 'phase', x1: x(m), x2: x(m), y1: Y0 - 30, y2: Y1 }, g);
+        const ln = el('line', { class: i === 0 && r.G > o.planned ? 'phase plan' : 'phase', x1: x(m), x2: x(m), y1: 6, y2: Y1 }, g);
         const e = el('text', { class: 'ph', x: x(m) + 6, y: 0 }, g, t);
-        let w = e.getComputedTextLength() || t.length * 8;
-        let lx = x(m) + 6;
-        if (lx + w > W - 2) { e.setAttribute('text-anchor', 'end'); lx = x(m) - 6 - w; e.setAttribute('x', x(m) - 6); }
-        row = lx < lastR + 10 ? row + 1 : 0;
-        e.setAttribute('y', 16 + row * 18); lastR = lx + w;
+        const w = e.getComputedTextLength() || t.length * 8;
+        const sides = [[x(m) + 6, 'start', x(m) + 6], [x(m) - 6, 'end', x(m) - 6 - w]];
+        for (let row = 0; ; row++) {
+          rows[row] = rows[row] || [];
+          const fit = sides.find(([, , l]) => l >= 2 && l + w <= W - 2 && rows[row].every(([a, b]) => l >= b + 10 || l + w <= a - 10) &&
+            lines.every((lx, j) => j === i || lx < l - 4 || lx > l + w + 4));
+          if (fit || row >= 2) { const [ax, an, l] = fit || sides[0]; e.setAttribute('x', ax); e.setAttribute('text-anchor', an); e.setAttribute('y', 16 + row * 18); ln.setAttribute('y1', 4 + row * 18); rows[row].push([l, l + w]); break; }
+        }
       });
     }
     const pathD = r.s.map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).toFixed(1)).join(' ');
@@ -106,10 +112,38 @@ document.addEventListener('DOMContentLoaded', function () {
     // the threshold's name moves under its line where the curve would run through it
     const b = lt.getBBox(), m0 = Math.floor((b.x - X0) / (X1 - X0) * M), m1 = Math.ceil((b.x + b.width - X0) / (X1 - X0) * M);
     if (r.s.slice(Math.max(0, m0), m1 + 1).some((f) => y(f) > b.y - 4 && y(f) < b.y + b.height + 4)) lt.setAttribute('y', y(o.loan) + 20);
+    // the curve as points a few pixels apart, for keeping notes off it
+    const pts = [];
+    for (let i = 0; i < M; i++) for (let t = 0; t < 1; t += 0.25) pts.push([x(i + t), y(r.s[i] + (r.s[i + 1] - r.s[i]) * t)]);
+    const crosses = (b) => pts.some(([px, py]) => px > b.x - 4 && px < b.x + b.width + 4 && py > b.y - 3 && py < b.y + b.height + 3);
+    const meets = (a, b) => !(a.x > b.x + b.width || a.x + a.width < b.x || a.y > b.y + b.height || a.y + a.height < b.y);
+    const taken = [lt.getBBox()];
+    // a note takes the first of its spots that stays in the plot, clear of the curve and the notes already set
+    const place = (t, spots) => {
+      for (const [sx, an, sy] of spots) {
+        t.setAttribute('x', sx); t.setAttribute('text-anchor', an); t.setAttribute('y', sy);
+        const b = t.getBBox();
+        if (b.x < 2 || b.x + b.width > W - 2 || b.y < Y0 - 4 || b.y + b.height > Y1 - 2 || crosses(b) || taken.some((q) => meets(q, b))) continue;
+        taken.push(b); return true;
+      }
+      t.remove(); return false;
+    };
     if (r.T > -1) {
       el('circle', { class: 'cv-dot', r: 4.5, cx: x(r.T), cy: y(o.loan) }, svg);
-      const right = x(r.T) > X1 - 120;
-      el('text', { class: 'cv-dott', x: x(r.T) + (right ? -10 : 10), y: y(o.loan) - 12, 'text-anchor': right ? 'end' : 'start' }, svg, 'Month ' + r.T);
+      const t = el('text', { class: 'cv-dott' }, svg, 'Month ' + r.T), tx = x(r.T), ty = y(o.loan);
+      place(t, [[tx + 10, 'start', ty + 22], [tx - 10, 'end', ty - 12], [tx + 10, 'start', ty + 38], [tx - 10, 'end', ty + 22], [tx + 10, 'start', ty - 12], [tx - 10, 'end', ty - 28]]);
+    }
+    // at completion, the share still for sale measured off as a dimension string, as on the home page's curve
+    if (r.C > -1 && r.C <= M) {
+      const done = r.s[r.C], xd = x(r.C), yd = y(done), yt = y(1);
+      const sl = (yy) => `M${xd - 4} ${yy + 4} L${xd + 4} ${yy - 4}`, room = 1 - done >= 0.03 && yd - yt > 18;
+      const dl = room ? el('path', { class: 'cv-dim', d: `M${xd} ${yd - 6} L${xd} ${yt} ${sl(yt)} ${sl(yd - 6)}` }, svg) : null;
+      el('circle', { class: 'cv-dimr', r: 3.5, cx: xd, cy: yd }, svg);
+      if (room) {
+        const t = el('text', { class: 'cv-dimt' }, svg, Math.round((1 - done) * 100) + '% for sale'), ym = (yd + yt) / 2 + 5;
+        // (a dimension with no room for its figure is left out)
+        if (!place(t, [[xd + 8, 'start', ym], [xd - 8, 'end', ym]])) dl.remove();
+      }
     }
   }
 
@@ -131,14 +165,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const phase = (m) => (m < 0 ? 'open' : r.G < 0 || m <= r.G ? 'pre' : m <= r.C ? 'mid' : 'post');
     units.forEach((u) => { u.p = phase(u.m); });
 
-    const cw = 20, ch = 14, gap = 3, lw = 34, VW = lw + per * (cw + gap), VH = F * (ch + gap) + 16;
-    plan.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
-    plan.style.setProperty('--lp-w', Math.min(100, Math.max(40, per * 9)) + '%');
+    // drawn as a stacking plan is: every floor numbered up the left, the lines numbered along the foot, the building on its
+    // ground line over a band of hatch, and set at one size, about a cell to a finger's width, so a short building never
+    // swells to fill the page and a tall one keeps to the screen
+    const cw = 20, ch = 14, gap = 3, lw = 34, foot = per <= 12 ? 34 : 16, VW = lw + per * (cw + gap), base = F * (ch + gap) + 2, VH = base + foot;
+    plan.setAttribute('viewBox', `-2 -2 ${VW + 4} ${VH + 4}`);
+    plan.style.width = Math.round((VW + 4) * Math.min(1.25, 540 / VH)) + 'px';
     plan.textContent = '';
     units.forEach((u) => el('rect', { class: 'lp-u ' + u.p, x: lw + u.c * (cw + gap), y: (F - 1 - u.f) * (ch + gap), width: cw, height: ch }, plan));
-    const lab = F > 30 ? 10 : 5;
-    for (let f = 0; f < F; f++) if ((f + 1) % lab === 0 || f === 0 || f === F - 1) el('text', { class: 'lp-fl', x: lw - 8, y: (F - 1 - f) * (ch + gap) + ch - 3, 'text-anchor': 'end' }, plan, String(f + 1));
-    el('line', { class: 'lp-gr', x1: lw - 4, x2: VW, y1: F * (ch + gap) + 2, y2: F * (ch + gap) + 2 }, plan);
+    const lab = F > 30 ? 5 : 1, pad = (n) => String(n).padStart(2, '0');
+    for (let f = 0; f < F; f++) if ((f + 1) % lab === 0 || f === 0 || f === F - 1) el('text', { class: 'lp-fl', x: lw - 8, y: (F - 1 - f) * (ch + gap) + ch - 3, 'text-anchor': 'end' }, plan, pad(f + 1));
+    const hatch = el('pattern', { id: 'plH', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, el('defs', {}, plan));
+    el('line', { class: 'lp-h', x1: 0, y1: 0, x2: 0, y2: 5 }, hatch);
+    el('path', { d: `M${lw - 4} ${base}H${VW}v6H${lw - 4}Z`, fill: 'url(#plH)' }, plan);
+    el('line', { class: 'lp-gr', x1: lw - 4, x2: VW, y1: base, y2: base }, plan);
+    if (per <= 12) {
+      el('text', { class: 'lp-fl lp-ln', x: lw - 8, y: base + 24, 'text-anchor': 'end' }, plan, 'Line');
+      for (let c = 0; c < per; c++) el('text', { class: 'lp-fl', x: lw + c * (cw + gap) + cw / 2, y: base + 24, 'text-anchor': 'middle' }, plan, pad(c + 1));
+    }
     const c = { pre: 0, mid: 0, post: 0, open: 0 }, v = { pre: 0, mid: 0, post: 0 };
     units.forEach((u) => { c[u.p]++; if (u.p !== 'open') v[u.p] += u.v; });
     ['pre', 'mid', 'post', 'open'].forEach((p) => { $('plK' + p).textContent = c[p]; });

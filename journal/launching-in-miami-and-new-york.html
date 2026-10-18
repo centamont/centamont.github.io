@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME='; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90='; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -36,9 +36,10 @@
 <link rel="preload" href="../fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="../site.css?v=7ac23133">
+<link rel="stylesheet" href="../site.css?v=e1ab3e09">
 <script>document.documentElement.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))document.documentElement.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)document.documentElement.dataset.theme=q[1];try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')document.documentElement.dataset.motion='off'}catch(e){}setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))document.documentElement.classList.add('nosite')},4000)</script>
-<script src="../site.js?v=7ac23133" defer></script>
+<script src="../site.js?v=e1ab3e09" defer></script>
+<script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js" id="top">
 <a class="skip" href="#main">Skip to content</a>
@@ -52,13 +53,13 @@
       <a class="dw" href="../#services">What we do</a>
       <a href="../#developers">Developers</a>
       <a href="../#clients">Private clients</a>
-      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Markets<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><span class="mk-st" role="group" aria-labelledby="mkFl"><span class="mk-k" id="mkFl">Florida</span> <a href="../south-florida.html">South Florida<span class="vh">, open now</span></a> <a href="../tampa.html">Tampa</a> <a href="../naples.html">Naples</a></span> <span class="mk-st" role="group" aria-labelledby="mkNy"><span class="mk-k" id="mkNy">New York</span> <a href="../new-york.html">New York City<span class="vh">, open now</span></a> <a href="../hamptons.html">Hamptons<span class="vh">, open now</span></a></span> <span class="mk-st" role="group" aria-labelledby="mkCa"><span class="mk-k" id="mkCa">California</span> <a href="../los-angeles.html">Los Angeles</a> <a href="../san-francisco.html">San Francisco</a> <a href="../orange-county.html">Orange County</a></span> <span class="mk-st" role="group" aria-labelledby="mkTx"><span class="mk-k" id="mkTx">Texas</span> <a href="../dallas.html">Dallas</a> <a href="../austin.html">Austin</a> <a href="../houston.html">Houston</a></span></div></div>
+      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Markets<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><span class="mk-st" role="group" aria-labelledby="mkOpen"><span class="mk-k" id="mkOpen">Open now</span> <a href="../south-florida.html">South Florida</a> <a href="../new-york.html">New York City</a> <a href="../hamptons.html">Hamptons</a></span> <span class="mk-st mk-later" role="group" aria-labelledby="mkNext"><span class="mk-k" id="mkNext">Next</span> <a href="../los-angeles.html">Los Angeles</a> <a href="../dallas.html">Dallas</a> <a href="../tampa.html">Tampa</a> <a href="../naples.html">Naples</a> <a href="../austin.html">Austin</a> <a href="../houston.html">Houston</a> <a href="../san-francisco.html">San Francisco</a> <a href="../orange-county.html">Orange County</a></span></div></div>
       <a href="./" aria-current="true">Journal</a>
       <a class="dw" href="../advisors.html">Advisors</a>
       <a href="../#contact">Contact</a>
     </nav>
     <div class="tools">
-    <nav class="lang" aria-label="Language"><a href="/journal/launching-in-miami-and-new-york.html" lang="en" aria-current="true"><span aria-hidden="true">EN</span><span class="vh">English</span></a><a href="/es/" hreflang="es" lang="es"><span aria-hidden="true">ES</span><span class="vh">Español</span></a><a href="/pt/" hreflang="pt-BR" lang="pt-BR"><span aria-hidden="true">PT</span><span class="vh">Português</span></a></nav>
+    <nav class="lang" aria-label="Language"><a href="/journal/launching-in-miami-and-new-york.html" lang="en" aria-current="true"><span aria-hidden="true">EN</span><span class="vh">English</span></a><a href="/es/" hreflang="es" lang="es" title="Esta página aún no está en español: abre el inicio en español"><span aria-hidden="true">ES</span><span class="vh">Inicio en español</span></a><a href="/pt/" hreflang="pt-BR" lang="pt-BR" title="Esta página ainda não está em português: abre o início em português"><span aria-hidden="true">PT</span><span class="vh">Início em português</span></a></nav>
     <button class="motion" id="motionBtn" type="button" aria-label="Pause motion" title="Pause motion" aria-pressed="false"><svg class="pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 2.5v11M10.5 2.5v11" stroke="currentColor"/></svg><svg class="play" viewBox="-.5 -.5 16 16" aria-hidden="true"><path d="M5 3.2v9.6L12.6 8z" fill="none" stroke="currentColor"/></svg></button>
     <a class="hd" href="https://ig.me/m/centamont" target="_blank" rel="noopener">@centamont<span class="vh"> on Instagram (opens in a new tab)</span><svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
     <button class="theme" id="themeBtn" type="button" aria-label="Night mode" title="Night mode"><svg class="sun" viewBox="-.5 -.5 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor"/><path d="M8 .8v2M8 13.2v2M.8 8h2M13.2 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M2.9 13.1l1.4-1.4M11.7 4.3l1.4-1.4" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 10.4A6 6 0 0 1 5.6 2.4a6 6 0 1 0 8 8z" fill="none" stroke="currentColor"/></svg></button>
@@ -72,9 +73,9 @@
 <h1>Launching in Miami <span class="nw">and New York</span></h1>
 <p class="standfirst">The same tower would launch under two different rulebooks. Here is how the filing, the deposits, the threshold and the closing costs compare, and what each one changes in the sales&nbsp;plan.</p>
 <div class="meta"><span class="nw">The partners</span> <span class="nw"><time datetime="2026-10-15">October 15, 2026</time></span> <span class="nw">4-minute read</span></div>
-<figure class="photo plate broad"><picture><source type="image/avif" srcset="../media/south-beach-960.avif 960w, ../media/south-beach-1600.avif 1600w, ../media/south-beach-2400.avif 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px"><source type="image/webp" srcset="../media/south-beach-960.webp 960w, ../media/south-beach-1600.webp 1600w, ../media/south-beach-2400.webp 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px"><img src="../media/south-beach-1600.jpg" srcset="../media/south-beach-960.jpg 960w, ../media/south-beach-1600.jpg 1600w, ../media/south-beach-2400.jpg 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px" width="1600" height="1066" alt="The shoreline and towers of Miami Beach from the air at dusk." loading="lazy" decoding="async"></picture><figcaption class="cap"><span>South Beach, Miami Beach, at dusk.</span><span class="credit">Photograph: Jairo Gonzalez, Unsplash</span></figcaption></figure>
+<figure class="photo plate broad"><picture><source type="image/avif" srcset="../media/south-beach-960.avif 960w, ../media/south-beach-1600.avif 1600w, ../media/south-beach-2400.avif 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px"><source type="image/webp" srcset="../media/south-beach-960.webp 960w, ../media/south-beach-1600.webp 1600w, ../media/south-beach-2400.webp 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px"><img fetchpriority="high" src="../media/south-beach-1600.jpg" srcset="../media/south-beach-960.jpg 960w, ../media/south-beach-1600.jpg 1600w, ../media/south-beach-2400.jpg 2400w" sizes="(max-width:1240px) calc(100vw - 40px), 1200px" width="1600" height="1066" alt="The shoreline and towers of Miami Beach from the air at dusk." decoding="async"></picture><figcaption class="cap"><span>South Beach, Miami Beach, at dusk.</span><span class="credit">Photograph: Jairo Gonzalez, Unsplash</span></figcaption></figure>
 <div class="prose lead">
-<h2>Filing comes first</h2>
+<h2 id="filing-comes-first">Filing comes first</h2>
 <p>Neither state lets a developer sell before the paperwork is in. In Florida, <a href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&amp;URL=0700-0799/0718/Sections/0718.502.html" target="_blank" rel="noopener">section&nbsp;718.502<span class="vh"> (Florida Statutes, opens in a new tab)</span></a> requires the developer to file its offering documents with the state before it offers purchase contracts, and it cannot close a sale until the state confirms the filing is proper. Reservations can start earlier, once the state has approved the escrow agreement and the reservation form, and a reservation deposit must be refunded whenever the buyer asks in&nbsp;writing.</p>
 <p>In New York the developer is the <strong>sponsor</strong>, and under <a href="https://www.law.cornell.edu/regulations/new-york/13-NYCRR-20.1" target="_blank" rel="noopener">Part&nbsp;20<span class="vh"> of the Attorney General’s regulations (opens in a new tab)</span></a> no unit may be offered at all until the Attorney General’s office accepts the offering plan for filing. There is no reservation stage to test prices on. The day the plan is accepted is the first day of the campaign, so it belongs on the launch calendar from the&nbsp;start.</p>
 
@@ -94,21 +95,21 @@
 <figcaption class="cap">Florida and New York rules for a new condominium sold by its developer, side by side. In bronze, the difference that changes the&nbsp;financing.</figcaption>
 </figure>
 
-<h2>Deposits and the capital stack</h2>
+<h2 id="deposits-and-the-capital-stack">Deposits and the capital stack</h2>
 <aside class="side" aria-hidden="true"><b>10%</b><span>of the price is the part of a Miami deposit that must stay in escrow until&nbsp;closing</span></aside>
 <p>This is the difference that reaches the financing. Under <a href="https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&amp;URL=0700-0799/0718/Sections/0718.202.html" target="_blank" rel="noopener">section&nbsp;718.202<span class="vh"> (Florida Statutes, opens in a new tab)</span></a>, the first 10&nbsp;percent of the price stays in escrow until closing, and anything above it may go into construction if the contract says so. Miami deposit schedules often reach 30 to 50&nbsp;percent before completion, so buyers’ money can carry part of the cost of the&nbsp;building.</p>
 <p>In New York, deposits stay the buyer’s money until closing and may not be spent on construction. Equity and the construction loan carry the whole build. A sponsor planning both cities should expect the New York tower to need more capital behind it before the first sale, and the Miami tower to lean harder on the pace of&nbsp;contracts.</p>
 
-<h2>Two thresholds in New York</h2>
+<h2 id="two-thresholds-in-new-york">Two thresholds in New York</h2>
 <p>Lenders in both cities set pre-sale requirements of their own. New York adds a second one in law: under <a href="https://www.law.cornell.edu/regulations/new-york/13-NYCRR-20.3" target="_blank" rel="noopener">section&nbsp;20.3<span class="vh"> of the Attorney General’s regulations (opens in a new tab)</span></a>, a plan cannot be declared effective until buyers have signed for at least 15&nbsp;percent of the units offered. Until then the sponsor may still abandon the offering, and every deposit goes back. In both cities the launch price decides when the threshold arrives, as our note on <a href="launch-price-and-the-pre-sale-threshold.html">launch price and the pre-sale threshold</a>&nbsp;shows.</p>
 
-<h2>Who pays at closing</h2>
+<h2 id="who-pays-at-closing">Who pays at closing</h2>
 <p>Closing costs change the price a buyer actually compares. In Florida the documentary stamp tax on the deed is the seller’s by custom, though developer contracts often pass it to the buyer. In New York the state and city transfer taxes are also normally the seller’s and are often passed to the buyer in a sponsor sale, and the buyer always pays the mansion tax: 1&nbsp;percent from $1&nbsp;million, rising with the supplemental tax to 3.9&nbsp;percent combined at the top of the New York City market. Taking on some of these costs is a real concession that leaves the price list where it&nbsp;is.</p>
 
-<h2>Selling one city to the other</h2>
+<h2 id="selling-one-city-to-the-other">Selling one city to the other</h2>
 <p>Many Miami buyers live in New York. A Florida offering marketed to New York residents generally needs a New York filing or an exemption first, and the Attorney General’s <a href="https://ag.ny.gov/sites/default/files/regulatory-documents/8.5.2015_Advertising_Guidelines_for_Out_of_State_Offerings.pdf" target="_blank" rel="noopener">advertising guidelines<span class="vh"> (PDF, opens in a new tab)</span></a> describe how a website can avoid targeting New York until then. Settle it before the first event in Manhattan, not&nbsp;after.</p>
 
-<h2>One plan, two calendars</h2>
+<h2 id="one-plan-two-calendars">One plan, two calendars</h2>
 <ul class="ref">
 <li>In New York, the day the plan is accepted sets the earliest launch. Build the campaign to open on&nbsp;it.</li>
 <li>In Miami, a reservation program can test lines and prices before contracts, with deposits the buyer can recover on&nbsp;request.</li>
