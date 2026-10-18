@@ -320,14 +320,17 @@
   // the crown, then the aviation light last
   const CASCADE = 2400;
   // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, each made from one
-  // camera of that hero at 1440 x 900 and lit by one sun (by day, at golden hour, after dark). For each: the crop's place
+  // camera of that hero at 1440 x 900 and lit by one sun (by day, in the early morning and at golden hour, after dark;
+  // the morning's is seen from the south-east, as the night's is, so its low sun rakes across the face in view). Each
+  // runs on past that hero's right and bottom edges, so a wider or taller window is still filled. For each: the crop's place
   // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 897, y: 168, w: 543, h: 732, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    gold: { x: 898, y: 156, w: 542, h: 744, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 890, y: 151, w: 550, h: 749, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 897, y: 168, w: 843, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    morning: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 898, y: 156, w: 842, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
@@ -1221,8 +1224,11 @@
         g.lineWidth = 0.75;
         for (let q = 1; q <= kq; q++) { const st = sets[q]; if (!st.length) continue; g.beginPath(); for (let i = 0; i < st.length; i += 4) { g.moveTo(st[i], st[i + 1]); g.lineTo(st[i + 2], st[i + 3]); } g.strokeStyle = col(q / kq); g.stroke(); }
       };
-      // Ground: survey grid, site line, and the tower's shadow
-      if (this.o.grid) (() => {
+      // Ground: survey grid, site line, and the tower's shadow. Under the photograph (which has its own site) it goes, so
+      // left of the photograph the open bay runs on rather than a drawn plane under the links (gA, the ground's alpha)
+      const gA = 1 - sa;
+      if (this.o.grid && gA > 0.001) (() => {
+        g.globalAlpha = gA;
         // seen from above, as a plan, the ground drawing carries the picture, so it is drawn darker
         const bo = 1 + clamp(-(this.phi + (this.tyy || 0)) * 1.6, 0, 1);
         // a ground line is cut where it passes behind the eye (a close camera, as on the empty lot, can stand inside the
@@ -1238,7 +1244,7 @@
         // renderer has drawn to the horizon, out to a sea wall round it, and the survey grid stays on the land
         if (sky && dark && this.o.site !== false) {
           const pw = nearCut(SHORE, this.k, 1), sp = pw.map(([x, z]) => this.P(x, 0, z));
-          g.save(); g.globalAlpha = skyA; sky.land(g, this, sp); g.restore();
+          g.save(); g.globalAlpha = skyA * gA; sky.land(g, this, sp); g.restore();
           g.lineWidth = 1; g.strokeStyle = ink(0.34 * (r3 ? 1 : skyA)); g.beginPath(); sp.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); if (pw === SHORE) g.closePath(); g.stroke();
         }
         g.lineWidth = 1;
@@ -1267,9 +1273,9 @@
             for (let i = 0; i <= 20; i++) { const a = TAU * i / 20, p = this.P(x + Math.cos(a) * 0.9, 0, z + Math.sin(a) * 0.9); q.push(p); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
             const f = inLens ? 1 : clamp(Math.min(x0, w - x1, y0, h - y1) / 24, 0, 1);
             if (f <= 0) continue;
-            g.globalAlpha = f; g.beginPath(); q.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.stroke();
+            g.globalAlpha = f * gA; g.beginPath(); q.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.stroke();
           }
-          g.globalAlpha = 1;
+          g.globalAlpha = gA;
           // north point, only where the view looks down enough to read it
           if (this.o.north) {
           const nc = [12.5, 9.5];
@@ -1288,6 +1294,7 @@
           seg(this.P(-3.6, 0, -5.4), this.P(-3.6, 0, -7.5)); seg(this.P(3.6, 0, -5.4), this.P(3.6, 0, -7.5));
           g.stroke();
         }
+        g.globalAlpha = 1;
       })();
       if (L > 0.01 && !solid) {
         // The tower's shadow. On ink it is the sun's, and goes with it: it fades through dusk (its bearing easing toward
@@ -2071,9 +2078,10 @@
       }
       if (solid && (r3 || sa > 0)) {
         // the aviation light, as the drawing lights it: on the rendered (or photographed) crown it sits on the floating
-        // roof's high edge over the bay, where an obstruction light would be fixed, rather than on a mast
+        // roof's high edge over the bay, where an obstruction light would be fixed, rather than on a mast (it goes as the
+        // photograph comes in: its glow would sit round the photographed crown as a halo)
         const tp = SCREEN.reduce((a, q) => (CREST(q) > CREST(a) ? q : a));
-        if (this.G > 0.85) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+        if (this.G > 0.85 && sa < 1) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, (1 - sa) * ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
       }
       // The photograph, over the tower, the drawing and the render alike, as it fades in (and over the aviation light, whose
       // glow shows round the crown it stands on), with the light of the sky behind it where the renderer is not drawing it
@@ -2105,7 +2113,8 @@
         // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
         for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
           if (!named(i)) continue;
-          const a = ra * (i === lastN ? give : 1);
+          // (over the photograph, a name below the horizon would sit on its palms: it gives way as the photograph comes in)
+          const a = ra * (i === lastN ? give : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
           if (a <= 0.01) continue;
           const t = 'L' + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
         }
@@ -2543,8 +2552,9 @@
   // What the rendered tower (tower3d.js) and the sales curve's small elevation (instrument.js) are built from: the same
   // plans, structure, site and stacking plan as the drawing.
   // Which photograph suits the hour (see STILLS): the night's once the sun is below the horizon (as the hero's camera
-  // judges it), golden hour's while it stands under 15 degrees, the day's above that; and their bearings.
-  Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? 'gold' : 'day'; };
+  // judges it), the early morning's or golden hour's while it stands under 15 degrees (east or west of south), the day's
+  // above that; and their bearings.
+  Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? (s.az < 180 ? 'morning' : 'gold') : 'day'; };
   Model.stills = STILLS;
   Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
