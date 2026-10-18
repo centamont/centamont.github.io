@@ -218,6 +218,10 @@ html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 .chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .wo{fill:none;stroke:var(--faint);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round}
 .chart .wf{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.chart .ov .lnd{fill:var(--fg);fill-opacity:.045;stroke:none}
+.chart .ov .wl{fill:var(--fg);opacity:.34}
+.chart .ov .st{fill:none;stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-dasharray:calc(1px * var(--u,1)) calc(2.5px * var(--u,1));stroke-linecap:round;opacity:.38}
+.chart .ov .bd{fill:none;stroke:var(--fg);stroke-width:calc(.7px * var(--u,1));stroke-dasharray:calc(7px * var(--u,1)) calc(2.5px * var(--u,1)) calc(1px * var(--u,1)) calc(2.5px * var(--u,1));opacity:.45}
 .chart .levels{margin:0;padding:0;list-style:none}
 .chart .lv{position:relative}
 .chart .lv .no{display:none}

@@ -1190,6 +1190,8 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
    inside keep 8px clear of them) */
 .ticks,.cv-fig svg,.letter .sheet{--tk:14px;--tc:var(--faint);background:linear-gradient(var(--tc),var(--tc)) 0 0/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 0 0/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 0/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 0/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 0 100%/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 0 100%/1px var(--tk) no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 100%/var(--tk) 1px no-repeat,linear-gradient(var(--tc),var(--tc)) 100% 100%/1px var(--tk) no-repeat,var(--sheet)}
 .chart .coast path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;opacity:.5;stroke-linejoin:round}
+/* (the overview draws its coast once, in its defs, and uses it for the coast, the land's tone and the sea's water lines) */
+.chart .coast use{fill:none;stroke:var(--fg);stroke-width:calc(.7px * var(--u,1));stroke-linejoin:round;opacity:.62}
 .chart [data-m]{transition:opacity .4s var(--ease)}
 .chart[data-hl] .ov [data-m]{opacity:.18}
 .chart[data-hl="sf"] .ov [data-m="sf"],.chart[data-hl="ny"] .ov [data-m="ny"],.chart[data-hl="ladal"] .ov [data-m="ladal"],.chart[data-hl="more"] .ov [data-m="more"],.chart[data-hl="intl"] .ov [data-m="intl"]{opacity:1}
@@ -1207,14 +1209,14 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
 .js .chart .pt:not(.landed){stroke:var(--rule)}
 /* each city's skyline, the roofline of its elevation on its own page, rises over its dot as the route lands: drawn in
-   ink first, then filled with the sheet so the routes and grid pass behind it */
-.chart .sky{fill:var(--sheet);fill-opacity:1;stroke:var(--fg);stroke-width:calc(1px * var(--u,1));stroke-linejoin:miter;stroke-opacity:.85}
+   ink first, then filled in ink as a silhouette, so it reads at a glance over the engraved coast */
+.chart .sky{fill:var(--fg);fill-opacity:.62;stroke:var(--fg);stroke-width:calc(.8px * var(--u,1));stroke-linejoin:miter;stroke-opacity:.9}
 /* (on a phone Dallas's skyline would run under the note that points off the map to Los Angeles, so it stands down there) */
 @media (max-width:599px){.chart .sky.nd{display:none}}
 .js .chart .sky{stroke-dasharray:1;stroke-dashoffset:1;fill-opacity:0;transition:stroke-dashoffset 1.1s var(--ease-ink) .15s,fill-opacity .5s var(--ease) .9s}
-.js .chart .sky.landed{stroke-dashoffset:0;fill-opacity:1}
+.js .chart .sky.landed{stroke-dashoffset:0;fill-opacity:.62}
 @media (prefers-reduced-motion:reduce){.js .chart .sky{transition:none}}
-:root[data-motion="off"] .chart .sky{stroke-dashoffset:0;fill-opacity:1;transition:none}
+:root[data-motion="off"] .chart .sky{stroke-dashoffset:0;fill-opacity:.62;transition:none}
 /* what opens now is the only continuous line: the reach along the coast, three points, the locator around them */
 .chart .rch{fill:none;stroke:var(--patina);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
 
@@ -1231,6 +1233,8 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 /* the survey: hatched land, the coast and its islands, county lines, the reach, three cities, a scale and a north point */
 .chart .sv #svHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
 .chart .sv .land{fill:url(#svHatch);opacity:.5}
+/* (and the sea takes the overview's water lines, finer and closer, as a survey would) */
+.chart .sv .wl{fill:var(--fg);opacity:.3}
 .chart .sv .swp{transform:translateY(calc((1 - var(--c,1)) * 600px))}
 .chart .sv .coast path,.chart .sv .isle path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
@@ -1278,7 +1282,7 @@ figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
 .cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
 @media (max-width:600px){.cap{grid-template-columns:minmax(0,1fr)}}
 /* in forced colours the plate's sheet turns to the system canvas: the knock-outs, halos and ink lines follow it */
-@media (forced-colors:active){.chart .ko{fill:Canvas}.chart svg text{fill:CanvasText;stroke:Canvas}.chart :is(.coast path,.isle path,.arc,.county path,.sbar,.sl,.na,.wo,.ldr path,.sky){stroke:CanvasText}.chart .nh{fill:CanvasText}.chart .pt{fill:Canvas;stroke:CanvasText}.cap .key path:not(.k-now){stroke:CanvasText}}
+@media (forced-colors:active){.chart .ko{fill:Canvas}.chart svg text{fill:CanvasText;stroke:Canvas}.chart :is(.coast path,.coast use,.isle path,.st,.bd,.arc,.county path,.sbar,.sl,.na,.wo,.ldr path,.sky){stroke:CanvasText}.chart .nh{fill:CanvasText}.chart .pt{fill:Canvas;stroke:CanvasText}.cap .key path:not(.k-now){stroke:CanvasText}}
 /* without the page script the drawings take an approximate scale for their type at each width */
 html:not(.js) .chart .sv{--u:1.06}
 @media (min-width:1600px){html:not(.js) .chart .sv{--u:.87}}
@@ -2767,11 +2771,25 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
 .mk-fig .sv .ttl{text-anchor:end;transform:translate(328px,262px)}
 .mk-fig .sv .scl{transform:translate(232px,-92px)}
-.mk-fig .mk-ny{--u:.26;position:static;width:100%;max-width:none;height:auto}
-.mk-fig .mk-ny .gl{display:inline}
-.mk-fig .mk-ny .gl{letter-spacing:.2em}
-.mk-fig .mk-ny .pt{r:1.5}.mk-fig .mk-ny .pt + .pt{r:1.3}
-@media (max-width:600px){.mk-fig .sv{--u:1}.mk-fig .mk-ny{--u:.42}}
+/* the New York survey, drawn like South Florida's: hatched land, the sea's water lines, state lines, the two markets
+   opening now joined by the reach, a scale and a north point */
+.mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
+.mk-fig .nyd #nyHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.mk-fig .nyd .land{fill:url(#nyHatch);opacity:.5}
+.mk-fig .nyd .wl{fill:var(--fg);opacity:.3}
+.mk-fig .nyd .coast use{stroke-width:calc(.8px * var(--u,1));opacity:.8}
+.mk-fig .nyd .st{fill:none;stroke:var(--fg);stroke-width:calc(.75px * var(--u,1));stroke-dasharray:var(--lt-datum);opacity:.45}
+.mk-fig .nyd :is(.cn,.scl) text{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.mk-fig .nyd .sea text{fill:var(--faint);font:italic 400 calc(15px * var(--u,1)) var(--display);letter-spacing:.24em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd .gl{stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.mk-fig .nyd .nh{fill:var(--fg)}
+.mk-fig .nyd .rch{--r:1}
+.mk-fig .nyd .cp{fill:var(--patina);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1))}
+.mk-fig .nyd .cl text{fill:var(--fg);font:italic 400 calc(19px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+@media (max-width:600px){.mk-fig .sv{--u:1}.mk-fig .nyd{--u:1.4}.mk-fig .nyd :is(.gl,.sl,.sbar,.scl text:not(:last-child),.li){display:none}.mk-fig .nyd .sea text{letter-spacing:.12em}
+  .mk-fig .nyd .cl .c1{text-anchor:start;transform:translate(22px,34px)}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 /* Each market page opens on its city seen from the water: a composite elevation, drawn to the same scale in feet for both
    cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the
@@ -2784,15 +2802,23 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-el .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu));opacity:.5}
 .mk-el .br{stroke:var(--sold-line)}
 .mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu))}
+/* depth in tone, as a presentation elevation shades it: the nearest rank stays paper, each rank behind takes more ink,
+   and every tower turns its right-hand side from the light; the tone washes in once the lines are drawn */
+.mk-el :is(.tn,.sh){stroke:none}
+.mk-el .tn{fill:var(--fg);fill-opacity:0}
+.mk-el .tn.r2{fill-opacity:.05}.mk-el .tn.r3{fill-opacity:.09}.mk-el .tn.r4{fill-opacity:.13}
+.mk-el .sh{fill:var(--fg);fill-opacity:.075}
+.js .mk-el :is(.tn,.sh){opacity:0;transition:opacity .9s var(--ease-out) .9s}
+.js .mk-el.in :is(.tn,.sh){opacity:1}
 .mk-el text{font:500 calc(11px * var(--fu)) var(--body);letter-spacing:.2em;fill:var(--faint)}
 .mk-el .rl text{text-anchor:end;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .js .mk-el path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--t-ink) var(--ease-ink) calc(var(--i,0) * 90ms)}
 .js .mk-el.in path{stroke-dashoffset:0}
 .js .mk-el text{opacity:0;transition:opacity .6s var(--ease-out) 1s}
 .js .mk-el.in text{opacity:1}
-@media (prefers-reduced-motion:reduce){.js .mk-el path{stroke-dashoffset:0;transition:none}.js .mk-el text{opacity:1;transition:none}}
+@media (prefers-reduced-motion:reduce){.js .mk-el path{stroke-dashoffset:0;transition:none}.js .mk-el text,.js .mk-el :is(.tn,.sh){opacity:1;transition:none}}
 :root[data-motion="off"] .mk-el path{stroke-dashoffset:0;transition:none}
-:root[data-motion="off"] .mk-el text{opacity:1;transition:none}
+:root[data-motion="off"] .mk-el text,:root[data-motion="off"] .mk-el :is(.tn,.sh){opacity:1;transition:none}
 @media (max-width:900px){.mk-el{--fu:1.4;aspect-ratio:2/1}}
 @media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
 /* A buyer guide's steps, drawn as a schedule: a ruled rail with a tick at each step, the time to its left and the step to
