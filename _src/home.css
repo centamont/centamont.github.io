@@ -4,7 +4,7 @@
 
 /* The score: the chapters open loud, the back matter reads quiet (the ink bands and the close keep their own) */
 #services,#developers,#markets{padding-top:clamp(88px,9.6vw,136px)}
-.intro{color:var(--muted);font-size:clamp(19px,1.45vw,21px);max-width:44ch}
+.intro{color:var(--muted);font-size:var(--t-intro);max-width:44ch}
 .head .intro::before{content:"";display:block;width:56px;height:1px;background:var(--accent);margin-bottom:22px}
 .head.wide .intro{grid-column:2}
 @media (max-width:820px){.head.wide .intro{grid-column:1}
@@ -95,6 +95,10 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 /* the last step ends with its words: the story hands straight on to the curve, with no blank run under it */
   .step:last-child{min-height:auto;padding-bottom:0}
 }
+/* A phone held upright reads the story one step at a time, so it keeps each step to its heading and its first paragraph:
+   the first step's three subjects are already the first practice's and the first question's answer, and the launch's
+   second paragraph (the sales team, each owning a segment) is the advisors' intro further down. Nothing else is left out. */
+@media (max-width:600px){#steps .step:first-child ul,#steps .step p:not(.vh) ~ p:not(.vh){display:none}}
 @media (max-width:820px),(min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.gauge{order:1;display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:clamp(16px,100cqw - 270px,48px);align-items:end;padding:6px 0 2.77em;border-top:1px solid var(--rule);font-size:13px;line-height:1}
 .gauge .meter{bottom:-1em}
 @container (max-width:15.39em){.gauge{grid-template-columns:minmax(0,1fr);row-gap:6px}}
@@ -123,7 +127,7 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 .spec{position:relative;display:grid;gap:12px;color:inherit;text-decoration:none}
 .sp-go::after{content:"";position:absolute;inset:0}
 .sp-go:focus-visible{outline:0}
-.sp-go:focus-visible::after{outline:1px solid var(--accent);outline-offset:5px}
+.sp-go:focus-visible::after{outline:2px solid var(--accent);outline-offset:5px}
 .sp-sheet{position:relative;background:var(--sheet);border:1px solid var(--fg);container-type:inline-size}
 
 /* the report's corner mark: each edge runs on 8px past its corner, as the lines of a drawing do */
@@ -179,6 +183,9 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 /* the status follows the market's name in the markup (a meta line goes below its title); in the ruled phone table it keeps its column at the left */
 .lv .when{grid-column:1;grid-row:1}
 .lv.now .when{color:var(--patina)}
+/* each market's name is the way to its page: its underline stands in the rule's tone and hands over to ink under the
+   pointer, so the ruled list itself is the index of market pages (no second list of links under it) */
+.lv h3 a{color:inherit;background-image:linear-gradient(var(--rule),var(--rule)),linear-gradient(currentColor,currentColor)}
 @media (max-width:700px){.lv{grid-template-columns:80px minmax(0,1fr);gap:4px 16px}}
 
 /* Journal: one note, set as a feature, with its drawing */
@@ -194,6 +201,16 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 /* On the home page the guide stands as words alone (its deposit plate is in the guide itself): the text across the
    column, its links under it. */
 #journal .feature.plain{grid-template-columns:minmax(0,1fr);gap:20px}
+/* and across the measure it takes the head's two columns: the title and its meta line on the left seven, the standfirst
+   and the links on the right five, so the article fills the sheet's width rather than its left half */
+@media (min-width:821px){
+  #journal .feature.plain{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:18px}
+  #journal .feature.plain .txt{display:contents}
+  #journal .feature.plain h3{grid-column:1/span 7;grid-row:1}
+  #journal .feature.plain .meta-line{grid-column:1/span 7;grid-row:2;align-self:end}
+  #journal .feature.plain .txt > p:not([class]){grid-column:8/-1;grid-row:1}
+  #journal .feature.plain .links{grid-column:8/-1;grid-row:2;align-self:end}
+}
 .people .head{grid-template-columns:1fr;align-items:start}
 .people .head{grid-area:head}
 
@@ -246,7 +263,7 @@ html:not(.js) .seam{display:none}
 /* The veil under the copy: across from the left, and up from the foot of the copy column only (to about half the width),
    so the tower's lit lobby and its ground stand clear of it. */
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),radial-gradient(54% 40% at 0 100%,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),.9) 40%,rgba(var(--hero-rgb),0) 100%)}
-.hero .lede{font-size:clamp(18px,1.5vw,21px);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
+.hero .lede{font-size:var(--t-intro);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
 
 /* the illustration note is one of the survey note's items, not a figure's caption strip: it takes the note's size, case and
@@ -469,7 +486,7 @@ html:not(.js) .step{min-height:auto}
 .faq details:has(> summary:focus-visible)::after{transform:none;transition-duration:300ms}
 .faq details:has(> summary.press)::after{transform:none;transition-duration:var(--t-press)}
 @media (hover:hover) and (pointer:fine){.faq details:has(> summary:hover)::after{transform:none;transition-duration:300ms}}
-.faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+.faq summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media screen and (prefers-reduced-motion:no-preference){.faq details{interpolate-size:allow-keywords}
 .faq details::details-content{block-size:0;overflow-y:clip;transition:block-size .45s var(--ease),content-visibility .45s allow-discrete}
 .faq details[open]::details-content{block-size:auto}
@@ -490,8 +507,8 @@ html:not(.js) .step{min-height:auto}
 #questions .intro{margin-top:18px}
 .faq summary{padding:22px 0}
 }
-.head.masthead .intro{margin-top:20px;max-width:40ch;text-wrap:balance}
-.head.masthead .intro::before{margin-inline:auto}
+/* The journal keeps the back matter's head (the h2 on the left seven columns, its intro on the right five) and marks
+   where its feature begins with a double rule (two hairlines), so it still reads as a journal's front page */
 .head.masthead + .feature{border-top:3px double var(--fg)}
 .notes-list{list-style:none;margin:clamp(32px,4vw,48px) 0 0;padding:0;border-top:1px solid var(--rule)}
 .sp-go.press{color:var(--fg);transition:none}
@@ -508,5 +525,18 @@ html:not(.js) .step{min-height:auto}
 .hero .row .write{align-self:center;margin:0 0 0 10px;padding-block:6px 3px;color:inherit;opacity:.86}
 @media (hover:hover) and (pointer:fine){.hero .row .write:hover{opacity:1}}
 @media (max-width:820px){.hero .row .write{display:none}}
+/* The buttons and the quiet link always stand on clean ink: under the row lies a veil of the hero's own ink, from the
+   window's edge to 140px past the link's end, feathered over that last 140px and over 36px above and below, so neither
+   the drawn tower's podium and ground grid (to 1180px) nor the photograph's site plan and landscape (wider) ever runs
+   through a button or under the link. Where the row is already on ink it adds nothing that shows. */
+@media (min-width:821px){
+  .hero .row{position:relative;justify-self:start}
+  .hero .row::before{content:"";position:absolute;z-index:-1;top:-36px;bottom:-36px;left:-50vw;right:-140px;pointer-events:none;background:linear-gradient(90deg,rgba(var(--hero-rgb),.94) calc(100% - 140px),rgba(var(--hero-rgb),.6) calc(100% - 84px),rgba(var(--hero-rgb),0));-webkit-mask-image:linear-gradient(transparent,#000 36px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(transparent,#000 36px,#000 calc(100% - 36px),transparent)}
+}
+@media print{.hero .row::before{display:none}}
+/* Spanish and Portuguese say the headline in more letters, so beside the tower their h1 takes a wider measure and a size
+   a tenth under the English one (and on a short window a little less, as its four lines are one more): four lines at most ("edificios nuevos," whole on one, "con propósito" bound together),
+   and the lede and both buttons stay above the fold of a 1440x900 or 1280x720 window */
+@media (min-width:821px){:is(:lang(es),:lang(pt)) .hero h1{max-width:14.5ch;font-size:min(calc(var(--t-hero) * .9),10.4vh)}}
 .ask{margin-top:clamp(36px,4vw,56px);padding-top:18px;border-top:1px solid var(--rule);font-family:var(--display);font-size:var(--t-big);line-height:1.35;color:var(--fg)}
 #questions .ask{max-width:none}
