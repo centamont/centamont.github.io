@@ -355,8 +355,7 @@ html .btn:not(:has(> .fx)):is(:focus-visible,:active){background-color:var(--fil
 /* Section scaffolding */
 section{padding-block:clamp(72px,8.4vw,120px)}
 section + section{border-top:1px solid var(--rule)}
-/* The score: the chapters open loud, the back matter reads quiet (the ink bands and the close keep their own) */
-#services,#developers,#markets{padding-top:clamp(88px,9.6vw,136px)}
+
 #journal,#people,#questions{padding-block:clamp(56px,5.6vw,84px)}
 .head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px clamp(32px,6vw,96px);align-items:end}
 .head > *{min-width:0}
@@ -366,22 +365,17 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .head.quiet h2,.door h2{font-size:var(--t-section)}
 /* (on tablets the chapter heads keep the desktop measure, so they break where they do on a laptop) */
 @media (min-width:521px) and (max-width:820px){.head.statement h2{max-width:21ch}}
-.intro{color:var(--muted);font-size:clamp(19px,1.45vw,21px);max-width:44ch}
-.head .intro::before{content:"";display:block;width:56px;height:1px;background:var(--accent);margin-bottom:22px}
+
 .head.wide{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
 .head.wide h2{grid-column:1/-1;font-size:var(--t-spread);max-width:13ch;letter-spacing:-.025em;line-height:.98}
-.head.wide .intro{grid-column:2}
-@media (max-width:820px){.head,.head.wide{grid-template-columns:1fr}.head.wide .intro{grid-column:1}.head .intro::before{margin-bottom:18px}}
+
+@media (max-width:820px){.head,.head.wide{grid-template-columns:1fr}}
 .big{font-family:var(--display);font-size:var(--t-big);line-height:1.32;font-weight:400}
 /* the lead lines that answer a heading across a spread (the two ink bands, the advisors) keep the larger lede size */
 .band .big,.people .col .big{font-size:var(--t-lede)}
 /* lead lines and intros balance their lines rather than leave one short */
 .big,.standfirst,.head .intro,.reach .intro{text-wrap:balance}
 
-/* Practices */
-.practices{margin-top:clamp(48px,6vw,80px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-/* One building front: three bays under a shared cornice, on one ground line. The bay of the practice in hand takes the light. */
-.facade{grid-column:1/-1;display:block;width:100%;height:auto;color:var(--fg);overflow:visible}
 /* its pens: the ground line and the outer silhouette in the profile pen, the cornice and the marks in the object pen, the
    bays in the detail pen, the earth in hatch at half strength (each kept to its screen width through --fu) */
 .facade path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu,1.1));stroke-linejoin:round}
@@ -393,7 +387,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .facade .br{stroke:var(--sold-line)}
 .facade .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu,1.1));opacity:.5}
 .facade .b{fill:var(--sold);stroke:none;opacity:.45;transition:opacity .5s var(--ease)}
-.facade .lt{fill:var(--sold);stroke:none;opacity:0;transition:opacity .6s var(--ease)}
+
 .js .facade path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease-ink) calc(var(--i,0) * 60ms)}
 .js .facade.in path{stroke-dashoffset:0}
 .js .facade.in .b{animation:facade-b .9s var(--ease) .7s backwards}
@@ -401,16 +395,12 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .js .facade:not(.in) .b{opacity:0}
 .js .facade:not(.in) :is(.w,.k){opacity:0}
 .js .facade.in :is(.w,.k){animation:facade-b .9s var(--ease) .5s backwards}
-.practices:has(.pr:nth-of-type(1):focus-within) .lt:nth-of-type(1),
-.practices:has(.pr:nth-of-type(2):focus-within) .lt:nth-of-type(2),
-.practices:has(.pr:nth-of-type(3):focus-within) .lt:nth-of-type(3){opacity:.14}
+
 .practices:has(.pr:nth-of-type(1):focus-within) g:nth-of-type(1) .b,
 .practices:has(.pr:nth-of-type(2):focus-within) g:nth-of-type(2) .b,
 .practices:has(.pr:nth-of-type(3):focus-within) g:nth-of-type(3) .b{opacity:1}
 @media (hover:hover) and (pointer:fine){
-.practices:has(.pr:nth-of-type(1):hover) .lt:nth-of-type(1),
-.practices:has(.pr:nth-of-type(2):hover) .lt:nth-of-type(2),
-.practices:has(.pr:nth-of-type(3):hover) .lt:nth-of-type(3){opacity:.14}
+
 .practices:has(.pr:nth-of-type(1):hover) g:nth-of-type(1) .b,
 .practices:has(.pr:nth-of-type(2):hover) g:nth-of-type(2) .b,
 .practices:has(.pr:nth-of-type(3):hover) g:nth-of-type(3) .b{opacity:1}
@@ -419,29 +409,21 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 :root[data-motion="off"] .facade path{stroke-dashoffset:0;transition:none}
 :root[data-motion="off"] .facade:not(.in) .b{opacity:.45}
 :root[data-motion="off"] .facade :is(.w,.k){opacity:1;animation:none}
-.pr{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:clamp(28px,3vw,40px) clamp(16px,2.4vw,36px) 0}
+
 .pr > *{min-width:0;max-width:100%}
-.pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
-.pr:focus-within::after{transform:none}
-@media (hover:hover) and (pointer:fine){.pr:hover::after{transform:none}}
+
 .pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
 .pr h3{font-size:var(--t-head)}
 .pr p{color:var(--muted);margin-top:14px}
 .pr p{margin-bottom:12px}
 .pr .more{margin-top:auto;padding-top:6px}
 /* Side by side, the three practices share their rows: a heading that wraps to two lines moves its neighbours' paragraphs with it */
-@media (min-width:821px){.pr{display:grid;grid-row:2/span 4;grid-template-rows:subgrid;justify-items:start;align-content:start}}
-/* Where the practices stack (a tablet and a phone) the facade stays inside the page's gutters, its profile lines and double
-   rules drawn at the hairline: one building of three bays, the index of the three practices. Under its ground each bay is
-   lettered with its practice's numeral, I, II and III, and each practice carries the same numeral over its heading as a
-   quiet label: the display face at 20px (in the label face a roman numeral would read as a row of bars), in muted, as
-   bronze is kept for what is sold; a practice in hand lights its bay and its letter. */
-.bays{display:none}
+
 @media (max-width:820px){
-  .practices{grid-template-columns:minmax(0,1fr)}
+  
   .facade .pf{stroke-width:calc(var(--lw-object) * var(--fu,1.1))}
-  .pr{padding:28px 0;border-bottom:1px solid var(--rule)}.pr::after{top:auto;bottom:-1px}
-  .bays{display:block;position:relative;height:20px;margin:8px 0 0;font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted)}
+  
+  
   .bays span{position:absolute;top:0;transform:translateX(-50%);padding-left:.04em;transition:color var(--t-ui) var(--ease-out)}
   .bays span:nth-child(1){left:17.29%}.bays span:nth-child(2){left:50%}.bays span:nth-child(3){left:82.71%}
   .practices:has(.pr:nth-of-type(1):focus-within) .bays span:nth-child(1),
@@ -457,74 +439,51 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 }
 @media (max-width:520px){.pr h3 + p{margin-top:12px}}
 
-/* The building rises: the tower stands on the sheet itself, full height, bled to the page edge */
-.rise{--bleed:calc(max(0px,(100vw - var(--max)) / 2) + var(--gl));display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32px,5vw,96px);margin-top:clamp(48px,7vw,96px)}
-@media (min-width:1181px){.rise{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}}
 /* the steps hang from the same column as the section's intro above them (.head.statement: twelve columns, intro from the eighth) */
 @media screen and (min-width:1041px),screen and (min-width:821px) and (min-height:501px){
-  html.js .rise{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px)}
-  html.js .rise .elev{grid-column:1/span 7}html.js .rise .steps{grid-column:8/-1}
+  
+  html.js .rise .elev{grid-column:1/span 7}
 }
 .rise > *{min-width:0}
 .elev{position:sticky;align-self:start;top:64px;height:calc(100svh - 64px);display:flex;flex-direction:column;gap:12px;margin:0 0 0 calc(var(--bleed) * -1);padding:clamp(18px,3vh,36px) 0 clamp(14px,2.4vh,28px)}
 .elev canvas{width:100%;flex:1;min-height:0;display:block}
-.gauge{display:flex;justify-content:flex-start;align-items:baseline;gap:clamp(28px,4vw,72px);margin-left:var(--bleed);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
 .gauge b{font-family:var(--display);font-weight:300;font-size:clamp(40px,3.8vw,60px);letter-spacing:-.01em;color:var(--fg);margin-left:12px;line-height:1}
 .gauge span + span b{color:var(--accent)}
 .gauge i{font-style:normal;color:var(--faint);margin-left:2px;letter-spacing:.04em}
 .gauge em{font-style:normal}
-/* Under the sales count, a hairline meter of the residences sold, with the lender's pre-sale threshold marked as the curve below marks it */
-.gauge{padding-bottom:30px}
-.gauge .gs{position:relative}
-.gauge .meter{position:absolute;left:0;right:0;bottom:-12px;height:1px;background:var(--rule)}
-.gauge .fill{position:absolute;left:0;right:0;top:-.5px;height:2px;background:var(--sold-line);transform:scaleX(0);transform-origin:0 50%}
-.gauge .lim{position:absolute;left:50%;top:-4px;width:1px;height:9px}
-.gauge .lim::before{content:'';position:absolute;inset:0;background:var(--sold-line)}
+
 .gauge .lim small{position:absolute;top:13px;left:0;transform:translateX(-50%);font-size:13px;line-height:1;letter-spacing:.14em;white-space:nowrap;color:var(--muted);transition:color .6s var(--ease)}
 .gauge.met .lim small{color:var(--accent)}
-.gauge.pulse .lim::before{animation:lim 1.1s var(--ease)}
+
 @keyframes lim{30%{transform:scaleY(2.2)}}
 /* with forced colours the meter and its tick keep their lines, in the system's colours, so the threshold label still has
    its mark to point at */
-@media (forced-colors:active){.gauge .meter{forced-color-adjust:none;background:GrayText}.gauge .fill,.gauge .lim::before{background:CanvasText}.gauge .lim small{forced-color-adjust:auto}}
-@media (min-width:821px) and (max-width:1180px){.gauge{align-items:end}.gauge span{display:flex;flex-wrap:wrap;align-items:baseline}.gauge em{flex-basis:100%;margin-bottom:6px}.gauge b{margin-left:0}}
+@media (forced-colors:active){.gauge .lim small{forced-color-adjust:auto}}
+@media (min-width:821px) and (max-width:1180px){.gauge span{display:flex;flex-wrap:wrap;align-items:baseline}.gauge em{flex-basis:100%;margin-bottom:6px}.gauge b{margin-left:0}}
 .elev figcaption{font-size:15px;color:var(--faint);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin-left:var(--bleed);border-top:1px solid var(--rule);padding-top:10px}
 .elev figcaption b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:.14em;text-transform:uppercase;font-size:13px;white-space:nowrap}
 /* on the narrowest phones the caption keeps the same lines at every step, so the tower never changes size between them:
    one line down to 350px, and below that the step's name always on a second line under the disclosure */
 @media (max-width:360px){.elev figcaption{column-gap:6px}}
 @media (max-width:349px){.elev figcaption span{flex-basis:100%}}
-.steps{list-style:none;margin:0;padding:0;counter-reset:st}
-.step{min-height:64svh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding-block:40px;counter-increment:st}
-.step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
-/* the last step is the tower's last runway: a full window, so its last closing view settles before the drawing lets go */
-.step:last-child{min-height:100svh}
-@media (min-width:1041px){.step:last-child{min-height:72svh}}
+
 /* beside the tower every step is as tall as its words, with the same measured gap between one step and the next, so the
    story reads at an even pace (the last keeps its runway) */
-@media (min-width:1041px){.steps{--pad:clamp(40px,4.5svh,72px)}.step{padding-block:var(--pad)}.step:not(:last-child){min-height:0}}
+
 /* Step 05 keeps the drawing until its first line meets the bar, so it has a window of its own, whole, after 04 has passed
    under the bar and before 06 takes the ink: the line between the two steps' boxes (where the drawing changes hands, at
    the middle of the window) moves down the gap between their words, which stays the same measured gap. 405px is the bar
    (65px) and 05's words (about 340px); a short window, where 05 cannot stand whole beside a whole 06, keeps the change at
    the top of the gap, and a tall one at its foot. */
-@media screen and (min-width:1041px){
-  html.js .steps{--hand:clamp(0px,52svh - 405px,2 * var(--pad))}
-  html.js .step:nth-last-child(2){padding-bottom:var(--hand)}
-  html.js .step:last-child{padding-top:calc(2 * var(--pad) - var(--hand))}
-}
-/* the last step's words are a coda: a box of their own inside the runway (on a phone it simply stands in the step) */
-.coda{display:flex;flex-direction:column;gap:inherit}
+
 /* Beside the tower the runway is the drawing's moment: the last step's words arrive at the same gap as every other step
    and stop at the foot of the sheet, their last line on the baseline of the figure's caption (Last closing), and hold
    there beside the finished building while its last closing view settles; then words and drawing leave together, line
    for line, so no fragment of the words is left beside the drawing and no part of the drawing beside an empty column.
    (The words hold their foot as far above the window's foot as the step's own padding, which is the figure's own bottom
    padding less the 1px between the two faces' baselines, so they let go exactly as the figure reaches the end of the story.) */
-@media screen and (min-width:821px) and (min-height:600px){
-  html.js .step:last-child{--hold:calc(clamp(14px,2.4vh,28px) - 1px);justify-content:flex-end;padding-bottom:var(--hold)}
-  html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
-}
+
 .step h3{font-size:var(--t-head);max-width:17ch}
 /* each step's numeral at display size, sliding in as the step arrives; the steps before and after it keep a steady ghost */
 .step h3::before{content:counter(st,decimal-leading-zero);display:block;width:max-content;font:300 var(--t-num)/.8 var(--display);letter-spacing:-.03em;color:var(--accent);margin:0 0 .12em -.06em;font-variant-numeric:lining-nums tabular-nums;opacity:.2;transform:translateX(-.22em);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
@@ -555,25 +514,21 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .step ul{list-style:none;margin:4px 0 0;padding:0;max-width:46ch;border-top:1px solid var(--rule)}
 .step li{padding:12px 0;border-bottom:1px solid var(--rule)}
 @media (max-width:820px){
-  .rise{--bleed:0px;grid-template-columns:1fr;gap:0}
+  
   /* On a phone the drawing owns the sticky panel: the caption is one line above it and the gauge one line below, so
      the canvas keeps the height (the model refits to it). The panel ends on a foot of its own ground 10px under the
      threshold label, then a long, eased fade (32px, more than a line, as the sideways curve heading's band has), so the
      words passing under it have all but dissolved before they reach the label, never cut and never read as the gauge's. */
   .elev{top:var(--hdr);z-index:2;padding:6px var(--gr) 0 var(--gl);margin-inline:calc(var(--gl) * -1) calc(var(--gr) * -1);background:var(--bg);gap:4px}
   .rise .elev{height:calc(46svh + 38px)}
-  .rise .gauge{padding-bottom:3.54em}
+  
   .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:32px;background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 88%,transparent) 30%,color-mix(in srgb,var(--bg) 45%,transparent) 65%,transparent);pointer-events:none}
   /* (with forced colours the fade is dropped, so the panel ends on a rule over a short solid band instead, and the words
      passing under it never meet the threshold label) */
   @media (forced-colors:active){.rise .elev::after{height:6px;background:Canvas;border-bottom:1px solid CanvasText}}
-  /* (the measured gap between two steps, 46px, falls mostly above each step's numeral, so the step's box reaches up past
-     the reading line, 62% down the window, as soon as its numeral stands under the drawing, even with the header back
-     and the panel 64px lower, reading back up a short phone) */
-  .step{min-height:auto;padding-block:24px 22px;gap:12px}
-  .step:first-child{min-height:auto;padding-top:22px}
-  /* the last step ends with its words: the story hands straight on to the curve, with no blank run under it */
-  .step:last-child{min-height:auto;padding-bottom:0}
+  
+  
+  
 }
 /* On a phone held either way the panel reads as a drawing sheet: the caption strip over the drawing and the gauge, a
    title block, under it; and the steps share one family of numerals and headings */
@@ -588,11 +543,11 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
      layouts below are asked for in the panel's em (its 18px), so where the reader sets the text larger (a browser's text
      zoom) the bands open with it and the counters stack as on a narrower panel, rather than run off the page. */
   .rise .elev{container-type:inline-size}
-  .gauge{order:1;display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:clamp(16px,100cqw - 270px,48px);align-items:end;padding:6px 0 2.77em;border-top:1px solid var(--rule);font-size:13px;line-height:1}
+  
   .gauge > span{display:block;white-space:nowrap}
   .gauge em{display:block;margin:0 0 3px}
   .gauge b{font-size:24px;line-height:.8}
-  .gauge .meter{bottom:-1em}
+  
   .gauge .lim small{top:1.154em;left:auto;right:0;transform:none;letter-spacing:.1em}
   /* the drawing is masked off a few pixels short of the caption strip above it and the gauge's rule below it, so the
      site plan's grid and the ground's linework never run up to either (it fades out over 8px, then leaves 3px clear) */
@@ -603,7 +558,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   /* a panel too narrow for the two counters side by side (a phone on its side under about 740px, a zoomed window) takes
      each on a line, its label beside its figure; the meter then runs across the panel, its label centred on the tick */
   @container (max-width:15.39em){
-    .gauge{grid-template-columns:minmax(0,1fr);row-gap:6px}
+    
     .gauge > span{display:flex;align-items:baseline}
     .gauge em{margin:0 8px 0 0}
     .gauge .lim small{left:0;right:auto;transform:translateX(-50%);width:max-content;max-width:100cqw;white-space:normal;text-align:center}
@@ -627,16 +582,13 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
    and its steps keep the phone's spacing) */
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){
   .step h3::before{font-size:clamp(40px,40svh - 100px,60px)}
-  .step{gap:12px}
+  
 }
 @media (prefers-reduced-motion:reduce){.step h3::before{transform:none;transition:none}html.js .step :is(h3,p,li,.more){transition:none}}
 :root[data-motion="off"] .step h3::before{transform:none}
 
-/* How an engagement begins: the heading and the specimen sheet on the left; the steps, the call to write and the
-   case-study note on the right. On phones: the heading, the steps, the sheet, then the call and the note. */
-.begin{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);border-top:1px solid var(--fg);padding-top:clamp(36px,4vw,56px)}
 .begin > *{min-width:0}
-.b-l,.b-r{display:grid;align-content:start;gap:clamp(28px,3vw,40px)}
+
 .begin h3{font-size:var(--t-head);max-width:14ch}
 .begin ol{list-style:none;margin:0;padding:0;display:grid;gap:0}
 .begin ol > li{display:grid;grid-template-columns:max(56px,3.12em) minmax(0,1fr);align-items:baseline;gap:4px 0;padding:22px 0;border-bottom:1px solid var(--rule)}
@@ -646,76 +598,48 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 /* a sequence numeral, hung in its own column: shared by every numbered run of rows (the column is 56px, or 3.12em of the
    row's text where the reader sets the text larger, so the numeral never runs into its words) */
 .seq{font-family:var(--display);font-weight:300;font-size:32px;line-height:1;color:var(--accent);font-variant-numeric:lining-nums tabular-nums}
-.begin .close{display:grid;gap:14px;margin-top:-4px}
+
 .begin .close .btn{justify-self:start}
 .begin .close p{font-size:16px;line-height:1.55;color:var(--muted);max-width:32em}
-/* the line that leads into the call reads as the steps do; the case-study note under it stays small */
-.begin .close .lead-in{font-size:inherit;line-height:inherit;color:var(--muted)}
-@media (min-width:1041px){.b-l{position:sticky;top:96px;align-self:start}}
-@media (max-width:1040px){.begin{grid-template-columns:minmax(0,1fr);gap:28px}.b-l,.b-r{display:contents}.begin h3{order:1}.begin ol{order:2}.spec{order:3;max-width:560px}.begin .close{order:4;margin-top:0}}
+
+@media (max-width:1040px){.begin h3{order:1}.begin ol{order:2}}
 /* on a phone the three steps close up a little, each still parted by its rule */
 @media (max-width:520px){.begin ol > li{grid-template-columns:max(44px,2.45em) minmax(0,1fr);column-gap:10px;padding-block:16px}.begin ol > li:first-child{padding-top:0}}
 
-/* The specimen sheet, drawn without figures: the report's own stacking plan, its pace against the plan, and the key.
-   The whole drawing is one link to the report. */
-/* the specimen is a figure; its one link is the line under it, which stretches over the whole sheet so the sheet still
-   opens the report (and takes the focus ring round it) */
-.spec{position:relative;display:grid;gap:12px;color:inherit;text-decoration:none}
-.sp-go::after{content:"";position:absolute;inset:0}
-.sp-go:focus-visible{outline:0}
-.sp-go:focus-visible::after{outline:1px solid var(--accent);outline-offset:5px}
-.sp-sheet{position:relative;background:var(--sheet);border:1px solid var(--fg);container-type:inline-size}
-/* the report's corner mark: each edge runs on 8px past its corner, as the lines of a drawing do */
-.sp-sheet::before{content:"";position:absolute;inset:-9px;pointer-events:none;--t:linear-gradient(var(--fg),var(--fg));background:var(--t) 0 8px/8px 1px no-repeat,var(--t) 8px 0/1px 8px no-repeat,var(--t) 100% 8px/8px 1px no-repeat,var(--t) calc(100% - 8px) 0/1px 8px no-repeat,var(--t) 0 calc(100% - 8px)/8px 1px no-repeat,var(--t) 8px 100%/1px 8px no-repeat,var(--t) 100% calc(100% - 8px)/8px 1px no-repeat,var(--t) calc(100% - 8px) 100%/1px 8px no-repeat}
-.sp-hd{display:flex;justify-content:space-between;gap:12px;padding:10px 14px 9px;border-bottom:1px solid var(--rule);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;line-height:1.4;color:var(--fg)}
 .sp-hd > span{margin-right:-.14em}
 .sp-hd > span + span{color:var(--muted)}
-.sp-body{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;column-gap:18px;padding:16px 14px 14px}
-.sp-plan{display:block;overflow:visible;grid-row:1 / span 2}
+
 .sp-plan text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
-.sp-side{flex:1;min-width:0;display:flex;flex-direction:column}
-.sp-pace{display:block;width:100%;flex:1 1 0;height:0;min-height:72px;overflow:visible}
+
 .sp-pace path{fill:none;vector-effect:non-scaling-stroke}
-.sp-grid{stroke:var(--grid);stroke-dasharray:2 4}
-.sp-axis{stroke:var(--fg)}
-.sp-now{stroke:var(--accent);stroke-dasharray:3 3}
-.sp-plan-l{stroke:var(--fg);stroke-width:1.2;stroke-dasharray:4 3;opacity:.6}
-.sp-act{stroke:var(--sold-line);stroke-width:2}
-.sp-dot{stroke:var(--sold-line);stroke-width:8;stroke-linecap:round}
+
 .spec .rp-key{margin:10px 0 0;gap:6px 14px;font-weight:500;color:var(--muted)}
-.spec .sp-key{margin:0;padding-top:12px;display:grid;gap:5px}
+
 /* a narrow sheet sets the key in a row beneath the drawing, and its header drops the day */
-@container (max-width:339px){.sp-plan{grid-row:1}.spec .sp-key{grid-column:1 / -1;display:flex;gap:8px 20px;padding-top:14px}.sp-day{display:none}}
-/* its caption keeps the one caption strip, the sheet's own edge standing for its rule: the disclosure in Jost 15px faint,
-   and the way in to the report on a line of its own under it, as a note's links follow its meta line */
-.sp-cap{display:grid;justify-items:start;gap:10px;margin:0;font-size:15px;line-height:1.5;color:var(--faint)}
-.sp-go{display:inline-flex;align-items:center;gap:10px;font-size:16px;font-weight:500;letter-spacing:.04em;color:var(--accent);padding-bottom:2px;text-decoration:none}
+
 .sp-go svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
-.sp-go:focus-visible{color:var(--fg)}
+
 .sp-go:focus-visible svg{transform:translateX(4px)}
-@media (hover:hover) and (pointer:fine){.spec:hover .sp-go{color:var(--fg)}.spec:hover .sp-go svg{transform:translateX(4px)}}
+@media (hover:hover) and (pointer:fine){.spec:hover .sp-go svg{transform:translateX(4px)}}
 /* it arrives as a sheet is filled in: the floors from the first level up, 40ms apart, then the contracts in bronze */
 .js .spec:not(.in) .sp-plan g,.js .spec:not(.in) .sp-pace{opacity:0}
 .js .spec:not(.in) .sp-plan .sold{fill-opacity:0}
-.js .spec:not(.in) .sp-act{clip-path:inset(0 100% 0 0)}
-.js .spec:not(.in) .sp-dot{opacity:0}
+
 .sp-plan g{transition:opacity .3s calc(var(--r) * 40ms)}
 .sp-plan .sold{transition:fill-opacity .4s calc(900ms + var(--r) * 18ms)}
-.sp-pace{transition:opacity .4s}
-.sp-act{clip-path:inset(0 0 0 0);transition:clip-path 1.1s var(--ease) .2s}
-.sp-dot{transition:opacity .3s 1.1s}
-@media (prefers-reduced-motion:reduce){.js .spec:not(.in) .sp-plan g,.js .spec:not(.in) .sp-pace{opacity:1}.js .spec:not(.in) .sp-plan .sold{fill-opacity:1}.js .spec:not(.in) .sp-act{clip-path:none}.js .spec:not(.in) .sp-dot{opacity:1}.sp-plan g,.sp-plan .sold,.sp-pace,.sp-act,.sp-dot{transition:none}}
+
+@media (prefers-reduced-motion:reduce){.js .spec:not(.in) .sp-plan g,.js .spec:not(.in) .sp-pace{opacity:1}.js .spec:not(.in) .sp-plan .sold{fill-opacity:1}.sp-plan g,.sp-plan .sold,.sp-pace,.sp-act,.sp-dot{transition:none}}
 
 /* Private clients: a dark door */
 .band{background:var(--band);color:var(--band-fg);--sold-line:var(--bronze-500)}
 section.band + section,section + section.band{border-top:0}
 .band h2{color:var(--band-fg)}
 .band .intro,.band p{color:var(--band-muted)}
-#clients{position:relative;overflow:hidden;isolation:isolate}
+
 .band{border-block:1px solid transparent}
 :root[data-theme="dark"] .band{border-color:rgba(var(--bronze-rgb),.28)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{border-color:rgba(var(--bronze-rgb),.28)}}
-.door{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,7vw,120px);align-items:center}
+
 .door > *{min-width:0}
 .door .big{color:var(--band-fg);margin-top:26px;max-width:28ch}
 .door .row{margin-top:34px}
@@ -748,8 +672,7 @@ section.band + section,section + section.band{border-top:0}
 .leaf::before{content:"";position:absolute;inset:34% 16% 9%;border:1px solid rgba(var(--bronze-rgb),.4)}
 .leaf::after{content:"";position:absolute;top:56%;width:5px;height:5px;border-radius:50%;background:var(--bronze);opacity:calc(1 - clamp(0,(var(--o) - .15) / .2,1))}
 .leaf.l::after{right:9%}.leaf.r::after{left:9%}
-/* light falls out of the open door across the floor, feathered at every edge, so it reads as light and never as a shape */
-.doorway .light{position:absolute;top:100%;left:-40%;width:180%;height:calc(clamp(80px,10vw,136px) + 2px);overflow:visible;pointer-events:none;opacity:clamp(0,(var(--o) - .35) / .65,1);transform-origin:50% 0;transform:scaleY(calc(.25 + .75 * var(--o)));filter:blur(clamp(6px,.9vw,12px))}
+
 /* at night the light at the threshold is brighter, so it still reads against the true-ink band */
 :root[data-theme="dark"] #doorLight stop:first-child{stop-opacity:.44}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #doorLight stop:first-child{stop-opacity:.44}}
@@ -761,13 +684,13 @@ section.band + section,section + section.band{border-top:0}
 .door .terms b{display:block;font-family:var(--display);font-weight:400;font-size:26px;color:var(--band-fg);line-height:1.3;margin-bottom:2px}
 /* tablets and small laptops: the door takes half the width, so its terms stay below the crown of the arch */
 @media (min-width:821px) and (max-width:1180px){
-  .door{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,64px)}
+  
   .doorway{padding-inline:clamp(52px,6vw,62px)}
   .door .terms b{font-size:22px}
   .door .terms p{padding:12px 0;font-size:16px}
 }
 @media (max-width:820px){
-  .door{grid-template-columns:1fr;gap:clamp(48px,12vw,72px)}
+  
   /* the door stands under the text's left edge; its terms keep clear of the open leaves at the jambs,
      and stand at least two fifths of the door's width below its top, so on short screens the door grows to keep them under the crown */
   .doorway{aspect-ratio:auto;min-height:70svh;max-width:420px;justify-self:start;padding:min(40%,168px) clamp(52px,14vw,62px) 28px;margin-bottom:0}
@@ -777,7 +700,7 @@ section.band + section,section + section.band{border-top:0}
 /* phones: the heading with the offer directly under it, as every section opens, then the door with its terms, then the
    call, the note and the way to the page */
 @media (max-width:820px){
-  .door{gap:0}
+  
   .door > div:first-child{display:contents}
   .door h2{order:1}
   .door .big{order:2;margin-top:22px}
@@ -787,12 +710,12 @@ section.band + section,section + section.band{border-top:0}
   .door .more{order:6}
   /* the light pools on the floor between the door and the call, and is spent before the button's top */
   .door .doorway{margin-bottom:52px}
-  .door .doorway .light{height:46px;filter:blur(5px)}
+  
 }
 /* tablets: the heading, the door and the offer share one column the door's width, centred in the band, so the door never
    stands alone beside an empty measure; the door keeps the arch's own 2:3 and its terms sit under the crown */
 @media (min-width:641px) and (max-width:820px){
-  .door{max-width:calc(440px + 2 * var(--gutter))}
+  
   .door .doorway{max-width:none;padding-inline:68px}
 }
 @media (min-width:641px) and (max-width:820px) and (min-height:501px){.door .doorway{aspect-ratio:2/3;min-height:0;padding-top:0}}
@@ -803,21 +726,16 @@ section.band + section,section + section.band{border-top:0}
 /* if the shared script never arrives, the door stands drawn and open */
 html.nosite body.no-js .doorway{--o:1}
 html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
-/* Markets */
-.levels{margin-top:clamp(44px,6vw,80px);border-top:1px solid var(--fg)}
-.lv{display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:baseline;padding-block:24px;border-bottom:1px solid var(--rule)}
+
 .lv > *{min-width:0}
-.lv .when{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-/* the status follows the market's name in the markup (a meta line goes below its title); in the ruled phone table it keeps its column at the left */
-.lv .when{grid-column:1;grid-row:1}.lv h3{grid-column:2;grid-row:1}
-.lv.now .when{color:var(--patina)}
+
+.lv h3{grid-column:2;grid-row:1}
+
 .lv h3{font-size:var(--t-head);font-weight:300}
 .lv.now h3{font-style:italic;font-weight:400}
 .lv p{color:var(--muted)}
-@media (max-width:700px){.lv{grid-template-columns:80px minmax(0,1fr);gap:4px 16px}.lv p{grid-column:2;font-size:17px}}
+@media (max-width:700px){.lv p{grid-column:2;font-size:17px}}
 
-/* Journal: one note, set as a feature, with its drawing */
-.feature{margin-top:clamp(44px,6vw,80px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,6vw,96px);border-top:1px solid var(--fg);padding-top:clamp(32px,4vw,48px);align-items:start}
 .feature > *{min-width:0}
 .feature .txt{display:grid;gap:18px;align-content:start}
 .feature h3{font-size:var(--t-head);font-weight:300;letter-spacing:-.015em;line-height:1.02}
@@ -832,8 +750,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
    (at this line height its underline sits where it does under a link set inline). */
 :is(h1,h2,h3,.ji-t,.notes-list .t,.intro) .nw{display:inline-block;max-width:100%;white-space:normal}
 @media (max-width:520px){a.nw{display:inline-block;max-width:100%;white-space:normal;line-height:1.4}}
-.meta-line{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-@media (max-width:820px){.feature{grid-template-columns:1fr}}
+
 .deposit{margin:0;display:grid;gap:12px;container-type:inline-size}
 .dbar{display:flex;height:64px;border:var(--lw-profile) solid var(--fg);background:var(--sheet)}
 .dbar .s{flex:0 0 calc(var(--w) * 1%);transform-origin:left;transition:transform 1s var(--ease) calc(var(--d) * .22s)}
@@ -881,12 +798,12 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 @container (max-width:18.83em){:is(#journal,.prose) .dkey div{grid-template-columns:minmax(0,1fr)}}
 #journal .feature .links{margin-top:calc(14px - clamp(32px,6vw,96px))}
 @media (min-width:821px){
-  /* (the text's row is as tall as the text; the plate's extra height falls to the row under it, so the links keep to the
-     meta line: the row's 24px gap less 6px gives the 18px between the text's own lines) */
-  #journal .feature{grid-template-columns:minmax(0,3fr) minmax(0,5fr);grid-template-rows:auto 1fr;gap:24px clamp(32px,4.4vw,64px)}
+  
   #journal .deposit{grid-area:1 / 2 / span 2}
   #journal .feature .links{grid-area:2 / 1;align-self:start;margin:-6px 0 0}
 }
+
+#journal .feature.plain .links{grid-area:auto;margin:0}
 
 /* People */
 /* On the home page the advisors keep their head alone, with one way on to their own page, the link under the intro on its
@@ -904,13 +821,13 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 }
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
 .people > *{min-width:0}
-.people .head{grid-template-columns:1fr;align-items:start}
+
 /* The advisors' table, drawn as a plan: the top in a double line, its two extension leaves in hidden line with a joint
    tick at each seam, ten chairs in ink and ten that may follow in hidden line. Two dimension strings give the counts. No
    bronze: nothing here is committed, it is a plan of seats. It follows the head and its column across the screen, the
    table centred on the column and the leaves and their chairs reaching out toward the margins, close under the copy. */
 .people{grid-template-areas:"head col" "table table";row-gap:clamp(32px,3.6vw,56px)}
-.people .head{grid-area:head}.people .col{grid-area:col}
+.people .col{grid-area:col}
 .table{grid-area:table;position:relative;justify-self:center;width:min(100vw - 48px,1600px);margin:0}
 .table svg{display:block;overflow:visible}
 .table .full{width:100%;height:auto}
@@ -943,14 +860,13 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .people ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .people li{padding:12px 0;border-bottom:1px solid var(--rule)}
 @media (max-width:820px){.people{grid-template-columns:1fr}}
-/* the bronze rule opens the lead on the right, not the intro under the heading */
-.people .head .intro::before{display:none}
+
 .people .col::before{content:"";display:block;width:56px;height:1px;background:var(--accent);transform-origin:left;transition:transform .7s var(--ease) .2s}
 /* (it draws in as the column arrives, as the intros' rules do; still or on paper it is simply drawn) */
 @media screen and (prefers-reduced-motion:no-preference){.js:not([data-motion="off"]) .people .col:not(.in)::before{transform:scaleX(0)}}
 @media (min-width:821px){
   .people{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px)}
-  .people .head.quiet{grid-area:1/1/2/8;grid-template-columns:minmax(0,1fr);align-items:start}
+  
   .people .head.quiet h2,.people .head.quiet .intro{grid-column:1}
   .people .col{grid-area:1/8/2/13}
   .people .table{grid-area:2/1/3/13}
@@ -960,14 +876,11 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
   .people .col::before{position:absolute;left:0;top:-23px}
 }
 /* on small laptops and large tablets the lead line takes six columns, so it doesn't wrap word by word */
-@media (min-width:821px) and (max-width:960px){.people .head.quiet{grid-area:1/1/2/7}.people .col{grid-area:1/7/2/13}}
+@media (min-width:821px) and (max-width:960px){.people .col{grid-area:1/7/2/13}}
 
-/* The house */
-.name .cut{font-family:var(--display);font-weight:300;font-size:var(--t-spread);line-height:1;letter-spacing:-.02em;color:var(--band-fg);max-width:none}
 .name .cut i{color:var(--bronze)}
 /* (on a phone the name takes the one head size every section shares there) */
-@media (max-width:520px){.name .cut{font-size:var(--t-chapter)}}
-.ruler{display:block;width:100%;height:auto;margin-top:clamp(40px,5vw,72px);overflow:visible}
+
 /* the hundred blows in the detail pen, every tenth and the base in the object pen, each at its screen width */
 .ruler line{stroke:var(--band-muted);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;opacity:.55;transform-box:fill-box;transform-origin:50% 100%}
 .ruler line[y2="44"]{stroke-width:var(--lw-object)}
@@ -975,22 +888,15 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 /* The hundred blows strike with the reader's scroll (site.js marks each one .hit); the hundredth cracks */
 .js .ruler line:not(.base){transform:scaleY(0);transition:transform .3s var(--ease)}
 .js .ruler line.hit{transform:none}
-.ruler .crack{fill:none;stroke:var(--bronze);stroke-width:1.5;stroke-dasharray:90;stroke-dashoffset:0;transition:stroke-dashoffset .6s var(--ease-ink)}
-.js .ruler:not(.struck) .crack{stroke-dashoffset:90}
-/* struck, the crack rests a little dim; as the seam below splits it flashes once (site.js marks .flash) and stays brighter */
-.js .ruler.struck .crack{opacity:.6}
-.js .ruler.flash .crack{opacity:.8;animation:crack-flash .6s var(--ease-out)}
+
 @keyframes crack-flash{0%{opacity:.6}35%{opacity:1}100%{opacity:.8}}
-@media (prefers-reduced-motion:reduce){.js .ruler.flash .crack{animation:none}}
-/* The scale under the ruler is set in type, not drawn, so it keeps the 13px annotation size at every width.
-   Its marks sit on ticks 1, 50 and 100 (x = 6, 490.12 and 984.12 of the 1000-unit drawing). */
-.rscale{position:relative;height:20px;margin-top:8px;font:500 13px/20px var(--body);letter-spacing:.12em;color:var(--band-muted)}
+
 .rscale span{position:absolute;top:0;transform:translateX(-50%);transition:color .6s var(--ease) .3s}
 .rscale span:nth-child(1){left:.6%;transform:none}
 .rscale span:nth-child(2){left:49.012%}
 .rscale span:nth-child(3){left:98.412%;transform:translateX(-100%);margin-right:-.12em}
 .ruler.struck + .rscale span:last-child{color:var(--bronze)}
-.name .cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);margin-top:clamp(48px,7vw,96px);border-top:1px solid var(--band-rule);padding-top:36px}
+
 .name .cols > *{min-width:0}
 .name .cols div{display:grid;gap:20px}
 /* on the widest screens the column outgrows a comfortable line, so the prose keeps to one */
@@ -998,11 +904,8 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .name .cols .big{color:var(--band-fg)}
 /* the lead line stands in the left column, under the ruler's first half, and the paragraph in the right, under its second,
    the two on one first baseline */
-@media (min-width:821px){.name .cols{align-items:baseline}.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
-@media (max-width:820px){.name .cols{grid-template-columns:1fr}}
-/* The band's foot splits along the crack and parts onto Contact. A decorative overlay below the text, never the text itself. */
-#house{position:relative;padding-bottom:clamp(104px,11vw,152px)}
-.seam{--seam-h:clamp(80px,9vw,136px);--hb:calc(var(--seam-h) * .714);position:absolute;left:0;right:0;bottom:-1px;height:var(--seam-h);overflow:hidden;pointer-events:none;background:var(--band)}
+@media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
+
 .seam i{position:absolute;inset:0;background:var(--band);transition:clip-path .9s var(--ease-ink)}
 .seam .l{clip-path:polygon(0 0,50% 0%,49.85% 12%,50.1% 26%,49.9% 41%,50.15% 55%,49.95% 70%,50.1% 85%,50% 100%,0 100%)}
 .seam .r{clip-path:polygon(100% 0,100% 100%,50% 100%,50.1% 85%,49.95% 70%,50.15% 55%,49.9% 41%,50.1% 26%,49.85% 12%,50% 0%)}
@@ -1010,7 +913,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 /* (the stroke keeps a screen pixel, so its dashes are measured on the screen: a dash of 1.4 lengths reaches the foot of the tallest seam) */
 .seam path{fill:none;stroke:var(--bronze);stroke-width:1;vector-effect:non-scaling-stroke;stroke-dasharray:1.4;stroke-dashoffset:1.4;transition:stroke-dashoffset .6s var(--ease-ink)}
 .seam.crack path{stroke-dashoffset:0}
-.seam.split{background:linear-gradient(var(--band) 3px,var(--bg) 3px)}
+
 /* Crack first, then the mountain: once the crack has drawn, the halves part along it into a peak, Centum's hundredth blow
    opening onto Mont, the mountain of the mark (its flanks at the mark's own pitch, half as wide again at the foot as the
    seam is tall), with clean straight sides, and the crack stays as one bronze vein climbing the peak from its foot to
@@ -1023,26 +926,17 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .seam i{background:linear-gradient(0deg,var(--band) 1px,var(--band-edge,var(--band)) 1px 2px,var(--band) 2px)}
 :root[data-theme="dark"]{--band-edge:var(--bronze-800)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band-edge:var(--bronze-800)}}
-html:not(.js) .seam{display:none}
 
-/* Contact: the page closes at display scale */
-.display{font-size:var(--t-display);text-wrap:balance;font-weight:300;letter-spacing:-.03em;line-height:.95;max-width:none}
-/* the intro, with the handle across from it as the second way in, then the letter (the handle again as one quiet line
-   beside its button) */
-.reach{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-areas:"intro handle";gap:12px clamp(32px,6vw,96px);align-items:end;margin-top:clamp(36px,4vw,56px)}
-.reach .intro{grid-area:intro;max-width:32em}
-.handle{grid-area:handle;justify-self:end;display:inline-flex;align-items:center;gap:.28em;font-family:var(--display);font-weight:300;font-size:clamp(34px,3.6vw,56px);line-height:1.1;letter-spacing:-.02em;color:var(--fg);padding-bottom:6px}
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
 .handle:focus-visible svg{transform:translateX(.12em)}
 @media (hover:hover) and (pointer:fine){.handle:hover svg{transform:translateX(.12em)}}
-@media (max-width:820px){.reach{grid-template-columns:1fr;grid-template-areas:"intro" "handle"}.handle{justify-self:start}}
+
 .who{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--fg)}
 .who div{padding:24px 28px 26px 0;display:grid;gap:8px;align-content:start}
 .who div + div{padding-left:28px;border-left:1px solid var(--rule)}
 .who h3{font-size:28px}
 .who p{color:var(--muted)}
 @media (max-width:820px){.who{grid-template-columns:1fr}.who div + div{padding-left:0;border-left:0;border-top:1px solid var(--rule)}}
-
 
 /* Footer: the drawing's title block */
 footer{border-top:1px solid var(--fg);font-size:15px;color:var(--muted)}
@@ -1153,13 +1047,8 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 @media (min-width:1280px){header.site.swap nav.main a{transition:none!important}}
 @media (forced-colors:active){header.site.lk::before{display:none}}
 
-/* Hero: the model */
-.hero{position:relative;background:rgb(var(--hero-rgb));color:var(--ivory);overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:var(--ivory);--sold:var(--bronze-500);--sold-line:var(--bronze-500);isolation:isolate}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
-.hero.loupe{cursor:none}
-/* The veil under the copy: across from the left, and up from the foot of the copy column only (to about half the width),
-   so the tower's lit lobby and its ground stand clear of it. */
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),radial-gradient(54% 40% at 0 100%,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),.9) 40%,rgba(var(--hero-rgb),0) 100%)}
+
 .hero .wrap{width:100%;padding-block:clamp(96px,14vh,150px) clamp(48px,9vh,96px);display:grid;gap:0}
 .hero h1{font-size:var(--t-hero);font-weight:300;max-width:12ch;letter-spacing:-.025em;line-height:.98;color:var(--ivory)}
 .hero h1 em{font-style:italic;color:var(--bronze-300)}
@@ -1185,79 +1074,59 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln > span{transition-dela
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.19s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.28s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition-delay:.4s}
-.hero .lede{font-size:clamp(18px,1.5vw,21px);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
+
 .hero .row{margin-top:clamp(28px,4vw,44px)}
 .hero .btn{--fill:var(--ivory);--on:var(--ink);border-color:rgba(var(--ivory-rgb),.6);color:var(--ivory)}
 .hero .btn:focus-visible{border-color:var(--ivory)}
 @media (hover:hover) and (pointer:fine){.hero .btn:hover{border-color:var(--ivory)}}
 .hero .btn.solid{--fill:rgb(var(--hero-rgb));--on:var(--ivory);background-color:var(--ivory);color:var(--ink);border-color:var(--ivory)}
-.hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
+
 .hero .coords b{font-weight:500;color:var(--bronze-300)}
 .hero .coords span:empty{display:none}
-/* the illustration note is one of the survey note's items, not a figure's caption strip: it takes the note's size, case and
-   on-ink tone (6.7:1 by day, 6.9:1 at night) and stands on its baseline, with no sheet rule over the ink */
-.hero .coords{align-items:baseline}
+
 .hero .coords .cap{display:block;border:0;padding:0;font-size:inherit;color:inherit}
 /* Short laptop windows (1366x657, 1280x600): the headline starts below the survey note, never through it,
    and the lede and buttons close up so the row still lands above the fold. */
 @media (min-width:821px) and (min-height:501px){.hero .wrap{padding-top:max(clamp(96px,14vh,150px),calc(126px + clamp(28px,5vh,52px)))}}
-@media (min-width:821px) and (max-height:720px) and (min-height:501px){:root{--t-hero:clamp(48px,min(7.8vw,calc(17.5vh - 37px)),116px)}.hero .lede{margin-top:20px}.hero .row{margin-top:28px}.hero .wrap{padding-bottom:40px}}
-@media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .lede{margin-top:16px}.hero .row{margin-top:22px}}
+@media (min-width:821px) and (max-height:720px) and (min-height:501px){:root{--t-hero:clamp(48px,min(7.8vw,calc(17.5vh - 37px)),116px)}.hero .row{margin-top:28px}.hero .wrap{padding-bottom:40px}}
+@media (min-width:821px) and (min-height:501px) and (max-height:580px){:root{--t-hero:clamp(44px,min(7.8vw,10vh),116px)}.hero .row{margin-top:22px}}
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
-  /* the veil rises only to just under the tower's ground (28px above the headline), so the lobby's light and the ground are clear of it */
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),rgba(var(--hero-rgb),0) calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}
+  
   /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 416px is the copy's height from the headline to the second button */
   .hero .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
   .hero h1{max-width:none}
-  .hero .coords{display:none}
+  
 }
 /* on a phone the headline sets a touch tighter, and the copy under it closes up a little, so both buttons stand whole above
    the fold of a 390x844 screen (and the first above a 360x640 one) without the drawing giving way */
-@media (max-width:520px){.hero h1{line-height:.97}.hero .lede{font-size:17px;line-height:1.5;margin-top:16px}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}
+@media (max-width:520px){.hero h1{line-height:.97}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}
 /* A tablet held upright has more height than the drawing's 58% takes, which left a band of empty ink between the tower's
    ground and the headline. There the drawing takes the whole hero, so the page script draws the tower down to 28px above
    the headline, as on a phone, and the shading starts lower to keep the ground in view. */
 @media (min-width:560px) and (max-width:820px) and (min-height:900px) and (orientation:portrait){
   .hero canvas{height:100%}
-  .hero::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 30%,rgba(var(--hero-rgb),0) 56%)}
+  
 }
 
 /* Text enlarged on its own stacks the hero as a phone does (the page script sets .stack): the tower above, the copy below */
 .hero.stack canvas{height:63svh;bottom:auto}
-.hero.stack::after{background:linear-gradient(0deg,rgb(var(--hero-rgb)) 0%,rgb(var(--hero-rgb)) 44%,rgba(var(--hero-rgb),0) 70%)}
+
 .hero.stack .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
 .hero.stack h1{max-width:none}
-.hero.stack .coords{top:80px}
-.hero.stack .coords > :not(.cap){display:none}
 
-/* Intro: a hundred blows */
-.curtain{display:none}
-/* While it covers the page the curtain takes the click (a click only skips it, it never follows a link beneath);
-   once the halves part, clicks pass through. */
-html.intro-on .curtain{display:grid;position:fixed;inset:0;z-index:100;color:var(--ivory);place-items:center;pointer-events:auto}
-.curtain.part{pointer-events:none}
-/* Failsafe: if the page script never runs, the curtain lifts on its own after four seconds and the headline shows. */
-html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwards}
 @keyframes curtain-failsafe{to{visibility:hidden;opacity:0}}
 @keyframes hero-failsafe{to{transform:none}}
-.curtain .half{position:absolute;top:0;bottom:0;width:50.2%;overflow:hidden;background:rgb(var(--hero-rgb));transition:transform .6s cubic-bezier(.7,0,.2,1) .08s,box-shadow 0s .08s}
-.curtain .half.l{left:0}.curtain .half.r{right:0;transition-duration:.66s,0s}
-/* the hairline cracks the struck count, and each slab leaves carrying its half of it (the curtain's script puts a copy of
-   the counter in each half, centred on the screen) with its cut face edged in bronze once it moves. The halves of the
-   count are seen apart, then fade out of the headline's way (by 0.32 s, before its first line rises where they stood),
-   so no half of a numeral ever stands beside a line of the headline or rides a slab out to the screen's edge. */
-.curtain .split{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--bronze-500);transform:scaleY(0);transition:transform .16s cubic-bezier(.7,0,.2,1),opacity .14s .16s}
-.curtain.split-on .split{transform:none;opacity:0}
+
 .curtain.split-on .half .in{opacity:0;transition:opacity .12s cubic-bezier(.5,0,.75,0) .2s}
-.curtain.split-on .half.l{transform:translateX(-101%);box-shadow:inset -1px 0 0 rgba(var(--bronze-rgb),.7)}.curtain.split-on .half.r{transform:translateX(101%);box-shadow:inset 1px 0 0 rgba(var(--bronze-rgb),.7)}
+
 .curtain .in{position:relative;display:grid;justify-items:center;gap:22px}
 .curtain .half .in{position:absolute;top:0;bottom:0;left:0;width:calc(100% / .502);align-content:center}
 .curtain .half.r .in{left:auto;right:0}
 /* (the copies wait, hidden, through the hold, so the struck count is never drawn twice) */
 .curtain:not(.split-on) .half .in,.curtain.split-on > .in{visibility:hidden}
-.curtain.fast .half{transition-delay:0s}.curtain.fast .split{transition-delay:0s,.1s}.curtain.fast .half .in{transition-delay:0s}
+.curtain.fast .half .in{transition-delay:0s}
 .curtain .n{font-family:var(--display);font-weight:300;font-size:clamp(64px,10vw,120px);line-height:.8;letter-spacing:.02em}
 .curtain .bar{width:min(240px,50vw);height:1px;background:rgba(var(--ivory-rgb),.18);position:relative;overflow:hidden}
 .curtain .bar i{position:absolute;inset:0;background:var(--bronze-500);transform-origin:left;transform:scaleX(0)}
@@ -1269,10 +1138,10 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .curtain .n .d::before{display:block;white-space:pre;animation:.58s steps(1,end) both}
 .curtain .n .h::before{content:"0\A 1";animation-name:cm-h}
 .curtain .n .t::before{content:"0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0";animation-name:cm-t}
-.curtain .n .o::before{content:"0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0";transform:translateY(-.8em);animation-name:cm-o}
+
 .curtain .bar i{animation:cm-bar .58s cubic-bezier(.33,1,.68,1) both}
 .curtain.struck .n .d::before,.curtain.struck .bar i{animation:none}
-.curtain.struck .n .h::before{transform:translateY(-.8em)}.curtain.struck .n .t::before{transform:translateY(-8em)}.curtain.struck .n .o::before{transform:translateY(-80em)}.curtain.struck .bar i{transform:none}
+.curtain.struck .n .h::before{transform:translateY(-.8em)}.curtain.struck .n .t::before{transform:translateY(-8em)}.curtain.struck .bar i{transform:none}
 @keyframes cm-h{82.9%,to{transform:translateY(-.8em)}}
 @keyframes cm-t{3.27%{transform:translateY(-.8em)}6.98%{transform:translateY(-1.6em)}11%{transform:translateY(-2.4em)}15.42%{transform:translateY(-3.2em)}20.37%{transform:translateY(-4em)}26.01%{transform:translateY(-4.8em)}32.69%{transform:translateY(-5.6em)}41.04%{transform:translateY(-6.4em)}52.82%{transform:translateY(-7.2em)}82.9%,to{transform:translateY(-8em)}}
 @keyframes cm-o{0%{transform:translateY(-.8em);animation-timing-function:steps(9,end)}3.27%{transform:translateY(-8em);animation-timing-function:steps(10,end)}6.98%{transform:translateY(-16em);animation-timing-function:steps(10,end)}11%{transform:translateY(-24em);animation-timing-function:steps(10,end)}15.42%{transform:translateY(-32em);animation-timing-function:steps(10,end)}20.37%{transform:translateY(-40em);animation-timing-function:steps(10,end)}26.01%{transform:translateY(-48em);animation-timing-function:steps(10,end)}32.69%{transform:translateY(-56em);animation-timing-function:steps(10,end)}41.04%{transform:translateY(-64em);animation-timing-function:steps(10,end)}52.82%{transform:translateY(-72em)}54.37%{transform:translateY(-72.8em)}56.03%{transform:translateY(-73.6em)}57.83%{transform:translateY(-74.4em)}59.79%{transform:translateY(-75.2em)}61.97%{transform:translateY(-76em)}64.43%{transform:translateY(-76.8em)}67.29%{transform:translateY(-77.6em)}70.76%{transform:translateY(-78.4em)}75.34%{transform:translateY(-79.2em)}82.9%,to{transform:translateY(-80em)}}
@@ -1280,24 +1149,22 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 /* the drawn wordmark, the same outlines as the header's */
 .curtain .w{display:block;height:11px;width:auto;overflow:visible;color:rgba(var(--ivory-rgb),.72)}
 
-
-
 /* Markets chart */
 /* The map as one plate: the overview of every market, with the routes to later markets drawn out from South Florida by the reader's scroll,
    and beside it a survey of the stretch of coast that opens first. Sizes on each drawing are set in screen pixels through
    --u (viewBox units per pixel, kept by the page script for each drawing). */
 .chart{margin-top:clamp(44px,6vw,80px);display:grid;gap:clamp(36px,4.4vw,64px)}
 .chart > *{min-width:0}
-.chart .map{margin:0;display:grid;gap:10px}
+
 .chart svg{display:block}
 /* the overview takes most of the width and the survey a narrow sheet beside it, at the same height (the survey is cut to
    its land and coast), with a ruled gutter between them; leaders run from the locator on the overview to the survey's corners */
 .chart .plate{position:relative;display:grid;grid-template-columns:minmax(0,284fr) minmax(0,16fr) minmax(0,100fr)}
 .chart .plate::after{content:"";position:absolute;top:0;bottom:0;left:73%;width:1px;background:var(--rule)}
-.chart .pa{grid-column:1;grid-row:1;position:relative;overflow:hidden;aspect-ratio:720/330}
+
 .chart .ov{width:100%;height:auto}
 .chart .sv{grid-column:3;grid-row:1;width:100%;height:100%}
-.chart .ldr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
 .chart .ldr path{fill:none;stroke:var(--faint);stroke-width:.75px;vector-effect:non-scaling-stroke}
 /* a frame drawn only at its corners, over the sheet, in the faint tone so the ticks never outweigh what they frame (labels
    inside keep 8px clear of them) */
@@ -1311,30 +1178,26 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 /* picked from the list, the launch stands out from the survey's linework */
 .chart .sv .ctx{transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .sv .ctx{opacity:.35}
-/* a row answers in ink: it holds its ink while the other markets stand back on the map and in the list (below) */
-.lv{transition:color .3s}
+
 .chart .grid line{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
 .chart .gl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.12em}
-/* routes: planned in hidden dashes, later in dots; each draws out through a mask of its own */
-.chart .arc{fill:none;stroke:var(--fg);stroke-width:1.25px;vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
-.chart .arc.later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
+
 .chart .ov mask rect{fill:#000}
 .chart mask path{fill:none;stroke:#fff;stroke-width:14;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
 .js .chart .pt:not(.landed){stroke:var(--rule)}
 /* what opens now is the only continuous line: the reach along the coast, three points, the locator around them */
 .chart .rch{fill:none;stroke:var(--patina);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
-.chart .loc{fill:none;stroke:var(--patina);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+
 .chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
 /* New York opens with South Florida: its two points take the survey's patina, drawn in with the reach between them */
 .chart .ov .pt.now{fill:var(--patina);stroke:var(--sheet);transform-box:fill-box;transform-origin:center;transform:scale(var(--r,1))}
 .js .chart :is(.lb,.lk):not(.landed){fill:var(--faint)}
-.chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+
 /* then, the world: the International route ends on a world key that marks the overview's own frame */
 .chart .ko{fill:var(--sheet)}
-.chart .wo{fill:none;stroke:var(--faint);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round}
-.chart .wf{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+
 .chart .lk{font-style:italic}
 /* the survey: hatched land, the coast and its islands, county lines, the reach, three cities, a scale and a north point */
 .chart .sv #svHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
@@ -1353,26 +1216,21 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart .ring{r:calc(4px * var(--u,1));fill:none;stroke:var(--patina);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
 .chart.pulse .ring{animation:ring 2.4s var(--ease) both}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
-/* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. */
-.chart .levels{margin:0;padding:0;list-style:none}
-.chart .lv{position:relative}
-.chart .lv .no{display:none}
-.chart .lv::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
-.chart .lv.landed::before{transform:none}
-@media (min-width:700px){.chart .lv{grid-template-columns:56px 132px minmax(0,1fr);gap:6px 24px;padding-block:22px}.chart .lv .no{display:block;grid-column:1;grid-row:1;font-size:13px;font-weight:500;letter-spacing:.14em;color:var(--faint);font-variant-numeric:lining-nums tabular-nums}.chart .lv .when{grid-column:2}.chart .lv h3{grid-column:3;font-size:var(--t-head,clamp(28px,2.8vw,40px))}.chart .lv p{grid-column:3;font-size:17px;text-wrap:balance}}
+
+@media (min-width:700px){.chart .lv h3{grid-column:3;font-size:var(--t-head,clamp(28px,2.8vw,40px))}.chart .lv p{grid-column:3;font-size:17px;text-wrap:balance}}
 /* (the coverage takes a column of its own once there is room for it beside the name) */
-@media (min-width:1000px){.chart .lv{grid-template-columns:56px 132px minmax(0,6fr) minmax(0,4fr);row-gap:0}.chart .lv p{grid-column:4;grid-row:1}}
+@media (min-width:1000px){.chart .lv p{grid-column:4;grid-row:1}}
 /* below 1200px (where the survey's type would crowd it beside the overview) the survey comes first, cut wide and short
    (y 36 to 286, its slice of the viewBox; its land and sea run on out to the plate's edges) with its scale and title moved out
    into the empty ocean, then the overview, in its crop on a phone; the leaders fold away */
-@media (max-width:1199px){.chart .plate{grid-template-columns:minmax(0,1fr);overflow:hidden}.chart .plate::after,.chart .ldr{display:none}.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}.chart .pa{grid-row:2;border-top:1px solid var(--rule)}.chart .lk{transform:translateY(calc(48px + 10px * var(--u,1)))}
+@media (max-width:1199px){.chart .plate{grid-template-columns:minmax(0,1fr);overflow:hidden}.chart .plate::after,.chart .ldr{display:none}.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}.chart .lk{transform:translateY(calc(48px + 10px * var(--u,1)))}
   .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
 @media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
 /* the overview's phone crop (x 290 to 720, y 24 to 310) is cut by its frame, so it holds without the page script too. Its
    foot runs 10 units past the world key's label, and the label stands 2px further in, so it keeps 8px clear of the
    frame's corner ticks down to a 320px phone. */
-@media (max-width:599px){.chart .pa{aspect-ratio:430/286}.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.392%}
-  .chart :is(.gl,.far){display:none}.chart .edge{display:inline}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
+@media (max-width:599px){.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.392%}
+  .chart :is(.gl,.far){display:none}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lb.now{font-size:calc(18px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
 /* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it, clear of Houston's */
 @media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
 @media (max-width:374px){.chart .ov .lb.now[data-m="sf"]{transform:translateY(-6px)}.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
@@ -1382,11 +1240,11 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;color:var(--faint);text-align:left}
 /* (a figure caption with no key keeps the strip's whole width, with no gap held open for one; the hero's coordinates line, also a .cap, keeps its spacing) */
 figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
-.cap .key{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+
 .cap .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .cap .key svg{width:28px;height:6px;overflow:visible}
 .cap .key path{fill:none;stroke:var(--fg)}
-.cap .k-now{stroke:var(--patina)!important;stroke-width:3px;stroke-linecap:round}
+
 .cap .k-plan{stroke-width:1.25px;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
 .cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
 @media (max-width:600px){.cap{grid-template-columns:minmax(0,1fr)}}
@@ -1426,6 +1284,27 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 /* Reading pages: journal notes, privacy, not-found */
 .page{padding-block:clamp(56px,8vw,112px) clamp(72px,9vw,128px)}
 .page .wrap{max-width:880px}
+/* On a wide screen the reading column is set in a page, not on a strip: its sections hang in the left margin as a short list
+   that stays in view from the first section down, the one being read marked in bronze (site.js builds it from the page's
+   own headings), and each photograph's caption steps out into the right margin, level with the photograph's top. */
+.toc{display:none}
+@media (min-width:1320px) and (hover:hover) and (pointer:fine){
+  main.page:not(.wide) > .wrap{position:relative}
+  .toc{display:block;position:absolute;top:var(--toc-top,0px);bottom:0;right:calc(100% - var(--gl) + 56px);width:clamp(168px,calc((100vw - 880px) / 2 - 48px),232px)}
+  .toc > div{position:sticky;top:calc(var(--hdr,64px) + 40px);max-height:calc(100svh - var(--hdr,64px) - 80px);overflow-y:auto;padding-top:14px;border-top:1px solid var(--rule)}
+  .toc-k{margin:0 0 10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .toc ol{list-style:none;margin:0;padding:0}
+  .toc a{position:relative;display:block;padding:6px 0 6px 16px;font-size:15px;line-height:1.35;color:var(--muted);text-decoration:none;transition:color var(--t-ui)}
+  .toc a::before{content:"";position:absolute;left:0;top:calc(6px + .675em);width:8px;height:1px;background:var(--rule);transition:background-color var(--t-ui),width var(--t-ui) var(--ease-out)}
+  .toc a[aria-current]{color:var(--fg)}
+  .toc a[aria-current]::before{background:var(--accent);width:11px}
+  .toc a:hover,.toc a:focus-visible{color:var(--fg)}
+  main.page:not(.wide) .prose figure.photo{position:relative}
+  main.page:not(.wide) .prose figure.photo > .cap{position:absolute;top:0;left:calc(100% + 40px);width:clamp(160px,calc((100vw - 880px) / 2 - 40px),220px);margin:0;display:block;font-size:14px;line-height:1.5}
+  main.page:not(.wide) .prose figure.photo > .cap > span{display:block}
+  main.page:not(.wide) .prose figure.photo > .cap .credit{margin-top:6px;white-space:normal}
+}
+@media print{.toc{display:none!important}}
 .crumbs{font-size:15px;color:var(--faint);margin-bottom:28px}
 .crumbs a{color:var(--accent)}
 /* (each crumb answers a touch 4px above and below its words, a 30px target, without moving the line or its underline) */
@@ -1654,36 +1533,32 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 @media (max-width:319px) and (prefers-reduced-motion:no-preference){html.menu-open .theme{animation:motion-in .5s var(--ease) .35s backwards}}
 /* The phone tower runs edge to edge, so its corner marks would hang past the screen */
 @media (max-width:820px){.rise .elev .reg{display:none}}
-/* Without scripts the drawings cannot be drawn; show the story as text rather than an empty sheet.
-   Every page marks html.js in its head, so these rules never flash on a page that has scripts. */
-html:not(.js) .rise{grid-template-columns:minmax(0,1fr)}
+
 html:not(.js) .rise .elev,html:not(.js) .vacant{display:none}
-html:not(.js) .step{min-height:auto}
+
 html:not(.js) .step h3::before{opacity:1;transform:none}
 
 /* Phones on their side: the story returns to two columns so the tower keeps its height.
    Below 480px wide (a 1280px window zoomed to 400% is 320px) there is no room for two, so the phone layout stays. */
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){
-  .rise{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:32px}
-  .rise{--bleed:0px}
+  
+  
   .rise .elev{position:sticky;top:calc(var(--hdr) + 8px);height:calc(100svh - 88px);margin-inline:0;padding:8px 0;gap:6px}
   .rise .elev::after{display:none}
-  .rise .gauge{padding-bottom:2.77em}
-  /* the first step's heading reaches the reading line (about a third of the way down) as the drawing settles under the
-     header, so the whole sheet, caption to gauge, is in view with it */
-  .step:first-child{padding-top:calc(36svh - 72px)}
+  
+  
   /* both drawings keep their illustration captions: the story's on its own line above the step's name where the column
      is too narrow for both (at the top of the panel, so it is in view with the drawing from the first step), the hero's
      one line under the header, as on a phone held upright */
   .elev figcaption{flex-wrap:wrap;row-gap:2px}
   .elev figcaption b{letter-spacing:.1em}
-  .hero .coords{display:flex;top:72px}
-  .hero .coords > :not(.cap){display:none}
+  
+  
   .hero canvas{height:100%}
-  .hero::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.9) 45%,rgba(var(--hero-rgb),0) 75%)}
+  
   .hero .wrap{padding-top:96px}
   .hero h1{font-size:40px}
-  .hero .lede{max-width:20.4em;font-size:16px}
+  
 }
 /* Up to 820px wide that column cannot hold the caption beside the longest step name, so the name always takes the second
    line and the drawing keeps one size from step to step. */
@@ -1695,23 +1570,22 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 @media (min-width:821px) and (max-width:1040px) and (min-height:348px) and (max-height:500px) and (orientation:landscape){
   .hero .wrap{padding-top:76px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
   .hero h1{font-size:36px}
-  .hero .lede{max-width:44ch;margin-top:12px}
+  
   .hero .row{margin-top:12px}
   .hero .btn{padding-block:14px}
 }
 
 /* Audit 4 */
 .hero :focus-visible,.band :focus-visible,header.site.over :focus-visible{outline-color:var(--bronze-300)}
-@media (max-width:1180px) and (min-width:821px) and (min-height:501px),(min-width:1041px) and (max-width:1180px){.hero .lede{max-width:21.6em}}
+
 @media (max-width:820px){.pr p,.feature p,.begin ol > li > span:not(.seq){max-width:52ch}}
 /* line breaks: market notes balance, captions avoid a lone last word, a question never strands its last word */
 .lv p{text-wrap:balance}
 figcaption,.dkey dd{text-wrap:pretty}
-.faq summary{text-wrap:balance}
 
 @media (max-width:520px){.hero .row,.page .row{display:grid;grid-template-columns:1fr}.hero .row .btn,.page .row .btn{justify-content:space-between}}
 /* a short phone held upright closes up the hero copy a little, so the first button clears the fold without the drawing giving way */
-@media (max-width:520px) and (max-height:700px) and (orientation:portrait){:root{--t-hero:clamp(40px,11.2vw,44px)}.hero .lede{line-height:1.45;margin-top:14px}.hero .row{margin-top:16px}}
+@media (max-width:520px) and (max-height:700px) and (orientation:portrait){:root{--t-hero:clamp(40px,11.2vw,44px)}.hero .row{margin-top:16px}}
 /* the meta rules end where the prose does (29em of the 22px reading face; the meta itself is set at 13px) */
 .page .meta{max-width:638px}
 @media (max-width:1279px),(max-width:79.9375em){nav.main.open a:first-child{border-top:1px solid var(--rule)}}
@@ -1752,16 +1626,12 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-fig,.cv-read{grid-area:1 / 2 / -1;position:sticky;top:96px}
 .cv-fig{margin-bottom:calc(var(--cv-rh,0px) + 22px)}
 .cv-read{top:calc(var(--cv-fh,0px) + 118px);margin-top:calc(var(--cv-fh,0px) + 22px)}
-/* the keyboard hint sits at the foot of the drawing while the keyboard is on it (instrument.js sets its height) */
-.cv-kbd{position:absolute;right:10px;top:0;margin:0;padding:1px 6px;font-size:13px;line-height:1.5;color:var(--faint);background:var(--sheet);pointer-events:none;opacity:0;transition:opacity .2s}
-.cv-fig:has(svg:focus-visible) .cv-kbd{opacity:1}.cv-axt{transition:opacity .2s}.cv-fig:has(svg:focus-visible) .cv-axt{opacity:0}
+
 /* the peek's one ring, pulsed on the price slider's thumb */
 .cv-p{position:relative}
-.cv-ring{position:absolute;left:0;top:0;width:21px;height:21px;box-sizing:border-box;border:1px solid var(--sold-line);border-radius:50%;pointer-events:none;opacity:0;transform:translate(-50%,-50%)}
-.cv-ring.go{animation:cv-ring .9s var(--ease)}
+
 @keyframes cv-ring{from{opacity:.6;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
-/* the line above a phone's plot and the phase row under its axis show only where they are needed (below) */
-.cv-now,.cv-ph{display:none}
+
 .cv-fig svg{display:block;width:100%;height:auto}
 /* its caption strip: the disclosure on the left and, beside a wide figure, the key on the right, under one rule */
 .cv-fig figcaption{font-size:15px;line-height:1.5;color:var(--faint);text-wrap:pretty;border-top:1px solid var(--rule);padding-top:10px}
@@ -1778,11 +1648,10 @@ figcaption,.dkey dd{text-wrap:pretty}
 /* numerals take number spacing, not label tracking, so 12 never reads as 1 2 */
 .cv-grid text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
 .cv-grid .ph{text-transform:uppercase;font-size:13px;letter-spacing:.08em;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
-.cv-build{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:1 3;opacity:.5}
+
 .cv-buildt{fill:var(--faint);font:italic 15px var(--display)}
 .cv-area{fill:var(--sold);opacity:.13}
-/* dashed like its legend swatch, so it never reads as the dotted construction line */
-.cv-par{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:4 3;stroke-linecap:butt;opacity:.6}
+
 .cv-line{fill:none;stroke:var(--sold-line);stroke-width:2}
 .cv-lim{stroke:var(--fg);stroke-width:1;stroke-dasharray:6 5}
 .cv-limt{fill:var(--fg);font:500 13px var(--body);letter-spacing:.12em;text-transform:uppercase;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
@@ -1794,7 +1663,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 /* phones and tall tablets: the heading and its text, then the figure with its disclosure read first and the reading just
    above the plot, the price slider straight under the plot, the two readouts, the sentence, and last the lender's slider:
    the source order, so the keyboard runs down the page with the eye */
-@media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}.cv-txt{display:contents}.cv-txt,.cv-fig,.cv-p,.cv-read,.cv-say,.cv-l{grid-area:auto}.cv-fig{position:relative;top:auto;margin-bottom:0}.cv-read{position:static;margin-top:0}.cv-p{margin-top:-4px}.cv-fig figcaption{order:-1;margin-bottom:6px}.cv-now{display:block;margin:0;font-family:var(--display);font-size:21px;line-height:1.3;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}.cv-read dd{font-size:26px}.cv-read{grid-template-rows:auto auto}.cv-read div{grid-row:span 2;grid-template-rows:subgrid;row-gap:0;padding-top:12px}.cv-done dd{align-items:flex-end}}
+@media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}.cv-txt{display:contents}.cv-txt,.cv-fig,.cv-p,.cv-read,.cv-say,.cv-l{grid-area:auto}.cv-fig{position:relative;top:auto;margin-bottom:0}.cv-read{position:static;margin-top:0}.cv-p{margin-top:-4px}.cv-fig figcaption{order:-1;margin-bottom:6px}.cv-read dd{font-size:26px}.cv-read{grid-template-rows:auto auto}.cv-read div{grid-row:span 2;grid-template-rows:subgrid;row-gap:0;padding-top:12px}.cv-done dd{align-items:flex-end}}
 /* (there, the strip with its disclosure reads first, above the plot, and the key follows the plot in a row) */
 @media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.cv-fig{grid-template-columns:minmax(0,1fr)}.cv-fig > :is(figcaption,.cv-key){grid-column:1 / -1}.cv-fig > .cv-key{order:0;flex-direction:row;gap:6px 22px;border-top:0;padding-top:0;font-weight:400}}
 html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){display:none}
@@ -1840,12 +1709,11 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 /* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
 .letter .send .alt{line-height:normal}
-.letter .send .direct{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 0 0 12px;padding-block:12px 3px}
+
 .letter .send .direct svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
 .letter .send .direct:focus-visible svg{transform:translateX(4px)}
 @media (hover:hover) and (pointer:fine){.letter .send .direct:hover svg{transform:translateX(4px)}}
-/* (until the letter is ready its plain link already goes there, so the line waits) */
-.letter:not(.ready) .send .direct{display:none}
+
 .letter .note{color:var(--fg);font-family:var(--display);font-style:italic;font-size:20px;min-height:1.4em}
 /* an empty note leaves the grid, so it adds no second gap; it stays a live region for the message to come */
 .letter .note:empty{position:absolute}
@@ -1856,7 +1724,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 /* a blank still to fill takes a heavier dashed rule, which stays when the focus moves on (its margin gives the extra pixel back) */
 .letter .sheet input:user-invalid,.letter .sheet input.miss{border-bottom:2px dashed var(--accent);margin-bottom:-1px}
 .letter .fine{color:var(--muted);font-size:16px}
-@media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter .send .direct{justify-self:start;margin:0}.letter legend{float:none;width:100%;margin-bottom:6px}}
+@media (max-width:520px){.letter .send{display:grid}.letter .send .btn{justify-content:space-between}.letter legend{float:none;width:100%;margin-bottom:6px}}
 /* the narrowest phones give the letter's lines a little more room, and keep the send button's label on one line; below 354px
    the letter's type also steps down with the screen, so the longest choice ('when the right home appears') still fits its line */
 @media (max-width:365px){.letter .sheet{padding:22px 20px;font-size:min(22px,calc(8.8vw - 9.3px))}}
@@ -1864,14 +1732,10 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 @media (max-width:339px){.letter .send .btn{letter-spacing:.08em}}
 .cv-txt h3{font-size:var(--t-head);max-width:14ch}
 .cv-done dd{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-/* the little tower stands on the numeral's baseline; where its cell is wide enough to keep it clear of the label, it rises
-   taller, up beside the label (a phone on its side, its label beside the numeral, keeps it at the smaller size) */
-.cv-done{container:cvdone/inline-size}
-.cv-tower{width:auto;height:68px;flex:none;overflow:visible;margin:0}
-@container cvdone (min-width:262px){.cv-tower{height:112px;margin-top:-34px}}
+
 /* stacked on narrow screens, each label sits on its value's baseline */
 /* a phone on its side keeps the curve beside its sliders, as a wider screen does, the figure held just under the header */
-@media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{gap:22px 32px;grid-template-rows:repeat(5,auto) 1fr}.cv-read{grid-area:5 / 1;position:static;margin-top:0}.cv-fig{top:calc(var(--hdr) + 8px);margin-bottom:0;transition:top 300ms var(--ease-out)}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0;align-self:baseline}.cv-read .cv-done .cv-tower{height:68px;margin-top:0}}
+@media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{gap:22px 32px;grid-template-rows:repeat(5,auto) 1fr}.cv-read{grid-area:5 / 1;position:static;margin-top:0}.cv-fig{top:calc(var(--hdr) + 8px);margin-bottom:0;transition:top 300ms var(--ease-out)}.cv-read{grid-template-columns:1fr}.cv-read div + div{padding-left:0;border-left:0}.cv-read div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.cv-read dd{margin:0;align-self:baseline}}
 /* and its heading holds under the header beside the chart it names (its ground runs up to the bar, level with the chart's
    top, and follows the header when a phone's header steps aside), so the bar never cuts the heading in two. The words and
    sliders pass under an opaque band, the heading's own ground 8px past its last line, and then a long, eased fade (32px,
@@ -1894,27 +1758,12 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
   .cv-ctl input{scroll-margin-top:140px}
 }
 @media (min-width:480px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){.curve{--cvt:8px;grid-template-rows:repeat(6,auto) 1fr}.cv-read{grid-area:6 / 1}}
-/* the model's glass is a faint wash until a residence sells, then bronze, its turned faces shaded in ink; its slab
-   edges are drawn darkest, its terraces and site plate as pale decks, and its fins, mullions and mast as hairlines */
-.cv-tower .tw-res,.cv-tower .tw-pod,.cv-tower .tw-screen{fill:var(--faint);fill-opacity:.16;transition:fill .5s var(--ease),fill-opacity .5s var(--ease)}
-.cv-tower .tw-pod{fill-opacity:.1}
-.cv-tower .tw-res.on{fill:var(--sold);fill-opacity:1;stroke:var(--sold-line);stroke-width:.6;vector-effect:non-scaling-stroke}
-.cv-tower .tw-shade{fill:var(--fg);fill-opacity:.3}
-.cv-tower .tw-edge{fill:var(--fg);fill-opacity:.62}
-.cv-tower .tw-deck{fill:var(--bg)}
-.cv-tower .tw-lid{fill:var(--fg);fill-opacity:.25}
-.cv-tower .tw-plate{fill:var(--fg);fill-opacity:.06}
-.cv-tower .tw-rail{fill:var(--fg);fill-opacity:.08}
-.cv-tower .tw-mull,.cv-tower .tw-fin{fill:none;stroke:var(--fg);stroke-width:.6;vector-effect:non-scaling-stroke}
-.cv-tower .tw-mull{stroke-opacity:.3}
-.cv-tower .tw-fin{stroke-opacity:.55}
-.cv-tower .tw-beacon{fill:var(--sold)}
-@media (prefers-reduced-motion:reduce){.cv-tower .tw-res{transition:none}}
+
 @media (max-width:520px){.letter .as{gap:8px 22px}.letter .as label{font-size:22px}}
 /* Touch: each blank is tall enough to tap (the padding sits above the words), and its top margin gives that height back,
    so a line with a blank keeps the same pitch as a line without one. Phones held sideways are touch screens too. */
 @media (max-width:520px),(pointer:coarse){.letter .sheet input,.letter .sheet select{padding-block:10px 1px;margin-block:-9px 0}.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline-offset:0}}
-.cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
 .cv-key li{display:flex;align-items:center;gap:8px}
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
@@ -1922,17 +1771,10 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .cv-key .k-lim{border-top:1px dashed var(--fg)}.cv-key .k-lim-li{display:none}
 /* the phone gap comes after the base rule so it applies; each item gives back its trailing tracking so the gap is the gap */
 .cv-key li,.rp-key li{margin-right:-.14em}
-@media (max-width:520px){.cv-key{display:none}}
-/* (under a phone's drawing the three milestones stand one to a line, their months in a column of their own, so Ground
-   broken and Top-off never run together on one line) */
-.cv-ph{flex-direction:column;gap:2px;margin:0;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;line-height:1.5;color:var(--faint)}
+
 .cv-ph span{white-space:nowrap}.cv-ph b{display:inline-block;min-width:2ch;text-align:right;font-weight:500;color:var(--fg);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums;margin-right:.6em}.cv-ph i{display:none}
-@media (max-width:520px){.cv-ph{display:flex}}
-.cv-fig.ph-row .cv-ph{display:flex}
-.cv-lab{fill:var(--fg);font:500 13px var(--body);letter-spacing:.1em;text-transform:uppercase;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
-.cv-lab.faint{fill:var(--faint)}
+
 .cv-key.lim-key .k-lim-li{display:flex}
-.cv-key .k-build{border-top:1px dotted var(--fg);opacity:.6}
 
 /* ---- Atelier: page-to-page transitions and type that arrives */
 @view-transition{navigation:auto}
@@ -1999,12 +1841,12 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 
 /* Three tiers of section head, so the page has rhythm instead of one repeated layout */
 @media (min-width:821px){
-  .head.statement{grid-template-columns:repeat(12,minmax(0,1fr));row-gap:clamp(28px,3vw,44px)}
+  
   .head.statement h2{grid-column:1/span 12;max-width:21ch;letter-spacing:-.022em;line-height:1.01}
-  .head.statement .intro{grid-column:8/-1}
+  
   .head.wide{grid-template-columns:repeat(12,minmax(0,1fr));align-items:last baseline}
   .head.wide h2{grid-column:1/span 8}
-  .head.wide .intro{grid-column:9/-1;grid-row:1;padding-bottom:0}
+  
   /* one head for the back matter: the h2 on seven of the twelve columns, its intro on the last five, from the same x as
      the chapters' intros, the two ending on one baseline */
   .head.quiet{grid-template-columns:repeat(12,minmax(0,1fr));align-items:last baseline}
@@ -2015,9 +1857,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    The contact head opens on a W, which has almost none, so it stays on the column. */
 .head h2,.page h1{margin-left:-.04em}
 .door h2{margin-left:-.02em}
-.name .cut{margin-left:-.045em}
+
 @media (min-width:1600px){:root{--max:1480px}}
-.pr:last-child{border-bottom:0}
+
 /* Night keeps the day's rhythm: graphite rooms, true-ink bands framed in bronze hairlines, a heavier grain on the ink.
    The ink is the brand ink taken deeper (#090A0C, the same cool hue as var(--ink)), so the hero, the private door and the
    name sit in one temperature with the graphite page (#1B1E23) and still read as rooms, a step down of 1.19:1; the
@@ -2026,11 +1868,6 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band:#090A0C;--band-rule:#2A2D31;--hero-rgb:9,10,12}}
 :root[data-theme="dark"] .band{background:#090A0C}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{background:#090A0C}}
-/* The rule above each intro draws itself as its section arrives (site.js marks the section .in; without the shared
-   script it simply stands drawn) */
-.head .intro::before{transform-origin:left}
-.js body:not(.no-js) main section:not(.in) .head .intro::before{transform:scaleX(0)}
-.js main section.in .head .intro::before{transition:transform .7s var(--ease-ink)}
 
 /* A practice row is one target: the numeral leans and steps in, and its bay of the facade takes the light */
 .pr .more::after{content:"";position:absolute;inset:0}
@@ -2508,7 +2345,7 @@ html.js .pc-nojs{display:none}
    its numeral clear of the band's fade, and a link in a step that takes focus is scrolled clear of the band and its fade
    (header 64, band 46svh + 38, fade 32, ring 12; the step's 24px of opening space less 6 keeps the numeral just clear of
    the fade) */
-@media (max-width:820px){.step{scroll-margin-top:calc(46svh + 46px)}.step a{scroll-margin-top:calc(46svh + 146px)}}
+@media (max-width:820px){.step a{scroll-margin-top:calc(46svh + 146px)}}
 /* (in the sideways two-column story the band is beside the steps, not above them, so a focused link needs no extra room) */
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.step a{scroll-margin-top:8px}}
 /* a window too short for the band (a 1280px window zoomed to 300% or 400%) keeps the tower above the story, where it scrolls
@@ -2562,38 +2399,30 @@ nav.main a[aria-current="page"]{color:var(--fg)}
 @media (max-width:520px) and (prefers-reduced-motion:no-preference){html.menu-open .tools .hd{animation:motion-in .5s var(--ease) .35s backwards}}
 @media (max-width:319px){html.menu-open .tools .hd{display:none}}
 @keyframes motion-in{from{opacity:0}}
-/* The practices sheet is laid over the ink: the hero sinks and dims beneath its bronze edge */
-#services{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}
-/* A jump to the practices lands with the hero's foot just passed above the bar (this gives back the page's scroll
-   padding, --hdr: 64px, or nothing while a phone's header has stepped aside), so the bar lands on the sheet, not on the
-   hero's last strip, and the section's top meets the screen's top either way; its own opening space keeps its heading
-   clear below the bar, which comes back for the jump */
-#services{scroll-margin-top:calc(var(--hdr) * -1)}
+
 .hero>*{translate:0 calc(var(--p,0) * 42vh);opacity:calc(1 - var(--p,0) * .5)}
 
 /* Audit round two */
 @media (max-width:820px){
-  .hero .coords{display:flex;top:80px;font-size:13px;letter-spacing:.14em}
-  /* the caption, and under it on one line of its own, the sun the drawing is lit by (the drawing is framed under both,
-     so the line never meets the crown) */
-  .hero .coords > :not(.cap):not(#sunline){display:none}
-  .hero .coords #sunline{flex-basis:100%;white-space:nowrap;line-height:1}
+  
+  
+  
   .step h3::before{transform:translateY(.12em);margin-left:0}
-  .gauge{font-size:13px}
+  
   /* when a label stacks over its numeral, the numeral starts flush under it; on one line the label keeps the same gap */
   .gauge b{margin-left:0}.gauge em{margin-right:6px}
 }
 /* a phone or small tablet on its side keeps its survey note as it was (the sun line is for the upright phone's caption row) */
-@media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.hero .coords #sunline{display:none}}
+
 /* phones on their side keep the illustration caption above the headline, clear of it */
-@media (min-width:480px) and (max-width:820px) and (max-height:500px) and (orientation:landscape){.hero .coords{top:72px}.hero .wrap{padding-top:102px}}
+@media (min-width:480px) and (max-width:820px) and (max-height:500px) and (orientation:landscape){.hero .wrap{padding-top:102px}}
 /* narrower phones on their side keep the illustration caption, so the hero starts under it and closes up enough for whole buttons;
    up to 520px the buttons stack, so the hero closes up only from the height where the open one would cut them anyway */
 @media (min-width:660px) and (max-width:820px) and (min-height:342px) and (max-height:500px) and (orientation:landscape){
-  .hero .coords{top:72px}
+  
   .hero .wrap{padding-top:100px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
   .hero h1{font-size:30px}
-  .hero .lede{max-width:44ch;margin-top:10px}
+  
   .hero .row{margin-top:14px}
   .hero .btn{padding-block:12px}
 }
@@ -2607,7 +2436,7 @@ p,li{text-wrap:pretty}
 /* on the narrowest phones a long note title wraps, so its underline follows each line of words instead of running the
    full box under the last; the next link takes a line of its own */
 @media (max-width:359px){.page .links{display:block}.page .links .more{display:inline;-webkit-box-decoration-break:clone;box-decoration-break:clone;line-height:2}.page .links .more + .more{display:table;margin-top:12px}}
-#services,#markets{padding-bottom:clamp(64px,7vw,96px)}
+
 /* the title block keeps one row of four cells only where its narrow cells can hold their labels on one line */
 /* The signature is engraved left to right, so a half-cut state still reads as an inscription */
 .sig.eng text{stroke:none;fill-opacity:1;transition:none}
@@ -2616,9 +2445,7 @@ p,li{text-wrap:pretty}
 /* Night: the ink rooms stand clear of the graphite page (its ground and paper are set with the night tokens) */
 :root[data-theme="dark"] .band{box-shadow:inset 0 1px 0 rgba(var(--bronze-rgb),.42),inset 0 -1px 0 rgba(var(--bronze-rgb),.42)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{box-shadow:inset 0 1px 0 rgba(var(--bronze-rgb),.42),inset 0 -1px 0 rgba(var(--bronze-rgb),.42)}}
-/* the hero runs under the header to the top of the screen, so it keeps only its foot rule */
-:root[data-theme="dark"] .hero{box-shadow:inset 0 -1px 0 rgba(var(--bronze-rgb),.42)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{box-shadow:inset 0 -1px 0 rgba(var(--bronze-rgb),.42)}}
+
 .legal .sep{font-style:normal}
 /* the fair-housing mark: the house and equals sign drawn in the line's own ink at cap height, its words beside it */
 .legal .eho{display:inline-flex;align-items:center;gap:.45em;vertical-align:bottom}
@@ -2640,9 +2467,9 @@ p,li{text-wrap:pretty}
   .table .dm{position:static;transform:none;display:grid;justify-items:center;align-content:start;gap:8px;text-align:center;white-space:normal;line-height:1.4;text-wrap:balance}
   .js .table:not(.in) .dim .dl{transform:scaleY(0)}
 }
-@media (max-width:820px){#markets{padding-bottom:48px}}
+
 /* on phones the section's own rule closes the list, so the last market row drops its line */
-@media (max-width:599px){.chart .lv:last-child{border-bottom:0}}
+
 /* Older browsers without :has still show which voice the letter is written in; where :has works, the label alone carries the underline and the ring */
 @supports not selector(:has(*)){.letter .as input:checked + span{color:var(--fg);border-bottom:1px solid var(--sold)}.letter .as input:focus-visible + span{outline:1px solid var(--accent);outline-offset:4px}}
 /* Without JavaScript, or when the shared script never arrives (the head script marks html.nosite four seconds on, and site.js
@@ -2664,10 +2491,10 @@ p,li{text-wrap:pretty}
   /* every headline, paragraph and drawing prints in its final state, wherever the reader had scrolled to */
   *,*::before,*::after{transition:none!important;animation:none!important}
   .js .tx-rise .w{overflow:visible}.js .tx-rise .w > i{transform:none!important}
-  .head .intro::before{transform:none!important}
+  
   html.js .cut .ln > span,.hero h1 .ln > span{transform:none!important}
   .js .facade path,.js .mk-el path,.arch path,.pc-arch path,.cv-line,.ruler .crack,.chart .arc,.chart mask path{stroke-dashoffset:0!important}
-  .ruler .crack{opacity:1!important}
+  
   .js .facade .b{opacity:.45!important}.js .facade :is(.w,.k){opacity:1!important}.js .mk-el text{opacity:1!important}.js .tl li,.js .tl ol::before,.js .wy .tr i{opacity:1!important;transform:none!important}
   .doorway{--o:1!important}
   .leaf{background:var(--band)!important}
@@ -2675,27 +2502,26 @@ p,li{text-wrap:pretty}
   .chart .pt{stroke:var(--fg)!important}.chart :is(.lb,.lk){fill:var(--fg)!important}
   .chart,.chart mask path{--a:1!important;--c:1!important;--t:1!important;--r:1!important}
   .step h3::before{opacity:1!important;transform:none!important}
-  /* the specimen sheet prints filled in, with its corner ticks and key swatches (backgrounds are dropped otherwise) */
-  .spec{-webkit-print-color-adjust:exact;print-color-adjust:exact}.js .spec .sp-plan g,.js .spec .sp-pace,.js .spec .sp-dot{opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}.js .spec .sp-act{clip-path:none!important}
+  .js .spec .sp-plan g,.js .spec .sp-pace,.js .spec .sp-dot{opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}
   .sig.eng{-webkit-mask:none!important;mask:none!important}
-  .faq details::details-content{content-visibility:visible;display:block;block-size:auto}
+  
   .prose .side,.deposit,.sheet-rp > *,.rp-after{break-inside:avoid}
   .hero,.band,#services{background:#fff!important;color:var(--ink)!important;box-shadow:none!important;min-height:0!important;--line:var(--ink)}
   .hero h1,.hero .lede,.band h1,.band h2,.band p,.band .big,.name .cut{color:var(--ink)!important}
-  .hero .coords,.hero::after{display:none!important}
+  
   .hero .btn{color:var(--ink)!important;border-color:var(--ink)!important}.hero .btn.solid{background-color:var(--ink)!important;color:#fff!important}
   .hero>*{translate:none!important;scale:none!important;opacity:1!important}
   .hero .wrap{padding-top:0!important}
   .chart,.instrument,.deposit,.table,.facade,.ruler,.sheet-rp,.cv-fig,.cv-key,.dkey,.btn.solid,.mk-tk,body > footer > .wrap::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   h2,h3{break-after:avoid}
   figure,li,.step{break-inside:avoid}
-  .step{min-height:0!important}
+  
   .rise .elev{display:none!important}
   a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
 }
 /* printed side by side (the sliders left off the page), the readouts simply follow the figure down its column */
 @media print and (min-width:901px){.curve{grid-template-rows:auto 1fr}.cv-say{grid-row:2}.cv-fig{margin-bottom:0}.cv-read{grid-row:3;margin-top:0}}
-@media (forced-colors:active){body::after{display:none}.cv-tower .tw-res.on{forced-color-adjust:none;fill:CanvasText}
+@media (forced-colors:active){body::after{display:none}
   .table :is(rect,path){stroke:CanvasText}.table .ch.on .rl{fill:CanvasText}
   .co-ln path,.co-mk svg :is(path,circle),.grade :is(line,pattern path){stroke:CanvasText}.co-mk .q,.co-mk text{fill:CanvasText}
   .mk-tk{forced-color-adjust:none;--tc:CanvasText;--sheet:Canvas}
@@ -2715,48 +2541,21 @@ p,li{text-wrap:pretty}
   .rp-c.sold,.rp-dot,.cv-dot{fill:CanvasText}.rp-dot,.cv-dot{stroke:Canvas}
   .ul,.more,.handle,.tb a,.legal a,.prose a,.crumbs a,.sp-go{text-decoration:underline}
 }
-/* Questions: ruled rows that open in place */
-.faq{border-top:1px solid var(--fg);margin-top:clamp(32px,4vw,56px)}
-.faq details{border-bottom:1px solid var(--rule)}
-.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 28px;align-items:center;gap:24px;padding:20px 0;font-family:var(--display);font-weight:400;font-size:var(--t-big);line-height:1.25;color:var(--fg);transition:color .3s var(--ease)}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"";width:13px;height:13px;justify-self:end;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
-.faq details[open] summary::after{transform:rotate(45deg)}
-/* a question answers in ink, as the ruled rows do: its foot rule takes the ink from the left (300 ms), and the title
-   keeps its colour */
-.faq details{position:relative}
-.faq details::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left;pointer-events:none;transition:transform 210ms var(--ease-out)}
-.faq details:has(> summary:focus-visible)::after{transform:none;transition-duration:300ms}
-.faq details:has(> summary.press)::after{transform:none;transition-duration:var(--t-press)}
-@media (hover:hover) and (pointer:fine){.faq details:has(> summary:hover)::after{transform:none;transition-duration:300ms}}
+
 @media (forced-colors:active){.faq details::after,.next::after{background:CanvasText}}
-.faq summary:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+
 /* the answer's space below is padding, not margin, so it stays inside the panel that opens and closes */
 .faq details p{margin:0;padding-bottom:24px;max-width:58ch;font-size:18px;line-height:1.65;color:var(--muted)}
 /* An answer opens as the + turns, where the browser can size a panel to its content; elsewhere it simply appears */
-@media screen and (prefers-reduced-motion:no-preference){
-  .faq details{interpolate-size:allow-keywords}
-  .faq details::details-content{block-size:0;overflow-y:clip;transition:block-size .45s var(--ease),content-visibility .45s allow-discrete}
-  .faq details[open]::details-content{block-size:auto}
-}
-:root[data-motion="off"] .faq details::details-content{transition:none}
-/* The questions read as a ledger, not a column beside a held head: each row runs the full measure, its number hung in
-   the margin in the display face, the question and its answer on one indent, and the head and the closing line set on
-   that indent too, so the margin carries nothing but the numbers. */
-#questions{--qn-w:clamp(36px,8.6vw,124px);--qn-gap:clamp(12px,2vw,28px);--qn:calc(var(--qn-w) + var(--qn-gap))}
-.faq{counter-reset:q}
-.faq details{counter-increment:q}
-.faq summary{grid-template-columns:var(--qn-w) minmax(0,1fr) 28px;column-gap:var(--qn-gap);align-items:baseline}
-.faq summary::before{content:counter(q,decimal-leading-zero);font-weight:300;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.02em;color:var(--faint)}
-.faq summary::after{align-self:center}
+
 .faq details p{margin-left:var(--qn)}
-#questions .ask{margin-left:var(--qn);border-top:0;padding-top:0}
+
 @media (min-width:821px){
-  #questions .head{padding-left:var(--qn);grid-template-columns:minmax(0,1fr);row-gap:0}
+  
   #questions .head > *{grid-column:1}
   #questions .head h2{max-width:none;margin-left:-.04em}
-  #questions .intro{margin-top:18px}
-  .faq summary{padding:22px 0}
+  
+  
   .faq details p{padding-right:calc(28px + var(--qn-gap))}
 }
 /* More notes under the featured guide */
@@ -2765,10 +2564,7 @@ p,li{text-wrap:pretty}
 .head.masthead{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;row-gap:0}
 .head.masthead :is(h2,.intro){grid-column:1}
 .head.masthead h2{max-width:none;margin-left:0;text-wrap:balance}
-.head.masthead .intro{margin-top:20px;max-width:40ch;text-wrap:balance}
-.head.masthead .intro::before{margin-inline:auto}
-.head.masthead + .feature{border-top:3px double var(--fg)}
-.notes-list{list-style:none;margin:clamp(32px,4vw,48px) 0 0;padding:0;border-top:1px solid var(--rule)}
+
 .notes-list li{border-bottom:1px solid var(--rule)}
 .notes-list a{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 24px;align-items:baseline;padding:18px 0;text-decoration:none;color:var(--fg)}
 .notes-list .k{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -2802,12 +2598,12 @@ nav.main a.press{color:var(--fg);transition:none}
 .js header.site.over nav.main a.press{color:var(--ivory)}
 @media (max-width:1279px),(max-width:79.9375em){nav.main a.press{border-color:var(--fg)}.js header.site.over nav.main a.press{border-color:rgba(var(--ivory-rgb),.6)}}
 .ul.press,.prose a.press,.crumbs a.press,.hd.press,.letter .send .direct.press{color:var(--fg);transition:none}
-.sp-go.press{color:var(--fg);transition:none}
+
 .sp-go.press svg,.letter .send .direct.press svg{transform:translateX(4px);transition-duration:var(--t-press)}
 .handle.press svg{transform:translateX(.12em);transition-duration:var(--t-press)}
 :is(.tb a,.legal a).press{background-size:100% 1px;color:var(--fg);transition:none}
 .ss a.press .t,.feature h3 a.press{background-size:100% 1px;transition:none}
-.pr:has(.more.press)::after{transform:none;transition-duration:var(--t-press)}
+
 .letter .as label.press{color:var(--fg);transition:none}
 .door .more.press,.pc-door .crumbs a.press{color:var(--band-fg)}
 .js.menu-open header.site.over .hd.press{color:var(--ivory)}
@@ -2819,6 +2615,18 @@ nav.main a.press{color:var(--fg);transition:none}
    below 1200px, its type kept near the size it has on the home page */
 .prose h3{font-size:clamp(24px,2.4vw,30px);font-weight:400;margin:36px 0 8px}
 .prose h2 + h3,.prose h2 + p + h3{margin-top:24px}
+/* The neighbourhoods of an open market: one after another on a wide screen; on a phone a row of cards, photograph first,
+   swiped sideways with the next card showing at the edge, so seven places take one card's height and not seven. */
+.hood:first-child > h3:first-child{margin-top:24px}
+.hoods:focus-visible{outline:1px solid var(--accent);outline-offset:8px}
+@media (max-width:700px){
+  .hoods{display:flex;gap:16px;margin:28px calc(-1 * var(--gl)) 0;padding:0 var(--gl) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
+  .hoods::-webkit-scrollbar{display:none}
+  .hood{flex:0 0 84%;display:flex;flex-direction:column;scroll-snap-align:start}
+  .hood > figure.photo{order:-1;margin:0 0 18px}
+  .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
+  .hood > p + p{margin-top:.6em}
+}
 .prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .mk-facts{margin:28px 0;border-top:1px solid var(--fg)}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
@@ -2984,7 +2792,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .reel .photo{margin:0}
 .photos-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(40px,5vw,64px)}
 .photos-pair .photo{margin:0}
-#markets .photos-pair + .links{margin-top:clamp(32px,4vw,48px)}
+#markets :is(.photos-pair,.chart) + .links{margin-top:clamp(32px,4vw,48px)}
 .photos-pair .cap{grid-template-columns:minmax(0,1fr)}
 /* One art direction for every photograph: the same quiet grade over each (a little less colour, a breath of warmth, the
    shadows held), so a Pexels evening and an Unsplash morning read as one set of plates on the vellum; a touch darker at night. */
@@ -3049,10 +2857,9 @@ main{overflow-x:clip}
 @media (max-width:700px){.trio{grid-template-columns:minmax(0,1fr)}}
 .plate{margin-bottom:0}
 .plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
-/* the room beyond the private-client door: window light on linen, seen only as the leaves open */
-.doorway .room{position:absolute;left:5.5%;right:5.5%;top:4.667%;bottom:0;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0;opacity:calc(var(--o) * .3);pointer-events:none}
+
 .doorway .room img{width:100%;height:100%;object-fit:cover}
-.doorway .room::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(var(--ink-rgb),0) 30%,rgba(var(--ink-rgb),.75))}
+
 @media (max-width:700px){.photos-pair{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:600px){.cap .credit{white-space:normal}}
 @media print{.film video{display:none}}
@@ -3061,21 +2868,16 @@ main{overflow-x:clip}
 /* Rhythm (October 16): the section heads stop repeating one module.
    The practices' head turns: the statement runs the full measure and its intro steps down on the left, where the three
    practices begin, rather than on the right as the developer story's does. */
-@media (min-width:821px){.head.statement.turn .intro{grid-column:1/span 5}}
+
 /* The name: the hundredth blow set as a pull quote across most of the measure, the paragraph answering it beneath, on the right */
 @media (min-width:821px){
-  .name .cols{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:clamp(28px,3vw,44px);align-items:start}
+  
   .name .cols .big{grid-column:1/span 10;font-size:var(--t-section);line-height:1.12;letter-spacing:-.012em;text-wrap:balance}
   .name .cols div p:not(.big){grid-column:7/-1;grid-row:2}
 }
-/* A quiet way to the partners at the foot of the places a reader decides: under the hero's buttons (wide screens), the
-   markets and the questions. */
-.hero .row .write{align-self:center;margin:0 0 0 10px;padding-block:6px 3px;color:inherit;opacity:.86}
-@media (hover:hover) and (pointer:fine){.hero .row .write:hover{opacity:1}}
-@media (max-width:820px){.hero .row .write{display:none}}
-.ask{margin-top:clamp(36px,4vw,56px);padding-top:18px;border-top:1px solid var(--rule);font-family:var(--display);font-size:var(--t-big);line-height:1.35;color:var(--fg)}
+
 .ask a{color:var(--accent)}
-#questions .ask{max-width:none}
+
 /* Phones: the advisors' seat plan drawn at three quarters of its height, so the section reads as one screen */
 @media (max-width:820px){.people .table .ph{width:122px;height:auto}}
 
