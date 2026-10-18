@@ -1,6 +1,6 @@
 # Builds the stylesheet pages load and stamps every page's links to site.css, site.js, model.js and instrument.js
-# with one shared ?v= token (and tower3d.js, the hero's rendered tower, planner.js, the launch planner's, and home.css, the
-# home pages' own styles), so a returning visitor never pairs new HTML with a stylesheet or script still in the
+# with one shared ?v= token (and tower3d.js, the hero's rendered tower, planner.js, the launch planner's, project-site.js, the
+# specimen project site's form, and home.css, the home pages' own styles), so a returning visitor never pairs new HTML with a stylesheet or script still in the
 # browser's cache.
 # The styles are written and commented in _src/site.css, and the home pages' own in _src/home.css (Jekyll never
 # publishes an underscore folder). This tool writes site.css and home.css from them with the comments and blank lines
@@ -43,11 +43,11 @@ for css in ('site.css','home.css'):
         if open(css).read()!=built[css]: stale.append(css); print(css,'stale: run python3 tools/version.py')
     else: open(css,'w').write(built[css])
 
-assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js']
 h=hashlib.sha256()
 for a in assets: h.update(built[a].encode() if a in built else open(a,'rb').read())
 token=h.hexdigest()[:8]
-pages=['index.html','privacy.html','404.html','private-clients.html','advisors.html','planner.html','shortlist.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html']+sorted(glob.glob('journal/*.html'))+sorted(glob.glob('es/*.html'))+sorted(glob.glob('pt/*.html'))
+pages=['index.html','privacy.html','404.html','private-clients.html','advisors.html','planner.html','shortlist.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html','developers.html','markets.html','project-site.html']+sorted(glob.glob('journal/*.html'))+sorted(glob.glob('es/*.html'))+sorted(glob.glob('pt/*.html'))
 ref=re.compile(r'((?:href|src)="[^"]*?(?:'+'|'.join(re.escape(a) for a in assets)+r'))(?:\?v=[0-9a-f]*)?"')
 for f in pages:
     t=open(f).read()

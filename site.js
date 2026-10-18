@@ -27,16 +27,39 @@
     document.body.prepend(a);
   }
 
+  // Visits are counted by GoatCounter, cookie-free: the page's path, its title and the site it came from, no cookie and
+  // nothing stored on the visitor's device. Only on centamont.com, never for a browser driven by a script (the tests),
+  // and never when the browser sends Global Privacy Control or Do Not Track (privacy.html says so). A few moments are
+  // counted as events by name: a letter sent (and from which page), the launch planner put to use, a step from the
+  // planner to the letter, a way out to Instagram, the developer brief downloaded.
+  // window.cmCount(name) counts one; instrument.js and planner.js call it.
+  const counting = /^(www\.)?centamont\.com$/.test(location.hostname) && !navigator.webdriver && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1';
+  const count = (p, ev) => {
+    if (!counting) return;
+    const u = 'https://centamont.goatcounter.com/count?' + new URLSearchParams({ p, t: ev ? p : document.title, r: ev ? '' : document.referrer, e: ev ? 'true' : 'false', rnd: Math.random().toString(36).slice(2, 7) });
+    try { if (navigator.sendBeacon && navigator.sendBeacon(u)) return; } catch (e) {}
+    new Image().src = u;
+  };
+  window.cmCount = (name) => count(name, true);
+  count(location.pathname, false);
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    if (/^https:\/\/(ig\.me|www\.instagram\.com)\//.test(a.href)) window.cmCount('instagram' + location.pathname);
+    else if (/\.pdf(\?|$)/.test(a.getAttribute('href'))) window.cmCount('brief' + location.pathname);
+  }, true);
+
   // Menu
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
   if (nav && btn) {
-    const label = btn.querySelector('span') || btn, word = label.textContent;
+    // (the word for Close is the page's own, as Menu is: a Spanish or Portuguese voice reads it in its own tongue)
+    const label = btn.querySelector('span') || btn, word = label.textContent, shut = { es: 'Cerrar', pt: 'Fechar' }[lang] || 'Close';
     // While the menu is open the page behind it is inert, and Tab cycles between the links and Close.
     const behind = () => document.querySelectorAll('main, footer, .skip');
     // (opening, the page behind turns inert a frame after the drawer has painted, so the press answers at once: making the
     // whole page inert restyles all of it; closing, it is live again at once, so a place chosen in the menu can take the focus)
     let still = 0;
-    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); if (o) root.classList.toggle('sb', innerWidth > root.clientWidth); root.classList.toggle('menu-open', o); label.textContent = o ? 'Close' : word;
+    const show = (o) => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); if (o) root.classList.toggle('sb', innerWidth > root.clientWidth); root.classList.toggle('menu-open', o); label.textContent = o ? shut : word;
       cancelAnimationFrame(still); if (o) still = requestAnimationFrame(() => { still = requestAnimationFrame(() => { if (nav.classList.contains('open')) behind().forEach((el) => { el.inert = true; }); }); }); else behind().forEach((el) => { el.inert = false; }); };
     nav.addEventListener('keydown', (e) => { const links = nav.querySelectorAll('a'); if (e.key === 'Tab' && e.shiftKey && nav.classList.contains('open') && document.activeElement === links[0]) { e.preventDefault(); btn.focus(); } });
     btn.addEventListener('keydown', (e) => { if (e.key === 'Tab' && !e.shiftKey && nav.classList.contains('open')) { e.preventDefault(); nav.querySelector('a').focus(); } });
@@ -91,10 +114,12 @@
   // Browser chrome follows the page: the one theme-color is the ground under the header (the ink of the hero or a band, or
   // the sheet; on a phone whose header has stepped aside, the ground at the top of the screen), set as the header takes its
   // ground and as day turns to night. The two tones are read once per theme, never per frame.
-  const tc = document.querySelector('meta[name="theme-color"]'), hex = (s) => '#' + (s.match(/\d+/g) || []).slice(0, 3).map((v) => (+v).toString(16).padStart(2, '0')).join('');
+  // (a page carries two, the night one first under its media query, so the browser's bar is right before this runs; from
+  // here on both say the same)
+  const tcs = [...document.querySelectorAll('meta[name="theme-color"]')], hex = (s) => '#' + (s.match(/\d+/g) || []).slice(0, 3).map((v) => (+v).toString(16).padStart(2, '0')).join('');
   let tones = { ink: '', page: '' }, onInk = false;
   const tone = () => { const cs = getComputedStyle(root); tones = { ink: hex(cs.getPropertyValue('--hero-rgb')), page: hex(getComputedStyle(document.body).backgroundColor) }; };
-  const chrome = (ink) => { onInk = ink; const v = ink ? tones.ink : tones.page; if (tc && v.length === 7 && tc.content !== v) tc.content = v; };
+  const chrome = (ink) => { onInk = ink; const v = ink ? tones.ink : tones.page; if (v.length === 7) tcs.forEach((tc) => { if (tc.content !== v) tc.content = v; }); };
   tone(); chrome(false);
   if (header && grounds.length) {
     let raf = 0, key = '', lead = [];
@@ -530,6 +555,14 @@
   ['pointerup', 'pointercancel', 'dragstart'].forEach((t) => document.addEventListener(t, letGo, { capture: true, passive: true }));
   addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
 
+  // A row of neighborhoods that scrolls sideways (a market page on a phone) takes the keyboard's focus, so its cards can be
+  // scrolled from the keys; where the cards stand in a column and nothing scrolls, it is no stop at all.
+  const rows = document.querySelectorAll('.hoods');
+  if (rows.length) {
+    const stop = () => rows.forEach((r) => { if (r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
+    let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
+  }
+
   // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so
   // by the time it stands in the middle of the screen it is finished, and a reader scrolling past never meets one half drawn.
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
@@ -537,14 +570,15 @@
 
   // Film loops: a few muted seconds of water and light. Each loads only as it comes into view, plays while it is on
   // screen and pauses once it leaves; the still beneath it shows until the first frame is ready. With motion reduced
-  // or paused, the still stays.
+  // or paused, the still stays. (The page names its files on the video, data-webm and data-mp4; the sources are made
+  // here, as it arrives, so the markup carries no source without a file.)
   const films = document.querySelectorAll('video.loop');
   if (films.length && !stillPage) {
     const fo = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting: on }) => {
       if (on) {
         if (!v.dataset.ready) {
           v.dataset.ready = '1';
-          v.querySelectorAll('source[data-src]').forEach((s) => { s.src = s.dataset.src; });
+          [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { if (!v.dataset[k]) return; const s = document.createElement('source'); s.src = v.dataset[k]; s.type = type; v.appendChild(s); });
           v.addEventListener('playing', () => v.classList.add('on'), { once: true });
           v.load();
         }
@@ -557,7 +591,9 @@
   // On paper, everything is drawn and every answer is open, wherever the reader had scrolled to. Answers the reader
   // had closed close again afterwards.
   let opened = [];
+  // Photographs still waiting to load (and the stills under the films) are fetched at once, so none prints as an empty frame.
   addEventListener('beforeprint', () => {
+    document.querySelectorAll('img[loading="lazy"]').forEach((i) => { i.loading = 'eager'; });
     document.querySelectorAll('.tx-rise, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
     opened = [...document.querySelectorAll('.faq details:not([open])')];
     opened.forEach((d) => { d.open = true; });

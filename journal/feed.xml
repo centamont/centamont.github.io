@@ -7,9 +7,45 @@
   <id>https://centamont.com/journal/</id>
   <icon>https://centamont.com/apple-touch-icon.png</icon>
   <logo>https://centamont.com/og.png</logo>
-  <updated>2026-10-17T12:00:00Z</updated>
+  <updated>2026-10-18T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <rights>© 2026 Centamont</rights>
+  <entry>
+    <title>Releasing inventory in a new building</title>
+    <link href="https://centamont.com/journal/releasing-inventory-in-a-new-building.html"/>
+    <id>https://centamont.com/journal/releasing-inventory-in-a-new-building.html</id>
+    <category term="Developer note"/>
+    <published>2026-10-18T12:00:00Z</published>
+    <updated>2026-10-18T12:00:00Z</updated>
+    <summary>Which residences go in the first release, which floors and lines to hold back and how to set the step between releases.</summary>
+  </entry>
+  <entry>
+    <title>Working with outside brokers</title>
+    <link href="https://centamont.com/journal/working-with-outside-brokers.html"/>
+    <id>https://centamont.com/journal/working-with-outside-brokers.html</id>
+    <category term="Developer note"/>
+    <published>2026-10-18T12:00:00Z</published>
+    <updated>2026-10-18T12:00:00Z</updated>
+    <summary>Registration, protection periods, procuring cause and approved materials: how a cooperating broker program for a new building is set up.</summary>
+  </entry>
+  <entry>
+    <title>Reading the pace of sales</title>
+    <link href="https://centamont.com/journal/reading-the-pace-of-sales.html"/>
+    <id>https://centamont.com/journal/reading-the-pace-of-sales.html</id>
+    <category term="Developer note"/>
+    <published>2026-10-18T12:00:00Z</published>
+    <updated>2026-10-18T12:00:00Z</updated>
+    <summary>Contracts per month, months of supply, how pace moves from launch to completion and what to ask the sales team to forecast.</summary>
+  </entry>
+  <entry>
+    <title>Deposit escrow for new condominiums</title>
+    <link href="https://centamont.com/journal/deposit-escrow-for-new-condominiums.html"/>
+    <id>https://centamont.com/journal/deposit-escrow-for-new-condominiums.html</id>
+    <category term="Developer note"/>
+    <published>2026-10-18T12:00:00Z</published>
+    <updated>2026-10-18T12:00:00Z</updated>
+    <summary>What Florida and New York let a developer do with buyers’ deposits before closing, and what it means for cash flow and the launch calendar.</summary>
+  </entry>
   <entry>
     <title>Buying new construction in California</title>
     <link href="https://centamont.com/journal/buying-new-construction-california.html"/>
@@ -97,7 +133,7 @@
     <id>https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html</id>
     <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
-    <updated>2026-10-11T12:00:00Z</updated>
+    <updated>2026-10-18T12:00:00Z</updated>
     <summary>How a launch price moves two numbers: the month the lender’s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
   </entry>
   <entry>

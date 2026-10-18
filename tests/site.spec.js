@@ -193,6 +193,19 @@ test('Escape closes the phone menu', async ({ page, isMobile }) => {
   await expect(page.getByRole('button', { name: 'Menu' })).toBeFocused();
 });
 
+test('the open phone menu says close in the page language', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  for (const [path, open, shut] of [['/', 'Menu', 'Close'], ['/es/', 'Menú', 'Cerrar'], ['/pt/', 'Menu', 'Fechar']]) {
+    await page.goto(path);
+    const btn = page.locator('#menuBtn');
+    await expect(btn).toHaveText(open);
+    await btn.click();
+    await expect(btn).toHaveText(shut);
+    await btn.click();
+    await expect(btn).toHaveText(open);
+  }
+});
+
 test('first visit plays the intro, then reveals the page', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop', 'the intro plays only on wide screens');
   await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
@@ -403,6 +416,39 @@ test('the specimen short list shows three residences and says it is invented', a
   await expect(page.locator('.standfirst')).toContainText('invented');
 });
 
+// The specimen project site's register form is a demonstration: it checks its fields and confirms on the page, and
+// nothing typed into it ever leaves the browser.
+test('the specimen register form confirms on the page and sends nothing', async ({ page }) => {
+  await page.goto('/project-site.html');
+  await expect(page.locator('.rp-foot')).toContainText('invented');
+  await expect(page.locator('.standfirst')).toContainText('invented');
+  await page.waitForLoadState('networkidle');
+  const sent = [];
+  page.on('request', (r) => sent.push(r.method() + ' ' + r.url()));
+  const form = page.locator('#psForm');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psName')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#psEmailE')).not.toBeEmpty();
+  await expect(page.locator('#psName')).toBeFocused();
+  await page.locator('#psName').fill('Ana Ribeiro');
+  await page.locator('#psEmail').fill('ana@example');
+  await page.locator('#psWant').selectOption('Two bedrooms');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psEmail')).toHaveAttribute('aria-invalid', 'true');
+  await page.locator('#psEmail').fill('ana@example.com');
+  await form.getByRole('button', { name: 'Register interest' }).click();
+  await expect(page.locator('#psDone')).toBeVisible();
+  await expect(page.locator('#psDone')).toBeFocused();
+  await expect(page.locator('#psThanks')).toHaveText('Thank you, Ana.');
+  await expect(page.locator('#psDone')).toContainText('sent nothing');
+  await expect(form).toBeHidden();
+  await page.locator('#psAgain').click();
+  await expect(form).toBeVisible();
+  await expect(page.locator('#psName')).toHaveValue('');
+  await page.waitForTimeout(300);
+  expect(sent).toEqual([]);
+});
+
 test('the sales curve answers the launch price, and says it is illustrative', async ({ page }) => {
   await page.goto('/');
   await page.locator('#curve').scrollIntoViewIfNeeded();
@@ -432,8 +478,10 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
   await page.goto('/');
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await page.locator('#letter label', { hasText: 'A buyer' }).click();
-  await expect(page.locator('#letter [data-for="buy"]')).toBeVisible();
-  await expect(page.locator('#letter [data-for="dev"]')).toBeHidden();
+  await expect(page.locator('#letter p[data-for="buy"]')).toBeVisible();
+  await expect(page.locator('#letter p[data-for="dev"]')).toBeHidden();
+  // a buyer signs with a name alone: the company blank goes with the developer's paragraph
+  await expect(page.locator('#letter .sign [data-for="dev"]')).toBeHidden();
   await page.locator('#letter input[name="area"]').fill('Miami Beach');
   page.on('popup', (p) => p.close().catch(() => {}));
   await page.locator('#letter button[data-to="ig"]').click();
@@ -456,6 +504,7 @@ test('the letter copies and opens Instagram without a clipboard permission', asy
   await page.locator('#letter input[name="where"]').fill('Edgewater');
   await page.locator('#letter input[name="units"]').fill('60');
   await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+  await page.locator('#letter input[name="company"]').fill('Ruiz Development');
   const popup = page.waitForEvent('popup');
   await page.locator('#letter button[data-to="ig"]').click();
   // the copy settles at once (copied, or the letter shown to copy by hand), never left waiting on a prompt
@@ -465,7 +514,7 @@ test('the letter copies and opens Instagram without a clipboard permission', asy
   if (browserName === 'chromium') {
     await expect(page.locator('#letterNote')).toContainText('Your letter is copied');
     await context.grantPermissions(['clipboard-read']);
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is still a sketch, and we hope to launch sales this year.\n\nWith regards,\nAna Ruiz');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year.\n\nWith regards,\nAna Ruiz of Ruiz Development');
   }
 });
 
@@ -492,10 +541,10 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 // Each page carries its own Content-Security-Policy, which allows its inline scripts by hash.
 // Editing an inline script without updating that page's hash would silently switch it off.
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
-  const pages = ['/', '/privacy.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html',
+  const pages = ['/', '/privacy.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
-    '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html'];
+    '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html', '/journal/deposit-escrow-for-new-condominiums.html', '/journal/reading-the-pace-of-sales.html', '/journal/working-with-outside-brokers.html', '/journal/releasing-inventory-in-a-new-building.html'];
   const refused = [];
   await page.addInitScript(() => document.addEventListener('securitypolicyviolation', (e) => console.error('CSP refused ' + e.violatedDirective + ' ' + e.blockedURI)));
   page.on('console', (m) => m.text().startsWith('CSP refused') && refused.push(page.url() + ' ' + m.text()));
@@ -547,15 +596,15 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
-    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
+  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
@@ -567,8 +616,8 @@ test('assets carry the current version', async ({}, info) => {
 // points at it by url(#id) takes the wrong one.
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
-    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html'];
+  const pages = ['index.html', 'privacy.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'journal/index.html',
+    'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   for (const p of pages) {
     const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
     expect(ids.filter((v, i) => ids.indexOf(v) !== i), `${p} repeats an id`).toEqual([]);
@@ -581,7 +630,7 @@ test('journal dates agree everywhere they are written', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   const feed = readFileSync('journal/feed.xml', 'utf8');
   const sitemap = readFileSync('sitemap.xml', 'utf8');
-  const notes = ['buying-pre-construction-florida.html', 'buying-new-construction-florida.html', 'buying-pre-construction-new-york.html', 'buying-new-construction-new-york.html', 'launch-price-and-the-pre-sale-threshold.html', 'what-a-weekly-sales-report-should-measure.html', 'launching-in-miami-and-new-york.html', 'buying-pre-construction-texas.html', 'buying-new-construction-texas.html', 'buying-pre-construction-california.html', 'buying-new-construction-california.html'];
+  const notes = ['buying-pre-construction-florida.html', 'buying-new-construction-florida.html', 'buying-pre-construction-new-york.html', 'buying-new-construction-new-york.html', 'launch-price-and-the-pre-sale-threshold.html', 'what-a-weekly-sales-report-should-measure.html', 'launching-in-miami-and-new-york.html', 'buying-pre-construction-texas.html', 'buying-new-construction-texas.html', 'buying-pre-construction-california.html', 'buying-new-construction-california.html', 'deposit-escrow-for-new-condominiums.html', 'reading-the-pace-of-sales.html', 'working-with-outside-brokers.html', 'releasing-inventory-in-a-new-building.html'];
   for (const n of notes) {
     const html = readFileSync('journal/' + n, 'utf8');
     const url = 'https://centamont.com/journal/' + n;
@@ -800,4 +849,13 @@ test.describe('every page in the sitemap', () => {
     expect(over).toBe(0);
     expect(skipBottom).toBeLessThan(0);
   });
+});
+
+// The developer and markets pages set their sections as ruled rows; a stylesheet change that drops those rules would
+// leave them as bare stacked text, so the grid itself is checked.
+test('the developer and markets pages keep their ruled rows', async ({ page }) => {
+  for (const path of ['/developers.html', '/markets.html']) {
+    await page.goto(path);
+    await expect(page.locator('.co-row').first()).toHaveCSS('display', 'grid');
+  }
 });

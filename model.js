@@ -70,7 +70,7 @@
   // The plan set in use: every plan, and everything traced from the plans, for one count of chords to a corner.
   // Every drawing chooses its own (Model.cs) and each scene and framing puts it in place first, so all the code below
   // reads the set of the drawing it is making. (Assigned by useSet, after everything a set is made from is defined.)
-  let PLANS, RAILS, MULL, SIDE, SPLIT, SIDEHULL, GALLERY, FAC, VMAP, RM, FALL, CS = 0;
+  let PLANS, SCREEN, RAILS, MULL, LOUVRE, SIDE, SPLIT, SIDEHULL, GALLERY, FAC, VMAP, RM, FALL, CS = 0;
   // (the plans with three chords to a corner, as every drawing had them before: the columns, the module counts and the
   // ruler's plane are found from these, so none of them moves when a drawing changes its set)
   const PLANS3 = Array.from({ length: FLOORS }, (_, k) => floorPlan(k, 3));
@@ -110,38 +110,14 @@
   })();
   // Glass balustrades just inside each terrace edge, the penthouse terraces and the roof terrace included.
   const RAIL_H = 0.3;
-  // The crown: the terraces keep rising past the roof as three open rings, a sky garden inside them. Each ring is a slab
-  // edge on the roof's outline (RINGS: the height of its underside over the roof, its outer and inner reach as shares of
-  // the roof's), each a little smaller than the one below so the top draws in, with an edge deeper than a floor's
-  // (RING_T) and carried on eight radial fins that stand on the roof's edge. On the roof terrace inside them stands a
-  // glass pavilion (PAV: its reach and height). CROWN_H is the height of the top ring's top over the roof. The outlines are the roof slab's hull, softened
-  // and scaled about its middle (CRN: o and i, each ring's outer and inner line; pav; cols, where the columns stand).
-  const RINGS = [[1.39, 0.99, 0.8], [2.74, 0.95, 0.76], [4.09, 0.9, 0.7]], RING_T = 0.24, CROWN_H = 4.09 + RING_T, PAV = [0.55, 1.24];
-  const CRN = (() => {
-    const h = hull(floorPlan(FLOORS - 1, 6).slab.map((p) => [p.x, p.z])), n = h.length;
-    let a2 = 0, cx = 0, cz = 0;
-    for (let i = 0; i < n; i++) { const [x0, z0] = h[i], [x1, z1] = h[(i + 1) % n], c = x0 * z1 - x1 * z0; a2 += c; cx += (x0 + x1) * c; cz += (z0 + z1) * c; }
-    cx /= 3 * a2; cz /= 3 * a2;
-    const v = h.map(([x, z]) => [Math.atan2(z - cz, x - cx), Math.hypot(x - cx, z - cz)]).sort((a, b) => a[0] - b[0]);
-    // the hull's reach at a bearing, read between its corners; then softened over seven neighbours
-    const N = 128, at = (t) => {
-      for (let i = 0; i < v.length; i++) {
-        const a = v[i], b = v[(i + 1) % v.length], tb = b[0] + (i + 1 === v.length ? 2 * Math.PI : 0), ta = t < v[0][0] ? t + 2 * Math.PI : t;
-        if (ta >= a[0] && ta <= tb) return a[1] + ((b[1] - a[1]) * (ta - a[0])) / (tb - a[0] || 1);
-      }
-      return v[0][1];
-    };
-    const th = Array.from({ length: N }, (_, j) => -Math.PI + (2 * Math.PI * j) / N), r0 = th.map(at);
-    const r = r0.map((_, j) => { let s = 0; for (let d = -3; d <= 3; d++) s += r0[(j + d + N) % N]; return s / 7; });
-    const ring = (sc) => {
-      const pts = th.map((t, j) => ({ x: cx + r[j] * sc * Math.cos(t), z: cz + r[j] * sc * Math.sin(t) }));
-      return pts.map((p, j) => { const a = pts[(j + N - 1) % N], b = pts[(j + 1) % N], tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1; return { x: p.x, z: p.z, nx: tz / l, nz: -tx / l }; });
-    };
-    // (in: each inner line run the other way and turned to face inward, for the ring's inner face)
-    return { o: RINGS.map((q) => ring(q[1])), i: RINGS.map((q) => ring(q[2])), in: RINGS.map((q) => ring(q[2]).reverse().map((p) => ({ x: p.x, z: p.z, nx: -p.nx, nz: -p.nz }))), pav: ring(PAV[0]), cols: ring(0.85).filter((_, j) => j % 16 === 0), cx, cz };
-  })();
-  // the aviation light sits on the top ring's edge where it reaches furthest over the bay (east)
-  const BEACON_AT = (() => { const o = CRN.o[2], p = o.reduce((a, q) => (q.x > a.x ? q : a)); return { x: p.x + p.nx * 0.14, z: p.z + p.nz * 0.14 }; })();
+  // The crown: a louvred screen round the roof plant, set a little behind the top floor's glass line so the roof
+  // reads as a cornice under it, with a terrace and its balustrade round the edge. Its blades rise and fall round the
+  // tower as one swell, lowest on the city side and tallest over the bay (east), so the tide that runs up the terraces
+  // breaks into the crown; SCREEN_H is the crest's height, CREST(p) the screen's height at a point of its line.
+  const SCREEN_H = 2.6;
+  const CREST = (p) => SCREEN_H * (0.4 + 0.6 * Math.pow(0.5 + 0.5 * Math.cos(Math.atan2(p.z, p.x) - 0.35), 1.4));
+  // the aviation light stands on a mast at the middle of the roof, tall enough (about 4 m) to show over the screen
+  const BEACON = 1.1;
   // Mullions and louvres keep a module measured along the façade line, so the rhythm runs evenly round the corners
   // whatever the facets: per[j] lists where (0 to 1) they fall on facet j. Every plan of a kind gets the same count,
   // so the mullions stand one above another from floor to floor.
@@ -161,19 +137,17 @@
   // climbs a storey more, and a clear gap of about two thirds of a storey shows above the coping at any size; on a phone
   // (u px a level, under 12), where the jib's and the coping's lines would merge sooner, up to a storey and a third more
   // (all of it from 10 px a level down).
-  const craneAt = (L, g = 0, u = 99) => ({ top: Math.max(7, L + 3.2) + (FLOORS + SLAB + CROWN_H + 1.8 + Math.max(1, 1.3 * clamp((18 - u) / 8, 0, 1)) - FLOORS - 3.2) * g, ang: -2.75 + 0.45 * Math.sin((L - FLOORS) * 0.38) });
+  const craneAt = (L, g = 0, u = 99) => ({ top: Math.max(7, L + 3.2) + (FLOORS + SLAB + SCREEN_H + 1.8 + Math.max(1, 1.3 * clamp((18 - u) / 8, 0, 1)) - FLOORS - 3.2) * g, ang: -2.75 + 0.45 * Math.sin((L - FLOORS) * 0.38) });
   // [x, z, height, lean, lean direction]
   // the sea wall round the point the site stands on (a rounded square in plan, 33 out from the tower), the bay beyond
   const SHORE = (() => { const o = [], A = 33, r = 9; for (let q = 0; q < 4; q++) for (let i = 0; i <= 6; i++) { const a = (q + i / 6) * Math.PI / 2, cx = (q === 0 || q === 3 ? 1 : -1) * (A - r), cz = (q < 2 ? 1 : -1) * (A - r); o.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); } return o; })();
   const PALMS = [[-8.3, -6.1, 3.9, 0.5, 3.6], [-6.3, -7.1, 4.2, 0.45, 4.4], [5.0, -7.3, 3.6, 0.4, 5.2], [-8.6, 5.6, 3.5, 0.4, 2.4], [8.4, 5.8, 3.7, 0.5, 0.4], [-0.6, 6.7, 3.3, 0.35, 1.4], [9.0, 0.6, 3.1, 0.3, 0.1]];
   // People at the entrance, for scale (a level is about 3.8 m): [x, z, height]. Two stand under the porte-cochère.
-  const FIGS = [[-1.3, -5.5, 0.47], [-0.95, -5.6, 0.44], [1.5, -5.15, 0.46], [3.1, -7.7, 0.46], [-5.4, -7.25, 0.45], [6.1, -6.8, 0.47]];
-  // A porte-cochère on the entrance side of the podium: one deep blade cantilevered some 30 m over the drive from the
-  // top of the lobby's two storeys of glass (its soffit about 7.8 m up), on two slender columns set well back, so the
-  // arrival reads from across the bay (PORTE_Z, its middle; PORTE_POSTS, where the columns stand)
-  const PORTE = 2.05, PORTE_Z = -8.6, PORTE_POSTS = [[-2.4, -7.0], [2.4, -7.0]];
-  // (a broad leaf of a roof with deeply rounded corners, the terraces' curve brought down to the door)
-  const CANOPY = rrect(4.2, 4.0, 2.2, 3, 2).map((p) => ({ x: p.x, z: p.z + PORTE_Z, nx: p.nx, nz: p.nz }));
+  const FIGS = [[-1.3, -5.5, 0.47], [-0.95, -5.6, 0.44], [1.5, -5.15, 0.46], [2.5, -7.2, 0.46], [-5.4, -7.25, 0.45], [6.1, -6.8, 0.47]];
+  // A porte-cochère on the entrance side of the podium, its soffit high enough for a coach (about 5.9 m)
+  const PORTE = 1.55;
+  // (a long leaf of a roof with fully rounded ends, the terraces' curve brought down to the door)
+  const CANOPY = rrect(3.3, 1.2, 1.15, 3, 2).map((p) => ({ x: p.x, z: p.z - 5.5, nx: p.nx, nz: p.nz }));
   // Lamp light after dark: the brand ivory warmed, as a lamp is. It is pale and high in value, under half as saturated
   // as the bronze of a sold residence and far lighter, so lamp light never reads as sold.
   const LAMP = [244, 225, 192];
@@ -196,6 +170,8 @@
   }
   // Mullions and louvres keep the counts the three-chord plans give them, so the rhythm never shifts between sets.
   const MULLN = PLANS3.map((pl, k) => Math.round(perim((k < PODIUM ? PLANS3[0] : k < CROWN ? PLANS3[PODIUM] : PLANS3[CROWN]).glass) / (k < PODIUM ? 1.25 : 0.85)));
+  const SCREEN3 = PLANS3[FLOORS - 1].glass.map((p) => ({ x: p.x - p.nx * 0.2, z: p.z - p.nz * 0.2 }));
+  const LOUVREN = Math.round(perim(SCREEN3) / 0.24);
   // While the building is going up, the sales gallery is the only room in use: the two bays of the lobby behind the
   // porte-cochère (the facets of its glass nearest the canopy), through both storeys of the lobby.
   const GALLERY3 = (() => {
@@ -228,6 +204,9 @@
     const { FAC: fac, VMAP: vm } = idxMap(na);
     // Glass balustrades just inside each terrace edge, the penthouse terraces and the roof terrace included.
     const rails = Array.from({ length: FLOORS + 1 }, (_, k) => (k >= PODIUM ? slabOf(k).map((p) => ({ x: p.x - p.nx * 0.05, z: p.z - p.nz * 0.05, nx: p.nx, nz: p.nz })) : null));
+    // The crown: a louvred screen round the roof plant, set a little behind the top floor's glass line so the roof
+    // reads as a cornice under it, with a terrace and its balustrade round the edge.
+    const screen = plans[FLOORS - 1].glass.map((p) => ({ x: p.x - p.nx * 0.2, z: p.z - p.nz * 0.2, nx: p.nx, nz: p.nz }));
     // Which residence each glass panel belongs to: 0 on the bay side of the level, 1 on the city side.
     const side = plans.map((pl) => Int8Array.from(pl.glass, (p, j) => (p.lx + pl.glass[(j + 1) % pl.glass.length].lx > 0 ? 0 : 1)));
     // The line between them runs through the middle of the north and south faces, at the points of the glass line where
@@ -245,8 +224,10 @@
     const sr = side[RES0], split = [];
     for (let j = 0; j < sr.length; j++) if (sr[j] !== sr[(j + sr.length - 1) % sr.length]) split.push(j);
     return {
-      PLANS: plans, RAILS: rails, SIDE: side, SPLIT: split, FAC: fac, VMAP: vm, RM: rm, FALL: fall,
+      PLANS: plans, RAILS: rails, SCREEN: screen, SIDE: side, SPLIT: split, FAC: fac, VMAP: vm, RM: rm, FALL: fall,
       MULL: plans.map((pl, k) => modules(pl.glass, MULLN[k])),
+      // the crown's louvres, finer: about a quarter of a unit apart
+      LOUVRE: modules(screen, LOUVREN),
       GALLERY: new Set([...fac.keys()].filter((j) => GALLERY3.has(fac[j]))),
       // Each residence's own outline in plan: the hull of its side's glass line, the party wall across it included (as
       // indices into the floor's glass line), so a sold residence can be drawn as the solid it is.
@@ -260,7 +241,7 @@
   function useSet(na) {
     if (na === CS) return;
     const S = SETS[na] || (SETS[na] = buildSet(na));
-    ({ PLANS, RAILS, SIDE, SPLIT, FAC, VMAP, RM, FALL, MULL, GALLERY, SIDEHULL } = S);
+    ({ PLANS, RAILS, SCREEN, SIDE, SPLIT, FAC, VMAP, RM, FALL, MULL, LOUVRE, GALLERY, SIDEHULL } = S);
     CS = na;
   }
   useSet(3);
@@ -346,10 +327,10 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 897, y: 116, w: 843, h: 934, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 856, y: 113, w: 884, h: 937, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 898, y: 116, w: 842, h: 934, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 856, y: 113, w: 884, h: 937, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 897, y: 168, w: 843, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    morning: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 898, y: 156, w: 842, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
@@ -910,6 +891,11 @@
       if (!r) { const f = typeof y === 'function'; r = new Array(pl.length); for (let i = 0; i < pl.length; i++) r[i] = this.P(pl[i].x, f ? y(pl[i]) : y, pl[i].z); e.m.set(y, r); }
       return r;
     }
+    // the crown's top as its screen stands h high at the crest (one function a height, so its projection is reused)
+    crownTop(h) {
+      if (!this._ct || this._ct.h !== h) this._ct = { h, f: (p) => FLOORS + SLAB + (h * CREST(p)) / SCREEN_H };
+      return this._ct.f;
+    }
 
     // world -> screen
     P(x, y, z) {
@@ -944,8 +930,8 @@
       }
       else {
         for (const k of [0, 2, 3, ...Array.from({ length: Math.ceil((CROWN - 6) / 4) }, (_, i) => 6 + 4 * i), CROWN, FLOORS - 1, FLOORS]) for (const p of slabPlan(k)) pts.push([p.x, k, p.z], [p.x, k + SLAB, p.z]);
-        for (const p of CRN.o[2]) pts.push([p.x, FLOORS + SLAB + CROWN_H, p.z]);
-        pads.push([BEACON_AT.x, FLOORS + SLAB + CROWN_H + 0.16, BEACON_AT.z, 8, 8, 8]); // the beacon's glow
+        for (const p of SCREEN) pts.push([p.x, FLOORS + SLAB + SCREEN_H, p.z]);
+        pads.push([0, FLOORS + SLAB + SCREEN_H + BEACON, 0, 8, 8, 8]); // the beacon's glow
       }
       // the crane at the height it will stand for a drawing of this size (u px a level)
       const crane = (u) => {
@@ -1498,7 +1484,7 @@
         if (L > 0.01 && k <= L + 0.001) layers.push({ lo: k, hi: k + SLAB, kind: 'slab', k });
         if (k < FLOORS && (k < L || k < coreTop)) layers.push({ lo: k + SLAB, hi: k + 1, kind: 'floor', k });
       }
-      const Ge = 1 - Math.pow(1 - this.G, 3), crownH = CROWN_H * Ge;
+      const Ge = 1 - Math.pow(1 - this.G, 3), crownH = SCREEN_H * Ge;
       if (L >= FLOORS - 0.001 && this.G > 0.01) layers.push({ lo: FLOORS + SLAB, hi: FLOORS + SLAB + crownH, kind: 'crown' });
       const ey = eye[1];
       const far = (l) => (l.lo > ey ? l.lo - ey : ey > l.hi ? ey - l.hi : 0);
@@ -1625,7 +1611,7 @@
               add(PLANS[PODIUM].glass, Y0);
               for (const lk of [...Array.from({ length: Math.ceil((CROWN - 6) / 3) }, (_, i) => 6 + 3 * i), CROWN - 1, CROWN, FLOORS]) if (lk <= tk + 0.001) add(edgePlan(lk), lk + SLAB);
               if (tk < FLOORS) add(PLANS[tk].slab, tk);
-              if (gw) add(CRN.o[2], FLOORS + SLAB + CROWN_H * (1 - Math.pow(1 - gw, 3)));
+              if (gw) add(SCREEN, FLOORS + SLAB + SCREEN_H * (1 - Math.pow(1 - gw, 3)));
               // (both outlines convex and counterclockwise in plan: the shadow's hull is cut by each edge of the roof's in turn)
               sh = hull(pts);
               for (let i = 0, m = pl.length; i < m && sh.length > 2; i++) {
@@ -1944,7 +1930,7 @@
           // glass is in (C from 1 to 2) it is drawn in the open frame's tone, so it never outweighs the building behind it.
           const ko = Math.max(0, Math.min(1, C - 1));
           g.beginPath(); g.strokeStyle = ink(0.5 + 0.2 * ko); g.lineWidth = 0.8 + 0.4 * ko;
-          for (const [x, z] of PORTE_POSTS) seg(this.P(x, 0, z), this.P(x, PORTE, z));
+          for (const x of [-2.2, 2.2]) seg(this.P(x, 0, -5.85), this.P(x, PORTE, -5.85));
           g.stroke();
           const t1 = PORTE + 0.1;
           const b = band(CANOPY, PORTE, t1, (nx, nz) => mix(dark ? (0.08 + 0.3 * dif(nx, nz)) * (1 - 0.5 * night) : 0.12), true);
@@ -1953,50 +1939,56 @@
           const ce = ey > t1 ? b.bot : b.top;
           g.beginPath(); g.strokeStyle = ink(dark ? 0.52 - 0.16 * night + (0.3 - 0.1 * night) * ko : 0.55 + 0.23 * ko); g.lineWidth = 0.75 + 0.05 * ko; for (const j of b.lines) { const j2 = (j + 1) % CANOPY.length; seg(ce[j], ce[j2]); } g.stroke();
         } else if (l.kind === 'crown') {
-          // The crown: the glass pavilion on the roof terrace, the columns, and the three open rings over them, each drawn
-          // as a slab is (its inner face where it shows across the open middle, its underside or its top, its edge), so
-          // the stack's last terraces read as slab edges lifted clear of the building. As it goes up (G) the rings rise
-          // off the roof together.
-          const y0 = l.lo, Ge = (l.hi - l.lo) / CROWN_H;
-          // (drawn with the slabs' pen set, so on a small drawing the crown is no heavier than the floors under it: a pen
-          // under a device pixel is drawn one pixel wide and lighter by as much)
-          const pw = (v) => (kpen < 1 ? Math.max(hair, v * kpen) : v), pa = (v) => (kpen < 1 ? kt * Math.min(1, (v * kpen) / hair) : 1);
-          // after dark the pavilion is lit from within (it comes on near the end of the lights-on cascade)
+          // The crown: a louvred screen round the roof plant, solid to the eye like everything else on the drawing
+          // (its far side hidden by its near one), with a coping along its top and the aviation light on its mast.
+          const y0 = l.lo, y1 = l.hi, top = this.crownTop(y1 - y0), above = ey > y0 + 0.4 * (y1 - y0);
+          // (seen from above, the plant's roof inside the screen, well below its crest)
+          if (above) { poly(cap(SCREEN, y0 + 0.35 * (y1 - y0))); g.fillStyle = mix(dark ? 0.22 * (1 - 0.4 * night) : 0.2); g.fill(); }
+          // the plant space shows dark between the blades; the blades catch the light
+          const b = band(SCREEN, y0, top, (nx, nz) => { const d = dif(nx, nz); return mix(dark ? (0.17 + 0.13 * d) * (1 - 0.4 * night) : 0.07 + 0.07 * (1 - d)); }, true);
+          const ns = SCREEN.length, lerp = (p, q, u) => [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u];
+          // after dark the plant screen is lit from within, brightest at its foot, and the blades stand dark against it
+          // (it comes on near the end of the lights-on cascade, and glows brighter than the screen stands by day)
           const up = dark && !this.xray && night > 0.05 ? night * cas(1.7) : 0;
-          // the columns, from the roof to the top ring
-          const yc = y0 + RINGS[RINGS.length - 1][0] * Ge;
-          g.beginPath(); g.strokeStyle = ink((dark ? 0.55 - 0.15 * night : 0.5) * pa(0.7)); g.lineWidth = pw(0.7);
-          for (const p of CRN.cols) seg(this.P(p.x, y0, p.z), this.P(p.x, yc, p.z));
-          g.stroke();
-          // the pavilion: a storey of glass, dark by day and warm after dark, under a flat roof
-          const yp = y0 + PAV[1] * Ge, np = CRN.pav.length;
-          const pv = band(CRN.pav, y0, yp, (nx, nz) => (up ? `rgba(${wr},${wg},${wb},${(0.3 + 0.45 * up).toFixed(3)})` : mix(dark ? 0.1 + 0.08 * dif(nx, nz) : 0.18)), true);
-          if (ey > yp) { poly(cap(CRN.pav, yp)); g.fillStyle = mix(dark ? 0.2 * (1 - 0.4 * night) : 0.1); g.fill(); }
-          g.beginPath(); g.strokeStyle = ink((dark ? 0.7 - 0.25 * night : 0.7) * pa(0.7)); g.lineWidth = pw(0.7);
-          for (const j of pv.lines) seg(pv.top[j], pv.top[(j + 1) % np]);
-          g.stroke();
-          // the rings, the farthest from eye level first
-          const order = RINGS.map((_, i) => i).sort((a, b) => Math.abs(y0 + RINGS[b][0] * Ge - ey) - Math.abs(y0 + RINGS[a][0] * Ge - ey));
-          for (const i of order) {
-            const o = CRN.o[i], n = o.length, r0 = y0 + RINGS[i][0] * Ge, r1 = r0 + RING_T * Ge, top = ey > r1;
-            const shade = (nx, nz) => { const d = dif(nx, nz); return mix(dark ? (0.06 + 0.55 * d) * (1 - 0.62 * night) : 0.05 + 0.22 * (1 - d)); };
-            band(CRN.in[i], r0, r1, shade, false);
-            const ro = cap(o, top ? r1 : r0), ri = cap(CRN.i[i], top ? r1 : r0);
+          if (up) {
+            const f0 = this.P(0, y0, 0), f1 = this.P(0, y1, 0), gr = g.createLinearGradient(0, f0[1], 0, f1[1]);
+            gr.addColorStop(0, `rgba(${wr},${wg},${wb},${(0.9 * up).toFixed(3)})`); gr.addColorStop(0.45, `rgba(${wr},${wg},${wb},${(0.5 * up).toFixed(3)})`); gr.addColorStop(1, `rgba(${wr},${wg},${wb},${(0.2 * up).toFixed(3)})`);
             g.beginPath();
-            ro.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
-            ri.forEach((p, j) => (j ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
-            g.fillStyle = mix(dark ? (top ? 0.26 + 0.32 * Math.max(0, sun[1]) * kd : 0.09) * (1 - 0.6 * night) : top ? 0.03 : 0.16); g.fill('evenodd');
-            // its edge: the arris away from the face that shows firm, the other a hairline, as a slab's
-            const b = band(o, r0, r1, shade, true), cont = top ? b.bot : b.top, crs = top ? b.top : b.bot;
-            g.beginPath(); g.strokeStyle = ink((dark ? 0.74 - 0.26 * night : 0.78) * pa(0.75)); g.lineWidth = pw(0.75);
-            for (const j of b.lines) seg(cont[j], cont[(j + 1) % n]);
-            g.stroke();
-            g.beginPath(); g.strokeStyle = ink((dark ? 0.44 - 0.16 * night : 0.42) * (0.5 + 0.5 * fine)); g.lineWidth = hair;
-            for (const j of b.lines) seg(crs[j], crs[(j + 1) % n]);
+            for (let j = 0; j < ns; j++) if (b.vis[j]) { const j2 = (j + 1) % ns; g.moveTo(b.bot[j][0], b.bot[j][1]); g.lineTo(b.bot[j2][0], b.bot[j2][1]); g.lineTo(b.top[j2][0], b.top[j2][1]); g.lineTo(b.top[j][0], b.top[j][1]); g.closePath(); }
+            g.fillStyle = gr; g.fill();
+          }
+          const blade = up ? this.line.map((v, i) => Math.round(v + (this.bg[i] - v) * up)) : this.line;
+          // louvres on their module, hairlines; on a small drawing only every third, so they stay clear of one another
+          for (const every of [true, false]) {
+            const a = (dark ? 0.42 + 0.2 * up : 0.32) * (every ? 1 : fine);
+            if (a <= 0) continue;
+            g.beginPath(); g.strokeStyle = `rgba(${blade[0]},${blade[1]},${blade[2]},${a.toFixed(3)})`; g.lineWidth = hair;
+            let c = 0;
+            for (let j = 0; j < ns; j++) for (const u of LOUVRE.per[j]) { if (!(c++ % 3) !== every || !b.vis[j]) continue; const j2 = (j + 1) % ns; seg(lerp(b.bot[j], b.bot[j2], u), lerp(b.top[j], b.top[j2], u)); }
             g.stroke();
           }
-          // the aviation light, on the top ring's edge over the bay
-          if (this.G > 0.85) this.beacon(this.P(BEACON_AT.x, l.hi + 0.16, BEACON_AT.z), now, dark, ((this.G - 0.85) / 0.15) * (1 - (glows ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+          // its foot on the roof, and the coping along its top, as firm as a slab edge and drawn with the same pen set, so on
+          // a small drawing the crown is no heavier than the floors under it (a pen under a device pixel is drawn one pixel
+          // wide and lighter by as much)
+          const pw = (v) => (kpen < 1 ? Math.max(hair, v * kpen) : v), pa = (v) => (kpen < 1 ? kt * Math.min(1, (v * kpen) / hair) : 1);
+          g.beginPath(); g.strokeStyle = ink((dark ? 0.5 : 0.45) * pa(0.6)); g.lineWidth = pw(0.6);
+          for (const j of b.lines) seg(b.bot[j], b.bot[(j + 1) % ns]);
+          g.stroke();
+          g.beginPath(); g.strokeStyle = ink((dark ? 0.92 - 0.3 * night : 0.8) * pa(0.9)); g.lineWidth = pw(0.9);
+          for (const j of b.lines) seg(b.top[j], b.top[(j + 1) % ns]);
+          g.stroke();
+          if (this.G > 0.85) {
+            // seen from below, the screen hides the mast's foot: it shows only above the coping in front of it
+            const m1 = this.P(0, y1 + BEACON, 0);
+            let m0 = this.P(0, y1, 0);
+            if (!above) for (const j of b.lines) {
+              const p = b.top[j], q = b.top[(j + 1) % ns];
+              if ((p[0] - m1[0]) * (q[0] - m1[0]) <= 0 && p[0] !== q[0]) { const yc = p[1] + ((q[1] - p[1]) * (m1[0] - p[0])) / (q[0] - p[0]); if (yc < m0[1]) m0 = [m1[0], yc]; }
+            }
+            // (the light sinks out of sight behind it, rather than blinking out, as the view comes down)
+            const show = clamp((m0[1] - m1[1]) / 4, 0, 1);
+            if (show > 0) { g.beginPath(); g.strokeStyle = ink(0.6); g.lineWidth = 0.8; seg(m0, m1); g.stroke(); this.beacon(m1, now, dark, show * (this.G - 0.85) / 0.15 * (1 - (glows ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night); }
+          }
         }
       }
 
@@ -2048,10 +2040,7 @@
           if (k < topK) H(PLANS[k].glass, k === 1 ? 1 : k + SLAB, k + 1, null, 0, (k !== 0 ? 1 : 0) | (k !== 1 ? 2 : 0));
         }
         // (the crown takes the balconies' pen, so on a small drawing it is no heavier than the floors under it)
-        if (topK >= FLOORS && this.G > 0.01) {
-          H(CRN.pav, FLOORS + SLAB, FLOORS + SLAB + PAV[1] * Ge, null, 0, 0, 1);
-          for (let i = 0; i < RINGS.length; i++) { const y = FLOORS + SLAB + RINGS[i][0] * Ge; H(CRN.o[i], y, y + RING_T * Ge, null, 0, 0, 1); }
-        }
+        if (topK >= FLOORS && this.G > 0.01) H(SCREEN, FLOORS + SLAB, this.crownTop(crownH), null, 0, 0, 1);
         // (the line comes in with the first glass, C 0 to 1, rather than appearing round the frame at once)
         const sw = silW * Math.max(0.75, kpen), ca = clamp(C, 0, 1);
         this.outline(hs, silCol(ca), sw, hide, fine < 1 ? { cls: tips, col: silCol(ca * (0.72 + 0.28 * fine)), v: Math.max(hair, sw * (0.5 + 0.5 * fine)) } : null);
@@ -2092,7 +2081,8 @@
         // the aviation light, as the drawing lights it: on the rendered (or photographed) crown it sits on the floating
         // roof's high edge over the bay, where an obstruction light would be fixed, rather than on a mast (it goes as the
         // photograph comes in: its glow would sit round the photographed crown as a halo)
-        if (this.G > 0.85 && sa < 1) this.beacon(this.P(BEACON_AT.x, FLOORS + SLAB + crownH + 0.16, BEACON_AT.z), now, dark, (1 - sa) * ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+        const tp = SCREEN.reduce((a, q) => (CREST(q) > CREST(a) ? q : a));
+        if (this.G > 0.85 && sa < 1) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, (1 - sa) * ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
       }
       // The photograph, over the tower, the drawing and the render alike, as it fades in (and over the aviation light, whose
       // glow shows round the crown it stands on), with the light of the sky behind it where the renderer is not drawing it
@@ -2572,6 +2562,6 @@
   // above that; and their bearings.
   Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? (s.az < 180 ? 'morning' : 'gold') : 'day'; };
   Model.stills = STILLS;
-  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, RINGS, RING_T, CROWN_H, PAV, CRN, BEACON_AT, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
+  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
 })();

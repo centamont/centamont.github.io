@@ -17,18 +17,18 @@ SHEETS = {
         'asof': ('2026-07', 'July 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
             ('New towers', '$1,983', 'a square foot', 'Average luxury asking price, against about $800 five years earlier', 2, (1983, 800, '$800')),
-            ('Projects', '26+', 'in pre-construction', 'Branded and ultra-luxury projects across the three counties', 2, None),
+            ('Projects', '26', 'or more in pre-construction', 'Branded and ultra-luxury projects across the three counties', 2, None),
             ('Resale', '12', 'months of supply', 'Miami-Dade condominiums, at a median price of $400,000; new construction excluded', 1, None),
         ]},
     'new-york.html': {
-        'asof': ('2026-09', 'Third quarter 2026'), 'next': ('2027-01', 'January 2027'),
+        'asof': ('2026-09', 'the third quarter of 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
-            ('Manhattan supply', '3,027', 'new development units', 'On the market, against a ten-year average of 4,209', 1, (3027, 4209, '4,209')),
+            ('Manhattan supply', '3,027', 'new development units', 'On the market, against a ten&#8209;year average of 4,209', 1, (3027, 4209, '4,209')),
             ('Contracts', '240', 'in the quarter', 'Down 27 percent from a year earlier', 1, (240, 329, '329')),
-            ('Closed prices', '$2,070', 'a square foot', 'On average, roughly flat on a year earlier', 2, None),
+            ('Closed prices', '$2,070', 'a square foot', 'On average, roughly flat on a year earlier', 1, None),
         ]},
     'hamptons.html': {
-        'asof': ('2026-09', 'Third quarter 2026'), 'next': ('2027-01', 'January 2027'),
+        'asof': ('2026-09', 'the third quarter of 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
             ('Median price', '$1.875M', 'in the quarter', 'Down 6.3 percent from a year earlier', 1, (1875, 2001, '$2.0M')),
             ('Listings', '970', 'homes for sale', 'Down from about 1,260 a year earlier', 2, (970, 1260, '1,260')),

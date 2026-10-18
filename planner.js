@@ -40,9 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Share of residences under contract at the end of each month, and the month ground breaks: the first month at or
   // after the planned one in which the lender's threshold is met. Topping off (six months before completion) and the
-  // finished building bring buyers back, as on the home page's curve; so does ground breaking itself.
+  // finished building bring buyers back, as on the home page's curve; so does ground breaking itself. The pace is
+  // the home page's for its building of 62 residences, a little slower for a larger building and quicker for a smaller
+  // one, so the planner's opening plan (that building, on that schedule) gives the same answer as the home page's curve.
   function model(o) {
-    const base = 0.035 * Math.exp(-0.05 * o.par) * Math.pow(88 / o.units, 0.3), s = [0];
+    const base = 0.035 * Math.exp(-0.05 * o.par) * Math.pow(62 / o.units, 0.3), s = [0];
     let left = 1, G = -1, T = -1;
     for (let m = 0; m < 240; m++) {
       let a = base;
@@ -233,12 +235,17 @@ document.addEventListener('DOMContentLoaded', function () {
     ['theme', 'motion'].forEach((k) => { if (q.get(k)) p.set(k, q.get(k)); });
     try { history.replaceState(history.state, '', location.pathname + '?' + p + location.hash); } catch (e) {}
     const lt = new URLSearchParams({ as: 'dev', units: String(n) }); if (where.value.trim()) lt.set('where', where.value.trim());
+    // (and the plan itself, so the letter can close with its link: "My plan: …")
+    const pl = new URLSearchParams(p); pl.delete('theme'); pl.delete('motion'); lt.set('plan', pl.toString());
     $('plWrite').href = './?' + lt + '#contact';
   }
 
   let raf = 0;
   const soon = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
   form.addEventListener('input', soon);
+  // counted once a visit: the planner put to use, and the step from it to the letter (site.js: window.cmCount)
+  form.addEventListener('input', () => { if (window.cmCount) window.cmCount('planner-used'); }, { once: true });
+  $('plWrite').addEventListener('click', () => { if (window.cmCount) window.cmCount('planner-to-letter'); });
   form.addEventListener('submit', (e) => e.preventDefault());
   let w0 = 0;
   if (window.ResizeObserver) new ResizeObserver(() => { const w = svg.clientWidth; if (w && Math.abs(w - w0) > 2) { w0 = w; soon(); } }).observe(svg);
