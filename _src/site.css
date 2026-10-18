@@ -104,6 +104,8 @@ body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;ba
 @media (hover:hover) and (pointer:fine){:is(.ul,.more,.handle,.prose a,.crumbs a):hover,.spec:hover .sp-go{--ul-a:0%;--ul-b:100%;transition:--ul-a var(--t-ui) cubic-bezier(.4,0,.2,1),--ul-b 260ms var(--ease-out) 140ms,color var(--t-ui)}}
 /* the title block's links draw theirs in, and take it away again, the same way under the pointer and under keyboard focus */
 .tb a,.legal a{background-size:0 1px;transition:background-size .5s var(--ease),color .2s}
+/* at least 24px tall on every pointer (WCAG 2.2 target size); the underline stays on the text */
+.tb a,.legal a{padding-block:2px;background-origin:content-box;background-clip:content-box}
 .tb a:focus-visible,.legal a:focus-visible{background-size:100% 1px;color:var(--fg)}
 @media (hover:hover) and (pointer:fine){.tb a:hover,.legal a:hover{background-size:100% 1px;color:var(--fg)}}
 /* on the dense legal line a closer ring keeps clear of the separators beside it */
@@ -251,8 +253,11 @@ header.site{container:site/inline-size;max-width:100vw}
   nav.main > a:nth-child(5){--k:7}nav.main > a:nth-child(6){--k:8}nav.main > a:nth-child(7){--k:9}
 }
 @media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
-  nav.main.open > a:nth-child(6){border-top:0}
-  nav.main.open .mk-panel > :nth-child(3){border-top:1px solid var(--rule)}
+  /* two columns of four rows: the open markets close the first column and the next ones the second, level with each other */
+  nav.main{grid-template-rows:repeat(4,auto)}
+  nav.main > a:nth-child(5){grid-area:1 / 2}nav.main > a:nth-child(6){grid-area:2 / 2}nav.main > a:nth-child(7){grid-area:3 / 2}
+  nav.main .mk-panel > :nth-child(2){grid-area:4 / 2}
+  nav.main.open > a:nth-child(5){border-top:1px solid var(--rule)}nav.main.open > a:nth-child(6){border-top:0}
 }
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk,header.site .mk-panel{display:contents}
@@ -266,19 +271,24 @@ header.site{container:site/inline-size;max-width:100vw}
   header.site nav.main .mk-panel > .mk-st:nth-child(1){--k:3}header.site nav.main .mk-panel > .mk-st:nth-child(2){--k:4}header.site nav.main .mk-panel > .mk-st:nth-child(3){--k:5}
   header.site nav.main > a:nth-child(5){--k:7}header.site nav.main > a:nth-child(6){--k:8}header.site nav.main > a:nth-child(7){--k:9}
 }}
-/* Florida, California and Texas each hold three cities, and New York two. In the bar's list the state is a quiet label over them, the cities set in from its edge; in
-   the drawer each group is one row of the same height, the state a quiet label over its cities in the bar's capitals (side by
-   side, the state in the drawer's face, South Florida, Tampa and Naples would not fit a phone's width), so the drawer keeps
-   its ten rows (and its two columns of five on a phone on its side). */
-/* With eleven cities a single column of the bar's list ran past the foot of a laptop's window (from about 690px tall down),
-   so the four states sit two by two, Florida and New York over California and Texas, in half the height; past that the
-   list scrolls inside itself rather than losing its last cities below the window's edge. */
+/* Two groups: the three markets open now, and the eight that come next. In the bar's list the group is a quiet label over its
+   cities, set in from its edge; in the drawer each group is one row, the label a quiet line over its cities in the bar's
+   capitals, wrapping as the width needs. */
+/* The list is in two groups: the three markets open now, then the eight that come next, in the order they open. A single
+   column of eleven ran past the foot of a laptop's window, so the open three stand in their own column and the next eight
+   sit two by two beside them, quieter; past that the list scrolls inside itself rather than losing cities below the edge.
+   Below 1440px the gaps narrow, so the Spanish list, the widest, keeps well clear of the window's right edge. */
 @media (min-width:1280px){
-  .mk-panel{grid-template-columns:repeat(2,max-content);column-gap:48px;align-items:start;max-height:calc(100svh - 80px);overflow-y:auto;overscroll-behavior:contain}
+  .mk-panel{grid-template-columns:repeat(2,max-content);column-gap:36px;align-items:start;max-height:calc(100svh - 80px);overflow-y:auto;overscroll-behavior:contain}
   .mk-st{display:grid}
   .mk-k{padding:14px 0 3px;font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   nav.main .mk-st a{padding:9px 0 8px 16px;border-bottom:0}
   .js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.62)}
+  .mk-st.mk-later{grid-template-columns:repeat(2,max-content);column-gap:24px}
+  .mk-st.mk-later .mk-k{grid-column:1/-1}
+  @media (max-width:1439px){.mk-panel{column-gap:28px;padding-right:12px}.mk-st.mk-later{column-gap:12px}}
+  nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:var(--muted)}
+  .js header.site.over nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:rgba(var(--ivory-rgb),.62)}
 }
 @media (max-width:1279px),(max-width:79.9375em){
   .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
@@ -1539,7 +1549,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .cp-t .cp-up,.cp-lt{text-transform:uppercase;letter-spacing:.12em;paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round}
 .cp-lt{fill:var(--fg);font:500 13px var(--body)}
 .cp-m text{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
-.prose .cp-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.prose .cp-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
 .prose .cp-key li{display:flex;align-items:center;gap:8px;margin-right:-.14em}
 .cp-key i{display:inline-block;width:22px;height:0;border-top:1.5px solid var(--accent)}
 .cp-key .k-alt{border-top:1px dashed var(--fg);opacity:.6}
@@ -1904,7 +1914,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 /* Touch: each blank is tall enough to tap (the padding sits above the words), and its top margin gives that height back,
    so a line with a blank keeps the same pitch as a line without one. Phones held sideways are touch screens too. */
 @media (max-width:520px),(pointer:coarse){.letter .sheet input,.letter .sheet select{padding-block:10px 1px;margin-block:-9px 0}.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline-offset:0}}
-.cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cv-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .cv-key li{display:flex;align-items:center;gap:8px}
 .cv-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}
 .cv-key .k-par{border-top:1px dashed var(--fg);opacity:.6}
@@ -2127,7 +2137,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .sheet-rp{margin-top:clamp(48px,6vw,88px);background:var(--sheet);border:1px solid var(--rule);padding:clamp(20px,3.4vw,48px);display:grid;gap:clamp(28px,3.4vw,48px);position:relative}
 .sheet-rp::before,.sheet-rp::after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--faint)}
 .sheet-rp::before{left:-1px;top:-1px;border-width:1px 0 0 1px}.sheet-rp::after{right:-1px;bottom:-1px;border-width:0 1px 1px 0}
-.sheet-rp small,.sheet-rp dt,.rp-block h2{font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.4}
+.sheet-rp small,.sheet-rp dt,.rp-block h2{font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.4}
 .rp-block h2{max-width:none;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
 @media (max-width:520px){.sheet-rp small,.sheet-rp dt,.rp-block h2{letter-spacing:.1em}}
 /* the sheet's head and its four figures are lists of terms and values (dl), so a screen reader pairs each label with its
@@ -2180,7 +2190,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .rp-c:is(.open,.later){stroke:var(--faint)}
 /* not yet released: drawn in dashes, as a drawing shows what is still to come */
 .rp-c.later{stroke-dasharray:2 2}
-.rp-key{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.rp-key{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .rp-key li{display:flex;align-items:center;gap:8px}
 .rp-key i{display:inline-block;width:22px;height:0;border-top:2px solid var(--sold-line)}.rp-key .k-act{border-top-color:var(--sold-line)}
 /* the plan's key is dashed like the plan line itself (8 on, 5 off in the chart), not with the browser's short border dashes */
@@ -2209,16 +2219,16 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* the funnel's key: what its bars and its percentages are each a share of */
 .rp-cap{margin-top:14px;font-size:15px;line-height:1.5;color:var(--faint);max-width:34em}
 .rp-table{width:100%;border-collapse:collapse;font-size:16px}
-.rp-table th{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 16px 10px 0;border-bottom:1px solid var(--fg)}
+.rp-table th{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 16px 10px 0;border-bottom:1px solid var(--fg)}
 .rp-table td{padding:14px 16px 14px 0;border-bottom:1px solid var(--rule);vertical-align:baseline;color:var(--muted)}
 .rp-table td:nth-child(3){color:var(--fg);font-family:var(--display);font-size:20px;white-space:nowrap}
 .rp-table td.num{font-family:var(--display);font-size:20px;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;width:4em}
 .rp-next ol{margin:0;padding:0;list-style:none;counter-reset:nx;display:grid;gap:12px}
 .rp-next li{counter-increment:nx;display:grid;grid-template-columns:2.4em minmax(0,1fr);align-items:baseline;font-family:var(--display);font-size:clamp(21px,1.8vw,25px);line-height:1.35}
 /* the counter sits on the baseline of its step's first line */
-.rp-next li::before{content:counter(nx,decimal-leading-zero);font-family:var(--body);font-size:13px;letter-spacing:.12em;color:var(--accent);font-variant-numeric:tabular-nums}
+.rp-next li::before{content:counter(nx,decimal-leading-zero);font-family:var(--body);font-size:14px;letter-spacing:.12em;color:var(--accent);font-variant-numeric:tabular-nums}
 .rp-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
-.rp-foot .num{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.rp-foot .num{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
 @media (max-width:600px){.rp-foot{grid-template-columns:minmax(0,1fr)}}
 /* The specimen short list: the report's sheet, with three residences set side by side. Each column is a subgrid of the same rows,
    so the elevations, the facts and the reasons line up across the three and read as one comparison. */
@@ -2227,7 +2237,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .sl-k{font-family:var(--display);font-size:clamp(44px,4vw,60px);font-weight:300;line-height:.9;color:var(--accent)}
 .sl-res h2{margin:8px 0 0;font-family:var(--display);font-size:clamp(24px,2.1vw,30px);font-weight:400;line-height:1.15;letter-spacing:0;text-transform:none;color:var(--fg)}
 .sl-where{margin-top:4px;font-size:15px;color:var(--muted)}
-.sl-pick{align-self:start;justify-self:start;margin-top:10px;padding:3px 10px;border:1px solid var(--accent);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.sl-pick{align-self:start;justify-self:start;margin-top:10px;padding:3px 10px;border:1px solid var(--accent);font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .sl-res:not(:has(.sl-pick)) .sl-where{grid-row:span 2}
 .sl-el{display:block;width:100%;max-width:200px;height:auto;margin:18px 0 6px}
 .sl-gr{stroke:var(--fg)}
@@ -2237,9 +2247,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .sl-ld{stroke:var(--sold-line);stroke-dasharray:2 2}
 .sl-facts{margin:10px 0 0;border-top:1px solid var(--rule)}
 .sl-facts > div{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--rule)}
-.sl-facts dt{font-size:13px}
+.sl-facts dt{font-size:14px}
 .sl-facts dd{font-size:16px;line-height:1.45;color:var(--fg);font-variant-numeric:lining-nums}
-.sl-res h3{margin:22px 0 8px;font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.sl-res h3{margin:22px 0 8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .sl-why{margin:0;padding:0;list-style:none;display:grid;gap:8px;align-content:start}
 .sl-why li{position:relative;padding-left:18px;font-size:16px;line-height:1.5;color:var(--read)}
 .sl-why li::before{content:"";position:absolute;left:0;top:.72em;width:8px;border-top:1px solid var(--accent)}
@@ -2381,13 +2391,13 @@ html.js .pc-nojs{display:none}
 /* the swatches show the brand's own colors in either theme */
 .co-sw .ink{background:var(--ink)}.co-sw .ivory{background:var(--ivory)}.co-sw .bronze{background:var(--bronze-500)}.co-sw .bronze-text{background:var(--bronze-700)}
 .co-sw b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
-.co-sw span{font-size:13px;color:var(--faint);letter-spacing:.1em}
+.co-sw span{font-size:14px;color:var(--faint);letter-spacing:.1em}
 /* Lines and Marks: the site's own conventions drawn 1:1, each sample 240px long with its label beside it */
 .co-ln{display:flex;flex-wrap:wrap;gap:24px clamp(32px,4vw,56px);max-width:none!important}
 .co-ln ul,.co-mk{list-style:none;margin:0;padding:0}
 .co-ln ul{display:grid;gap:10px;align-content:start}
 .co-ln li{display:flex;align-items:center;gap:16px}
-.co-ln li > span{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.5}
+.co-ln li > span{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.5}
 .co-ln svg{flex:none;overflow:hidden}
 .co-ln path,.co-mk svg :is(path,circle){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .co-ln .lw-pr path{stroke-width:var(--lw-profile)}
@@ -2809,12 +2819,12 @@ nav.main a.press{color:var(--fg);transition:none}
    below 1200px, its type kept near the size it has on the home page */
 .prose h3{font-size:clamp(24px,2.4vw,30px);font-weight:400;margin:36px 0 8px}
 .prose h2 + h3,.prose h2 + p + h3{margin-top:24px}
-.prose .mk-at{margin-top:8px;font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
+.prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .mk-facts{margin:28px 0;border-top:1px solid var(--fg)}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
 .mk-facts dd{margin:0;font-size:17px;line-height:1.6;color:var(--read)}
-.mk-facts sup,.prose p sup{font-size:.62em;line-height:0}
+.mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 /* footnote numerals are tiny; a 24px hit area around each keeps them easy to tap on a phone */
 .mk-facts sup a,.prose p sup a{position:relative}
@@ -2837,7 +2847,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .ms-bar .now{stroke:var(--accent)}
 .ms-bar .then{stroke:var(--faint);opacity:.45}
 .ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}
-.ms .ms-note sup{font-size:.62em;line-height:0}
+.ms .ms-note sup{font-size:max(12px,.62em);line-height:0}
 .ms .ms-note sup a{position:relative;color:var(--accent);text-decoration:none;padding-inline:2px}
 .ms .ms-note sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
 .ms-k{margin-top:10px;font-size:14px;line-height:1.5;color:var(--faint)}
@@ -2962,7 +2972,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .photo picture,.photo .frame{display:block;position:relative;overflow:hidden;background:var(--rule)}
 .photo img{display:block;width:100%;height:auto}
 .photo .cap{margin-top:12px}
-.cap .credit{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.cap .credit{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
 .film .frame{aspect-ratio:16/7}
 .film .frame picture{position:absolute;inset:0}
 .film .frame img,.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}

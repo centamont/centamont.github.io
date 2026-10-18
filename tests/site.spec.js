@@ -193,7 +193,8 @@ test('Escape closes the phone menu', async ({ page, isMobile }) => {
   await expect(page.getByRole('button', { name: 'Menu' })).toBeFocused();
 });
 
-test('first visit plays the intro, then reveals the page', async ({ page }) => {
+test('first visit plays the intro, then reveals the page', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'the intro plays only on wide screens');
   await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
   await page.goto('/');
   await expect(page.locator('html')).toHaveClass(/intro-on/);
@@ -279,12 +280,21 @@ test('fonts are served from the site', async ({ page }) => {
   expect(outside).toEqual([]);
 });
 
-test('a click skips the intro', async ({ page }) => {
+test('a click skips the intro', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'the intro plays only on wide screens');
   await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
   await page.goto('/');
   await expect(page.locator('html')).toHaveClass(/intro-on/);
   await page.mouse.click(10, 10);
   await expect(page.locator('html')).not.toHaveClass(/intro-on/, { timeout: 1500 });
+});
+
+// A phone, or a link that lands mid-page, opens straight onto the page.
+test('the intro waits for no one on a phone or a deep link', async ({ page }, info) => {
+  await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
+  await page.goto(info.project.name === 'desktop' ? '/#markets' : '/');
+  await expect(page.locator('html')).not.toHaveClass(/intro-on/);
+  await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
 test('the drawings arrive and say what they show', async ({ page }) => {
