@@ -39,8 +39,8 @@
 </script>
 <link rel="preload" href="/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/site.css?v=295a93b7">
-<link rel="stylesheet" href="/home.css?v=295a93b7">
+<link rel="stylesheet" href="/site.css?v=26646523">
+<link rel="stylesheet" href="/home.css?v=26646523">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -48,10 +48,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="/site.js?v=295a93b7" defer></script>
-<script src="/model.js?v=295a93b7" defer></script>
-<script src="/instrument.js?v=295a93b7" defer></script>
-<script src="/tower3d.js?v=295a93b7" async fetchpriority="low"></script>
+<script src="/site.js?v=26646523" defer></script>
+<script src="/model.js?v=26646523" defer></script>
+<script src="/instrument.js?v=26646523" defer></script>
+<script src="/tower3d.js?v=26646523" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -250,6 +250,20 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('pt-BR',{timeZone
         <div class="lab"><label for="cvLoan" id="cvLoanL">Patamar de <span class="nw">pré-venda</span> do financiador</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
         <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 por cento">
       </div>
+      <details class="cv-method">
+        <summary>Como a curva é calculada</summary>
+        <dl class="mk-facts">
+          <div><dt>Ritmo em paridade</dt><dd>A cada mês, 3,5 por cento das residências ainda à venda passam a estar sob contrato.</dd></div>
+          <div><dt>Lançamento</dt><dd>O triplo desse ritmo nos três primeiros meses.</dd></div>
+          <div><dt>Início da obra</dt><dd>1,3 vez o ritmo nos dois meses seguintes ao início da obra.</dd></div>
+          <div><dt>Estrutura concluída</dt><dd>1,5 vez o ritmo nos três meses seguintes à conclusão da estrutura.</dd></div>
+          <div><dt>Conclusão</dt><dd>1,25 vez o ritmo depois que o edifício fica pronto.</dd></div>
+          <div><dt>Preço de lançamento</dt><dd>Cada ritmo é multiplicado por e<sup>−0,05p</sup>, em que p é o preço em relação a edifícios comparáveis, em por cento, de −10 a +10: cerca de 5 por cento mais lento a cada ponto acima, e mais rápido&nbsp;abaixo.</dd></div>
+          <div><dt>Patamar</dt><dd>50 por cento das residências sob contrato, a menos que o controle o ajuste entre 30 e 70&nbsp;por&nbsp;cento.</dd></div>
+          <div><dt>Cronograma</dt><dd>A obra começa no mês&nbsp;6 previsto, ou no mês em que o patamar é atingido, se vier depois. A construção leva 24&nbsp;meses, e a estrutura fica pronta 6&nbsp;meses antes da conclusão.</dd></div>
+        </dl>
+        <p>Uma ilustração com ritmos presumidos, não uma previsão nem uma promessa de resultados.</p>
+      </details>
     </div>
 
     <div class="begin">

@@ -595,7 +595,7 @@
   addEventListener('beforeprint', () => {
     document.querySelectorAll('img[loading="lazy"]').forEach((i) => { i.loading = 'eager'; });
     document.querySelectorAll('.tx-rise, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
-    opened = [...document.querySelectorAll('.faq details:not([open])')];
+    opened = [...document.querySelectorAll('.faq details:not([open]), .cv-method:not([open])')];
     opened.forEach((d) => { d.open = true; });
   });
   addEventListener('afterprint', () => { opened.forEach((d) => { d.open = false; }); opened = []; });

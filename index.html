@@ -39,8 +39,8 @@
 </script>
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=295a93b7">
-<link rel="stylesheet" href="home.css?v=295a93b7">
+<link rel="stylesheet" href="site.css?v=26646523">
+<link rel="stylesheet" href="home.css?v=26646523">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -48,10 +48,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=295a93b7" defer></script>
-<script src="model.js?v=295a93b7" defer></script>
-<script src="instrument.js?v=295a93b7" defer></script>
-<script src="tower3d.js?v=295a93b7" async fetchpriority="low"></script>
+<script src="site.js?v=26646523" defer></script>
+<script src="model.js?v=26646523" defer></script>
+<script src="instrument.js?v=26646523" defer></script>
+<script src="tower3d.js?v=26646523" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -250,6 +250,20 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
         <div class="lab"><label for="cvLoan" id="cvLoanL">Lender’s <span class="nw">pre-sale</span> threshold</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
         <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 percent">
       </div>
+      <details class="cv-method">
+        <summary>How the curve is modeled</summary>
+        <dl class="mk-facts">
+          <div><dt>Pace at par</dt><dd>Each month, 3.5 percent of the residences still for sale go under contract.</dd></div>
+          <div><dt>Launch</dt><dd>Three times that pace in the first three months.</dd></div>
+          <div><dt>Ground broken</dt><dd>1.3 times the pace in the two months after ground breaks.</dd></div>
+          <div><dt>Top-off</dt><dd>1.5 times the pace in the three months after the building tops off.</dd></div>
+          <div><dt>Completion</dt><dd>1.25 times the pace once the building is finished.</dd></div>
+          <div><dt>Launch price</dt><dd>Every rate is multiplied by e<sup>−0.05p</sup>, where p is the price against comparable buildings in percent, from −10 to +10: about 5 percent slower for each percent above, and faster&nbsp;below.</dd></div>
+          <div><dt>Threshold</dt><dd>50 percent of the residences under contract, unless the slider sets it between 30 and 70&nbsp;percent.</dd></div>
+          <div><dt>Schedule</dt><dd>Ground breaks in the planned month&nbsp;6, or in the month the threshold is met if that comes later. Construction takes 24&nbsp;months, and the building tops off 6&nbsp;months before completion.</dd></div>
+        </dl>
+        <p>An illustration with assumed rates, not a forecast or a promise of results.</p>
+      </details>
     </div>
 
     <div class="begin">
