@@ -57,7 +57,7 @@ def dns(name, kind):
     status, body = get(f'https://dns.google/resolve?name={name}&type={kind}&do=1')
     if status != 200: return None, False
     d = json.loads(body)
-    return [a['data'] for a in d.get('Answer', []) if a.get('type') == {'A': 1, 'NS': 2, 'CNAME': 5, 'TXT': 16, 'AAAA': 28, 'DS': 43, 'CAA': 257}[kind]], d.get('AD', False)
+    return [a['data'] for a in d.get('Answer', []) if a.get('type') == {'A': 1, 'NS': 2, 'CNAME': 5, 'MX': 15, 'TXT': 16, 'AAAA': 28, 'DS': 43, 'CAA': 257}[kind]], d.get('AD', False)
 
 a, ad = dns('centamont.com', 'A')
 say('address records', bool(a) and set(a) <= GITHUB_A)
@@ -73,6 +73,13 @@ issue = {m.group(2).split(';')[0].strip().lower() for c in caa for m in [re.sear
 say('certificate authorities', bool(caa) and issue <= ISSUERS)
 dmarc = ' '.join(dns('_dmarc.centamont.com', 'TXT')[0] or []).replace('"', '')
 say('email policy', re.search(r'\bp=reject\b', dmarc) is not None)
+mx = dns('centamont.com', 'MX')[0] or []
+say('mail servers', [m.split()[-1].rstrip('.').lower() for m in mx] == ['smtp.google.com'])
+txt = [t.replace('"', '') for t in dns('centamont.com', 'TXT')[0] or []]
+spf = [t for t in txt if t.startswith('v=spf1')]
+say('mail senders', len(spf) == 1 and 'include:_spf.google.com' in spf[0].split())
+dkim = ''.join(dns('google._domainkey.centamont.com', 'TXT')[0] or []).replace('"', '').replace(' ', '')
+say('mail signature', dkim.startswith('v=DKIM1;') and 'p=MIIB' in dkim)
 
 # 3. Plain http still moves to https
 try:
