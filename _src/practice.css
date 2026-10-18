@@ -234,9 +234,11 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 @media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.curve{grid-template-columns:1fr;grid-template-rows:none;gap:22px}
 }
 html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){display:none}
-/* the curve's method: a closed ruled row across the whole instrument, set in the label face, that opens on the model's
+/* the curve's method: a closed ruled row under the whole instrument (outside it, so the figure, which holds its place
+   while the reader works the sliders, never slides over the opened table), set in the label face, that opens on the model's
    assumed rates and schedule, set as a fact table (the market pages' own) */
-.cv-method{grid-column:1 / -1;border-top:1px solid var(--rule)}
+.cv-method{margin-top:22px;border-top:1px solid var(--rule)}
+html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:none}
 .cv-method summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:44px;padding-block:10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .3s var(--ease)}
 .cv-method summary::-webkit-details-marker{display:none}
 .cv-method summary::after{content:"";flex:none;width:13px;height:13px;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}

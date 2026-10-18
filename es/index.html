@@ -39,9 +39,9 @@
 </script>
 <link rel="preload" href="/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/site.css?v=ffc82702">
-<link rel="stylesheet" href="/practice.css?v=ffc82702">
-<link rel="stylesheet" href="/home.css?v=ffc82702">
+<link rel="stylesheet" href="/site.css?v=df2da987">
+<link rel="stylesheet" href="/practice.css?v=df2da987">
+<link rel="stylesheet" href="/home.css?v=df2da987">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -49,10 +49,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="/site.js?v=ffc82702" defer></script>
-<script src="/model.js?v=ffc82702" defer></script>
-<script src="/instrument.js?v=ffc82702" defer></script>
-<script src="/tower3d.js?v=ffc82702" async fetchpriority="low"></script>
+<script src="/site.js?v=df2da987" defer></script>
+<script src="/model.js?v=df2da987" defer></script>
+<script src="/instrument.js?v=df2da987" defer></script>
+<script src="/tower3d.js?v=df2da987" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -251,21 +251,21 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         <div class="lab"><label for="cvLoan" id="cvLoanL">Umbral de <span class="nw">preventa</span> del prestamista</label><output id="cvLoanOut" for="cvLoan" aria-hidden="true">50%</output></div>
         <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 por ciento">
       </div>
-      <details class="cv-method">
-        <summary>Cómo se calcula la curva</summary>
-        <dl class="mk-facts">
-          <div><dt>Ritmo a la par</dt><dd>Cada mes pasa a estar bajo contrato el 3.5 por ciento de las residencias que siguen a la venta.</dd></div>
-          <div><dt>Lanzamiento</dt><dd>El triple de ese ritmo en los tres primeros meses.</dd></div>
-          <div><dt>Inicio de obra</dt><dd>1.3 veces el ritmo en los dos meses siguientes al inicio de obra.</dd></div>
-          <div><dt>Coronación</dt><dd>1.5 veces el ritmo en los tres meses siguientes a la coronación del edificio.</dd></div>
-          <div><dt>Terminación</dt><dd>1.25 veces el ritmo una vez terminado el edificio.</dd></div>
-          <div><dt>Precio de lanzamiento</dt><dd>Cada ritmo se multiplica por e<sup>−0.05p</sup>, donde p es el precio frente a edificios comparables en por ciento, de −10 a +10: alrededor de un 5 por ciento más lento por cada punto por encima, y más rápido por&nbsp;debajo.</dd></div>
-          <div><dt>Umbral</dt><dd>El 50 por ciento de las residencias bajo contrato, salvo que el control lo fije entre el 30 y el 70&nbsp;por&nbsp;ciento.</dd></div>
-          <div><dt>Calendario</dt><dd>La obra empieza en el mes&nbsp;6 previsto, o en el mes en que se alcanza el umbral si llega después. La construcción dura 24&nbsp;meses, y la coronación llega 6&nbsp;meses antes de la terminación.</dd></div>
-        </dl>
-        <p>Una ilustración con ritmos supuestos, no un pronóstico ni una promesa de resultados.</p>
-      </details>
     </div>
+    <details class="cv-method">
+      <summary>Cómo se calcula la curva</summary>
+      <dl class="mk-facts">
+        <div><dt>Ritmo a la par</dt><dd>Cada mes pasa a estar bajo contrato el 3.5 por ciento de las residencias que siguen a la venta.</dd></div>
+        <div><dt>Lanzamiento</dt><dd>El triple de ese ritmo en los tres primeros meses.</dd></div>
+        <div><dt>Inicio de obra</dt><dd>1.3 veces el ritmo en los dos meses siguientes al inicio de obra.</dd></div>
+        <div><dt>Coronación</dt><dd>1.5 veces el ritmo en los tres meses siguientes a la coronación del edificio.</dd></div>
+        <div><dt>Terminación</dt><dd>1.25 veces el ritmo una vez terminado el edificio.</dd></div>
+        <div><dt>Precio de lanzamiento</dt><dd>Cada ritmo se multiplica por e<sup>−0.05p</sup>, donde p es el precio frente a edificios comparables en por ciento, de −10 a +10: alrededor de un 5 por ciento más lento por cada punto por encima, y más rápido por&nbsp;debajo.</dd></div>
+        <div><dt>Umbral</dt><dd>El 50 por ciento de las residencias bajo contrato, salvo que el control lo fije entre el 30 y el 70&nbsp;por&nbsp;ciento.</dd></div>
+        <div><dt>Calendario</dt><dd>La obra empieza en el mes&nbsp;6 previsto, o en el mes en que se alcanza el umbral si llega después. La construcción dura 24&nbsp;meses, y la coronación llega 6&nbsp;meses antes de la terminación.</dd></div>
+      </dl>
+      <p>Una ilustración con ritmos supuestos, no un pronóstico ni una promesa de resultados.</p>
+    </details>
 
     <div class="begin">
       <div class="b-l">
