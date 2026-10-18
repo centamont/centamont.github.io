@@ -319,6 +319,18 @@
   // ms the lights-on cascade runs after the building is finished: the rooms over 1.6 s (the penthouses 0.4 s after),
   // the crown, then the aviation light last
   const CASCADE = 2400;
+  // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, each made from one
+  // camera of that hero at 1440 x 900 and lit by one sun (by day, at golden hour, after dark). For each: the crop's place
+  // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
+  // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
+  // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
+  const STILLS = {
+    day: { x: 897, y: 168, w: 543, h: 732, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    gold: { x: 898, y: 156, w: 542, h: 744, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 890, y: 151, w: 550, h: 749, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+  };
+  // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
+  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
   // (an engine whose media queries take only the older addListener)
   const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
   let GEN = 0; // camera generations, shared by every model: the plan rings are shared too
@@ -469,6 +481,7 @@
       this._gs = null; this._gsK = null; this._gsP = null; this._gsS = null; this._gsSK = null; this._rs = null; this._rsK = null; this._rsP = null; this._pool = null; this._poolK = null;
       this._hatch = new WeakMap(); this._frs = [];
       this.r3 = null; this.r3a = 0; this.r3f = null; // the rendered tower (tower3d.js), how far it has faded in, and its frame-time watch
+      this.ph = null; this.sa = 0; // the photograph that stands in for the finished tower (see photo), and how far it has faded in
       // Without a 2D context (an old engine, a blocked or exhausted GPU) the model stands down quietly: every call
       // becomes a no-op and the page around it carries on.
       try { this.ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null; } catch (e) { this.ctx = null; }
@@ -544,6 +557,56 @@
       const r = this.r3, q = r.q > 1.5 ? 1.5 : r.q > 1 ? 1 : r.q > 0.75 ? 0.75 : 0;
       if (q) r.q = q; else this.drop3d();
       this.touch();
+    }
+
+    // The hero's photograph (key, one of STILLS, from the folder base), fetched only once the page has loaded and gone
+    // quiet, at the density the screen and the framing call for. It takes over from the tower, drawn or rendered, once
+    // that is built and lit, and only while the camera stands where the photograph was made from, the sun is the hour's
+    // own (not moved along its path) and the sheet is ink; it fades in over 0.8 s (at once with motion off) and gives
+    // the tower back the same way. The sky and the bay are tower3d.js's, drawn under it with or without WebGL.
+    photo(key, base) {
+      const s = STILLS[key];
+      if (this.dead || !s) return;
+      this.ph = { key, s, img: null, fc: null, fk: '' };
+      const get = () => {
+        const img = new Image(), z = this.w ? (Math.min(this.w * 1.15, this.h) * this.o.scale) / s.f : 1;
+        img.decoding = 'async'; img.fetchPriority = 'low';
+        img.src = base + key + ((devicePixelRatio || 1) * z > 1.25 ? '-2x' : '-1x') + '.webp';
+        img.decode().then(() => { if (this.ph && this.ph.s === s) { this.ph.img = img; this.touch(); } }, () => {});
+      };
+      const idle = () => (window.requestIdleCallback ? requestIdleCallback(get, { timeout: 2500 }) : setTimeout(get, 200));
+      if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+    }
+    // whether the photograph may stand in for the tower now
+    photoOn() {
+      const p = this.ph;
+      if (!p || !p.img || !this.dark || this.forced || this.sunT != null || this.sunBack || !((this.r3 && !this.r3.lost) || window.CentamontSky)) return false;
+      if (this.L < FLOORS || this.G < 1 || this.occ < 1 || this.S !== this.Sold) return false;
+      const ph = this.phi + (this.tyy || 0), d = Math.abs((((this.theta + (this.tx || 0) - p.s.th) % TAU) + TAU + Math.PI) % TAU - Math.PI);
+      return d < 1e-4 && Math.abs(ph - STILL_PHI) < 1e-4 && Math.abs(Math.max(0.8, this.o.ty - this.o.dist * Math.sin(ph)) - STILL_EY) < 1e-3;
+    }
+    // The photograph, laid where the rendered tower is. Where it falls short of the canvas's right or bottom edge (a
+    // window wider or shorter than the one it was made in), it fades out over its last 48 to 200px (twice the shortfall)
+    // into the bay drawn under it rather than ending on a line (a copy faded once for each size, kept until it changes).
+    still(g, a) {
+      const p = this.ph, s = p.s, k = this.k, z = k.f / s.f;
+      const x = k.cx + (s.x - s.cx) * z, y = k.cy + (s.y - s.cy) * z, w = s.w * z, h = s.h * z, fr = x + w < this.w - 0.5, fb = y + h < this.h - 0.5;
+      let src = p.img;
+      if (fr || fb) {
+        const d = this.dpr || 1, cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d)), key = cw + 'x' + ch + (fr ? 'r' : '') + (fb ? 'b' : '');
+        if (p.fk !== key) {
+          const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d;
+          c.width = cw; c.height = ch;
+          const q = c.getContext('2d');
+          q.drawImage(p.img, 0, 0, cw, ch); q.globalCompositeOperation = 'destination-out';
+          const fade = (x0, y0, x1, y1) => { const lg = q.createLinearGradient(x0, y0, x1, y1); lg.addColorStop(0, 'rgba(0,0,0,0)'); lg.addColorStop(0.5, 'rgba(0,0,0,0.25)'); lg.addColorStop(1, 'rgba(0,0,0,1)'); q.fillStyle = lg; q.fillRect(0, 0, cw, ch); };
+          if (fr) fade(cw - e, 0, cw, 0);
+          if (fb) fade(0, ch - e, 0, ch);
+          p.fk = key;
+        }
+        src = p.fc;
+      }
+      g.globalAlpha = a; g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
     }
 
     // back to the drawing: the rendered tower and its sky (a CSS background on the canvas, set by tower3d.js) go
@@ -714,6 +777,12 @@
       const fading = !!this.r3 && this.r3a < 1;
       if (fading) { this.r3a = reduce ? 1 : Math.min(1, this.r3a + dt / 600); this.dirty = true; }
       const casting = this.doneAt > 0 && t - this.doneAt < CASCADE && this.dark && !this.o.sun && this.sunNow.night > 0.05;
+      // and the photograph over the tower, once it may (see photoOn; after dark, once its lights are on), in 0.8 s each way
+      const saT = !casting && this.photoOn() ? 1 : 0, phading = this.sa !== saT;
+      if (phading) {
+        this.sa = reduce ? saT : saT > this.sa ? Math.min(1, this.sa + dt / 800) : Math.max(0, this.sa - dt / 800); this.dirty = true;
+        if (this.sa > 0) this.c.dataset.still = this.ph.key; else delete this.c.dataset.still;
+      }
       // the sun, let go, going back to now (eased in and out over 0.8 s)
       const back = this.sunBack;
       if (back) {
@@ -755,7 +824,7 @@
       }
       this.tx = ease(this.tx || 0, this.mx * 0.12, 330);
       this.tyy = ease(this.tyy || 0, this.my * 0.05, 330);
-      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.occ === occT && this.Ra === relT && this.Rd === relT && this.E === envT && this.gd === gdT && !casting && !fading && !back && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
+      const settled = (reduce ? this.L === this.B && this.S === this.Sold && this.crane === this.craneT : this.L === bT && this.S === sT && this.crane === cT) && this.C === this.cladFor(this.L) && this.G === crownT && this.occ === occT && this.Ra === relT && this.Rd === relT && this.E === envT && this.gd === gdT && !casting && !fading && !phading && !back && !this.camT && Math.abs(this.tx - this.mx * 0.12) <= 0.001 && Math.abs(this.tyy - this.my * 0.05) <= 0.001;
       const orbiting = !reduce && !!this.o.orbit && this.orb !== 0;
       // Anything that moves draws every frame (and the frame after it stops). A settled tower on its slow orbit
       // turns about a tenth of a pixel between frames, so it is drawn twelve times a second whatever the display's
@@ -947,8 +1016,15 @@
       useSet(this.cs);
       const g = this.ctx, w = this.w, h = this.h, dark = this.dark;
       if (!inLens) g.clearRect(0, 0, w, h);
-      // where the tower is rendered, the sky stands behind the whole scene (tower3d.js draws it, fading in with the tower)
-      if (!inLens && this.r3 && !this.r3.lost) this.r3.backdrop(g, this, this.r3a);
+      // where the tower is rendered or photographed, the sky stands behind the whole scene (tower3d.js draws it, fading in
+      // with the tower or the photograph; with no rendered tower it goes with the photograph)
+      const sa = inLens ? 0 : this.sa, sky = inLens ? null : this.r3 && !this.r3.lost ? this.r3 : sa > 0 ? window.CentamontSky || null : null, skyA = sky === this.r3 ? Math.max(this.r3a, sa) : sa;
+      // (under the photograph, laid on the canvas itself: the light of the sky behind the tower is added to it)
+      if (sky) {
+        const s = sa > 0 && this.ph.s, z = s && this.k.f / s.f;
+        sky.backdrop(g, this, skyA, s ? { fill: sa >= 1, cut: [this.k.cx + (STILL_CUT[0] - s.cx) * z, this.k.cx + (STILL_CUT[1] - s.cx) * z, sa] } : null);
+      }
+      else if (!inLens && this.skyCss) { this.c.style.backgroundImage = ''; this.skyCss = ''; }
       const [lr, lg, lb] = this.line, [sr, sg, sb] = this.sold, [br, bgg, bb] = this.bg, [wr, wg, wb] = this.warm;
       const ink = (a) => `rgba(${lr},${lg},${lb},${a})`;
       const bronze = (a, k = 1) => `rgba(${Math.round(sr * k)},${Math.round(sg * k)},${Math.round(sb * k)},${a})`;
@@ -1000,7 +1076,8 @@
       // The rendered tower (tower3d.js), where it runs: while it fades in, it is laid over the whole drawing; once it has,
       // it stands in for the drawn tower, its shadow and its lamps' glow, and the drawing keeps the ground, the crane, the
       // sketch of the floors still to come, the people, the ruler and the labels.
-      const r3 = !inLens && this.r3 && !this.r3.lost ? this.r3 : null, solid = !!r3 && this.r3a >= 1;
+      // (the photograph, once it has faded in, stands in for all of that too)
+      const r3 = !inLens && this.r3 && !this.r3.lost ? this.r3 : null, solid = (!!r3 && this.r3a >= 1) || sa >= 1;
       const glows = dark && !inLens && !this.forced && night > 0.05 && !solid ? [] : null;
       // The lights-on cascade: seconds since the building was finished (99 once it long has been, -1 while it is not),
       // and how far on a lamp that comes on d seconds into it is (each takes 0.18 s)
@@ -1159,10 +1236,10 @@
         };
         // Where the tower is rendered, the site stands on a point in the bay: the land is laid over the water the
         // renderer has drawn to the horizon, out to a sea wall round it, and the survey grid stays on the land
-        if (r3 && dark && this.o.site !== false) {
+        if (sky && dark && this.o.site !== false) {
           const pw = nearCut(SHORE, this.k, 1), sp = pw.map(([x, z]) => this.P(x, 0, z));
-          g.save(); g.globalAlpha = this.r3a; r3.land(g, this, sp); g.restore();
-          g.lineWidth = 1; g.strokeStyle = ink(0.34); g.beginPath(); sp.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); if (pw === SHORE) g.closePath(); g.stroke();
+          g.save(); g.globalAlpha = skyA; sky.land(g, this, sp); g.restore();
+          g.lineWidth = 1; g.strokeStyle = ink(0.34 * (r3 ? 1 : skyA)); g.beginPath(); sp.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); if (pw === SHORE) g.closePath(); g.stroke();
         }
         g.lineWidth = 1;
         for (let i = 0; i <= 30; i += 3) {
@@ -1976,11 +2053,12 @@
         g.restore();
       }
 
-      if (r3) {
+      // (under a photograph that has faded in, the tower is not rendered at all)
+      if (r3 && sa < 1) {
         const b = r3.render(this);
         if (b) { g.globalAlpha = this.r3a; g.drawImage(r3.canvas, 0, 0, b.sw, b.sh, b.x, b.y, b.w, b.h); g.globalAlpha = 1; }
         // the lit rooms' glow, as the drawing lays its own (one falloff stretched over each window, added to what is under it)
-        if (b && solid && b.glows.length && g.getTransform && !this.forced) {
+        if (b && this.r3a >= 1 && b.glows.length && g.getTransform && !this.forced) {
           const T = g.getTransform();
           g.save(); g.globalCompositeOperation = 'lighter';
           for (const [x, y, rx, ry, a, gi] of b.glows) {
@@ -1990,14 +2068,24 @@
           }
           g.restore();
         }
-        // the aviation light, as the drawing lights it: on the rendered crown it sits on the floating roof's high edge
-        // over the bay, where an obstruction light would be fixed, rather than on a mast
+      }
+      if (solid && (r3 || sa > 0)) {
+        // the aviation light, as the drawing lights it: on the rendered (or photographed) crown it sits on the floating
+        // roof's high edge over the bay, where an obstruction light would be fixed, rather than on a mast
         const tp = SCREEN.reduce((a, q) => (CREST(q) > CREST(a) ? q : a));
-        if (solid && this.G > 0.85) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+        if (this.G > 0.85) this.beacon(this.P(tp.x + tp.nx * 0.14, FLOORS + SLAB + CREST(tp) * (crownH / SCREEN_H) + 0.16, tp.z + tp.nz * 0.14), now, dark, ((this.G - 0.85) / 0.15) * (1 - (dark && night > 0.05 ? night : 0) * (1 - clamp((casT - 1.95) / 0.3, 0, 1))), night);
+      }
+      // The photograph, over the tower, the drawing and the render alike, as it fades in (and over the aviation light, whose
+      // glow shows round the crown it stands on), with the light of the sky behind it where the renderer is not drawing it
+      if (sa > 0) {
+        const cs = window.CentamontSky;
+        if (cs && cs.glow && !(r3 && sa < 1)) cs.glow(g, this, sa);
+        this.still(g, sa);
       }
       if (craneOn && !craneBehind) this.drawCrane(true);
       palmsFront.forEach((p) => this.drawPalm(p));
-      g.globalAlpha = this.occ; figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
+      // (the photograph has its own people)
+      g.globalAlpha = this.occ * (1 - sa); figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
       const tw = this.o.labels ? this.o.labelSize * 3 : 0;
       this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
 
@@ -2454,6 +2542,10 @@
 
   // What the rendered tower (tower3d.js) and the sales curve's small elevation (instrument.js) are built from: the same
   // plans, structure, site and stacking plan as the drawing.
+  // Which photograph suits the hour (see STILLS): the night's once the sun is below the horizon (as the hero's camera
+  // judges it), golden hour's while it stands under 15 degrees, the day's above that; and their bearings.
+  Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? 'gold' : 'day'; };
+  Model.stills = STILLS;
   Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
 })();
