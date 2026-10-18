@@ -90,16 +90,16 @@ vec3 heaven(vec3 d) {
   // is low, and from below by the city after dark
   vec2 q = d.xz / (y + 0.06);
   float cl = vn(q * vec2(0.9, 0.35)) * 0.65 + vn(q * 2.1 + 3.1) * 0.35;
-  float cov = smoothstep(0.45, 0.75, cl) * smoothstep(0.02, 0.14, y) * (1.0 - 0.5 * smoothstep(0.3, 0.8, y));
-  vec3 cc = vec3(dot(uHor, vec3(0.3, 0.59, 0.11))) * 1.3 + uSunCol * 0.06 * (0.4 + 0.6 * sd) + uLamp * uNight * 0.05;
-  return mix(s, cc, cov * 0.6);
+  float cov = smoothstep(0.42, 0.7, cl) * smoothstep(0.02, 0.14, y) * (1.0 - 0.5 * smoothstep(0.3, 0.8, y));
+  vec3 cc = vec3(dot(uHor, vec3(0.3, 0.59, 0.11))) * 1.5 + uSunCol * 0.09 * (0.4 + 0.6 * sd) + uLamp * uNight * 0.05;
+  return mix(s, cc, cov * 0.8);
 }
 // the sun's own glint, kept apart so a shadow can take it away
 vec3 glint(vec3 r) { float sd = max(dot(r, uSun), 0.0); return uSunCol * (6.0 * pow(sd, 900.0) + 0.25 * pow(sd, 90.0)); }
 // (the sky is brighter, and warmer when the sun is low, on the sun's side: a face turned from it sees the cooler sky)
 vec3 amb(vec3 n) {
   float sd = dot(normalize(n.xz + 1e-4), normalize(uSun.xz + 1e-4)) * (1.0 - abs(n.y));
-  return mix(uGrd * 0.9, mix(uZen, uHor, 0.45 + 0.3 * sd), 0.5 + 0.5 * n.y) * 0.62;
+  return mix(uGrd * 0.9, mix(uZen, uHor, 0.45 + 0.3 * sd), 0.5 + 0.5 * n.y) * (0.46 + 0.1 * max(sd, 0.0));
 }
 float shadow(vec3 p, vec3 n) {
   if (uShOn < 0.5) return 1.0;
@@ -265,7 +265,7 @@ void main() {
   refl *= kind > 0.5 ? 1.0 : mix(occl, 1.0, 0.35 * step(r.y, 0.0));
   vec3 inside = room(p, n, -v, u, y0, y1, k * 13.0 + vB.z, lamp, gold, kind > 0.5 ? 1.0 : 0.0);
   // sunlight through the glass brightens a room, so the balconies' shadows lie across the façade
-  inside += vec3(0.5, 0.47, 0.42) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.3;
+  inside += vec3(0.55, 0.5, 0.44) * uSunCol * max(dot(n, uSun), 0.0) * sh * 0.65;
   vec3 transT = mix(vec3(0.55, 0.62, 0.63), vec3(0.66, 0.64, 0.6), sold);
   vec3 c = inside * transT * (1.0 - F) + refl * F;
   // mullions and the frit at each ceiling: dark bronze aluminium in the same light
@@ -544,7 +544,7 @@ void main() {
     {
       const lr = sc.map((p) => ({ x: p.x * 0.78, z: p.z * 0.78, nx: p.nx, nz: p.nz })), LH = 0.92;
       band(glass, lr, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
-      const br = sc.map((p) => ({ x: p.x + p.nx * 0.24, z: p.z + p.nz * 0.24 })), hb = sc.map((p) => y0 + CREST(p)), T = 0.11;
+      const br = sc.map((p) => ({ x: p.x + p.nx * 0.45, z: p.z + p.nz * 0.45 })), hb = sc.map((p) => y0 + CREST(p)), T = 0.15;
       const top = [], bot = [], eT = [], eB = [], a = [0, 0.92, 0, 0], b = [0, 0, 0, 0];
       const cT = crown.vert([0, y0 + CH + T, 0], [0, 1, 0], a, b), cB = crown.vert([0, y0 + CH, 0], [0, -1, 0], a, b);
       let s = 0;
@@ -987,14 +987,14 @@ void main() {
       // light: the sun's direction and colour, the sky's, by this hour (the drawing's sun, scrubbed or not)
       const sun = m.sunNow, sv = sun.v, el = sun.el, night = sun.night, kd = 1 - night;
       const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day;
-      const sunCol = [1, 0.95, 0.88].map((c, i) => (c * (1 - gold) + [1, 0.6, 0.34][i] * gold) * (3.5 - 1.3 * gold) * kd);
+      const sunCol = [1, 0.95, 0.88].map((c, i) => (c * (1 - gold) + [1, 0.6, 0.34][i] * gold) * (4.0 - 1.5 * gold) * kd);
       const mixv = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
       const zen = mixv([0.006, 0.008, 0.016], mixv([0.16, 0.3, 0.62], [0.2, 0.25, 0.42], gold), day);
       const hor = mixv([0.03, 0.026, 0.028], mixv([0.62, 0.7, 0.8], [0.95, 0.6, 0.42], gold), day);
       const grd = mixv([0.006, 0.006, 0.006], [0.1, 0.095, 0.085], day);
       const bronze = lin(m.sold || [184, 151, 106]);
       // the veil's colour: the radiance that the tone curve takes to the backdrop's haze behind the tower
-      const sp = sky(m), air = { c: mixc(sp.hor, sp.mid, 0.5).map((v) => untone(v / 255)), f: 0.11 * sp.day + 0.05 * (1 - sp.day) };
+      const sp = sky(m), air = { c: mixc(sp.hor, sp.mid, 0.5).map((v) => untone(v / 255)), f: 0.08 * sp.day + 0.05 * (1 - sp.day) };
       const cascT = m.doneAt === -Infinity ? 99 : m.doneAt ? (performance.now() - m.doneAt) / 1000 : -1, cas = (d) => clamp((cascT - d) / 0.18, 0, 1);
       rooms(m, night, cas);
 
@@ -1054,7 +1054,7 @@ void main() {
         if (u.uAirC) { gl.uniform3fv(u.uAirC, air.c); gl.uniform1f(u.uAir, air.f); gl.uniform1f(u.uAirD, k.d); }
         if (u.uLS) gl.uniformMatrix4fv(u.uLS, false, LS || VP);
         if (u.uShadow) gl.uniform1i(u.uShadow, 0); if (u.uRooms) gl.uniform1i(u.uRooms, 1);
-        if (u.uTexel) gl.uniform2f(u.uTexel, 1.2 / SM, 1.2 / SM);
+        if (u.uTexel) gl.uniform2f(u.uTexel, 0.8 / SM, 0.8 / SM);
         if (u.uOcc) gl.uniform1f(u.uOcc, occ);
       };
       // (the drawing's camera looks along +z with y up, so a face turned to the eye winds clockwise on screen)
