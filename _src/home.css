@@ -308,26 +308,9 @@ html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 .curtain.fast .split{transition-delay:0s,.1s}
 .curtain .n .o::before{content:"0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0";transform:translateY(-.8em);animation-name:cm-o}
 .curtain.struck .n .o::before{transform:translateY(-80em)}
-.chart .map{margin:0;display:grid;gap:10px}
-.chart .pa{grid-column:1;grid-row:1;position:relative;overflow:hidden;aspect-ratio:720/330}
-.chart .ldr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* a row answers in ink: it holds its ink while the other markets stand back on the map and in the list (below) */
 .lv{transition:color .3s}
-
-/* routes: planned in hidden dashes, later in dots; each draws out through a mask of its own */
-.chart .arc{fill:none;stroke:var(--fg);stroke-width:1.25px;vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
-.chart .arc.later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
-.chart .loc{fill:none;stroke:var(--patina);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-.chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
-.chart .wo{fill:none;stroke:var(--faint);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round}
-.chart .wf{fill:none;stroke:var(--accent);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-/* the overview is engraved like a chart of the coast: the land takes a breath of tone, the sea four water lines that
-   fade as they leave the shore, the states a dotted hairline and the borders a dash and dot */
-.chart .ov .lnd{fill:var(--fg);fill-opacity:.045;stroke:none}
-.chart .ov .wl{fill:var(--fg);opacity:.34}
-.chart .ov .st{fill:none;stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-dasharray:calc(1px * var(--u,1)) calc(2.5px * var(--u,1));stroke-linecap:round;opacity:.38}
-.chart .ov .bd{fill:none;stroke:var(--fg);stroke-width:calc(.7px * var(--u,1));stroke-dasharray:calc(7px * var(--u,1)) calc(2.5px * var(--u,1)) calc(1px * var(--u,1)) calc(2.5px * var(--u,1));opacity:.45}
 
 /* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. */
 .chart .levels{margin:0;padding:0;list-style:none}
@@ -340,12 +323,6 @@ html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 .chart .lv .when{grid-column:2}
 }
 @media (min-width:1000px){.chart .lv{grid-template-columns:56px 132px minmax(0,6fr) minmax(0,4fr);row-gap:0}}
-@media (max-width:1199px){.chart .pa{grid-row:2;border-top:1px solid var(--rule)}}
-@media (max-width:599px){.chart .pa{aspect-ratio:430/286}
-.chart .edge{display:inline}
-}
-.cap .key{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase}
-.cap .k-now{stroke:var(--patina)!important;stroke-width:3px;stroke-linecap:round}
 
 /* Without scripts the drawings cannot be drawn; show the story as text rather than an empty sheet.
    Every page marks html.js in its head, so these rules never flash on a page that has scripts. */
@@ -559,3 +536,28 @@ html:not(.js) .step{min-height:auto}
 @media (min-width:821px) and (max-height:800px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(calc(var(--t-hero) * .9),8.6vh)}}
 /* and on a phone it sets a touch smaller and starts higher, for the same reason: the copy here runs about 50px taller */
 @media (max-width:820px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(42px,11vw)}:is(:lang(es),:lang(pt)) .hero .wrap{padding-top:calc(clamp(40svh,100svh - 470px,56svh) - var(--rise,0px))}}
+
+/* the journal's lead guide, drawn as a strip of its steps under it: each step on its own length of rule, the part of a
+   deposit that may fund construction in bronze; on a phone the strip folds to three steps a row */
+#journal .jr-strip{margin:clamp(28px,3vw,40px) 0 0}
+.jr-strip ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));row-gap:22px}
+.jr-strip li{position:relative;margin:0;padding:16px 14px 0 0;border-top:1px solid var(--fg)}
+.jr-strip li::before{content:'';position:absolute;left:0;top:-7px;width:1px;height:13px;background:var(--fg)}
+.jr-strip li.m::after{content:'';position:absolute;left:0;right:0;top:-2px;height:3px;background:var(--sold-line)}
+.jr-strip .w{display:block;font:500 11px/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.jr-strip b{display:block;margin-top:6px;font:400 clamp(19px,1.5vw,22px)/1.2 var(--display);font-variant-numeric:lining-nums;color:var(--fg)}
+.jr-strip li.m b{color:var(--accent)}
+.jr-strip figcaption{margin-top:16px;font-size:13px;line-height:1.5;color:var(--faint)}
+@media (max-width:820px){.jr-strip ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* the advisors' table under the seat line, the ten seats at launch in ink and the ten more it can ever take in dashes */
+#people .seat-plan{grid-column:1/-1;margin:clamp(28px,3.4vw,48px) 0 0;max-width:820px}
+.seat-plan svg{display:block;width:100%;height:auto}
+.seat-plan :is(rect,path){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.seat-plan .top{stroke-width:var(--lw-profile)}
+.seat-plan .top.in{stroke-width:var(--lw-detail)}
+.seat-plan .leaf{stroke-dasharray:var(--lt-hidden);opacity:.6}
+.seat-plan .ch .rl{fill:var(--fg);stroke:none}
+.seat-plan .ch:not(.on){opacity:.45}
+.seat-plan .ch:not(.on) rect{stroke-dasharray:var(--lt-hidden)}
+.seat-plan .ch:not(.on) .rl{fill:none;stroke:var(--fg)}
+@media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}.seat-plan :is(rect,path){stroke:CanvasText}}
