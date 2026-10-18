@@ -62,11 +62,12 @@
   --lt-hidden:4 3; --lt-dot:1 3; --lt-datum:12 3 2 3;
   /* the type ladder: one size per role, and a heading never smaller than one below it in rank. The close is set at
      display scale, the one h1 next, then the full-measure spreads (markets, the name), the chapter openers (and each
-     subpage's title), the back-matter heads, every h3, and the large reading lines. Body stays 18px, labels 13px. */
+     subpage's title), the back-matter heads, every h3, and the large reading lines; the hero's lede and each section's intro share one size
+     (--t-intro). Body stays 18px, labels 13px, and no running Jost text sits a pixel off either. */
   --t-display:clamp(48px,9.6vw,calc(136px + var(--wide) * .04)); --t-hero:clamp(48px,min(7.8vw,12.4vh),116px);
   --t-spread:clamp(46px,7.2vw,calc(104px + var(--wide) * .015)); --t-chapter:clamp(42px,5.6vw,calc(84px + var(--wide) * .02));
   --t-section:clamp(36px,3.9vw,calc(56px + var(--wide) * .018)); --t-head:clamp(28px,2.8vw,calc(40px + var(--wide) * .012));
-  --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
+  --t-big:clamp(21px,1.8vw,calc(26px + var(--wide) * .006)); --t-intro:clamp(19px,1.5vw,21px); --t-lede:clamp(24px,2.4vw,calc(32px + var(--wide) * .008));
   --t-num:clamp(80px,7.6vw,124px);
   color-scheme:light;
 }
@@ -87,8 +88,10 @@
 html{scroll-behavior:smooth;scroll-padding-top:var(--hdr);scrollbar-color:var(--rule) transparent;scrollbar-width:thin;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-weight:400;font-size:18px;line-height:1.7;-webkit-font-smoothing:antialiased;caret-color:var(--accent)}
 ::selection{background:var(--bronze);color:var(--ink)}
-/* Vellum: a faint grain over every ground, so nothing reads as flat screen color */
-body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;background:url(grain.png);opacity:.55}
+/* Vellum: a faint grain over every ground, so nothing reads as flat screen color. The tile is AVIF (13 KB, the same
+   texture: its spread over ivory within 2% of the original), with the PNG (26 KB) for a browser without AVIF; random grain
+   barely compresses, and WebP comes to 25 KB lossless and larger lossy, so it isn't offered. */
+body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55}
 @media print{body::after{display:none}}
 /* Numerals stand upright wherever they carry a count */
 .n,.num,.gauge b,.begin li::before,.dscale,.table b,.rscale,.lv .when{font-variant-numeric:lining-nums tabular-nums}
@@ -114,9 +117,9 @@ body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;ba
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--rule);border:2px solid var(--bg)}
 ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-:focus-visible{outline:1px solid var(--accent);outline-offset:5px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 /* a control brought into view by the keyboard stops with its whole ring in sight: clear of the fixed header above, and of the
-   menu's motion row below (5px offset, 1px ring, a little air) */
+   menu's motion row below (5px offset, 2px ring, a little air) */
 :focus-visible{scroll-margin-block:12px}
 a{color:inherit;text-underline-offset:.28em;text-decoration-thickness:1px}
 h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.08;letter-spacing:-.01em;text-wrap:balance;margin:0}
@@ -155,9 +158,12 @@ header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:
    centre sits on the nav's cap line: half the difference in height, plus the 1.7px the nav's caps ride above
    the bar's centre (the Menu label's ride 0.7px above it). */
 .mark{--sym:22px;--wm:13px;--cap:1.7px;display:flex;align-items:flex-end;gap:7px;text-decoration:none;translate:0 calc((var(--wm) - var(--sym)) / 2 - var(--cap))}
-/* the drawing stays its size; the link is 44px tall to the touch, without moving the art or its focus ring */
-.mark{position:relative}
+/* the drawing stays its size; the link is 44px tall to the touch, without moving the art: its own box is padded out to
+   43px (a 24px target by any measure; the margins give the padding back, so nothing moves) and the 44px band beyond it,
+   and its ring keeps close to the art */
+.mark{position:relative;padding:12px 8px;margin:-12px -8px}
 .mark::before{content:"";position:absolute;left:0;right:0;top:50%;height:44px;translate:0 -50%}
+.mark:focus-visible{outline-offset:-3px}
 .mark svg{width:auto;flex:none;overflow:visible}
 .mark .sym{height:var(--sym);color:var(--seal)}
 .mark .wm{height:var(--wm)}
@@ -255,11 +261,11 @@ header.site{container:site/inline-size;max-width:100vw}
   nav.main > a:nth-child(5){--k:7}nav.main > a:nth-child(6){--k:8}nav.main > a:nth-child(7){--k:9}
 }
 @media (min-width:540px) and (max-width:1279px) and (max-height:500px),(min-width:540px) and (max-width:79.9375em) and (max-height:500px){
-  /* two columns of four rows: the open markets close the first column and the next ones the second, level with each other */
-  nav.main{grid-template-rows:repeat(4,auto)}
-  nav.main > a:nth-child(5){grid-area:1 / 2}nav.main > a:nth-child(6){grid-area:2 / 2}nav.main > a:nth-child(7){grid-area:3 / 2}
-  nav.main .mk-panel > :nth-child(2){grid-area:4 / 2}
-  nav.main.open > a:nth-child(5){border-top:1px solid var(--rule)}nav.main.open > a:nth-child(6){border-top:0}
+  /* two columns of five rows: the open and the planned markets close the first column, the later ones open the second */
+  nav.main{grid-template-rows:repeat(5,auto)}
+  nav.main .mk-panel > :nth-child(2){grid-area:5 / 1}nav.main .mk-panel > :nth-child(3){grid-area:1 / 2}nav.main .mk-panel > :nth-child(4){grid-area:2 / 2}
+  nav.main > a:nth-child(5){grid-area:3 / 2}nav.main > a:nth-child(6){grid-area:4 / 2}nav.main > a:nth-child(7){grid-area:5 / 2}
+  nav.main.open .mk-panel > :nth-child(3){border-top:1px solid var(--rule)}nav.main.open > a:nth-child(6){border-top:0}
 }
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk,header.site .mk-panel{display:contents}
@@ -276,10 +282,11 @@ header.site{container:site/inline-size;max-width:100vw}
 /* Two groups: the three markets open now, and the eight that come next. In the bar's list the group is a quiet label over its
    cities, set in from its edge; in the drawer each group is one row, the label a quiet line over its cities in the bar's
    capitals, wrapping as the width needs. */
-/* The list is in two groups: the three markets open now, then the eight that come next, in the order they open. A single
-   column of eleven ran past the foot of a laptop's window, so the open three stand in their own column and the next eight
-   sit two by two beside them, quieter; past that the list scrolls inside itself rather than losing cities below the edge.
-   Below 1440px the gaps narrow, so the Spanish list, the widest, keeps well clear of the window's right edge. */
+/* The list is one ladder in three steps, in the order the markets open: the three open now, the two planned, the six
+   that come later, then a ruled line to the page of every market. A single column of eleven ran past the foot of a laptop's
+   window, so the open three and the planned two stand in one column and the later six sit two by two beside them,
+   quieter; past that the list scrolls inside itself rather than losing cities below the edge. Below 1440px the gaps narrow,
+   so the Spanish list, the widest, keeps well clear of the window's right edge. */
 @media (min-width:1280px){
   .mk-panel{grid-template-columns:repeat(2,max-content);column-gap:36px;align-items:start;max-height:calc(100svh - 80px);overflow-y:auto;overscroll-behavior:contain}
   .mk-st{display:grid}
@@ -288,9 +295,13 @@ header.site{container:site/inline-size;max-width:100vw}
   .js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.62)}
   .mk-st.mk-later{grid-template-columns:repeat(2,max-content);column-gap:24px}
   .mk-st.mk-later .mk-k{grid-column:1/-1}
+  .mk-st.mk-plan{grid-column:1}
+  .mk-st.mk-later{grid-column:2;grid-row:1 / span 2}
+  nav.main .mk-panel a.mk-all{grid-column:1/-1;margin-top:10px;padding:12px 0 4px;border-top:1px solid var(--rule);border-bottom:0}
+  .js header.site.over nav.main .mk-panel a.mk-all{border-color:rgba(var(--ivory-rgb),.14)}
   @media (max-width:1439px){.mk-panel{column-gap:28px;padding-right:12px}.mk-st.mk-later{column-gap:12px}}
-  nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:var(--muted)}
-  .js header.site.over nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:rgba(var(--ivory-rgb),.62)}
+  nav.main :is(.mk-plan,.mk-later) a:not(:hover,:focus-visible){color:var(--muted)}
+  .js header.site.over nav.main :is(.mk-plan,.mk-later) a:not(:hover,:focus-visible){color:rgba(var(--ivory-rgb),.62)}
 }
 @media (max-width:1279px),(max-width:79.9375em){
   .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
@@ -519,12 +530,13 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
   
   /* On a phone the drawing owns the sticky panel: the caption is one line above it and the gauge one line below, so
      the canvas keeps the height (the model refits to it). The panel ends on a foot of its own ground 10px under the
-     threshold label, then a long, eased fade (32px, more than a line, as the sideways curve heading's band has), so the
-     words passing under it have all but dissolved before they reach the label, never cut and never read as the gauge's. */
+     threshold label, then a band of that ground a full line deep (30px), so no glyph is ever cut by the panel's edge,
+     then a long, eased fade (32px, more than a line, as the sideways curve heading's band has), so the words passing
+     under it have all but dissolved before they reach the band, never cut and never read as the gauge's. */
   .elev{top:var(--hdr);z-index:2;padding:6px var(--gr) 0 var(--gl);margin-inline:calc(var(--gl) * -1) calc(var(--gr) * -1);background:var(--bg);gap:4px}
   .rise .elev{height:calc(46svh + 38px)}
   
-  .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:32px;background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 88%,transparent) 30%,color-mix(in srgb,var(--bg) 45%,transparent) 65%,transparent);pointer-events:none}
+  .rise .elev::after{content:"";position:absolute;left:0;right:0;top:100%;height:62px;background:linear-gradient(var(--bg) 30px,color-mix(in srgb,var(--bg) 88%,transparent) 40px,color-mix(in srgb,var(--bg) 45%,transparent) 51px,transparent);pointer-events:none}
   /* (with forced colours the fade is dropped, so the panel ends on a rule over a short solid band instead, and the words
      passing under it never meet the threshold label) */
   @media (forced-colors:active){.rise .elev::after{height:6px;background:Canvas;border-bottom:1px solid CanvasText}}
@@ -697,7 +709,7 @@ section.band + section,section + section.band{border-top:0}
      and stand at least two fifths of the door's width below its top, so on short screens the door grows to keep them under the crown */
   .doorway{aspect-ratio:auto;min-height:70svh;max-width:420px;justify-self:start;padding:min(40%,168px) clamp(52px,14vw,62px) 28px;margin-bottom:0}
   .door .terms b{font-size:24px}
-  .door .terms p{padding:14px 0;font-size:17px}
+  .door .terms p{padding:14px 0;font-size:18px}
 }
 /* phones: the heading with the offer directly under it, as every section opens, then the door with its terms, then the
    call, the note and the way to the page */
@@ -736,7 +748,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .lv h3{font-size:var(--t-head);font-weight:300}
 .lv.now h3{font-style:italic;font-weight:400}
 .lv p{color:var(--muted)}
-@media (max-width:700px){.lv p{grid-column:2;font-size:17px}}
+@media (max-width:700px){.lv p{grid-column:2;font-size:18px}}
 
 .feature > *{min-width:0}
 .feature .txt{display:grid;gap:18px;align-content:start}
@@ -818,8 +830,12 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 @media (min-width:821px){
   .adv .people .table{grid-area:1/1/2/13}
   .adv .people .col{grid-area:2/1/3/13;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:22px;align-items:start}
-  .adv .people .col > .big{grid-column:1/span 6;grid-row:1/span 2;margin:0}
-  .adv .people .col > :not(.big){grid-column:8/-1}
+  /* the one photograph stands on the left five columns, beside the standard on the right seven: the lead line, the three
+     tests and the invitation, from the photograph's top, so the sheet closes on a spread rather than an empty half */
+  .adv .people .col > .photo{grid-column:1/span 5;grid-row:1/span 5;margin:0;max-width:none}
+  .adv .people .col::before{grid-column:7/-1;grid-row:1}
+  .adv .people .col > :not(.photo){grid-column:7/-1}
+  .adv .people .col > .big{margin:0}
 }
 .people{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);align-items:start}
 .people > *{min-width:0}
@@ -857,6 +873,8 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .js .table:not(.in) :is(.dim .ex,.dim .tk,.dm){opacity:0}
 @media (max-width:820px){.people{grid-template-areas:"head" "table" "col";row-gap:clamp(32px,7vw,120px)}}
 .people .col{display:grid;gap:22px}
+/* (stacked, the photograph closes the column) */
+@media (max-width:820px){.adv .people .col > .photo{order:1;margin-block:14px 0}}
 .people .col p{color:var(--muted)}
 .people .col .big{color:var(--fg)}
 .people ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
@@ -1095,8 +1113,8 @@ html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){trans
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
   
-  /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 416px is the copy's height from the headline to the second button */
-  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 416px,56svh) - var(--rise,0px))}
+  /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 432px is the copy's height from the headline to the second button */
+  .hero .wrap{padding-top:calc(clamp(46svh,100svh - 432px,56svh) - var(--rise,0px))}
   .hero h1{max-width:none}
   
 }
@@ -1232,7 +1250,7 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart.pulse .ring{animation:ring 2.4s var(--ease) both}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
 
-@media (min-width:700px){.chart .lv h3{grid-column:3;font-size:var(--t-head,clamp(28px,2.8vw,40px))}.chart .lv p{grid-column:3;font-size:17px;text-wrap:balance}}
+@media (min-width:700px){.chart .lv h3{grid-column:3;font-size:var(--t-head,clamp(28px,2.8vw,40px))}.chart .lv p{grid-column:3;font-size:18px;text-wrap:balance}}
 /* (the coverage takes a column of its own once there is room for it beside the name) */
 @media (min-width:1000px){.chart .lv p{grid-column:4;grid-row:1}}
 /* below 1200px (where the survey's type would crowd it beside the overview) the survey comes first, cut wide and short
@@ -1301,11 +1319,13 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .page .wrap{max-width:880px}
 /* On a wide screen the reading column is set in a page, not on a strip: its sections hang in the left margin as a short list
    that stays in view from the first section down, the one being read marked in bronze (site.js builds it from the page's
-   own headings), and each photograph's caption steps out into the right margin, level with the photograph's top. */
+   own headings), and each photograph's caption steps out into the right margin, level with the photograph's top. The list
+   stands on the site's own left edge (the gutter the logo, the title and the footer keep), the column one rail in from it
+   (--rail, set with the reading pages' grid further down), so the page has two clean left edges, not three. */
 .toc{display:none}
 @media (min-width:1320px) and (hover:hover) and (pointer:fine){
   main.page:not(.wide) > .wrap{position:relative}
-  .toc{display:block;position:absolute;top:var(--toc-top,0px);bottom:0;right:calc(100% - var(--gl) + 56px);width:clamp(168px,calc((100vw - 880px) / 2 - 48px),232px)}
+  .toc{display:block;position:absolute;top:var(--toc-top,0px);bottom:0;left:var(--gl);width:min(232px,var(--rail,208px) - 40px)}
   .toc > div{position:sticky;top:calc(var(--hdr,64px) + 40px);max-height:calc(100svh - var(--hdr,64px) - 80px);overflow-y:auto;padding-top:14px;border-top:1px solid var(--rule)}
   .toc-k{margin:0 0 10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .toc ol{list-style:none;margin:0;padding:0}
@@ -1315,15 +1335,16 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
   .toc a[aria-current]::before{background:var(--accent);width:11px}
   .toc a:hover,.toc a:focus-visible{color:var(--fg)}
   main.page:not(.wide) .prose figure.photo{position:relative}
-  main.page:not(.wide) .prose figure.photo > .cap{position:absolute;top:0;left:calc(100% + 40px);width:clamp(160px,calc((100vw - 880px) / 2 - 40px),220px);margin:0;display:block;font-size:14px;line-height:1.5}
+  main.page:not(.wide) .prose figure.photo > .cap{position:absolute;top:0;left:calc(100% + 40px);width:210px;margin:0;display:block;font-size:14px;line-height:1.5}
   main.page:not(.wide) .prose figure.photo > .cap > span{display:block}
   main.page:not(.wide) .prose figure.photo > .cap .credit{margin-top:6px;white-space:normal}
 }
 @media print{.toc{display:none!important}}
 .crumbs{font-size:15px;color:var(--faint);margin-bottom:28px}
 .crumbs a{color:var(--accent)}
-/* (each crumb answers a touch 4px above and below its words, a 30px target, without moving the line or its underline) */
-.crumbs a{position:relative}.crumbs a::before{content:"";position:absolute;inset:-4px 0}
+/* (each crumb is padded 4px above and below its words, a 30px target, without moving the line or its underline, which
+   stays on the words) */
+.crumbs a{padding-block:4px;background-origin:content-box;background-clip:content-box}
 .page h1{font-size:var(--t-chapter);font-weight:300;letter-spacing:-.02em;line-height:1.04;max-width:8.586em}
 /* a note's headline gets three more characters, so 'Buying pre-construction' holds one line, as on the index and its share card */
 .page:has(.prose.lead) h1{max-width:10.017em}
@@ -1343,12 +1364,12 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .meta .open{color:var(--patina)}
 /* in the Markets menu the markets open now carry a small patina point: open, never sold. In the drawer's rows it follows the
    name; in the bar's list, where a city fills its column and its current mark stands at the right, it sits in the indent */
-nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="hamptons.html"]){
+nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="nueva-york.html"],[href$="nova-york.html"],[href$="hamptons.html"]){
   --pt:var(--patina);padding-right:14px;background:radial-gradient(circle,var(--pt) 2.5px,transparent 3px) right 0 top 50%/6px 6px no-repeat}
 .js header.site.over nav.main .mk-st a{--pt:var(--patina-300)}
 @media (min-width:1280px){
-  nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="hamptons.html"]){padding-right:0;background-position:left 3px top 50%}
-  @container site (max-width:71em){nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="hamptons.html"]){padding-right:14px;background-position:right 0 top 50%}}
+  nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="nueva-york.html"],[href$="nova-york.html"],[href$="hamptons.html"]){padding-right:0;background-position:left 3px top 50%}
+  @container site (max-width:71em){nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],[href$="sul-da-florida.html"],[href$="new-york.html"],[href$="nueva-york.html"],[href$="nova-york.html"],[href$="hamptons.html"]){padding-right:14px;background-position:right 0 top 50%}}
 }
 @media (forced-colors:active){nav.main .mk-st a{background:none}}
 /* A note is read in Cormorant at 22px: 29em is about 68 characters a line, in an ink a shade softer than the headings' */
@@ -1623,7 +1644,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;height:21px;margin-top:-10px;border-radius:50%;background:var(--bg);border:1px solid var(--accent);box-shadow:inset 0 0 0 4px var(--bg),inset 0 0 0 10px var(--sold)}
 /* the thumb's ring is its only edge, so it takes the text bronze (5.2:1 on ivory); the dot inside stays the sold bronze */
 .cv-ctl input[type=range]::-moz-range-thumb{width:21px;height:21px;border-radius:50%;background:var(--sold);border:4px solid var(--bg);outline:1px solid var(--accent)}
-.cv-ctl input[type=range]:focus-visible{outline:1px solid var(--accent);outline-offset:5px}
+.cv-ctl input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 .cv-read{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7.5em),1fr));margin:0;border-top:1px solid var(--rule)}
 .cv-read div{padding:14px 14px 0 0;display:grid;grid-template-rows:auto 1fr}
 .cv-read dd{align-self:end}
@@ -1696,7 +1717,7 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 .letter .as label{position:relative;cursor:pointer;font-family:var(--display);font-size:clamp(24px,2.4vw,30px);color:var(--faint);padding-bottom:4px;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
 .letter .as input{position:absolute;opacity:0;width:1px;height:1px}
 .letter .as label:has(input:checked){color:var(--fg);border-color:var(--accent)}
-.letter .as label:has(input:focus-visible){outline:1px solid var(--accent);outline-offset:4px}
+.letter .as label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:4px}
 /* Choosing a voice, the letter rewrites itself softly (instrument.js): the chosen label's dimension line (1px bronze between
    5px ticks) travels to it, the old paragraph goes, the sheet takes the new one's height and the new one settles in.
    Without the script, the label's own rule marks the choice and the paragraphs simply change. */
@@ -1723,9 +1744,21 @@ html:not(.js) .curve,html:not(.js) .letter > :not(.send),.js .curve:not(.ready){
 /* the open list takes the sheet's colors, by day and by night, never the field's bronze */
 .letter .sheet select option{color:var(--fg);background:var(--sheet)}
 /* a blank with the focus takes the site's bronze ring, drawn close round it so it keeps clear of the lines above and below */
-.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:1px solid var(--accent);outline-offset:3px;background-color:rgba(var(--bronze-rgb),.16)}
+.letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:2px solid var(--accent);outline-offset:3px;background-color:rgba(var(--bronze-rgb),.16)}
 /* (over that tint a placeholder steps up from faint to muted, so it keeps AA by night: 6.7:1, where faint falls to 4.2) */
 .letter .sheet input:focus-visible::placeholder{color:var(--muted)}
+/* Each blank keeps a small label under its line once it has the focus or a value, so the cue its placeholder gave is not
+   lost once the writer types (the label is the blank's own name, which a screen reader already hears, so it is not read
+   twice). The lines with blanks stand a little further apart to make room for it. */
+.letter .sheet :is(.body,.sign){line-height:2.05}
+.letter .blank{position:relative;display:inline-block;max-width:100%}
+.letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;top:calc(100% + 4px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
+/* the label shows while its blank has focus, on a chip of the letter's own sheet so it can sit over the line below it
+   without the two reading as one; once filled, the sentence around the value says what it is */
+.letter .blank::after{z-index:2;padding:3px 6px 4px;margin-left:-6px;background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
+.letter .blank:focus-within::after{opacity:1}
+/* a plan carried from the launch planner: its link, under the developer's paragraph, as it will be sent */
+.letter .plan-ref{display:block;margin-top:.4em;font-size:.7em;line-height:1.5;overflow-wrap:anywhere;color:var(--muted)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
 /* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
@@ -1908,8 +1941,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .cv-hdot{fill:var(--sheet);stroke:var(--sold-line);stroke-width:1.5;pointer-events:none}
 /* Footer as an architect's title block. On a wide screen, twelve columns in two rows: practice, office, the date drawn, the
    scale, and the sheet number standing the full height at the right; under them the ways in, the sheet set and the channels. */
-.tb{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-areas:"pr pr pr pr of of dr dr sc sc sh sh" "wk wk wk wk ss ss ss ss fo fo sh sh"}
-.t-pr{grid-area:pr}.t-of{grid-area:of}.t-dr{grid-area:dr}.t-sc{grid-area:sc}.t-sh{grid-area:sh}.t-wk{grid-area:wk}.t-ss{grid-area:ss}.t-fo{grid-area:fo}
+.tb{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-areas:"pr pr pr pr of of dr dr sc sc sh sh" "wk wk mk mk ss ss ss ss fo fo sh sh"}
+.t-pr{grid-area:pr}.t-of{grid-area:of}.t-dr{grid-area:dr}.t-sc{grid-area:sc}.t-sh{grid-area:sh}.t-wk{grid-area:wk}.t-mk{grid-area:mk}.t-ss{grid-area:ss}.t-fo{grid-area:fo}
 .tb > div{min-height:96px}
 /* the sheet number is the block's largest figure, set directly under its label like every other value, then a rule and
    the sheet's name with the size of the set. The name keeps to one line: where the cell is too narrow for both, the size
@@ -1937,7 +1970,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .ss a:focus-visible .t,.ss a[aria-current] .t{background-size:100% 1px}
 @media (hover:hover) and (pointer:fine){.ss a:hover .t{background-size:100% 1px}}
 .tb .ss a[aria-current]{color:var(--fg)}
-/* where the cell is wide enough for two columns, the set takes them, five and four */
+/* where the cell is wide enough for two columns, the set takes them, five and five */
 .t-ss{container-type:inline-size}
 @container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
 /* a date keeps whole, taking the next line as one piece where its line is full; only text set far larger than the cell (a
@@ -1946,15 +1979,12 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .sn{max-width:100%}
 .legal .totop{white-space:nowrap}
 /* narrower, three rows of two-column cells: the sheet keeps its full figure */
-@media (max-width:1023px){.tb{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"pr pr pr of of of" "dr dr sc sc sh sh" "wk wk ss ss fo fo"}}
+@media (max-width:1023px){.tb{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"pr pr pr of of of" "dr dr sc sc sh sh" "wk wk mk mk fo fo" "ss ss ss ss ss ss"}}
 /* phones: practice across the sheet, then two columns, the sheet standing beside the office and the date as it stands
-   beside the top row on a wide screen, and the set beside the ways in and the channels. The scale, which says only that
+   beside the top row on a wide screen, the ways in beside the markets, then the set across, five and five. The scale, which says only that
    nothing here is drawn to one, is left off. Every link keeps a 43px target, set edge to edge. */
-@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk ss" "fo ss"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
-  footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}
-  /* the set registers with the two cells beside it: 01 to 03 level with the ways in, and 04 on level with the channels,
-     the step between them as deep as the cell edge and the label that open the channels (12 + 1 + 10 + 18.2 + 4px) */
-  .ss li:nth-child(4){margin-top:calc(12px + 1px + 10px + 13px * 1.4 + 4px)}}
+@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk mk" "ss ss" "fo fo"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
+  footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
@@ -2172,12 +2202,13 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .pc-doorway .terms p{padding:11px 0;border-bottom:var(--lw-detail) solid var(--band-rule);font-size:15px;line-height:1.5;color:var(--band-muted)}
 .pc-doorway .terms b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(21px,1.6vw,23px);line-height:1.25;color:var(--band-fg);margin-bottom:3px}
 .pc-doorway .terms a{color:var(--band-fg)}
-/* the door's light: it falls across the band's floor and fades over the first 140px of the sheet below */
-.pc-light{position:absolute;top:100%;left:-40%;width:180%;height:calc(var(--floor) + 140px);pointer-events:none;opacity:clamp(0,(var(--o) - .35) / .65,1);filter:blur(clamp(8px,1.2vw,16px))}
+/* the door's light: it falls across the band's floor and stops at the band's edge, the threshold, so none of it reaches
+   the sheet below (the blur is clipped there too; its sides and the door's sill keep their feather) */
+.pc-light{position:absolute;top:100%;left:-40%;width:180%;height:var(--floor);pointer-events:none;opacity:clamp(0,(var(--o) - .35) / .65,1);filter:blur(clamp(8px,1.2vw,16px));clip-path:inset(-40px -40px 0 -40px)}
 /* the shape of the light is cut inside the blur, so its slanted sides are feathered as softly as its foot */
-.pc-light::before{content:"";position:absolute;inset:0;clip-path:polygon(25.3% 0,74.7% 0,88% 100%,-2.5% 100%);background:linear-gradient(rgba(var(--bronze-300-rgb),.34),rgba(var(--bronze-300-rgb),.18) var(--floor),rgba(var(--bronze-300-rgb),0) calc(var(--floor) + 140px))}
-:root[data-theme="dark"] .pc-light::before{background:linear-gradient(rgba(var(--bronze-300-rgb),.44),rgba(var(--bronze-300-rgb),.26) var(--floor),rgba(var(--bronze-300-rgb),0) calc(var(--floor) + 140px))}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc-light::before{background:linear-gradient(rgba(var(--bronze-300-rgb),.44),rgba(var(--bronze-300-rgb),.26) var(--floor),rgba(var(--bronze-300-rgb),0) calc(var(--floor) + 140px))}}
+.pc-light::before{content:"";position:absolute;inset:0;clip-path:polygon(25.3% 0,74.7% 0,88% 100%,-2.5% 100%);background:linear-gradient(rgba(var(--bronze-300-rgb),.34),rgba(var(--bronze-300-rgb),.14))}
+:root[data-theme="dark"] .pc-light::before{background:linear-gradient(rgba(var(--bronze-300-rgb),.44),rgba(var(--bronze-300-rgb),.2))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc-light::before{background:linear-gradient(rgba(var(--bronze-300-rgb),.44),rgba(var(--bronze-300-rgb),.2))}}
 @supports not (overflow-x:clip){.pc-light{left:0;width:100%}}
 /* arrived through the home page's door (site.js hands the arch across), the door here is already open */
 html[data-door="open"] .pc-doorway{--o:1!important;transition:none!important}
@@ -2257,6 +2288,21 @@ html.js .pc-nojs{display:none}
 /* phones: the plate goes above the title, the full width of the row */
 @media (max-width:600px){.ji a{grid-template-columns:3em minmax(0,1fr);grid-template-areas:"p p" "n t" ". s" ". d"}.ji .pl{width:100%;height:120px;margin:0 0 22px}.ji .ji-ph{width:100%;aspect-ratio:2/1;margin:0 0 22px}}
 @media (max-width:420px){.ji a{grid-template-columns:2.2em minmax(0,1fr);column-gap:16px}}
+/* The journal in two parts: the developer notes as featured rows, each with its plate, then the eight buyer guides folded
+   into one ruled table, a state to a row, pre-construction beside new construction (the comparison table's rules). */
+.ji-h{margin:clamp(48px,6vw,88px) 0 0;font:300 var(--t-head)/1.1 var(--display)}
+.ji-h + .ji{margin-top:clamp(18px,2vw,26px)}
+.ji-guides{margin:clamp(18px,2vw,26px) 0 0}
+.ji-guides table{border-top:1px solid var(--fg)}
+.ji-guides thead th{padding-top:18px}
+.ji-guides tbody th{width:16%}
+.ji-guides td{width:42%}
+.ji-guides td a{display:block;color:var(--fg);text-decoration:none;font-size:18px;line-height:1.55;transition:color var(--t-ui)}
+.ji-guides td a:focus-visible{text-decoration:underline}
+@media (hover:hover) and (pointer:fine){.ji-guides td a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}}
+.jg-n{display:block;margin-bottom:4px;font-family:var(--display);font-size:24px;line-height:1.2;color:var(--patina)}
+.jg-d{margin-top:10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
+@media (max-width:560px){.ji-guides tbody{border-top:0}.ji-guides tbody th{color:var(--fg)}.ji-guides td + td{margin-top:8px}}
 /* The plates: line drawings of each note's figure, in percentages of the plate, so a wider plate keeps its hatches and pens */
 .pl{display:block;width:168px;height:96px;overflow:visible}
 .pl-hero{width:100%;height:240px}
@@ -2335,6 +2381,9 @@ nav.main a[aria-current="page"]{color:var(--fg)}
   html.menu-open .motion{display:flex;align-items:center;gap:12px;position:fixed;left:0;right:auto;bottom:0;z-index:2;width:auto;height:calc(52px + env(safe-area-inset-bottom));padding:0 16px env(safe-area-inset-bottom) var(--gutter);background:transparent;border:0;font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
   /* the word sits in its name ("Pause motion"); the icon says which way the switch goes */
   html.menu-open .motion::after{content:"Motion"}
+  /* (in the page's own language: the switch's name already is) */
+  html:lang(es).menu-open .motion::after{content:"Animación"}
+  html:lang(pt).menu-open .motion::after{content:"Animação"}
   html.menu-open .motion:focus-visible{outline-offset:-6px}
   /* (the row itself is drawn under the switch, so the switch is only as wide as its glyph and word, with 16px to spare:
      a touch in the row's blank middle does nothing, and the switch's focus ring never takes in the handle beside it) */
@@ -2389,7 +2438,7 @@ nav.main a[aria-current="page"]{color:var(--fg)}
 h2,h3,.jl-title,.ji-t{text-wrap:balance}
 p,li{text-wrap:pretty}
 /* the skip link shows where a keyboard starts reading, at the top under the header, never over the hero's buttons */
-.skip:focus{top:76px;bottom:auto;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));position:fixed;background:var(--ink);color:var(--ivory);outline:1px solid var(--bronze);outline-offset:2px}
+.skip:focus{top:76px;bottom:auto;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));position:fixed;background:var(--ink);color:var(--ivory);outline:2px solid var(--bronze);outline-offset:2px}
 .links{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0}
 /* on the narrowest phones a long note title wraps, so its underline follows each line of words instead of running the
    full box under the last; the next link takes a line of its own */
@@ -2429,7 +2478,7 @@ p,li{text-wrap:pretty}
 /* on phones the section's own rule closes the list, so the last market row drops its line */
 
 /* Older browsers without :has still show which voice the letter is written in; where :has works, the label alone carries the underline and the ring */
-@supports not selector(:has(*)){.letter .as input:checked + span{color:var(--fg);border-bottom:1px solid var(--sold)}.letter .as input:focus-visible + span{outline:1px solid var(--accent);outline-offset:4px}}
+@supports not selector(:has(*)){.letter .as input:checked + span{color:var(--fg);border-bottom:1px solid var(--sold)}.letter .as input:focus-visible + span{outline:2px solid var(--accent);outline-offset:4px}}
 /* Without JavaScript, or when the shared script never arrives (the head script marks html.nosite four seconds on, and site.js
    clears body.no-js whenever it does run): no dead buttons, and the menu is simply a list of links. Wrapped onto several rows,
    the header scrolls away with the page rather than stay pinned over the reading on a phone (on the home page it stands above
@@ -2437,6 +2486,8 @@ p,li{text-wrap:pretty}
 :is(html:not(.js),html.nosite body.no-js) :is(.menu-btn,.motion,.theme){display:none}
 /* (with no switches beside it, the bar's eight sections keep to the right edge, as the full list did) */
 @media (min-width:1280px){:is(html:not(.js),html.nosite body.no-js) nav.main{margin-right:0}}
+/* (and Markets, a button no script answers, opens its list under a resting pointer or the keyboard's focus) */
+@media (min-width:1280px){:is(html:not(.js),html.nosite body.no-js) .mk:is(:hover,:focus-within) .mk-panel{opacity:1;visibility:visible;translate:0 0}}
 @media (max-width:1279px),(max-width:79.9375em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
 /* Print: ink on paper, no chrome */
 @media print{
@@ -2476,6 +2527,13 @@ p,li{text-wrap:pretty}
   
   .rise .elev{display:none!important}
   a.ul[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em}
+  /* the footer's title block is the screen's; on paper the ground line stands over one line of colophon, the name, the
+     office and the address, with the fair housing mark, so no sheet is spent on the signature and the index of sheets */
+  footer .sig,footer .tb,footer .legal a,footer .legal .sep,footer .legal > span:last-child > .nw:not(.eho){display:none!important}
+  footer{break-inside:avoid}
+  footer .legal{display:flex!important;flex-wrap:nowrap;justify-content:space-between;gap:24px;padding-block:10px 0;font-size:11pt}
+  footer .legal > span:last-child{display:inline!important}
+  footer .legal > span:first-child::after{content:" centamont.com"}
 }
 /* printed side by side (the sliders left off the page), the readouts simply follow the figure down its column */
 @media print and (min-width:901px){.curve{grid-template-rows:auto 1fr}.cv-say{grid-row:2}.cv-fig{margin-bottom:0}.cv-read{grid-row:3;margin-top:0}}
@@ -2516,17 +2574,31 @@ p,li{text-wrap:pretty}
   .faq details p{padding-right:calc(28px + var(--qn-gap))}
 }
 /* More notes under the featured guide */
-/* The journal opens as a journal's nameplate: its title on one line on the page's axis, the intro under it, and a double
-   rule (two hairlines) where the feature begins, so the back matter does not open on the same module three times over. */
-.head.masthead{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;row-gap:0}
-.head.masthead :is(h2,.intro){grid-column:1}
-.head.masthead h2{max-width:none;margin-left:0;text-wrap:balance}
 
 .notes-list li{border-bottom:1px solid var(--rule)}
 .notes-list a{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 24px;align-items:baseline;padding:18px 0;text-decoration:none;color:var(--fg)}
 .notes-list .k{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .notes-list .t{font-family:var(--display);font-size:clamp(22px,2vw,28px);line-height:1.25}
 @media (max-width:600px){.notes-list a{grid-template-columns:1fr}.notes-list .k{order:1}}
+/* The markets page: each market a ruled row, its name over one line of where it is; the page for developers sets its
+   notes, its report and its planner in the same rows and rules. */
+.mk-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.mk-list a,.mk-list .mk-intl{grid-template-columns:minmax(0,1fr);gap:4px;padding-right:32px}
+.mk-list .mk-intl{display:grid;padding-block:18px;color:var(--fg)}
+.mk-list .d{font-size:16px;line-height:1.55;color:var(--muted)}
+.mk-ask{margin:clamp(32px,4vw,56px) 0 0;padding-top:clamp(20px,2.4vw,28px);border-top:1px solid var(--fg);font:300 var(--t-big)/1.3 var(--display)}
+/* Ruled rows: the developer and markets pages set their sections as rows, a head in the first third and its text beside it */
+.co-row{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:16px clamp(32px,6vw,96px);padding-block:clamp(28px,3.4vw,44px);border-top:1px solid var(--rule);align-items:baseline}
+.co-row:first-of-type{margin-top:clamp(48px,6vw,88px);border-top-color:var(--fg)}
+.co-row h2{font-size:clamp(28px,2.6vw,38px)}
+.co-row > div{display:grid;gap:14px;max-width:40em}
+:where(.co-row > div > p){max-width:31em}
+.co-row p{color:var(--muted);margin:0}
+@media (max-width:820px){.co-row{grid-template-columns:1fr}}
+.devs .co-row .notes-list{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--rule)}
+.devs .co-row .more{justify-self:start}
+.dv-fine{grid-column:2;margin:18px 0 0;font-size:16px;color:var(--muted)}
+@media (max-width:820px){.dv-fine{grid-column:1}}
 /* Ruled rows answer with their rule: under the pointer or keyboard focus an ink line draws over the row's top rule from
    the left (300 ms, on the curve of things that answer) and an arrow draws in at the row's end in step with it, done as
    the rule is (site.js adds it); both go in a little over two thirds of the time. The title keeps its ink. */
@@ -2575,7 +2647,7 @@ nav.main a.press{color:var(--fg);transition:none}
 /* The neighbourhoods of an open market: one after another on a wide screen; on a phone a row of cards, photograph first,
    swiped sideways with the next card showing at the edge, so seven places take one card's height and not seven. */
 .hood:first-child > h3:first-child{margin-top:24px}
-.hoods:focus-visible{outline:1px solid var(--accent);outline-offset:8px}
+.hoods:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 @media (max-width:700px){
   .hoods{display:flex;gap:16px;margin:28px calc(-1 * var(--gl)) 0;padding:0 var(--gl) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .hoods::-webkit-scrollbar{display:none}
@@ -2588,7 +2660,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts{margin:28px 0;border-top:1px solid var(--fg)}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
-.mk-facts dd{margin:0;font-size:17px;line-height:1.6;color:var(--read)}
+.mk-facts dd{margin:0;font-size:18px;line-height:1.6;color:var(--read)}
 .mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 /* footnote numerals are tiny; a 24px hit area around each keeps them easy to tap on a phone */
@@ -2764,7 +2836,9 @@ nav.main a.press{color:var(--fg);transition:none}
 .photo picture,.photo .frame{display:block;position:relative;overflow:hidden;background:var(--rule)}
 .photo img{display:block;width:100%;height:auto}
 .photo .cap{margin-top:12px}
-.cap .credit{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+/* the credit is a quiet note after the caption, never a label: sentence case at 13px, in the faint tone, so it never
+   outweighs the caption it follows or the section labels */
+.cap .credit{font-size:13px;font-weight:400;letter-spacing:.01em;line-height:1.5;text-transform:none;color:var(--faint);white-space:nowrap}
 .film .frame{aspect-ratio:16/7}
 .film .frame picture{position:absolute;inset:0}
 .film .frame img,.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -2811,6 +2885,8 @@ main{overflow-x:clip}
 .opener > picture img.hi{object-position:50% 24%}
 /* an opener whose tallest tower meets the top of the frame keeps the whole of it in view */
 .opener > picture img.top{object-position:50% 0}
+/* an opener whose horizon sits low (a beach under an empty sky) keeps the shore and the last light, not the sky above them */
+.opener > picture img.low{object-position:50% 85%}
 .opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
 .js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
 .js .opener.in :is(.frame,picture){clip-path:inset(0)}
@@ -2841,6 +2917,45 @@ main{overflow-x:clip}
 @media (max-width:700px){.trio{grid-template-columns:minmax(0,1fr)}}
 .plate{margin-bottom:0}
 .plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
+/* A reading page's head on a wide screen (a market, a journal note, privacy) takes the site's full measure in the home
+   page's head module: the breadcrumb, the title across the measure, then the standfirst on the left seven columns and the
+   meta line on the right five, on one last line with it. The head stays short, so a market page opens on its view (the
+   full-bleed photograph takes about half the fold at 1440x900) and a note on its plate; a market's dated sheet follows the
+   view and its elevation, just before the text. The body keeps its 880px column (centred as before, and from 1320px one
+   rail in from the left edge, beside the list of sections). The head is a grid, so the children's margins are set here to
+   the spacing they had in flow. */
+@media (min-width:1100px){
+  main.page:not(.wide):not(.lot){padding-top:clamp(40px,3.4vw,48px)}
+  main.page:not(.wide):not(.lot) > .wrap{max-width:var(--max);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);column-gap:clamp(32px,6vw,96px);align-items:start}
+  main.page:not(.wide):not(.lot) > .wrap > *{grid-column:1/-1;min-width:0}
+  main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
+  main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
+  main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
+  /* (the market sheet, then the text and all that follows it, come after the view) */
+  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
+  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  main.page:not(.wide):not(.lot) > .wrap > .opener{margin-top:clamp(32px,2.8vw,40px)}
+  main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
+  main.page:not(.wide):not(.lot) > .wrap > .opener + .mk-el-fig{margin-top:0}
+  main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
+  /* the body's own column, where it stood in the 880px page */
+  main.page:not(.wide):not(.lot) > .wrap > :is(.ms,.mk-el-fig,.prose,.mk-fig,.next,.row,.links){margin-left:max(0px,(100% - 880px + var(--gl) + var(--gr)) / 2);max-width:min(100%,880px - var(--gl) - var(--gr))}
+  main.page:not(.wide):not(.lot) > .wrap > :is(.ms,.prose,.next){max-width:638px}
+  main.page:not(.wide):not(.lot) > .wrap > .mk-fig{max-width:640px}
+  main.page:not(.wide):not(.lot) > .wrap > .prose{max-width:29em}
+}
+/* from 1320px (where the list of sections shows) the body stands one rail in from the site's left edge: the list (168 to
+   232px wide) and 40px; the photographs' captions, the notes' side figures and the weekly report's card step out 40px
+   into a 210px margin on the right, inside the measure */
+@media (min-width:1320px) and (hover:hover) and (pointer:fine){
+  main.page:not(.wide):not(.lot){--rail:clamp(208px,var(--max) - var(--gl) - var(--gr) - 888px,320px)}
+  main.page:not(.wide):not(.lot) > .wrap > :is(.ms,.mk-el-fig,.prose,.mk-fig,.next,.row,.links){margin-left:var(--rail)}
+  main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{max-width:none}
+  main.page:not(.wide):not(.lot) .opener > .cap{width:638px;max-width:none;margin-left:calc((100% - var(--max)) / 2 + var(--gl) + var(--rail))}
+  main.page:not(.wide):not(.lot) .plate.broad > .cap{width:638px;margin-left:var(--rail)}
+  main.page:not(.wide):not(.lot) .prose .side{margin-right:-250px}
+  main.page:not(.wide):not(.lot) .prose .wk{width:210px;margin-right:-250px}
+}
 
 .doorway .room img{width:100%;height:100%;object-fit:cover}
 
@@ -2878,7 +2993,7 @@ main{overflow-x:clip}
 .lp-opt{letter-spacing:.04em;text-transform:none;font-weight:400;color:var(--faint)}
 .lp-tx input{font:300 24px/1.3 var(--display);color:var(--fg);background:none;border:0;border-bottom:1px solid var(--sold-line);border-radius:0;padding:6px 0 8px;min-height:44px;width:100%;font-variant-numeric:lining-nums}
 .lp-tx input::placeholder{color:var(--faint);font-style:italic}
-.lp-tx input:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+.lp-tx input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .lp-tx input[type=month]{font-family:var(--body);font-size:18px;font-weight:400;color-scheme:inherit}
 /* on a phone or tablet the curve sits under the sliders, so its three key readings ride at the foot of the screen while
    the sliders are in view */
@@ -2935,7 +3050,7 @@ main{overflow-x:clip}
 .lp-key .open{background:none;border-color:var(--faint)}
 .lp-key b{font-weight:500;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}
 .lp-act{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px;border-top:1px solid var(--rule);padding-top:24px}
-.lp-act .ul{font-size:17px}
+.lp-act .ul{font-size:18px}
 .lp-note{flex-basis:100%;margin:0;min-height:1.5em;font-size:15px;color:var(--muted)}
 .lp-fine{margin:0;font-size:15px;line-height:1.6;color:var(--faint);max-width:52em;text-wrap:pretty}
 /* wide screens: the inputs down the left, the curve and its readings held beside them as they change */
