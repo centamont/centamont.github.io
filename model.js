@@ -2170,7 +2170,7 @@
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         // (over the photograph's bright haze, each name stands on a soft ink halo, so the lowest still read)
         const halo = this.sa > 0 && this.dark && !this.forced;
-        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.75 * this.sa).toFixed(3)})`; g.shadowBlur = 6; }
+        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 7; }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
         g.globalAlpha = 1;
