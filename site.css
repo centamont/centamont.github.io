@@ -197,7 +197,7 @@ header.site{container:site/inline-size;max-width:100vw}
   .js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.62)}
   .mk-st.mk-later{grid-template-columns:repeat(2,max-content);column-gap:24px}
   .mk-st.mk-later .mk-k{grid-column:1/-1}
-  @media (max-width:1439px){.mk-panel{padding-right:16px}.mk-st.mk-later{column-gap:16px}}
+  @media (max-width:1439px){.mk-panel{column-gap:28px;padding-right:12px}.mk-st.mk-later{column-gap:12px}}
   nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:var(--muted)}
   .js header.site.over nav.main .mk-st.mk-later a:not(:hover,:focus-visible){color:rgba(var(--ivory-rgb),.62)}
 }
