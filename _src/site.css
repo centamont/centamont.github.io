@@ -1964,7 +1964,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 @media (min-width:360px) and (max-width:379px){.st{letter-spacing:.12em}}
 @media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}}
 
-/* ---- Deeper pages: wide sheets for the report, private clients, colophon and the journal index */
+/* ---- Deeper pages: wide sheets for the report, private clients and the journal index */
 .page.wide .wrap{max-width:var(--max)}
 /* on the narrowest phones the size gives way, so a closing word held to its neighbour still fits */
 .page.wide h1{max-width:7.632em;line-height:1}
@@ -2229,73 +2229,6 @@ html.js .pc-nojs{display:none}
    than hanging over them closed */
 @media (max-height:700px){.js .pc-door .pc-ann{opacity:var(--o)}}
 
-/* Colophon */
-/* each row's head shares the first baseline of its text; the color row, which opens with swatches, aligns their tops */
-.co-row{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:16px clamp(32px,6vw,96px);padding-block:clamp(28px,3.4vw,44px);border-top:1px solid var(--rule);align-items:baseline}
-.co-row:has(.co-sw){align-items:start}
-.co-row:first-of-type{margin-top:clamp(48px,6vw,88px);border-top-color:var(--fg)}
-.co-row h2{font-size:clamp(28px,2.6vw,38px)}
-.co-row > div{display:grid;gap:14px;max-width:40em}
-/* the paragraphs keep the reading measure; the swatch grid and the specimens take the wider column. Zero specificity, so .co-fine keeps its own 34em */
-:where(.co-row > div > p){max-width:31em}
-.co-row p{color:var(--muted);margin:0}
-/* the Latin words take Cormorant's true italic: Jost has no italic here, and the browser would only slant it */
-.co-row p i{font-family:var(--display);font-style:italic;font-size:1.1em;line-height:1}
-/* (a specimen word wider than the screen, as with text enlarged on its own, breaks rather than push the page sideways) */
-.co-spec{color:var(--fg)!important;line-height:1;overflow-wrap:anywhere}
-.co-display{font-family:var(--display);font-weight:300;font-size:clamp(48px,6vw,88px);letter-spacing:-.02em}
-.co-body{font-family:var(--body);font-weight:400;font-size:clamp(34px,4vw,56px);letter-spacing:.02em;margin-top:18px!important}
-.co-fine{font-size:15px;color:var(--faint)!important;max-width:34em}
-.co-sw{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-/* rows never stretch, so a two-line label cannot grow its square past the column */
-.co-sw li{display:grid;gap:4px;align-content:start}
-.co-sw i{display:block;aspect-ratio:1;border:1px solid var(--rule);margin-bottom:8px}
-/* the swatches show the brand's own colors in either theme */
-.co-sw .ink{background:var(--ink)}.co-sw .ivory{background:var(--ivory)}.co-sw .bronze{background:var(--bronze-500)}.co-sw .bronze-text{background:var(--bronze-700)}
-.co-sw b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
-.co-sw span{font-size:14px;color:var(--faint);letter-spacing:.1em}
-/* Lines and Marks: the site's own conventions drawn 1:1, each sample 240px long with its label beside it */
-.co-ln{display:flex;flex-wrap:wrap;gap:24px clamp(32px,4vw,56px);max-width:none!important}
-.co-ln ul,.co-mk{list-style:none;margin:0;padding:0}
-.co-ln ul{display:grid;gap:10px;align-content:start}
-.co-ln li{display:flex;align-items:center;gap:16px}
-.co-ln li > span{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);line-height:1.5}
-.co-ln svg{flex:none;overflow:hidden}
-.co-ln path,.co-mk svg :is(path,circle){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-.co-ln .lw-pr path{stroke-width:var(--lw-profile)}
-.co-ln .lw-dt path{stroke-width:var(--lw-detail)}
-.co-ln .lw-ha path{stroke-width:var(--lw-hatch);opacity:.5}
-.co-ln .lt-hi path{stroke-dasharray:var(--lt-hidden)}
-.co-ln .lt-do path{stroke-dasharray:var(--lt-dot)}
-.co-ln .lt-da path{stroke-dasharray:var(--lt-datum)}
-/* on phones each label stands over its sample, which keeps its full 240px */
-@media (max-width:600px){.co-ln li{flex-direction:column-reverse;align-items:flex-start;gap:4px}.co-ln ul{gap:14px}}
-/* each mark drawn 1:1 in a 120px column, with a plain one-line gloss beside it, set on the foot of the drawing */
-.co-mk{display:grid;gap:18px;max-width:none}
-.co-mk li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:0 24px;align-items:end;min-width:0}
-.co-mk li > span:last-child{font-size:15px;line-height:1.5;color:var(--muted)}
-.co-mk li > span:last-child b{font-weight:500;color:var(--fg)}
-.co-mk svg{overflow:visible}
-.co-mk .ln{stroke-dasharray:var(--lt-datum)}
-.co-mk .q{fill:var(--fg);stroke:none}
-.co-mk text{font:500 13px/1 var(--body);letter-spacing:.14em;fill:var(--fg)}
-.co-mk .t{stroke-width:var(--lw-detail)}
-.co-mk .c{stroke:var(--bronze);stroke-width:var(--lw-profile)}
-.mk-tk{display:block;width:96px;height:60px}
-.mk-cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;width:120px;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;line-height:1.5;color:var(--faint)}
-.mk-cap b{font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
-/* on wide screens the Lines specimen fills the first screen's empty columns, beside the title, though it reads after Color */
-@media (min-width:1101px){
-  .colophon .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);column-gap:clamp(32px,6vw,96px)}
-  .colophon .wrap > *{grid-column:1 / -1}
-  .colophon .wrap > :is(.crumbs,h1,.standfirst){grid-column:1}
-  .colophon .co-lines{grid-column:2;grid-row:1 / span 3;align-self:end;display:grid;grid-template-columns:minmax(0,1fr);gap:22px;padding-block:22px 0}
-  .co-lines .co-ln{flex-direction:column}
-}
-/* four swatches in a row down to phones; two to a row only where four would be too small to read as color */
-@media (max-width:820px){.co-row{grid-template-columns:1fr}}
-@media (max-width:560px){.co-sw{grid-template-columns:repeat(2,minmax(0,1fr))}.co-mk li{column-gap:16px}}
-
 /* Journal index: the first screen carries the latest note's plate beside the title; each note is a ruled row with its
    standfirst, its meta line under the title, and a plate of its own figure */
 .ji-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,72px);align-items:end}
@@ -2537,7 +2470,7 @@ p,li{text-wrap:pretty}
   .hero .btn{color:var(--ink)!important;border-color:var(--ink)!important}.hero .btn.solid{background-color:var(--ink)!important;color:#fff!important}
   .hero>*{translate:none!important;scale:none!important;opacity:1!important}
   .hero .wrap{padding-top:0!important}
-  .chart,.instrument,.deposit,.table,.facade,.ruler,.sheet-rp,.cv-fig,.cv-key,.dkey,.btn.solid,.mk-tk,body > footer > .wrap::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .chart,.instrument,.deposit,.table,.facade,.ruler,.sheet-rp,.cv-fig,.cv-key,.dkey,.btn.solid,body > footer > .wrap::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   h2,h3{break-after:avoid}
   figure,li,.step{break-inside:avoid}
   
@@ -2548,8 +2481,7 @@ p,li{text-wrap:pretty}
 @media print and (min-width:901px){.curve{grid-template-rows:auto 1fr}.cv-say{grid-row:2}.cv-fig{margin-bottom:0}.cv-read{grid-row:3;margin-top:0}}
 @media (forced-colors:active){body::after{display:none}
   .table :is(rect,path){stroke:CanvasText}.table .ch.on .rl{fill:CanvasText}
-  .co-ln path,.co-mk svg :is(path,circle),.grade :is(line,pattern path){stroke:CanvasText}.co-mk .q,.co-mk text{fill:CanvasText}
-  .mk-tk{forced-color-adjust:none;--tc:CanvasText;--sheet:Canvas}
+  .grade :is(line,pattern path){stroke:CanvasText}
   /* the corner ticks are gradients, which this mode drops, so the chart and the letter keep a plain frame instead */
   .cv-fig svg,.letter .sheet{border:1px solid CanvasText}
   /* the sliders keep their track, and the voice the letter is written in keeps the only underline */
@@ -2915,7 +2847,6 @@ main{overflow-x:clip}
 @media (max-width:700px){.photos-pair{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:600px){.cap .credit{white-space:normal}}
 @media print{.film video{display:none}}
-.co-row .credits{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:6px;font-size:16px;line-height:1.5;color:var(--muted, inherit)}
 
 /* Rhythm (October 16): the section heads stop repeating one module.
    The practices' head turns: the statement runs the full measure and its intro steps down on the left, where the three
