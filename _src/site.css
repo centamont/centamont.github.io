@@ -2644,7 +2644,7 @@ p,li{text-wrap:pretty}
 /* Print: ink on paper, no chrome */
 @media print{
   /* ink on white, whichever theme the reader was in */
-  :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:var(--ink);--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--grid:#D6CDBB;--accent:var(--bronze-700);--seal:var(--ink);--sold:var(--bronze-500);--line:var(--ink);--band:#fff;--band-fg:var(--ink);--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
+  :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:var(--ink);--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--grid:#D6CDBB;--accent:var(--bronze-700);--seal:var(--ink);--sold:var(--bronze-500);--sold-line:var(--bronze-600);--patina:var(--patina-700);--leaf:#1C1E23;--line:var(--ink);--band:#fff;--band-fg:var(--ink);--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
   body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.letter,.cv-ctl,canvas,.seam,.curtain{display:none!important}
   /* printed while the first-visit intro plays, the page prints as it stands once the curtain has parted */
   html.intro-on .hero :is(.lede,.row){transform:none!important}
