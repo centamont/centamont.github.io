@@ -937,6 +937,12 @@ html.intro-on .hero:not(.lit) h1 .ln > span{animation:hero-failsafe 0s 4s forwar
 .chart mask path{fill:none;stroke:#fff;stroke-width:14;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
 .js .chart .pt:not(.landed){stroke:var(--rule)}
+.chart .sky{fill:var(--sheet);fill-opacity:1;stroke:var(--fg);stroke-width:calc(1px * var(--u,1));stroke-linejoin:miter;stroke-opacity:.85}
+@media (max-width:599px){.chart .sky.nd{display:none}}
+.js .chart .sky{stroke-dasharray:1;stroke-dashoffset:1;fill-opacity:0;transition:stroke-dashoffset 1.1s var(--ease-ink) .15s,fill-opacity .5s var(--ease) .9s}
+.js .chart .sky.landed{stroke-dashoffset:0;fill-opacity:1}
+@media (prefers-reduced-motion:reduce){.js .chart .sky{transition:none}}
+:root[data-motion="off"] .chart .sky{stroke-dashoffset:0;fill-opacity:1;transition:none}
 .chart .rch{fill:none;stroke:var(--patina);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
 .chart .loc{fill:none;stroke:var(--patina);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .lb{fill:var(--fg);font:400 calc(16px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke;transition:fill .2s var(--ease),opacity .4s var(--ease)}
@@ -989,7 +995,7 @@ figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
 .cap .k-plan{stroke-width:1.25px;stroke-dasharray:var(--lt-hidden);stroke-opacity:.72}
 .cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
 @media (max-width:600px){.cap{grid-template-columns:minmax(0,1fr)}}
-@media (forced-colors:active){.chart .ko{fill:Canvas}.chart svg text{fill:CanvasText;stroke:Canvas}.chart :is(.coast path,.isle path,.arc,.county path,.sbar,.sl,.na,.wo,.ldr path){stroke:CanvasText}.chart .nh{fill:CanvasText}.chart .pt{fill:Canvas;stroke:CanvasText}.cap .key path:not(.k-now){stroke:CanvasText}}
+@media (forced-colors:active){.chart .ko{fill:Canvas}.chart svg text{fill:CanvasText;stroke:Canvas}.chart :is(.coast path,.isle path,.arc,.county path,.sbar,.sl,.na,.wo,.ldr path,.sky){stroke:CanvasText}.chart .nh{fill:CanvasText}.chart .pt{fill:Canvas;stroke:CanvasText}.cap .key path:not(.k-now){stroke:CanvasText}}
 html:not(.js) .chart .sv{--u:1.06}
 @media (min-width:1600px){html:not(.js) .chart .sv{--u:.87}}
 @media (min-width:821px) and (max-width:1199px){html:not(.js) .chart .ov{--u:.8}html:not(.js) .chart .sv{--u:.65}}
@@ -2143,10 +2149,6 @@ nav.main a.press{color:var(--fg);transition:none}
 .wy li:nth-child(2){--k:1}.wy li:nth-child(3){--k:2}
 @media (prefers-reduced-motion:reduce){.js .tl ol::before,.js .tl li,.js .wy .tr i{transform:none;opacity:1;transition:none}}
 :root[data-motion="off"] .tl ol::before,:root[data-motion="off"] .tl li,:root[data-motion="off"] .wy .tr i{transform:none;opacity:1;transition:none}
-.mk-el.hp{--fu:1.2;aspect-ratio:5/2}
-.mk-el .sh{opacity:.4}
-.prose .hp-fig{margin:28px 0 8px}
-@media (max-width:600px){.mk-el.hp{--fu:1.6;aspect-ratio:3/2}}
 .mk-el .far{opacity:.62}
 .mk-el .dt.far{opacity:.35}
 .prose .cmp{margin:clamp(40px,5vw,56px) 0}
