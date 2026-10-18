@@ -817,3 +817,12 @@ test.describe('every page in the sitemap', () => {
     expect(skipBottom).toBeLessThan(0);
   });
 });
+
+// The developer and markets pages set their sections as ruled rows; a stylesheet change that drops those rules would
+// leave them as bare stacked text, so the grid itself is checked.
+test('the developer and markets pages keep their ruled rows', async ({ page }) => {
+  for (const path of ['/developers.html', '/markets.html']) {
+    await page.goto(path);
+    await expect(page.locator('.co-row').first()).toHaveCSS('display', 'grid');
+  }
+});
