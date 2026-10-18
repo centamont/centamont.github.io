@@ -669,9 +669,9 @@ void main() {
     const sun = m.sunNow, el = sun.el, night = sun.night;
     const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day, dusk = smooth(clamp(1 - Math.abs(el + 3) / 6, 0, 1)) * (1 - day * 0.6);
     const ink = m.bg || [20, 22, 26];
-    // (sRGB: a clear day is a true Miami blue over a pale haze, the page's ink kept by the veil under the headline; dusk
+    // (sRGB: a clear day is a deep Miami blue over a pale haze, the page's ink kept by the veil under the headline; dusk
     // a bronze horizon under indigo)
-    let zen = mixc([38, 78, 130], [24, 30, 50], gold), hor = mixc([182, 198, 212], [168, 120, 84], gold);
+    let zen = mixc([30, 58, 96], [24, 30, 50], gold), hor = mixc([160, 176, 190], [168, 120, 84], gold);
     zen = mixc(mixc(ink, [12, 16, 30], 0.7), zen, day); hor = mixc([56, 46, 42], hor, day);
     hor = mixc(hor, [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
     return { zen, hor, ink, day, gold, night, dusk, mid: mixc(mixc(zen, hor, 0.42), [74, 62, 78], gold * 0.5 + dusk * 0.3) };
