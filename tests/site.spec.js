@@ -1,6 +1,7 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
@@ -414,6 +415,28 @@ test('only the home pages load the home styles', async ({}, info) => {
   }
 });
 
+// Every page loads site.css, then only the sheets its template uses: the practice's pages (the home pages, developers,
+// private clients, advisors, the markets hub, and their Spanish and Portuguese twins) practice.css, the market pages market.css, the reading pages (the journal,
+// the buyer guides, privacy, terms, the not-found page) reading.css, and the specimen sheets sheet.css. A new page has to be
+// placed in one of these, and every stylesheet a page names has to exist.
+test('each page loads site.css and its own template sheet, and nothing else', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const market = ['south-florida', 'new-york', 'hamptons', 'los-angeles', 'dallas', 'austin', 'houston', 'san-francisco', 'tampa', 'naples', 'orange-county', 'es/sur-de-florida', 'pt/sul-da-florida', 'es/nueva-york', 'pt/nova-york'].map((p) => p + '.html');
+  const practice = ['developers', 'private-clients', 'es/clientes-privados', 'pt/clientes-privados', 'advisors', 'markets', 'es/desarrolladores', 'pt/incorporadoras', 'es/mercados', 'pt/mercados'].map((p) => p + '.html');
+  const homes = ['index.html', 'es/index.html', 'pt/index.html'];
+  const sheets = ['report', 'planner', 'shortlist', 'project-site'].map((p) => p + '.html');
+  const reading = (p) => p.startsWith('journal/') || ['privacy.html', 'terms.html', '404.html'].includes(p) || /^(es|pt)\/comprar-/.test(p);
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const p of pages) {
+    const want = homes.includes(p) ? ['site.css', 'practice.css', 'home.css'] : practice.includes(p) ? ['site.css', 'practice.css'] : market.includes(p) ? ['site.css', 'market.css']
+      : sheets.includes(p) ? ['site.css', 'sheet.css'] : reading(p) ? ['site.css', 'reading.css'] : null;
+    expect(want, `${p} belongs to no template: place it in this test and link its sheet`).not.toBeNull();
+    const links = [...readFileSync(p, 'utf8').matchAll(/<link rel="stylesheet" href="([^"?]*)(?:\?[^"]*)?"/g)].map((m) => m[1]);
+    expect(links.map((h) => h.split('/').pop()), p).toEqual(want);
+    for (const h of links) expect(existsSync(h.startsWith('/') ? h.slice(1) : join(dirname(p), h)), `${p} links ${h}, which does not exist`).toBe(true);
+  }
+});
+
 // Each translated page and its English original name one another: in the header's language switch and in the head.
 test('translated pages and their originals link to one another', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
@@ -635,21 +658,21 @@ test('the report bars draw on a short phone screen', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => [...document.querySelectorAll('.rp-funnel .bar i, .rp-src .bar i')].every((i) => getComputedStyle(i).transform === 'none'))).toBe(true);
 });
 
-// The stylesheet is written, with its notes, in _src/site.css; tools/version.py builds the site.css pages load without them.
-// A hand edit to site.css, or a source change without a rebuild, would ship styles that differ from the source.
+// The stylesheets and shared scripts are written, with their notes, in _src/; tools/version.py builds the copies pages load
+// without them. A hand edit to a built file, or a source change without a rebuild, would ship what differs from the source.
 test('the stylesheet is built from its source', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   let out = '';
   try { execFileSync('python3', ['tools/version.py', '--check'], { encoding: 'utf8' }); }
   catch (e) { out = String(e.stdout || e.message); }
-  expect(out, 'site.css or a ?v= token is stale: run python3 tools/version.py').toBe('');
+  expect(out, 'a built stylesheet or script, or a ?v= token, is stale: run python3 tools/version.py').toBe('');
 });
 
 // Stylesheet and scripts are linked with one shared ?v= token taken from their contents (tools/version.py), so a
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
@@ -657,7 +680,7 @@ test('assets carry the current version', async ({}, info) => {
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|site\.js|model\.js|instrument\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }

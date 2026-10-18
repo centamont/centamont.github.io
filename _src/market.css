@@ -1,0 +1,166 @@
+/* Styles only the market pages use (south-florida.html, new-york.html, the nine planned markets, and the Spanish and
+   Portuguese South Florida and New York pages). They load site.css first, then this file, so a rule here wins a tie
+   with one in site.css. A rule belongs here only if nothing outside the market pages uses its elements; when in doubt,
+   keep it in site.css. */
+@media print{.js .mk-el text{opacity:1!important}
+}
+/* the market pages: the launch along one ground line, numbered as the list beneath it */
+.mk-lfig{margin:28px 0 8px}
+.mk-launch{display:block;width:100%;height:auto;overflow:visible}
+.mk-launch .ru{fill:none;stroke:var(--fg)}
+.mk-launch .wk{fill:none;stroke:var(--fg);opacity:.45}
+.mk-launch .sn{fill:var(--accent);font:italic 400 21px var(--display);text-anchor:middle;font-variant-numeric:lining-nums}
+@media (max-width:600px){.mk-launch .sn{font-size:34px}.mk-launch .ru{stroke-width:1.6}}
+/* The neighbourhoods of an open market: one after another on a wide screen; on a phone a row of cards, photograph first,
+   swiped sideways with the next card showing at the edge, so seven places take one card's height and not seven. */
+.hood:first-child > h3:first-child{margin-top:24px}
+.hoods:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
+@media (max-width:700px){
+  .hoods{display:flex;gap:16px;margin:28px calc(-1 * var(--gl)) 0;padding:0 var(--gl) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
+  .hoods::-webkit-scrollbar{display:none}
+  .hood{flex:0 0 84%;display:flex;flex-direction:column;scroll-snap-align:start}
+  .hood > figure.photo{order:-1;margin:0 0 18px}
+  .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
+  .hood > p + p{margin-top:.6em}
+}
+.prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
+.ms-h{display:flex;flex-wrap:wrap;gap:6px 1.15em;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.ms-h span:first-child{color:var(--accent)}
+.ms-n{display:block;font-family:var(--display);font-size:clamp(40px,4vw,52px);font-weight:300;line-height:1;letter-spacing:-.01em;font-variant-numeric:lining-nums;color:var(--fg)}
+.ms-u{display:block;margin-top:6px;font-size:15px;color:var(--muted)}
+/* a figure and the one it is measured against, to scale from zero (tools/marketsheet.py): the line in ink runs to the figure
+   now, a tick stands at the figure then with it written under, and where then was the greater a dotted reference line
+   carries on to its tick. No bronze: a market figure is neither sold nor committed */
+.ms-sc{position:relative;display:block;max-width:220px;height:31px;margin-top:14px}
+.ms-sc::after{content:'';position:absolute;left:0;top:0;width:1px;height:13px;background:var(--fg)}
+.ms-sc::before{content:'';position:absolute;left:0;right:0;top:6px;height:1px;background:var(--rule)}
+.ms-sc i{position:absolute;left:0;display:block}
+.ms-sc .now{top:5px;width:var(--now);height:3px;background:var(--fg)}
+.ms-sc .ref{left:var(--now);top:6px;width:calc(var(--then) - var(--now));height:1px;background:repeating-linear-gradient(90deg,var(--fg) 0 1px,transparent 1px 4px)}
+.ms-sc .then{left:var(--then);top:0;width:1px;height:13px;background:var(--fg)}
+.ms-sc b{position:absolute;top:17px;left:0;transform:translateX(-50%);font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--faint);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.ms-sc[style*="--then:100.0%"] b{transform:translateX(-100%)}
+@media (forced-colors:active){.ms-sc{forced-color-adjust:none}.ms-sc :is(.now,.then),.ms-sc::after{background:CanvasText}.ms-sc .ref{background:repeating-linear-gradient(90deg,CanvasText 0 1px,transparent 1px 4px)}.ms-sc b{color:CanvasText}}
+.ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}
+.ms .ms-note sup{font-size:max(12px,.62em);line-height:0}
+.ms .ms-note sup a{position:relative;color:var(--accent);text-decoration:none;padding-inline:2px}
+.ms .ms-note sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
+.ms-k{margin-top:10px;font-size:14px;line-height:1.5;color:var(--faint)}
+@media (max-width:640px){
+  .ms-n{font-size:36px}
+}
+.prose .mk-src{font-size:15px}
+.prose .mk-src li{scroll-margin-top:96px}
+.mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
+.mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
+.mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
+.mk-fig .sv .ttl{text-anchor:end;transform:translate(328px,262px)}
+.mk-fig .sv .scl{transform:translate(232px,-92px)}
+/* the New York survey, drawn like South Florida's: hatched land, the sea's water lines, state lines, the two markets
+   opening now joined by the reach, a scale and a north point */
+.mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
+.mk-fig .nyd #nyHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.mk-fig .nyd .land{fill:url(#nyHatch);opacity:.5}
+.mk-fig .nyd .wl{fill:var(--fg);opacity:.3}
+.mk-fig .nyd .coast use{stroke-width:calc(.8px * var(--u,1));opacity:.8}
+.mk-fig .nyd .st{fill:none;stroke:var(--fg);stroke-width:calc(.75px * var(--u,1));stroke-dasharray:var(--lt-datum);opacity:.45}
+.mk-fig .nyd :is(.cn,.scl) text{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.mk-fig .nyd .sea text{fill:var(--faint);font:italic 400 calc(15px * var(--u,1)) var(--display);letter-spacing:.24em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd .gl{stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.mk-fig .nyd :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.mk-fig .nyd .nh{fill:var(--fg)}
+.mk-fig .nyd .rch{--r:1}
+.mk-fig .nyd .cp{fill:var(--patina);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1))}
+.mk-fig .nyd .cl text{fill:var(--fg);font:italic 400 calc(19px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+@media (max-width:600px){.mk-fig .sv{--u:1}.mk-fig .nyd{--u:1.4}.mk-fig .nyd :is(.gl,.sl,.sbar,.scl text:not(:last-child),.li){display:none}.mk-fig .nyd .sea text{letter-spacing:.12em}
+  .mk-fig .nyd .cl .c1{text-anchor:start;transform:translate(22px,34px)}}
+/* the later markets' district maps: the Census survey's ground and water, its boundaries as faint survey lines, and the
+   districts where new buildings rise hatched in bronze at their true positions, with the city's landmarks in ink */
+.mk-fig .dmap{--u:.9;display:block;width:100%;height:auto}
+.mk-fig .dmap .hp line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.mk-fig .dmap .zp line{stroke:var(--sold-line);stroke-width:var(--lw-hatch)}
+.mk-fig .dmap .land{opacity:.5}
+.mk-fig .dmap .wl{fill:var(--fg);opacity:.3}
+.mk-fig .dmap .coast use{stroke-width:calc(.8px * var(--u,1));opacity:.8}
+.mk-fig .dmap .fb{fill:none;stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-linejoin:round;opacity:.22}
+.mk-fig .dmap .dz path{stroke:var(--sold-line);stroke-width:calc(1px * var(--u,1))}
+.mk-fig .dmap .dzl{fill:none;stroke:var(--sold-line);stroke-width:calc(4px * var(--u,1));stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+.mk-fig .dmap rect.lm{fill:var(--fg)}
+.mk-fig .dmap text{stroke:var(--sheet);stroke-linejoin:round;paint-order:stroke}
+.mk-fig .dmap .dl{fill:var(--fg);font:italic 400 calc(19px * var(--u,1)) var(--display);stroke-width:calc(5px * var(--u,1))}
+.mk-fig .dmap :is(text.lm,.scl text){fill:var(--faint);font:500 calc(12px * var(--u,1)) var(--body);letter-spacing:.14em;stroke-width:calc(4px * var(--u,1))}
+.mk-fig .dmap .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.mk-fig .dmap .wn{fill:var(--faint);font:italic 400 calc(15px * var(--u,1)) var(--display);letter-spacing:.2em;stroke-width:calc(4px * var(--u,1))}
+.mk-fig .dmap :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+.mk-fig .dmap .nh{fill:var(--fg)}
+@media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap :is(text.lm,.wn){display:none}}
+@media (forced-colors:active){.mk-fig .dmap :is(.fb,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
+.mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
+/* Each market page opens on its city seen from the water: a composite elevation, drawn to the same scale in feet for both
+   cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the
+   skyline, at a heavier pen, and leaves the ruler and the water's name to the wider screens. */
+.mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+.mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
+.mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
+.mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el .dt,.mk-el .bk{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.6}
+.mk-el .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu));opacity:.5}
+.mk-el .br{stroke:var(--sold-line)}
+.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu))}
+/* depth in tone, as a presentation elevation shades it: the nearest rank stays paper, each rank behind takes more ink,
+   and every tower turns its right-hand side from the light; the tone washes in once the lines are drawn */
+.mk-el :is(.tn,.sh){stroke:none}
+.mk-el .tn{fill:var(--fg);fill-opacity:0}
+.mk-el .tn.r2{fill-opacity:.05}.mk-el .tn.r3{fill-opacity:.09}
+.mk-el .sh{fill:var(--fg);fill-opacity:.075}
+.js .mk-el :is(.tn,.sh){opacity:0;transition:opacity .9s var(--ease-out) .9s}
+.js .mk-el.in :is(.tn,.sh){opacity:1}
+.mk-el text{font:500 calc(11px * var(--fu)) var(--body);letter-spacing:.2em;fill:var(--faint)}
+.mk-el .rl text{text-anchor:end;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.js .mk-el path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--t-ink) var(--ease-ink) calc(var(--i,0) * 90ms)}
+.js .mk-el.in path{stroke-dashoffset:0}
+.js .mk-el text{opacity:0;transition:opacity .6s var(--ease-out) 1s}
+.js .mk-el.in text{opacity:1}
+@media (prefers-reduced-motion:reduce){.js .mk-el path{stroke-dashoffset:0;transition:none}.js .mk-el text,.js .mk-el :is(.tn,.sh){opacity:1;transition:none}}
+:root[data-motion="off"] .mk-el path{stroke-dashoffset:0;transition:none}
+:root[data-motion="off"] .mk-el text,:root[data-motion="off"] .mk-el :is(.tn,.sh){opacity:1;transition:none}
+@media (max-width:900px){.mk-el{--fu:1.4;aspect-ratio:2/1}}
+@media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
+/* farther towers draw at a lighter weight than the waterfront, as a draughtsman would */
+.mk-el .far{opacity:.62}
+.mk-el .dt.far{opacity:.35}
+.film .frame{aspect-ratio:16/7}
+.film .frame picture{position:absolute;inset:0}
+.film .frame img,.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.film video{opacity:0;transition:opacity 1.4s cubic-bezier(.3,0,.15,1)}
+.film video.on{opacity:1}
+.bleed{margin-inline:calc(50% - 50vw)}
+.bleed .frame,.bleed > picture{border-radius:0}
+.bleed > .cap{box-sizing:border-box}
+/* market pages open on their view, full bleed under the title, with the elevation drawing after it */
+.opener{margin-block:clamp(40px,5vw,72px) clamp(40px,5vw,64px)}
+.opener .frame,.opener > picture{aspect-ratio:16/7}
+.opener > picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* an opener whose tallest tower meets the top of the frame keeps the whole of it in view */
+.opener > picture img.top{object-position:50% 0}
+/* an opener whose horizon sits low (a beach under an empty sky) keeps the shore and the last light, not the sky above them */
+.opener > picture img.low{object-position:50% 85%}
+.opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
+.js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
+.js .opener.in :is(.frame,picture){clip-path:inset(0)}
+.opener .frame picture{clip-path:none!important}
+.opener + .mk-el-fig{margin-top:clamp(8px,2vw,24px)}
+@media (max-width:700px){
+  .asym :is(.wide-v,.tall-v) picture,.opener .frame,.opener > picture{aspect-ratio:3/2}
+}
+@media (min-width:1100px){
+  main.page:not(.wide):not(.lot) > .wrap > .opener{margin-top:clamp(32px,2.8vw,40px)}
+  main.page:not(.wide):not(.lot) > .wrap > .opener + .mk-el-fig{margin-top:0}
+  main.page:not(.wide):not(.lot) > .wrap > .mk-fig{max-width:640px}
+}
+@media (min-width:1320px) and (hover:hover) and (pointer:fine){
+  main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{max-width:none}
+  main.page:not(.wide):not(.lot) .opener > .cap{width:638px;max-width:none;margin-left:calc((100% - var(--max)) / 2 + var(--gl) + var(--rail))}
+}
+@media print{.film video{display:none}}
