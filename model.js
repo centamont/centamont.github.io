@@ -567,6 +567,8 @@
       const cs = getComputedStyle(this.c);
       this.line = rgb(cs.getPropertyValue('--line') || '#14161A');
       this.sold = rgb(cs.getPropertyValue('--sold') || '#B8976A');
+      this.b300 = rgb(cs.getPropertyValue('--bronze-300') || '#C9A877');
+      this.b700 = rgb(cs.getPropertyValue('--bronze-700') || '#7A5F3A');
       let bg = null;
       for (let el = this.c; el && !bg; el = el.parentElement) {
         const b = getComputedStyle(el).backgroundColor, v = rgb(b);
@@ -2061,7 +2063,7 @@
       g.stroke();
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
-        g.fillStyle = this.forced ? `rgb(${this.line.join()})` : this.dark ? 'rgb(201,168,119)' : 'rgb(122,95,58)'; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
+        g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         g.globalAlpha = 1;
       }
