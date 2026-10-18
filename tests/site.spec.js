@@ -204,11 +204,13 @@ test('first visit plays the intro, then reveals the page', async ({ page }, info
 
 // The hero's tower is rendered in WebGL2 (tower3d.js) where a real GPU can afford it; the test browser's GPU is emulated
 // in software, which the renderer declines, so the test asks for it outright. It takes over from the drawing without an
-// error, and the drawing alone still stands where it is not asked for.
+// error, and the drawing alone still stands where it is not asked for. (In a window narrower than the one where the
+// finished tower is a photograph, so the render stays in view.)
 test('hero tower renders in 3D where it can, and is drawn where it cannot', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop', 'one engine is enough');
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  await page.setViewportSize({ width: 1100, height: 720 });
   await page.addInitScript(() => { window.__cmForce3D = true; });
   await page.goto('/');
   await expect(page.locator('#heroModel')).toHaveAttribute('data-render', '3d', { timeout: 20000 });
@@ -216,12 +218,32 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   await expect.poll(() => page.locator('#heroModel').evaluate((c) => c.style.backgroundImage), { timeout: 10000 }).toContain('linear-gradient');
   expect(errors).toEqual([]);
   const plain = await page.context().newPage();
+  await plain.setViewportSize({ width: 1100, height: 720 });
   await plain.goto('/');
   await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '34');
   await plain.waitForTimeout(3000);
   await expect(plain.locator('#heroModel')).not.toHaveAttribute('data-render', '3d');
   expect(await plain.locator('#heroModel').evaluate((c) => c.style.backgroundImage)).toBe('');
   await plain.close();
+});
+
+// On a desktop that sets the tower beside the headline at full size, the finished tower is a photograph (hero/), one of
+// three picked by the hour's sun and fetched only once the page has loaded; a phone keeps the drawing and fetches none.
+test('the desktop hero shows a photograph of the tower, and a phone does not', async ({ page, isMobile }) => {
+  const asked = [];
+  page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const hero = page.locator('#heroModel');
+  await expect(hero).toHaveAttribute('data-built', '34');
+  if (isMobile) {
+    await page.waitForTimeout(3000);
+    expect(asked).toEqual([]);
+    await expect(hero).not.toHaveAttribute('data-still', /./);
+    return;
+  }
+  await expect(hero).toHaveAttribute('data-still', /^(day|gold|night)$/, { timeout: 20000 });
+  expect(asked).toHaveLength(1);
 });
 
 test('day and night toggle remembers the choice', async ({ page }) => {
