@@ -6,6 +6,27 @@
   const root = document.documentElement;
   root.classList.add('js');
 
+  // Where the page is shown. Inside another site's frame it takes the whole window, or, where the browser will not let
+  // it, leaves only a link to itself. Served from any address but centamont.com (a local preview, a translation or an
+  // archive aside), it says so in one line and links to the original.
+  const home = 'https://centamont.com', lang = (root.lang || 'en').slice(0, 2);
+  let framed = false;
+  try { framed = top !== self && top.location.origin !== location.origin; } catch (e) { framed = true; }
+  if (framed) {
+    try { top.location.replace(location.href); } catch (e) {}
+    const a = document.createElement('a');
+    a.href = location.href; a.target = '_top'; a.rel = 'noopener'; a.className = 'copy-note';
+    a.textContent = { es: 'Abrir centamont.com', pt: 'Abrir centamont.com' }[lang] || 'Open centamont.com';
+    document.body.replaceChildren(a);
+    return;
+  }
+  if (location.protocol !== 'file:' && !/^(centamont\.com|www\.centamont\.com|localhost|127\.0\.0\.1|\[::1\]|.+\.translate\.goog|web\.archive\.org|webcache\.googleusercontent\.com)$/.test(location.hostname)) {
+    const a = document.createElement('a');
+    a.href = home + location.pathname; a.rel = 'noopener'; a.className = 'copy-note';
+    a.textContent = { es: 'Esta página es una copia. La original está en centamont.com.', pt: 'Esta página é uma cópia. A original está em centamont.com.' }[lang] || 'This page is a copy. The original is at centamont.com.';
+    document.body.prepend(a);
+  }
+
   // Menu
   const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
   if (nav && btn) {

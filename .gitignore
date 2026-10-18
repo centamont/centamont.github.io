@@ -7,3 +7,7 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 __pycache__/
+
+# Internal notes live in the project folder; a local copy for a design skill is never committed
+/PRODUCT.md
+/DESIGN.md

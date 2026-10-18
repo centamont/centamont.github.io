@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // (the launch planner's link also carries the building's size and neighborhood into the developer's letter)
       if (v) {
         preset(v); q.delete('as');
-        if (v === 'dev') [['units', /^\d{1,4}$/], ['where', /^[^<>]{1,60}$/]].forEach(([k, ok]) => { const t = (q.get(k) || '').trim(), i = form.elements[k]; if (i && ok.test(t)) i.value = t; q.delete(k); });
+        if (v === 'dev') [['units', /^\d{1,4}$/], ['where', /^(?!.*(\d{5,}|[\p{L}\p{N}-]\.\p{L}{2,}))(?!(\D*\d){7})[\p{L}\p{M}\p{N} .,'’&()/-]{1,60}$/u]].forEach(([k, ok]) => { const t = (q.get(k) || '').trim(), i = form.elements[k]; if (i && ok.test(t)) i.value = t; q.delete(k); });
         history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);
       }
     } catch (e) {}

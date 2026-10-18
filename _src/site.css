@@ -129,6 +129,8 @@ p{margin:0;text-wrap:pretty}
 .vh{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;border:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
 .skip{position:absolute;left:var(--gutter);top:0;transform:translateY(calc(-100% - 2px));background:var(--fg);color:var(--bg);padding:10px 16px;z-index:30;text-decoration:none;font-size:15px}
 .skip:focus{top:12px;transform:none}
+/* a page served from another address than centamont.com, or framed by another site, says so in one line (site.js) */
+.copy-note{display:block;position:fixed;left:0;right:0;bottom:0;z-index:60;padding:10px var(--gutter);padding-bottom:max(10px,env(safe-area-inset-bottom));background:var(--ink);color:var(--ivory);font:400 14px/1.4 var(--body);letter-spacing:.02em;text-align:center;text-decoration:underline;text-decoration-color:var(--bronze);text-underline-offset:3px}
 
 /* Header */
 header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}

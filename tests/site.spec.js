@@ -311,6 +311,24 @@ test('the drawings arrive and say what they show', async ({ page }) => {
   await expect(page.locator('#chart figcaption')).toContainText('simplified');
 });
 
+// A link can name a building and a neighborhood, but only in plain words: never a web address or a run of digits.
+test('the planner takes only plain names from its link', async ({ page }) => {
+  await page.goto('/planner.html?n=The%20Bayfront&w=Coconut%20Grove');
+  await expect(page.locator('#plName')).toHaveValue('The Bayfront');
+  await expect(page.locator('#plWhereIn')).toHaveValue('Coconut Grove');
+  await page.goto('/planner.html?n=' + encodeURIComponent('Wire to 123456789') + '&w=' + encodeURIComponent('see example.com'));
+  await expect(page.locator('#plName')).toHaveValue('');
+  await expect(page.locator('#plWhereIn')).toHaveValue('');
+});
+
+// Inside another site's frame a page keeps nothing but a link to itself.
+test('a page framed by another site shows only a link to itself', async ({ page, baseURL }) => {
+  await page.setContent('<iframe src="' + baseURL + '/privacy.html" width="800" height="600"></iframe>');
+  const frame = page.frameLocator('iframe');
+  await expect(frame.locator('a.copy-note')).toHaveText('Open centamont.com');
+  await expect(frame.locator('body > *')).toHaveCount(1);
+});
+
 // The launch planner draws a developer's own building, keeps the plan in its link, and hands its size to the letter.
 test('the launch planner answers its inputs, keeps them in its link and says it is illustrative', async ({ page }) => {
   await page.goto('/planner.html?u=120&f=30&c=4');
