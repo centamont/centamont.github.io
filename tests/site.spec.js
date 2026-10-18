@@ -227,21 +227,15 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   await plain.close();
 });
 
-// On a desktop that sets the tower beside the headline at full size, the finished tower is a photograph (hero/), one of
-// four picked by the hour's sun and fetched only once the page has loaded; a phone keeps the drawing and fetches none.
-test('the desktop hero shows a photograph of the tower, and a phone does not', async ({ page, isMobile }) => {
+// Once built, the finished tower is a photograph (hero/), one of four picked by the hour's sun and fetched only once the
+// page has loaded, on a phone as on a desktop: one file, whichever the screen.
+test('the hero shows a photograph of the tower, on a phone as on a desktop', async ({ page }) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
-  if (isMobile) {
-    await page.waitForTimeout(3000);
-    expect(asked).toEqual([]);
-    await expect(hero).not.toHaveAttribute('data-still', /./);
-    return;
-  }
   await expect(hero).toHaveAttribute('data-still', /^(day|morning|gold|night)$/, { timeout: 20000 });
   expect(asked).toHaveLength(1);
 });
