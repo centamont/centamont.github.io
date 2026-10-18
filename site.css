@@ -1105,7 +1105,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 .cv-lim{stroke:var(--fg);stroke-width:1;stroke-dasharray:var(--lt-datum)}
 .cv-limt{fill:var(--fg);font:500 13px var(--body);letter-spacing:.12em;text-transform:uppercase;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
 .cv-dim{fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-.cv-ring{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
+.cv-dimr{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
 .cv-dimt{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
 .cv-dot{fill:var(--sold-line);stroke:var(--sheet);stroke-width:3}
 .cv-dott{fill:var(--fg);font:400 19px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
@@ -1722,7 +1722,7 @@ p,li{text-wrap:pretty}
   .letter .as label{border-bottom-style:none;padding-bottom:5px}
   .letter .as label:has(input:checked){border-bottom:2px solid Highlight;padding-bottom:3px}}
 @media (forced-colors:active){
-  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line,.cv-dim,.cv-ring{stroke:CanvasText}
+  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line,.cv-dim,.cv-dimr{stroke:CanvasText}
   .rp-c.sold,.rp-dot,.cv-dot{fill:CanvasText}.rp-dot,.cv-dot{stroke:Canvas}
   .ul,.more,.handle,.tb a,.legal a,.prose a,.crumbs a,.sp-go{text-decoration:underline}
 }

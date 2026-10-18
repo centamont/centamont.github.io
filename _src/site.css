@@ -1659,7 +1659,7 @@ figcaption,.dkey dd{text-wrap:pretty}
 /* the share still for sale at completion, measured off as a dimension string: an ink line with a slash at each end, from a
    ring on the curve up to the whole building, its figure set like the journal figure's completion values */
 .cv-dim{fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-.cv-ring{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
+.cv-dimr{fill:var(--sheet);stroke:var(--fg);stroke-width:1}
 .cv-dimt{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
 .cv-dot{fill:var(--sold-line);stroke:var(--sheet);stroke-width:3}
 .cv-dott{fill:var(--fg);font:400 19px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round}
@@ -2547,7 +2547,7 @@ p,li{text-wrap:pretty}
    left as they are): sold, reserved, open and later cells, the contract lines and their dots. Links keep an underline, since
    the one they draw as a background is removed. */
 @media (forced-colors:active){
-  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line,.cv-dim,.cv-ring{stroke:CanvasText}
+  .rp-c:is(*,.sold,.res,.open,.later),.rp-hatch,.rp-act,.rp-lim,.cv-line,.cv-dim,.cv-dimr{stroke:CanvasText}
   .rp-c.sold,.rp-dot,.cv-dot{fill:CanvasText}.rp-dot,.cv-dot{stroke:Canvas}
   .ul,.more,.handle,.tb a,.legal a,.prose a,.crumbs a,.sp-go{text-decoration:underline}
 }
