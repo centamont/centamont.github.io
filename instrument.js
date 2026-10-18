@@ -18,26 +18,44 @@ document.addEventListener('DOMContentLoaded', function () {
   if (svg) {
     const price = document.getElementById('cvPrice'), loan = document.getElementById('cvLoan');
     const out = (id) => document.getElementById(id);
-    const M = 36, BREAK = 6, TOP = 24, DONE = 30;
+    // The illustration's schedule: ground is planned for month 6 and the building takes 24 months from ground breaking,
+    // topping off six months before it is finished. Ground breaks once the lender's threshold is met, never before the
+    // planned month (the launch planner's rule, planner.js), so the schedule moves with the price and the threshold, and
+    // the months the drawing spans move with it.
+    const PLAN = 6, BUILD = 24;
+    let M = 36, BREAK = PLAN, TOP = PLAN + BUILD - 6, DONE = PLAN + BUILD;
     const NS = 'http://www.w3.org/2000/svg';
     const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; (parent || svg).appendChild(e); return e; };
     // Drawn at the figure's real width, one unit to one pixel, so labels keep their size on every screen.
     let W, H, X0, X1, Y0, Y1;
     const x = (m) => X0 + (X1 - X0) * m / M, y = (f) => Y1 - (Y1 - Y0) * f;
 
-    // Share of residences under contract at the end of each month.
-    function model(p) {
-      const base = 0.035 * Math.exp(-0.05 * p), sold = [0];
-      let left = 1;
-      for (let m = 0; m < M; m++) {
+    // Share of residences under contract at the end of each month, and the month ground breaks: the same model as the
+    // launch planner's (planner.js) for this building, so the two give one answer for it. A surge at launch, a lift as
+    // ground breaks, at topping off and once the building is finished; the further above comparable buildings the price
+    // sits, the slower the pace. (Ten years of months, so every curve the sliders can make runs past its completion.)
+    function model(p, t = +loan.value / 100) {
+      const base = 0.035 * Math.exp(-0.05 * p), s = [0];
+      let left = 1, G = -1;
+      for (let m = 0; m < 120; m++) {
         let a = base;
         if (m < 3) a *= 3; // launch
-        else if (m >= TOP && m < TOP + 3) a *= 1.5; // topping off brings buyers back
-        else if (m >= DONE) a *= 1.25; // a finished building sells
-        left *= 1 - a; sold.push(1 - left);
+        if (G > -1) {
+          const top = G + BUILD - 6;
+          if (m >= G && m < G + 2) a *= 1.3; // ground breaking brings buyers in
+          else if (m >= top && m < top + 3) a *= 1.5; // topping off brings buyers back
+          else if (m >= G + BUILD) a *= 1.25; // a finished building sells
+        }
+        left *= 1 - a; s.push(1 - left);
+        if (G < 0 && m + 1 >= PLAN && s[m + 1] >= t) G = m + 1;
       }
-      return sold;
+      s.G = G; s.C = G + BUILD;
+      return s;
     }
+    // the schedule for the price and threshold as they stand, and the months the drawing spans: a little past completion
+    // and never less than three years, in steps of six
+    const fix = () => { const s = model(+price.value); BREAK = s.G; TOP = s.G + BUILD - 6; DONE = s.C; M = Math.max(36, Math.ceil((DONE + 3) / 6) * 6); return M + ' ' + BREAK; };
+    let drawn = '';
 
     let build, area, par, line, lim, limT, dot, dotT, labC, labP, labB, dimL, dimT, ring;
     const keyRow = document.querySelector('.cv-key'), fig = svg.closest('.cv-fig');
@@ -60,14 +78,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (keyRow) keyRow.classList.toggle('lim-key', W < 520);
     }
     function sheet() {
-      size();
+      size(); drawn = fix();
       X0 = 54; X1 = W - 14; // room for '100%' and a clear margin inside the frame
       // a name on the top row keeps 8px clear of the corner tick (14px) at the frame's top right
       const TC = 14 + 8;
       svg.textContent = '';
       const g = el('g', { class: 'cv-grid' });
-      // phase names along the top, each beside its line (a phone names them in a row under the drawing instead)
-      const phases = phone ? [] : [[BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
+      // phase names along the top, each beside its line (a phone names them in a row under the drawing instead); where
+      // the threshold holds ground breaking past its planned month, the plan keeps a line of its own, in hidden line
+      const phases = phone ? [] : [...(BREAK > PLAN ? [[PLAN, 'Planned']] : []), [BREAK, 'Ground broken'], [TOP, 'Top-off'], [DONE, 'Completion']];
       const tl = [];
       phases.forEach(([m, t]) => { const e = el('text', { class: 'ph', 'text-anchor': 'start' }, g, t); tl.push([m, e, e.getComputedTextLength() || t.length * 8]); });
       // Where the last phase name fits to the right of its line, the plot stops short to leave it room; a narrow figure
@@ -123,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
       Y0 = tl.length ? 34 + P * two : 30; Y1 = H - 52;
       tl.forEach(([m, e]) => e.setAttribute('y', 18 + P * +e.dataset.row));
       [0.25, 0.5, 0.75, 1].forEach((f) => { el('line', { x1: X0, x2: X1, y1: y(f), y2: y(f) }, g); el('text', { x: X0 - 8, y: y(f) + 4, 'text-anchor': 'end' }, g, Math.round(f * 100) + '%'); });
-      tl.forEach(([m, e]) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: 6 + P * +e.dataset.row, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
+      tl.forEach(([m, e]) => { const l = el('line', { class: m < BREAK ? 'phase plan' : 'phase', x1: x(m), x2: x(m), y1: 6 + P * +e.dataset.row, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
       if (!tl.length) [BREAK, TOP, DONE].forEach((m) => { const l = el('line', { class: 'phase', x1: x(m), x2: x(m), y1: Y0 - 8, y2: Y1 }, g); g.insertBefore(l, g.firstChild); });
       el('line', { class: 'axis', x1: X0, x2: X1, y1: Y1, y2: Y1 }, g);
       // month ticks, every six
@@ -142,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (phone) { labB = el('text', { class: 'cv-lab faint' }, null, 'Construction'); labP = el('text', { class: 'cv-lab' }, null, 'At par'); labC = el('text', { class: 'cv-lab' }, null, 'Contracts signed'); }
     }
 
-    const path = (s) => s.map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).toFixed(1)).join(' ');
+    const path = (s) => s.slice(0, M + 1).map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).toFixed(1)).join(' ');
     const fmt = (p) => (p === 0 ? 'At par' : (p > 0 ? p + '% above' : -p + '% below'));
     const list = (a) => a.slice(0, -1).join('; ') + '; and ' + a[a.length - 1];
     const key = document.querySelector('.cv-key .k-par');
@@ -223,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
       area.setAttribute('d', path(s) + ` L${x(M)} ${Y1} L${x(0)} ${Y1} Z`);
       lim.setAttribute('x1', X0); lim.setAttribute('x2', X1); lim.setAttribute('y1', y(T)); lim.setAttribute('y2', y(T));
       limT.setAttribute('x', X1); limT.setAttribute('y', y(T) - 8); limT.textContent = 'Pre-sale threshold';
-      const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T);
+      const hit = s.findIndex((f) => f >= T), done = s[DONE], baseHit = base.findIndex((f) => f >= T), baseDone = base[base.C];
       // the curves as points a few pixels apart, for keeping notes off them
       const pts = [];
       for (const c of p ? [s, base] : [s]) for (let i = 0; i < M; i++) for (let t = 0; t < 1; t += 0.25) pts.push([x(i + t), y(c[i] + (c[i + 1] - c[i]) * t)]);
@@ -306,19 +325,24 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       out('cvMonth').textContent = hit > -1 ? 'Month ' + hit : 'Not met';
       out('cvDone').textContent = Math.round(done * 100) + '%';
+      // the months of the three phases, in the row a phone (or a figure too narrow to name them) keeps under the drawing
+      [['cvPhG', BREAK], ['cvPhT', TOP], ['cvPhC', DONE]].forEach(([id, m]) => { const e = out(id); if (e) e.textContent = m; });
       // and the same reading in one line just above a phone's plot
       out('cvNowM').textContent = hit > -1 ? 'Month ' + hit : 'Threshold not met'; out('cvNowD').textContent = Math.round(done * 100) + '%';
       // the same share of the building, its residences sold in the hero's order in the small elevation beside the figure
       if (homes.length) { const n = Math.round(done * RES); for (const h of homes) { h.r.classList.toggle('on', h.rank < n); h.r.style.transitionDelay = (reduceM ? 0 : Math.abs(h.rank - lastN) * 14) + 'ms'; } lastN = n; }
       let say;
-      const unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - base[DONE]) * 100);
-      if (p === 0) say = 'At par, about ' + Math.round(done * 100) + ' percent of the building is under contract by completion' + (hit > -1 ? '.' : ', and the threshold is not met within ' + M + ' months.');
+      const pct = Math.round(done * 100), unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - baseDone) * 100), late = BREAK - PLAN;
+      if (hit < 0) say = 'At ' + (p ? fmt(p).toLowerCase() : 'par') + ', the threshold is not met within ' + M + ' months.';
+      else if (p === 0) say = 'At par, the threshold is met in month ' + hit + (late > 0 ? ', and ground breaks with it, ' + late + (late === 1 ? ' month' : ' months') + ' later than planned' : ', in time for ground breaking as planned, in month ' + PLAN) + '. By completion in month ' + DONE + ', about ' + pct + ' percent of the building is under contract.';
       else {
         const d = hit - baseHit;
-        const when = hit < 0 ? 'the threshold is not met within ' + M + ' months' : d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
+        const when = d === 0 ? 'the threshold arrives in the same month' : 'the threshold arrives ' + Math.abs(d) + (Math.abs(d) === 1 ? ' month ' : ' months ') + (d > 0 ? 'later' : 'sooner');
         // "but" only where the threshold pays for the higher price; otherwise the two clauses are simply set side by side
-        const join = p > 0 && (hit < 0 || d > 0) ? ', but ' : '; ';
-        say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + '. At completion, ' + unsold + ' percent is still for sale, against ' + unsoldPar + ' percent at par.';
+        const join = p > 0 && d > 0 ? ', but ' : '; ';
+        // (where the price moves ground breaking, it moves completion too, so each share is given with its month)
+        const moved = DONE !== base.C;
+        say = 'Each residence sells for ' + Math.abs(p) + ' percent ' + (p > 0 ? 'more' : 'less') + join + when + '. At completion' + (moved ? ', in month ' + DONE + ',' : '') + ' ' + unsold + ' percent is still for sale, against ' + unsoldPar + ' percent at par' + (moved ? ' in month ' + base.C : '') + '.';
       }
       out('cvSay').textContent = say;
       // the drawing's text alternative also reads the curve itself, every six months
@@ -411,7 +435,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // the sentence is a live region; announce it once the slider settles, not on every step
     const sayEl = out('cvSay'); let quiet;
-    const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); draw(); if (last !== null) read(last); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
+    // a price or threshold that moves ground breaking moves the phases, and the months the drawing spans, so the sheet
+    // is laid out again; otherwise only the curves move
+    const update = () => { if (fix() !== drawn) { hair = null; sheet(); } draw(); if (last !== null) { last = Math.min(last, M); if (kb !== null) kb = last; read(last); } };
+    const onInput = () => { first(); sayEl.setAttribute('aria-live', 'off'); update(); clearTimeout(quiet); quiet = setTimeout(() => { sayEl.setAttribute('aria-live', 'polite'); const t = sayEl.textContent; sayEl.textContent = ''; sayEl.textContent = t; }, 600); };
     price.addEventListener('input', onInput); loan.addEventListener('input', onInput);
     // On a phone on its side the heading holds over its column on a band of its own. A slider the keyboard brings the focus
     // to while it lies under that band or its fade (reading back up the page, the browser sees it as in view) is brought out
@@ -435,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function () {
       let wait = 0, run = null, v0 = 0, seen = false;
       const ring = document.createElement('span');
       ring.className = 'cv-ring'; ring.setAttribute('aria-hidden', 'true'); price.parentNode.appendChild(ring);
-      const setP = (v) => { price.value = v; draw(); if (last !== null) read(last); };
+      const setP = (v) => { price.value = v; update(); };
       const settle = () => { peeked = true; clearTimeout(wait); io.disconnect(); try { sessionStorage.setItem('cm-cv-peek', '1'); } catch (e) {} };
       const play = () => {
         if (peeked) return;
@@ -566,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
-    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', prod: 'last year\u2019s sales', name: 'your name' };
+    const asks = { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', name: 'your name' };
     const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
     const ask = (empty) => 'Fill in ' + list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())) + ' first, so the partners know who is writing and why.';
     // As each named blank is filled, the reminder names only the ones still empty, and goes once none is.

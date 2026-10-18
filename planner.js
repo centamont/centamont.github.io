@@ -40,9 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Share of residences under contract at the end of each month, and the month ground breaks: the first month at or
   // after the planned one in which the lender's threshold is met. Topping off (six months before completion) and the
-  // finished building bring buyers back, as on the home page's curve; so does ground breaking itself.
+  // finished building bring buyers back, as on the home page's curve; so does ground breaking itself. The pace is
+  // the home page's for its building of 62 residences, a little slower for a larger building and quicker for a smaller
+  // one, so the planner's opening plan (that building, on that schedule) gives the same answer as the home page's curve.
   function model(o) {
-    const base = 0.035 * Math.exp(-0.05 * o.par) * Math.pow(88 / o.units, 0.3), s = [0];
+    const base = 0.035 * Math.exp(-0.05 * o.par) * Math.pow(62 / o.units, 0.3), s = [0];
     let left = 1, G = -1, T = -1;
     for (let m = 0; m < 240; m++) {
       let a = base;

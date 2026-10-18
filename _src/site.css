@@ -2248,6 +2248,9 @@ html.js .pc-nojs{display:none}
 .co-sw i{display:block;aspect-ratio:1;border:1px solid var(--rule);margin-bottom:8px}
 /* the swatches show the brand's own colors in either theme */
 .co-sw .ink{background:var(--ink)}.co-sw .ivory{background:var(--ivory)}.co-sw .bronze{background:var(--bronze-500)}.co-sw .bronze-text{background:var(--bronze-700)}
+/* the fifth swatch: patina, the colour of the markets open now; the five stand in one row wherever four did */
+.co-sw .patina{background:var(--patina-700)}
+@media (min-width:561px){.co-sw{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .co-sw b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
 .co-sw span{font-size:14px;color:var(--faint);letter-spacing:.1em}
 /* Lines and Marks: the site's own conventions drawn 1:1, each sample 240px long with its label beside it */

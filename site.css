@@ -1510,6 +1510,8 @@ html.js .pc-nojs{display:none}
 .co-sw li{display:grid;gap:4px;align-content:start}
 .co-sw i{display:block;aspect-ratio:1;border:1px solid var(--rule);margin-bottom:8px}
 .co-sw .ink{background:var(--ink)}.co-sw .ivory{background:var(--ivory)}.co-sw .bronze{background:var(--bronze-500)}.co-sw .bronze-text{background:var(--bronze-700)}
+.co-sw .patina{background:var(--patina-700)}
+@media (min-width:561px){.co-sw{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .co-sw b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
 .co-sw span{font-size:14px;color:var(--faint);letter-spacing:.1em}
 .co-ln{display:flex;flex-wrap:wrap;gap:24px clamp(32px,4vw,56px);max-width:none!important}

@@ -7,7 +7,7 @@
   <id>https://centamont.com/journal/</id>
   <icon>https://centamont.com/apple-touch-icon.png</icon>
   <logo>https://centamont.com/og.png</logo>
-  <updated>2026-10-17T12:00:00Z</updated>
+  <updated>2026-10-18T12:00:00Z</updated>
   <author><name>Centamont</name><uri>https://centamont.com/</uri></author>
   <rights>© 2026 Centamont</rights>
   <entry>
@@ -97,7 +97,7 @@
     <id>https://centamont.com/journal/launch-price-and-the-pre-sale-threshold.html</id>
     <category term="Developer note"/>
     <published>2026-10-08T12:00:00Z</published>
-    <updated>2026-10-11T12:00:00Z</updated>
+    <updated>2026-10-18T12:00:00Z</updated>
     <summary>How a launch price moves two numbers: the month the lender’s pre-sale threshold is met, and how much is still unsold when the building is finished.</summary>
   </entry>
   <entry>

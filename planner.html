@@ -32,10 +32,10 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=b246bf8a">
+<link rel="stylesheet" href="site.css?v=f065767f">
 <script>document.documentElement.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))document.documentElement.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)document.documentElement.dataset.theme=q[1];try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')document.documentElement.dataset.motion='off'}catch(e){}setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))document.documentElement.classList.add('nosite')},4000)</script>
-<script src="site.js?v=b246bf8a" defer></script>
-<script src="planner.js?v=b246bf8a" defer></script>
+<script src="site.js?v=f065767f" defer></script>
+<script src="planner.js?v=f065767f" defer></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js" id="top">
@@ -86,8 +86,8 @@
       <label for="plWhereIn">Neighborhood <span class="lp-opt">optional</span></label>
       <input id="plWhereIn" name="where" maxlength="60" autocomplete="off" placeholder="e.g. Edgewater">
     </div>
-    <div class="cv-ctl"><div class="lab"><label for="plUnits">Residences</label><output id="plUnitsOut" for="plUnits">88</output></div><input type="range" id="plUnits" name="units" min="20" max="400" step="2" value="88"></div>
-    <div class="cv-ctl"><div class="lab"><label for="plFloors">Residential floors</label><output id="plFloorsOut" for="plFloors">22</output></div><input type="range" id="plFloors" name="floors" min="3" max="80" step="1" value="22"></div>
+    <div class="cv-ctl"><div class="lab"><label for="plUnits">Residences</label><output id="plUnitsOut" for="plUnits">62</output></div><input type="range" id="plUnits" name="units" min="20" max="400" step="2" value="62"></div>
+    <div class="cv-ctl"><div class="lab"><label for="plFloors">Residential floors</label><output id="plFloorsOut" for="plFloors">31</output></div><input type="range" id="plFloors" name="floors" min="3" max="80" step="1" value="31"></div>
     <div class="cv-ctl"><div class="lab"><label for="plPrice">Average price</label><output id="plPriceOut" for="plPrice">$2.4M</output></div><input type="range" id="plPrice" name="price" min="0.5" max="15" step="0.1" value="2.4"></div>
     <div class="cv-ctl"><div class="lab"><label for="plPar">Against comparable buildings</label><output id="plParOut" for="plPar">At par</output></div><input type="range" id="plPar" name="par" min="-10" max="15" step="1" value="0"></div>
   </fieldset>
@@ -95,7 +95,7 @@
     <legend>Lender and schedule</legend>
     <div class="cv-ctl"><div class="lab"><label for="plLoan">Lender’s pre-sale threshold</label><output id="plLoanOut" for="plLoan">50%</output></div><input type="range" id="plLoan" name="loan" min="30" max="70" step="5" value="50"></div>
     <div class="cv-ctl"><div class="lab"><label for="plDeposit">Deposit per contract</label><output id="plDepositOut" for="plDeposit">20%</output></div><input type="range" id="plDeposit" name="dep" min="5" max="50" step="5" value="20"></div>
-    <div class="cv-ctl"><div class="lab"><label for="plPlanned">Planned ground breaking</label><output id="plPlannedOut" for="plPlanned">Month 12</output></div><input type="range" id="plPlanned" name="planned" min="3" max="24" step="1" value="12"></div>
+    <div class="cv-ctl"><div class="lab"><label for="plPlanned">Planned ground breaking</label><output id="plPlannedOut" for="plPlanned">Month 6</output></div><input type="range" id="plPlanned" name="planned" min="3" max="24" step="1" value="6"></div>
     <div class="cv-ctl"><div class="lab"><label for="plBuild">Construction</label><output id="plBuildOut" for="plBuild">24 months</output></div><input type="range" id="plBuild" name="build" min="14" max="42" step="1" value="24"></div>
     <div class="lp-tx">
       <label for="plStart">Sales launch</label>
@@ -106,12 +106,12 @@
   <div class="lp-out">
     <figure class="lp-fig">
       <svg id="plSvg" class="lp-svg" aria-hidden="true" focusable="false"></svg>
-      <figcaption>Share of residences under contract, month by month from the sales launch. Ground breaks once the threshold is met, never before the planned month.</figcaption>
+      <figcaption>Share of residences under contract, month by month from the sales launch. Ground breaks once the threshold is met, never before the planned month. The planner opens on the building in our home page’s illustration.</figcaption>
     </figure>
     <dl class="cv-read lp-read">
       <div><dt>Threshold met</dt><dd><span id="plT">Month 14</span><small id="plTd"></small></dd></div>
       <div><dt>Ground broken</dt><dd><span id="plG">Month 14</span><small id="plGd"></small></dd></div>
-      <div><dt>Sold by completion</dt><dd><span id="plDone">74%</span><small id="plDoned"></small></dd></div>
+      <div><dt>Sold by completion</dt><dd><span id="plDone">81%</span><small id="plDoned"></small></dd></div>
       <div><dt>Under contract by completion</dt><dd><span id="plV">–</span></dd></div>
       <div><dt>Deposits at ground breaking</dt><dd><span id="plDep">–</span><small id="plDepd"></small></dd></div>
     </dl>
