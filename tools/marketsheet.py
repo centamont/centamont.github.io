@@ -17,7 +17,7 @@ SHEETS = {
         'asof': ('2026-07', 'July 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
             ('New towers', '$1,983', 'a square foot', 'Average luxury asking price, against about $800 five years earlier', 2, (1983, 800, '$800')),
-            ('Projects', '26 or more', 'in pre-construction', 'Branded and ultra-luxury projects across the three counties', 2, None),
+            ('Projects', '26', 'or more in pre-construction', 'Branded and ultra-luxury projects across the three counties', 2, None),
             ('Resale', '12', 'months of supply', 'Miami-Dade condominiums, at a median price of $400,000; new construction excluded', 1, None),
         ]},
     'new-york.html': {
