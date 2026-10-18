@@ -440,7 +440,7 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, RINGS, PAV, CRN, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, RINGS, RING_T, PAV, CRN, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
     const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), canopy = new Mesh(), deck = new Mesh();
@@ -525,13 +525,13 @@ void main() {
     {
       const a = [0, 0.92, 0, 0], last = RINGS.length - 1;
       for (let i = 0; i <= last; i++) {
-        const r0 = y0 + RINGS[i][0], r1 = r0 + SLAB, b = [r0, r1, 0, 0];
+        const r0 = y0 + RINGS[i][0], r1 = r0 + RING_T, b = [r0, r1, 0, 0];
         band(crown, CRN.o[i], r0, r1, () => [a, b]);
         band(crown, CRN.in[i], r0, r1, () => [[0, 0.75, 0, 0], b]);
         cap(crown, CRN.o[i], CRN.i[i], r1, true, a, 0.95, 0.85, true);
         cap(crown, CRN.o[i], CRN.i[i], r0, false, a, 0.8, 0.6, true);
       }
-      for (const p of CRN.cols) post(crown, p.x, p.z, 0.05, y0, y0 + RINGS[last][0], [0, 0.9, 0, 0]);
+      for (const p of CRN.cols) post(crown, p.x, p.z, 0.07, y0, y0 + RINGS[last][0], [0, 0.9, 0, 0]);
       const LH = PAV[1], roof = CRN.pav.map((p) => ({ x: CRN.cx + (p.x - CRN.cx) * 0.5, z: CRN.cz + (p.z - CRN.cz) * 0.5 }));
       band(glass, CRN.pav, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
       cap(crown, CRN.pav, roof, y0 + LH, true, a, 0.9, 0.9);

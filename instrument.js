@@ -208,8 +208,8 @@ document.addEventListener('DOMContentLoaded', function () {
       for (const p of C.cols) poly([P(p, top), P(p, top + G.RINGS[G.RINGS.length - 1][0])], 'tw-fin');
       G.RINGS.forEach((q, i) => {
         const y = top + q[0];
-        band(C.o[i], y, y + G.SLAB, 'tw-edge');
-        el('path', { d: 'M' + C.o[i].map((p) => P(p, y + G.SLAB)).join('L') + 'ZM' + C.i[i].map((p) => P(p, y + G.SLAB)).join('L') + 'Z', class: 'tw-deck', 'fill-rule': 'evenodd' }, tw);
+        band(C.o[i], y, y + G.RING_T, 'tw-edge');
+        el('path', { d: 'M' + C.o[i].map((p) => P(p, y + G.RING_T)).join('L') + 'ZM' + C.i[i].map((p) => P(p, y + G.RING_T)).join('L') + 'Z', class: 'tw-deck', 'fill-rule': 'evenodd' }, tw);
       });
       const [bx, by] = P(G.BEACON_AT, ht + 0.16).split(' ');
       el('circle', { cx: bx, cy: by, r: 0.17, class: 'tw-beacon' }, tw);

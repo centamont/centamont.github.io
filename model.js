@@ -112,11 +112,11 @@
   const RAIL_H = 0.3;
   // The crown: the terraces keep rising past the roof as three open rings, a sky garden inside them. Each ring is a slab
   // edge on the roof's outline (RINGS: the height of its underside over the roof, its outer and inner reach as shares of
-  // the roof's), carried on eight slender columns; the gaps between them grow and the last ring is the widest, so the
-  // stack ends by opening to the sky. On the roof terrace inside them stands a glass pavilion (PAV: its reach and
-  // height). CROWN_H is the height of the top ring's top over the roof. The outlines are the roof slab's hull, softened
+  // the roof's), each a little smaller than the one below so the top draws in, with an edge deeper than a floor's
+  // (RING_T) and carried on eight radial fins that stand on the roof's edge. On the roof terrace inside them stands a
+  // glass pavilion (PAV: its reach and height). CROWN_H is the height of the top ring's top over the roof. The outlines are the roof slab's hull, softened
   // and scaled about its middle (CRN: o and i, each ring's outer and inner line; pav; cols, where the columns stand).
-  const RINGS = [[1.49, 1, 0.85], [3.09, 1.03, 0.85], [4.84, 1.1, 0.64]], CROWN_H = 4.84 + SLAB, PAV = [0.55, 1.29];
+  const RINGS = [[1.39, 0.99, 0.8], [2.74, 0.95, 0.76], [4.09, 0.9, 0.7]], RING_T = 0.24, CROWN_H = 4.09 + RING_T, PAV = [0.55, 1.24];
   const CRN = (() => {
     const h = hull(floorPlan(FLOORS - 1, 6).slab.map((p) => [p.x, p.z])), n = h.length;
     let a2 = 0, cx = 0, cz = 0;
@@ -138,7 +138,7 @@
       return pts.map((p, j) => { const a = pts[(j + N - 1) % N], b = pts[(j + 1) % N], tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1; return { x: p.x, z: p.z, nx: tz / l, nz: -tx / l }; });
     };
     // (in: each inner line run the other way and turned to face inward, for the ring's inner face)
-    return { o: RINGS.map((q) => ring(q[1])), i: RINGS.map((q) => ring(q[2])), in: RINGS.map((q) => ring(q[2]).reverse().map((p) => ({ x: p.x, z: p.z, nx: -p.nx, nz: -p.nz }))), pav: ring(PAV[0]), cols: ring(0.86).filter((_, j) => j % 16 === 0), cx, cz };
+    return { o: RINGS.map((q) => ring(q[1])), i: RINGS.map((q) => ring(q[2])), in: RINGS.map((q) => ring(q[2]).reverse().map((p) => ({ x: p.x, z: p.z, nx: -p.nx, nz: -p.nz }))), pav: ring(PAV[0]), cols: ring(0.85).filter((_, j) => j % 16 === 0), cx, cz };
   })();
   // the aviation light sits on the top ring's edge where it reaches furthest over the bay (east)
   const BEACON_AT = (() => { const o = CRN.o[2], p = o.reduce((a, q) => (q.x > a.x ? q : a)); return { x: p.x + p.nx * 0.14, z: p.z + p.nz * 0.14 }; })();
@@ -346,10 +346,10 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 897, y: 100, w: 843, h: 950, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 856, y: 97, w: 884, h: 953, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 898, y: 100, w: 842, h: 950, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 856, y: 97, w: 884, h: 953, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 897, y: 116, w: 843, h: 934, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    morning: { x: 856, y: 113, w: 884, h: 937, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 898, y: 116, w: 842, h: 934, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 856, y: 113, w: 884, h: 937, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
@@ -1978,7 +1978,7 @@
           // the rings, the farthest from eye level first
           const order = RINGS.map((_, i) => i).sort((a, b) => Math.abs(y0 + RINGS[b][0] * Ge - ey) - Math.abs(y0 + RINGS[a][0] * Ge - ey));
           for (const i of order) {
-            const o = CRN.o[i], n = o.length, r0 = y0 + RINGS[i][0] * Ge, r1 = r0 + SLAB, top = ey > r1;
+            const o = CRN.o[i], n = o.length, r0 = y0 + RINGS[i][0] * Ge, r1 = r0 + RING_T * Ge, top = ey > r1;
             const shade = (nx, nz) => { const d = dif(nx, nz); return mix(dark ? (0.06 + 0.55 * d) * (1 - 0.62 * night) : 0.05 + 0.22 * (1 - d)); };
             band(CRN.in[i], r0, r1, shade, false);
             const ro = cap(o, top ? r1 : r0), ri = cap(CRN.i[i], top ? r1 : r0);
@@ -2050,7 +2050,7 @@
         // (the crown takes the balconies' pen, so on a small drawing it is no heavier than the floors under it)
         if (topK >= FLOORS && this.G > 0.01) {
           H(CRN.pav, FLOORS + SLAB, FLOORS + SLAB + PAV[1] * Ge, null, 0, 0, 1);
-          for (let i = 0; i < RINGS.length; i++) { const y = FLOORS + SLAB + RINGS[i][0] * Ge; H(CRN.o[i], y, y + SLAB, null, 0, 0, 1); }
+          for (let i = 0; i < RINGS.length; i++) { const y = FLOORS + SLAB + RINGS[i][0] * Ge; H(CRN.o[i], y, y + RING_T * Ge, null, 0, 0, 1); }
         }
         // (the line comes in with the first glass, C 0 to 1, rather than appearing round the frame at once)
         const sw = silW * Math.max(0.75, kpen), ca = clamp(C, 0, 1);
@@ -2572,6 +2572,6 @@
   // above that; and their bearings.
   Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? (s.az < 180 ? 'morning' : 'gold') : 'day'; };
   Model.stills = STILLS;
-  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, RINGS, CROWN_H, PAV, CRN, BEACON_AT, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
+  Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, RINGS, RING_T, CROWN_H, PAV, CRN, BEACON_AT, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;
 })();
