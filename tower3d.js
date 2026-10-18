@@ -411,8 +411,8 @@ void main() {
     }
   }
   // a flat cap over a ring at height y, facing up (or down): an annulus to an inner ring of as many points (ao falling
-  // to aoIn there) and a fan inside it
-  function cap(M, ring, inner, y, up, a, aoOut, aoIn) {
+  // to aoIn there) and a fan inside it (none when open: the annulus alone)
+  function cap(M, ring, inner, y, up, a, aoOut, aoIn, open) {
     const n = ring.length, ny = up ? 1 : -1, nr = [0, ny, 0];
     const A = (ao) => [a[0], ao, 0, a[3]], B = [y, y, 0, 0];
     const o = [], im = [];
@@ -421,8 +421,8 @@ void main() {
     const c = M.vert([cx, y, cz], nr, A(aoIn * 0.8), B);
     for (let j = 0; j < n; j++) {
       const j2 = (j + 1) % n;
-      if (up) { M.quad(o[j2], o[j], im[j], im[j2]); M.tri(c, im[j2], im[j]); }
-      else { M.quad(o[j], o[j2], im[j2], im[j]); M.tri(c, im[j], im[j2]); }
+      if (up) { M.quad(o[j2], o[j], im[j], im[j2]); if (!open) M.tri(c, im[j2], im[j]); }
+      else { M.quad(o[j], o[j2], im[j2], im[j]); if (!open) M.tri(c, im[j], im[j2]); }
     }
   }
   // a box standing on (x, z), w by w, from y0 to y1
@@ -440,7 +440,7 @@ void main() {
   }
 
   function build(G) {
-    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, SCREEN_H, CREST, PORTE, CANOPY, CORE, COLS } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RAIL_H, RINGS, PAV, CRN, PORTE, PORTE_Z, PORTE_POSTS, CANOPY, CORE, COLS } = G;
     const S = G.set(6), PL = S.PLANS;
     const idx = (k) => (k === PODIUM || k === CROWN || k === FLOORS ? k - 1 : k);
     const slabs = new Mesh(), cols = new Mesh(), core = new Mesh(), glass = new Mesh(), rails = new Mesh(), crown = new Mesh(), canopy = new Mesh(), deck = new Mesh();
@@ -519,52 +519,26 @@ void main() {
         rails.quad(q[0], q[1], q[2], q[3]);
       }
     }
-    // the crown: its screen of fins, rising to its crest over the bay (each fin's own height is its top, so the
-    // lantern's glow fills it to the top whatever it is)
-    const y0 = FLOORS + SLAB, sc = S.SCREEN, ns = sc.length;
-    const CH = sc.reduce((v, p) => v + CREST(p), 0) / ns;
+    // the crown: three open rings over the roof terrace, each a slab edge (its band, its top and underside, and its
+    // inner face), on eight slender columns, with a glass pavilion inside them on the terrace (lit as the lobby is)
+    const y0 = FLOORS + SLAB;
     {
-      let s = 0;
-      for (let j = 0; j < ns; j++) {
-        const p = sc[j], q = sc[(j + 1) % ns], len = Math.hypot(q.x - p.x, q.z - p.z), tp = y0 + CREST(p), tq = y0 + CREST(q);
-        const a0 = [0, 0.9, s, 1], a1 = [0, 0.9, s + len, 1], b0 = [y0, tp, 0, 0], b1 = [y0, tq, 0, 0];
-        const v0 = crown.vert([p.x, y0, p.z], [p.nx, 0, p.nz], a0, b0), v1 = crown.vert([q.x, y0, q.z], [q.nx, 0, q.nz], a1, b1);
-        const v2 = crown.vert([q.x, tq, q.z], [q.nx, 0, q.nz], a1, b1), v3 = crown.vert([p.x, tp, p.z], [p.nx, 0, p.nz], a0, b0);
-        crown.quad(v0, v3, v2, v1);
-        // (and its inner face, so the screen reads as a thin open crown from above rather than a box)
-        const w0 = crown.vert([p.x, y0, p.z], [-p.nx, 0, -p.nz], a0, b0), w1 = crown.vert([q.x, y0, q.z], [-q.nx, 0, -q.nz], a1, b1);
-        const w2 = crown.vert([q.x, tq, q.z], [-q.nx, 0, -q.nz], a1, b1), w3 = crown.vert([p.x, tp, p.z], [-p.nx, 0, -p.nz], a0, b0);
-        crown.quad(w0, w1, w2, w3);
-        s += len;
+      const a = [0, 0.92, 0, 0], last = RINGS.length - 1;
+      for (let i = 0; i <= last; i++) {
+        const r0 = y0 + RINGS[i][0], r1 = r0 + SLAB, b = [r0, r1, 0, 0];
+        band(crown, CRN.o[i], r0, r1, () => [a, b]);
+        band(crown, CRN.in[i], r0, r1, () => [[0, 0.75, 0, 0], b]);
+        cap(crown, CRN.o[i], CRN.i[i], r1, true, a, 0.95, 0.85, true);
+        cap(crown, CRN.o[i], CRN.i[i], r0, false, a, 0.8, 0.6, true);
       }
-    }
-    // Inside the screen, the sky lounge: a storey of glass set back on the roof (lit as the lobby is), the terrace
-    // round it open to the sky between the fins, and over both a thin roof that floats on the fins' tops, sloping with
-    // the crest and reaching a little past them, so the tide ends in a lantern rather than a drum
-    {
-      const lr = sc.map((p) => ({ x: p.x * 0.78, z: p.z * 0.78, nx: p.nx, nz: p.nz })), LH = 0.92;
-      band(glass, lr, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
-      const br = sc.map((p) => ({ x: p.x + p.nx * 0.45, z: p.z + p.nz * 0.45 })), hb = sc.map((p) => y0 + CREST(p)), T = 0.15;
-      const top = [], bot = [], eT = [], eB = [], a = [0, 0.92, 0, 0], b = [0, 0, 0, 0];
-      const cT = crown.vert([0, y0 + CH + T, 0], [0, 1, 0], a, b), cB = crown.vert([0, y0 + CH, 0], [0, -1, 0], a, b);
-      let s = 0;
-      for (let j = 0; j < ns; j++) {
-        const q = br[j], p = sc[j], sj = [0, 0.92, s, 0];
-        top.push(crown.vert([q.x, hb[j] + T, q.z], [0, 1, 0], a, b));
-        bot.push(crown.vert([q.x, hb[j], q.z], [0, -1, 0], a, b));
-        eT.push(crown.vert([q.x, hb[j] + T, q.z], [p.nx, 0, p.nz], sj, b));
-        eB.push(crown.vert([q.x, hb[j], q.z], [p.nx, 0, p.nz], sj, b));
-        s += Math.hypot(sc[(j + 1) % ns].x - p.x, sc[(j + 1) % ns].z - p.z);
-      }
-      for (let j = 0; j < ns; j++) {
-        const j2 = (j + 1) % ns;
-        crown.tri(cT, top[j2], top[j]); crown.tri(cB, bot[j], bot[j2]);
-        crown.quad(eB[j], eT[j], eT[j2], eB[j2]);
-      }
+      for (const p of CRN.cols) post(crown, p.x, p.z, 0.05, y0, y0 + RINGS[last][0], [0, 0.9, 0, 0]);
+      const LH = PAV[1], roof = CRN.pav.map((p) => ({ x: CRN.cx + (p.x - CRN.cx) * 0.5, z: CRN.cz + (p.z - CRN.cz) * 0.5 }));
+      band(glass, CRN.pav, y0, y0 + LH, (j, s) => [[FLOORS - 1, 0, s, 1], [y0, y0 + LH, j % 12, 0]]);
+      cap(crown, CRN.pav, roof, y0 + LH, true, a, 0.9, 0.9);
     }
     // the porte-cochère: a leaf of a roof on two slender posts, its soffit high enough for a coach, its edge the
     // terraces' blade (a thin face over an underside that rounds back and up), so the tower's line comes down to the door
-    const cr = CANOPY.map((p) => ({ x: p.x * 0.6, z: (p.z + 5.5) * 0.6 - 5.5 }));
+    const cr = CANOPY.map((p) => ({ x: p.x * 0.6, z: (p.z - PORTE_Z) * 0.6 + PORTE_Z }));
     {
       const CT = 0.34, tuck = CANOPY.map((p) => ({ x: p.x - p.nx * CT, z: p.z - p.nz * CT })), n = CANOPY.length, r = Math.SQRT1_2;
       const a = [0, 1, 0, 0], b = [PORTE, PORTE + 0.2, 0, 0], ao = [0, 0.8, 0, 0];
@@ -579,7 +553,7 @@ void main() {
       for (let j = 0; j < n; j++) { const j2 = (j + 1) % n; canopy.quad(o[j], o[j2], i[j2], i[j]); }
       cap(canopy, tuck, cr, PORTE - 0.02, false, [0, 0, 0, 0], 0.75, 0.7);
     }
-    for (const x of [-2.1, 2.1]) post(canopy, x, -5.85, 0.05, 0, PORTE, [0, 0.9, 0, 0]);
+    for (const [x, z] of PORTE_POSTS) post(canopy, x, z, 0.05, 0, PORTE, [0, 0.9, 0, 0]);
     // the amenity deck's pool, beside the tower on the podium's roof
     {
       const y = PODIUM + SLAB + 0.006, x0 = -5.85, x1 = -4.45, z0 = -3.0, z1 = 2.2, a = [0, 1, 0, 2], b = [0, 0, 0, 0], nr = [0, 1, 0];
@@ -907,7 +881,7 @@ void main() {
       const dbg = gl.getExtension('WEBGL_debug_renderer_info'), name = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
       if (/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(name)) { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); return null; }
     }
-    const { FLOORS, SLAB, PODIUM, CROWN, RES0, SCREEN_H } = G;
+    const { FLOORS, SLAB, PODIUM, CROWN, RES0, CROWN_H } = G;
     const R = { canvas, ready: false, lost: false, q: opt.q || 1, cw: 0, ch: 0, box: null, backdrop: (g, m, a, o) => backdrop(g, m, a, o), land: (g, m, p) => land(g, m, p) };
     canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R.lost = true; if (opt.onLost) opt.onLost(); });
 
@@ -1019,7 +993,7 @@ void main() {
       // the box it fills on screen: the tower to the beacon, and the plaza's light round its foot
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       const add = (x, y, z) => { const p = m.P(x, y, z); if (p[2] < 0.5) return; x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); };
-      for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU; add(Math.cos(a) * 16.5, 0, Math.sin(a) * 16.5); add(Math.cos(a) * 7, FLOORS + SLAB + SCREEN_H + 1.2, Math.sin(a) * 7); add(Math.cos(a) * 9.5, 5, Math.sin(a) * 9.5); }
+      for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU; add(Math.cos(a) * 16.5, 0, Math.sin(a) * 16.5); add(Math.cos(a) * 7, FLOORS + SLAB + CROWN_H + 1.2, Math.sin(a) * 7); add(Math.cos(a) * 9.5, 5, Math.sin(a) * 9.5); }
       const pad = 2;
       x0 = Math.max(0, Math.floor(x0 - pad)); y0 = Math.max(0, Math.floor(y0 - pad)); x1 = Math.min(W, Math.ceil(x1 + pad)); y1 = Math.min(H, Math.ceil(y1 + pad));
       if (x1 - x0 < 2 || y1 - y0 < 2) return null;

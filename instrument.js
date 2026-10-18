@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // A small model of the hero tower beside the share, built from its own plans (model.js) and seen as an architect's
     // model is, from a little above and to the southeast, lit from the southwest: the podium on its site plate, nineteen
     // residential levels turning a little as they rise, their terraces deepening and narrowing in a slow spiral, the two
-    // penthouse levels set back behind deep terraces, and the lantern of the crown. Each level holds two residences, the
+    // penthouse levels set back behind deep terraces, and the open rings of the crown. Each level holds two residences, the
     // bay side on the right and the city side on the left, and they sell in the hero's own order (penthouses and upper
     // floors first, the bay side ahead), so the bronze edge reads as a record of sales. The podium and crown never sell.
     const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
@@ -201,14 +201,17 @@ document.addEventListener('DOMContentLoaded', function () {
         // the lobby's mullions
         if (k === 0) runs(g).forEach((r) => r.segs.forEach((o, i) => { if (i % 2 === 0) poly([P(o.p, ya), P(o.p, yb)], 'tw-mull'); }));
       }
-      // the crown: a lantern of fins round the roof plant, its lid, and the beacon's mast
-      const top = G.FLOORS + G.SLAB, ht = top + G.SCREEN_H, scr = plans[G.FLOORS - 1].glass.map((p) => ({ x: p.x - p.nx * 0.2, z: p.z - p.nz * 0.2, nx: p.nx, nz: p.nz, lx: p.lx }));
-      band(scr, top, ht, 'tw-screen', null, true);
-      runs(scr).forEach((r) => r.segs.forEach((o, i) => { if (i % 2 === 0) poly([P(o.p, top), P(o.p, ht)], 'tw-fin'); }));
-      band(scr, ht - 0.1, ht, 'tw-edge'); deck(scr, ht, 'tw-lid');
-      const c = { x: 0, z: 0 };
-      poly([P(c, ht), P(c, ht + G.BEACON)], 'tw-fin');
-      const [bx, by] = P(c, ht + G.BEACON).split(' ');
+      // the crown: the glass pavilion on the roof, the slender columns, and the three open rings over them (each ring's
+      // edge and its deck, an annulus open in the middle), from the lowest up, and the beacon on the top ring's edge
+      const top = G.FLOORS + G.SLAB, ht = top + G.CROWN_H, C = G.CRN;
+      band(C.pav, top, top + G.PAV[1], 'tw-screen', null, true); deck(C.pav, top + G.PAV[1], 'tw-lid');
+      for (const p of C.cols) poly([P(p, top), P(p, top + G.RINGS[G.RINGS.length - 1][0])], 'tw-fin');
+      G.RINGS.forEach((q, i) => {
+        const y = top + q[0];
+        band(C.o[i], y, y + G.SLAB, 'tw-edge');
+        el('path', { d: 'M' + C.o[i].map((p) => P(p, y + G.SLAB)).join('L') + 'ZM' + C.i[i].map((p) => P(p, y + G.SLAB)).join('L') + 'Z', class: 'tw-deck', 'fill-rule': 'evenodd' }, tw);
+      });
+      const [bx, by] = P(G.BEACON_AT, ht + 0.16).split(' ');
       el('circle', { cx: bx, cy: by, r: 0.17, class: 'tw-beacon' }, tw);
       tw.setAttribute('viewBox', [x0 - 0.3, y0 - 0.4, x1 - x0 + 0.6, y1 - y0 + 0.6].map((v) => v.toFixed(2)).join(' '));
     }
