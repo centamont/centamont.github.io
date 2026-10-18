@@ -631,7 +631,7 @@
       const cs = getComputedStyle(this.c);
       this.line = rgb(cs.getPropertyValue('--line') || '#14161A');
       this.sold = rgb(cs.getPropertyValue('--sold') || '#B8976A');
-      this.b300 = rgb(cs.getPropertyValue('--bronze-300') || '#C9A877');
+      this.b300 = rgb(cs.getPropertyValue('--bronze-300') || '#D5B382');
       this.b700 = rgb(cs.getPropertyValue('--bronze-700') || '#7A5F3A');
       let bg = null;
       for (let el = this.c; el && !bg; el = el.parentElement) {
