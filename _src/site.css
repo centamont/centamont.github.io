@@ -19,6 +19,7 @@
 
 /* An architect's elevation sheet: ivory vellum, ink linework, bronze for what has sold, patina for what is open now. */
 :root{
+  /* named in the Color Standard: Drafting Ink, Vellum, Centamont Bronze, Century Patina */
   --ink:#14161A; --ivory:#F4F0E8; --bronze:#B8976A;
   /* one bronze, five steps on the same hue: night accent, fill, line on ivory, text on ivory, edge at night */
   --bronze-300:#D5B382; --bronze-500:#B8976A; --bronze-600:#9C7C50; --bronze-700:#7A5F3A; --bronze-800:#59472E;
