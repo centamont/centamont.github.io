@@ -2187,6 +2187,7 @@ main{overflow-x:clip}
 .opener .frame,.opener > picture{aspect-ratio:16/7}
 .opener > picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .opener > picture img.hi{object-position:50% 24%}
+.opener > picture img.top{object-position:50% 0}
 .opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
 .js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
 .js .opener.in :is(.frame,picture){clip-path:inset(0)}
