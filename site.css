@@ -99,6 +99,7 @@ header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:
 .mark .sym{height:var(--sym);color:var(--seal)}
 .mark .wm{height:var(--wm)}
 nav.main{display:flex;gap:clamp(18px,2.1vw,30px)}
+@media (min-width:1280px) and (max-width:1599px){:is(:lang(es),:lang(pt)) nav.main{gap:clamp(14px,1.5vw,22px)}}
 nav.main a{white-space:nowrap;font-size:var(--t-nav);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding-block:6px;border-bottom:1px solid transparent;transition:color var(--t-ui),border-color var(--t-ui)}
 nav.main a:focus-visible,nav.main a[aria-current="true"]{color:var(--fg)}
 @media (hover:hover) and (pointer:fine){nav.main a:hover{color:var(--fg)}}
