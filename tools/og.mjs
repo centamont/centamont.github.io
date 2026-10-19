@@ -3,7 +3,8 @@
 // language: the English words are covered with the card's own ground (a clear patch of the same card, so its grain runs
 // on unbroken, or its flat ink), and the new words are set in the same faces, sizes, colours and places, with the
 // drawing, the photograph and the wordmark left exactly as they are. Run it from the repo root after changing an
-// English card or a translation here, then raise the ?v= on the pages' og:image and twitter:image:
+// English card or a translation here, then raise the ?v= on the pages' og:image and twitter:image. (The South Florida and
+// New York market cards are not made here: tools/og-markets.mjs draws them from the es/ and pt/ pages themselves.)
 //   node tools/og.mjs             writes es/og*.png|jpg and pt/og*.png|jpg
 //   node tools/og.mjs --en DIR    sets the English words over the same patches into DIR, to check the setting against
 //                                 the English cards (they should match to the pixel, give or take antialiasing)
@@ -93,39 +94,6 @@ const CARDS = [
       { t: w.kick, x: 86, base: 271, size: 18, face: 'body', weight: 500, color: BRONZE, ls: '.16em', upper: true },
     ],
   },
-  ...[
-    // the market notes: a drawn elevation of the city, its height scale in the page's own numbers (Portuguese writes
-    // 1.500 pés, as pt/sul-da-florida.html does)
-    {
-      base: 'og-south-florida.png', out: { es: 'es/og-sur-de-florida.jpg', pt: 'pt/og-sul-da-florida.jpg' },
-      patches: [[50, 108, 580, 86, [0, 296]], [50, 194, 580, 82, [480, 300]]],
-      words: {
-        en: { h1: 'South Florida', p: 'Miami, Fort Lauderdale and West Palm Beach' },
-        es: { h1: 'Sur de Florida', p: 'Miami, Fort Lauderdale y West Palm Beach' },
-        pt: { h1: 'Sul da Flórida', p: 'Miami, Fort Lauderdale e West Palm Beach' },
-      },
-    },
-    {
-      base: 'og-new-york.jpg', out: { es: 'es/og-nueva-york.jpg', pt: 'pt/og-nova-york.jpg' },
-      patches: [[50, 108, 400, 168, [680, 104]], [450, 108, 230, 168, [700, 104]]],
-      words: {
-        en: { h1: 'New York City', p: 'Manhattan’s new condominiums' },
-        es: { h1: 'Ciudad de Nueva York', p: 'Los condominios nuevos de Manhattan' },
-        pt: { h1: 'Cidade de Nova York', p: 'Os novos condomínios de Manhattan' },
-      },
-    },
-  ].map((c) => ({
-    ...c,
-    patches: [...c.patches, [970, 68, 172, 28, [970, 140]], [1090, 279, 72, 21, [990, 279]], [1090, 380, 72, 21, [990, 380]]],
-    words: Object.fromEntries(Object.entries(c.words).map(([k, v]) => [k, { ...v, lab: { en: 'Market note', es: 'Nota de mercado', pt: 'Nota de mercado' }[k], top: k === 'pt' ? '1.500 pés' : '1,500 ft', mid: k === 'pt' ? '1.000' : '1,000' }])),
-    lines: (w) => [
-      { t: w.h1, x: 60, base: 205, size: 104, face: 'display', weight: 300, color: INK, ls: '-.01em' },
-      { t: w.p, x: 66, base: 261, size: 26, face: 'body', weight: 400, color: '#4A463F' },
-      { t: w.lab, right: 1136, base: 89, size: 17, face: 'body', weight: 500, color: '#6E675D', ls: '.2em', upper: true },
-      { t: w.top, right: 1162, base: 294, size: 13.75, face: 'body', weight: 500, color: '#6E675D', ls: '.06em', num: true },
-      { t: w.mid, right: 1162, base: 394, size: 13.75, face: 'body', weight: 500, color: '#6E675D', ls: '.06em', num: true },
-    ],
-  })),
 ];
 
 const css = (root) => `
