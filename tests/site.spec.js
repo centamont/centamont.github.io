@@ -706,13 +706,15 @@ test('inline scripts are published without their notes', async ({}, info) => {
   expect(sourced).toBeGreaterThanOrEqual(12);
 });
 
-// The markets maps on the home pages and the markets hub place their coastlines from one cached drawing,
-// media/maps.svg, and the Spanish and Portuguese home pages read their sun note's words from the page's language.
+// The markets maps on the home pages and the markets hub place their plain layers (state lines, borders, the world
+// inset, the survey's coast and islands) from one cached drawing, media/maps.svg, and the Spanish and Portuguese home pages read their sun note's words from the page's language.
 test('the markets maps draw their coastlines from the shared drawing', async ({ page }) => {
   for (const [path, sun] of [['/', /^Sun /], ['/markets.html', null], ['/es/', /^Sol /], ['/pt/mercados.html', null]]) {
     await page.goto(path);
     await page.locator('.chart .map').scrollIntoViewIfNeeded();
-    for (const sel of ['.chart .ov use.lnd', '.chart .ov .coast use', '.chart .sv .coast use', '.chart .sv .isle use']) {
+    // masks and clip paths draw from the page's own land; only plain layers come from the shared file
+    expect(await page.locator('.chart :is(mask, clipPath) use').evaluateAll((us) => us.filter((u) => !u.getAttribute('href').startsWith('#')).length), path).toBe(0);
+    for (const sel of ['.chart .ov use.lnd', '.chart .ov use.st', '.chart .ov use.wo', '.chart .sv .coast use', '.chart .sv .isle use']) {
       await expect.poll(() => page.locator(sel).first().evaluate((u) => Math.round(u.getBBox().width)), `${path} ${sel}`).toBeGreaterThan(20);
     }
     if (sun) await expect(page.locator('#sunline')).toHaveText(sun);
