@@ -531,36 +531,39 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
   // a buyer signs with a name alone: the company blank goes with the developer's paragraph
   await expect(page.locator('#letter .sign [data-for="dev"]')).toBeHidden();
   await page.locator('#letter input[name="area"]').fill('Miami Beach');
-  page.on('popup', (p) => p.close().catch(() => {}));
-  await page.locator('#letter button[data-to="ig"]').click();
+  await page.locator('#letter button[data-to="mail"]').click();
   // the reminder names the blank that is missing, and the field says it is invalid
   await expect(page.locator('#letterNote')).toContainText('Fill in your name first');
   await expect(page.locator('#letter input[name="name"]')).toBeFocused();
   await expect(page.locator('#letter input[name="name"]')).toHaveAttribute('aria-invalid', 'true');
   await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
   await expect(page.locator('#letter input[name="name"]')).not.toHaveAttribute('aria-invalid', /.*/);
-  await page.locator('#letter button[data-to="ig"]').click();
-  await expect(page.locator('#letterNote')).toContainText('Instagram');
+  await page.locator('#letter button[data-to="mail"]').click();
+  await expect(page.locator('#letterNote')).toContainText('office@centamont.com');
 });
 
 // No clipboard permission granted in advance, as for a first-time visitor. Chrome and Edge only allow the copy while
-// the click still counts as the visitor's own, so the copy must start before the Instagram tab opens.
-test('the letter copies and opens Instagram without a clipboard permission', async ({ page, context, browserName }) => {
-  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
+// the click still counts as the visitor's own, so the copy must start before the email app takes the letter.
+test('the letter opens as an email to the office and is copied, without a clipboard permission', async ({ page, context, browserName }) => {
   await page.goto('/');
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await page.locator('#letter input[name="where"]').fill('Edgewater');
   await page.locator('#letter input[name="units"]').fill('60');
   await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
   await page.locator('#letter input[name="company"]').fill('Ruiz Development');
-  const popup = page.waitForEvent('popup');
-  await page.locator('#letter button[data-to="ig"]').click();
+  await page.locator('#letter button[data-to="mail"]').click();
   // the copy settles at once (copied, or the letter shown to copy by hand), never left waiting on a prompt
-  await expect(page.locator('#letterNote')).toContainText('Instagram', { timeout: 2000 });
-  // and the new tab goes straight to the message
-  await (await popup).waitForURL(/^https:\/\/ig\.me\/m\/centamont/, { timeout: 2000 });
+  await expect(page.locator('#letterNote')).toContainText('office@centamont.com', { timeout: 2000 });
+  // and the address in the note opens the same letter, its subject naming the writer
+  const href = await page.locator('#letterNote a').getAttribute('href');
+  expect(href.startsWith('mailto:office@centamont.com?subject=')).toBe(true);
+  const q = new URLSearchParams(href.split('?')[1]);
+  expect(q.get('subject')).toBe('A letter from Ana Ruiz of Ruiz Development');
+  expect(q.get('body')).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year.\n\nWith regards,\nAna Ruiz of Ruiz Development');
+  // the page itself stays where it was
+  await expect(page).toHaveURL(/127\.0\.0\.1:4173\/$/);
   if (browserName === 'chromium') {
-    await expect(page.locator('#letterNote')).toContainText('Your letter is copied');
+    await expect(page.locator('#letterNote')).toContainText('it is copied too');
     await context.grantPermissions(['clipboard-read']);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year.\n\nWith regards,\nAna Ruiz of Ruiz Development');
   }
@@ -568,22 +571,21 @@ test('the letter copies and opens Instagram without a clipboard permission', asy
 
 // The Spanish and Portuguese developer pages write the developer's letter in their own language, reminder included.
 test('the developer letter composes in Spanish and Portuguese', async ({ page, context, browserName }) => {
-  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
-  page.on('popup', (p) => p.close().catch(() => {}));
   for (const [path, ask, copied, letter] of [
-    ['/es/desarrolladores.html', 'Complete primero su nombre', 'Su carta está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development'],
-    ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'Sua carta foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development']]) {
+    ['/es/desarrolladores.html', 'Complete primero su nombre', 'también está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development'],
+    ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'ela também foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development']]) {
     await page.goto(path);
     await page.locator('#letter').scrollIntoViewIfNeeded();
     await expect(page.locator('#letter fieldset.as')).toBeHidden();
     await page.locator('#letter input[name="where"]').fill('Edgewater');
     await page.locator('#letter input[name="units"]').fill('60');
     await page.locator('#letter input[name="company"]').fill('Ruiz Development');
-    await page.locator('#letter button[data-to="ig"]').click();
+    await page.locator('#letter button[data-to="mail"]').click();
     await expect(page.locator('#letterNote')).toContainText(ask);
     await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
-    await page.locator('#letter button[data-to="ig"]').click();
-    await expect(page.locator('#letterNote')).toContainText('Instagram');
+    await page.locator('#letter button[data-to="mail"]').click();
+    await expect(page.locator('#letterNote')).toContainText('office@centamont.com');
+    expect(new URLSearchParams((await page.locator('#letterNote a').getAttribute('href')).split('?')[1]).get('subject')).toBe('Carta de Ana Ruiz' + letter.split('Ana Ruiz')[1]);
     if (browserName === 'chromium') {
       await expect(page.locator('#letterNote')).toContainText(copied);
       await context.grantPermissions(['clipboard-read']);
@@ -594,19 +596,16 @@ test('the developer letter composes in Spanish and Portuguese', async ({ page, c
 
 // The private-clients page writes its own letter, already set to a buyer, without the sales curve beside it.
 test('the buyer letter on private clients composes and copies', async ({ page, context, browserName }) => {
-  await context.route('https://ig.me/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Instagram</title>' }));
   await page.goto('/private-clients.html');
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await expect(page.locator('#letter fieldset.as')).toBeHidden();
   await expect(page.locator('#letter [data-for="buy"]')).toBeVisible();
   await page.locator('#letter input[name="area"]').fill('Palm Beach');
   await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
-  const popup = page.waitForEvent('popup');
-  await page.locator('#letter button[data-to="ig"]').click();
-  await expect(page.locator('#letterNote')).toContainText('Instagram', { timeout: 2000 });
-  await (await popup).waitForURL(/^https:\/\/ig\.me\/m\/centamont/, { timeout: 2000 });
+  await page.locator('#letter button[data-to="mail"]').click();
+  await expect(page.locator('#letterNote')).toContainText('office@centamont.com', { timeout: 2000 });
   if (browserName === 'chromium') {
-    await expect(page.locator('#letterNote')).toContainText('Your letter is copied');
+    await expect(page.locator('#letterNote')).toContainText('it is copied too');
     await context.grantPermissions(['clipboard-read']);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nI am looking for a residence in Palm Beach, with a budget of over $20 million, and hope to move within six months.\n\nWith regards,\nAna Ruiz');
   }
@@ -631,6 +630,16 @@ test('every page runs under its security policy with nothing refused', async ({ 
     await page.waitForTimeout(300);
   }
   expect(refused).toEqual([]);
+});
+
+// One address for every inquiry, written out in every page's title block and behind the menu's handle.
+test('every page gives the office address', async () => {
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const missing = pages.filter((p) => {
+    const html = readFileSync(p, 'utf8');
+    return !html.includes('<a href="mailto:office@centamont.com">office@<wbr>centamont.com</a></dd>') || !html.includes('<a class="hd" href="mailto:office@centamont.com">');
+  });
+  expect(missing).toEqual([]);
 });
 
 // Every page asks the browser to fetch the next page while a link is hovered or pressed, so the click lands at once.

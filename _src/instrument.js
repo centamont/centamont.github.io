@@ -28,8 +28,9 @@ const cmWords = ({
     asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
     of: ', de ', plan: 'Mi plan: ',
     ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
-    copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente.'],
-    notCopied: ['Su navegador no permitió copiar. Copie la carta de abajo y péguela en el mensaje de ', '.'],
+    subject: (who) => 'Carta de ' + who,
+    copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente.'],
+    notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
   },
   pt: {
     planned: 'Previsto', ground: 'Início da obra', top: 'Estrutura concluída', done: 'Conclusão', axis: 'Meses desde o lançamento',
@@ -50,8 +51,9 @@ const cmWords = ({
     asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
     of: ', ', plan: 'Meu plano: ',
     ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
-    copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente.'],
-    notCopied: ['Seu navegador não permitiu a cópia. Copie a carta abaixo e cole-a na mensagem do ', '.'],
+    subject: (who) => 'Carta de ' + who,
+    copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente.'],
+    notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
   },
 })[(document.documentElement.lang || 'en').slice(0, 2)] || {};
 // a word in the page's language, or the English given: either may be a function, called with the figures that follow
@@ -545,8 +547,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  // ---- The letter: composed here, copied, and sent by the writer through Instagram. Until this script has set it up
-  // (or if it never runs), the letter's button is a plain link to the same Instagram message (practice.css, .letter.ready).
+  // ---- The letter: composed here, opened in the writer's own email, addressed to the office, and sent by the writer.
+  // It is copied too, for a browser with no email app to open. Until this script has set it up (or if it never runs),
+  // the letter's button is a plain link to the same address (practice.css, .letter.ready).
   const form = document.getElementById('letter');
   if (form) {
     const note = document.getElementById('letterNote');
@@ -666,7 +669,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? cmSay('of', ' of ') + of : '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
-    // The status note is built from text and, where it names Instagram, one link: nothing is ever parsed as HTML.
+    // (the subject names the writer, so the office can tell one letter from the next at a glance)
+    const subject = () => { const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim(); return cmSay('subject', (w) => 'A letter from ' + w, name + (of ? cmSay('of', ' of ') + of : '')); };
+    // The status note is built from text and, where it names the address, one link: nothing is ever parsed as HTML.
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
@@ -710,24 +715,24 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       reminding = '';
       if (window.cmCount) window.cmCount('letter' + location.pathname);
-      const url = 'https://ig.me/m/centamont', where = 'Instagram';
-      const t = text();
-      // Copy first, while the click still counts as the writer's own and this tab still has the focus. Opening a tab
-      // first spends that click in Chrome and Edge, and an asynchronous copy can lose the focus to the new tab before
-      // it lands, so the synchronous copy goes first and the clipboard API is only the second try.
+      const to = 'office@centamont.com', t = text();
+      const url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject()) + '&body=' + encodeURIComponent(t);
+      // Copy first, while the click still counts as the writer's own and this tab still has the focus. Handing the
+      // letter to an email app first can take the focus before an asynchronous copy lands, so the synchronous copy
+      // goes first and the clipboard API is only the second try.
       let copying;
       if (syncCopy(t)) copying = Promise.resolve();
       else if (navigator.clipboard && navigator.clipboard.writeText) {
         try { copying = navigator.clipboard.writeText(t); } catch (err) { copying = Promise.reject(err); }
       } else copying = Promise.reject(new Error('copy'));
-      // then open Instagram, still inside the same click, so browsers do not block the tab
-      const w = window.open(url, '_blank');
-      if (w) { try { w.opener = null; } catch (err) {} }
+      // then hand it to the writer's email, still inside the same click (the page itself stays where it is)
+      location.href = url;
       busy = true; setTimeout(() => { busy = false; }, 1200);
-      const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = where; return a; };
+      // (the address in the note opens the same letter again)
+      const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.textContent = to; return a; };
       const go = (copied) => {
         box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-        const [a, b] = copied ? cmSay('copied', ['Your letter is copied. Paste it into the message on ', ', and a partner will reply personally.']) : cmSay('notCopied', ['Your browser did not allow copying. Copy the letter below and paste it into the message on ', '.']);
+        const [a, b] = copied ? cmSay('copied', ['Your letter is open in your email, addressed to ', '. If nothing opened, it is copied too: paste it into a new message to that address. A partner will reply personally.']) : cmSay('notCopied', ['Your letter is open in your email, addressed to ', '. If nothing opened, copy the letter below and send it to that address.']);
         say(a, link(), b);
       };
       copying.then(() => go(true), () => go(false));

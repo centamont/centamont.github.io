@@ -34,6 +34,7 @@ const a = e.target.closest && e.target.closest('a[href]');
 if (!a) return;
 if (/^https:\/\/(ig\.me|www\.instagram\.com)\//.test(a.href)) window.cmCount('instagram' + location.pathname);
 else if (/\.pdf(\?|$)/.test(a.getAttribute('href'))) window.cmCount('brief' + location.pathname);
+else if (/^mailto:/.test(a.href)) window.cmCount('email' + location.pathname);
 }, true);
 const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
 if (nav && btn) {
