@@ -587,14 +587,17 @@
   // Film loops: a few muted seconds of water and light. Each loads only as it comes into view, plays while it is on
   // screen and pauses once it leaves; the still beneath it shows until the first frame is ready. With motion reduced
   // or paused, the still stays. (The page names its files on the video, data-webm and data-mp4; the sources are made
-  // here, as it arrives, so the markup carries no source without a file.)
+  // here, as it arrives, so the markup carries no source without a file.) A phone takes the 960px cut, data-webm-sm and
+  // data-mp4-sm, a quarter of the weight; a visitor saving data, or on a slow connection, keeps the still.
   const films = document.querySelectorAll('video.loop');
-  if (films.length && !stillPage) {
+  const conn = navigator.connection, lean = !!conn && (conn.saveData || /(^|-)[23]g$/.test(conn.effectiveType || ''));
+  const small = matchMedia('(max-width:820px)').matches;
+  if (films.length && !stillPage && !lean) {
     const fo = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting: on }) => {
       if (on) {
         if (!v.dataset.ready) {
           v.dataset.ready = '1';
-          [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { if (!v.dataset[k]) return; const s = document.createElement('source'); s.src = v.dataset[k]; s.type = type; v.appendChild(s); });
+          [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { const src = (small && v.dataset[k + 'Sm']) || v.dataset[k]; if (!src) return; const s = document.createElement('source'); s.src = src; s.type = type; v.appendChild(s); });
           v.addEventListener('playing', () => v.classList.add('on'), { once: true });
           v.load();
         }
