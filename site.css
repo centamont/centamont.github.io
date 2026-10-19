@@ -798,6 +798,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 @media (max-width:1023px){.tb{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"pr pr pr of of of" "dr dr sc sc sh sh" "wk wk mk mk fo fo" "ss ss ss ss ss ss"}}
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk mk" "ss ss" "fo fo"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;min-height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
+@media (max-width:600px){.t-fo ul{display:flex;flex-wrap:wrap;column-gap:24px}}
 @media (max-width:600px){.t-of a{font-size:.9em}}
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
 @media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}

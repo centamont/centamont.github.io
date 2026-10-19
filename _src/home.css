@@ -1078,6 +1078,22 @@ html:not(.js) .step{min-height:auto}
   #journal .notes-list a{padding-block:15px}
   .faq summary{padding-block:17px}
 }
+/* Within sixteen screens in all three languages (a test holds it): on a phone the journal keeps its guide and its line to
+   every note, leaving the two developer notes to the journal itself, and the chapters, bands and close each give up a
+   little of their air (60px over each chapter, 52 at the bands, 56 and 72 round the name) */
+@media (max-width:520px){
+  #journal .notes-list{display:none}
+  #services,#developers,#markets{padding-top:60px}
+  #developers{padding-bottom:48px}
+  #clients,#contact{padding-block:52px}
+  #journal,#people,#questions{padding-block:44px}
+  .name{padding-block:56px 72px}
+  /* the chapter heads take the phone's whole measure: their wide-screen measure, about eleven words, leaves a phone's
+     column a quarter empty and adds a line to most heads */
+  main .head h2,main .head.wide h2,#clients h2,.step h3,.cv-txt h3{max-width:none}
+  /* the curve's sentence repeats its two readings above it; a phone shows the readings and still announces the sentence */
+  .cv-say{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;min-height:0}
+}
 /* Spanish and Portuguese say each head in more letters, and on a phone their longer words break a line sooner: their
    heads set a step under the English ones (about 0.92), as the hero's headline already does, so the page keeps the
    English page's length within a few percent */

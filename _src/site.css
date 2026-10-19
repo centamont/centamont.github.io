@@ -1258,6 +1258,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    nothing here is drawn to one, is left off. Every link keeps a 43px target, set edge to edge. */
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk mk" "ss ss" "fo fo"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;min-height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
+/* and the three follow links stand in one row across the sheet's foot, each still a full-height target */
+@media (max-width:600px){.t-fo ul{display:flex;flex-wrap:wrap;column-gap:24px}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
 /* the office's address sits on one line in its half-width cell down to a 360px phone; below that it breaks after the @ */

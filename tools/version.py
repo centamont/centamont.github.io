@@ -17,7 +17,7 @@ import re,hashlib,glob,sys
 check='--check' in sys.argv[1:]
 stale=[]
 CSS=['site.css','home.css','practice.css','market.css','reading.css','sheet.css']
-JS=['site.js','instrument.js','planner.js']
+JS=['site.js','instrument.js','planner.js','home.js']
 
 def strip_css(src,name='site.css'):
     # Drops /* comments */ outside strings and unquoted url(), then trailing spaces and blank lines.
@@ -112,7 +112,7 @@ for f in CSS+JS:
         if open(f).read()!=built[f]: stale.append(f); print(f,'stale: run python3 tools/version.py')
     else: open(f,'w').write(built[f])
 
-assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css','media/maps.svg']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css','home.js','media/maps.svg']
 h=hashlib.sha256()
 for a in assets: h.update(built[a].encode() if a in built else open(a,'rb').read())
 token=h.hexdigest()[:8]
