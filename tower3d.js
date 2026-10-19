@@ -670,10 +670,12 @@ void main() {
     const day = smooth(clamp((el + 4) / 16, 0, 1)), gold = clamp((20 - el) / 16, 0, 1) * day, dusk = smooth(clamp(1 - Math.abs(el + 3) / 6, 0, 1)) * (1 - day * 0.6);
     const ink = m.bg || [20, 22, 26];
     // (sRGB: a clear day is a deep Miami blue over a pale haze, the page's ink kept by the veil under the headline; dusk
-    // a bronze horizon under indigo)
-    let zen = mixc([30, 58, 96], [24, 30, 50], gold), hor = mixc([160, 176, 190], [168, 120, 84], gold);
+    // a bronze horizon under indigo, and dawn, over the bay to the east, a cooler rose under a paler blue, so a morning
+    // never reads as the same hour as an evening)
+    const am = sun.az < 180 ? 1 : 0;
+    let zen = mixc([30, 58, 96], am ? [34, 48, 78] : [24, 30, 50], gold), hor = mixc([160, 176, 190], am ? [178, 150, 146] : [168, 120, 84], gold);
     zen = mixc(mixc(ink, [12, 16, 30], 0.7), zen, day); hor = mixc([56, 46, 42], hor, day);
-    hor = mixc(hor, [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
+    hor = mixc(hor, am ? [98, 82, 96] : [104, 74, 62], dusk * 0.8); zen = mixc(zen, [16, 20, 38], dusk * 0.6);
     return { zen, hor, ink, day, gold, night, dusk, mid: mixc(mixc(zen, hor, 0.42), [74, 62, 78], gold * 0.5 + dusk * 0.3) };
   }
   // (drawn straight onto the drawing, each time it draws: a few broad fills, which a graphics chip lays down in a blink,
