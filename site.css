@@ -384,7 +384,8 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 @media (max-width:599px) and (prefers-reduced-motion:no-preference){html.menu-open .lang{animation:motion-in .5s var(--ease) .35s backwards}}
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
-@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1280px) and (max-width:1599px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1600px){:lang(es) .motion::after{content:"Animación";letter-spacing:.1em}:lang(pt) .motion::after{content:"Animação";letter-spacing:.1em}}
 :root[data-motion="off"]{scroll-behavior:auto}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
 .theme .sun{display:none}

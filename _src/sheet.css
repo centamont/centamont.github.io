@@ -325,3 +325,11 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
   .lp-plan svg{max-height:120mm}
   .lp-u,.lp-key i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* on a phone each head cell's label holds one line ("Weekly report" as well as "Building"): the labels set at 13px on
+   .08em, the cells close in to 12px, and the first column takes a little more of the width (under 341px they may wrap) */
+@media (max-width:520px){
+  .rp-head{grid-template-columns:minmax(0,1.14fr) minmax(0,1fr)}
+  .rp-head > div{padding-inline:12px}
+  .rp-head dt{font-size:13px;letter-spacing:.08em}
+}
+@media (min-width:341px) and (max-width:520px){.rp-head dt{white-space:nowrap}}

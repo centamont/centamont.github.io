@@ -271,3 +271,9 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
   .lp-plan svg{max-height:120mm}
   .lp-u,.lp-key i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+@media (max-width:520px){
+  .rp-head{grid-template-columns:minmax(0,1.14fr) minmax(0,1fr)}
+  .rp-head > div{padding-inline:12px}
+  .rp-head dt{font-size:13px;letter-spacing:.08em}
+}
+@media (min-width:341px) and (max-width:520px){.rp-head dt{white-space:nowrap}}

@@ -603,8 +603,10 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 /* in the bar the motion switch says what it is: its glyph, then the word, in the small labels' voice */
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
-/* the word is English, so the Spanish and Portuguese pages keep the glyph alone, which also leaves room for their longer menu */
-@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+/* the Spanish and Portuguese pages say it in their own word, a touch closer set, from 1600px, where their longer menu
+   leaves room for it; below that they keep the glyph alone */
+@media (min-width:1280px) and (max-width:1599px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1600px){:lang(es) .motion::after{content:"Animación";letter-spacing:.1em}:lang(pt) .motion::after{content:"Animação";letter-spacing:.1em}}
 /* Motion switched off on this site: everything arrives in its final state, and anchors jump rather than glide (no
    transition at all, as with motion reduced: even a .001ms one would start on every element a change of night or day
    touches, and a list of them, even at 0s, is weighed on every element at every restyle) */
