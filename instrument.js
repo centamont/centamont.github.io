@@ -19,8 +19,9 @@ salute: 'Estimados socios:', sign: 'Saludos cordiales,',
 asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
 of: ', de ', plan: 'Mi plan: ',
 ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
-copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente.'],
-notCopied: ['Su navegador no permitió copiar. Copie la carta de abajo y péguela en el mensaje de ', '.'],
+subject: (who) => 'Carta de ' + who,
+copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente.'],
+notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
 },
 pt: {
 planned: 'Previsto', ground: 'Início da obra', top: 'Estrutura concluída', done: 'Conclusão', axis: 'Meses desde o lançamento',
@@ -41,8 +42,9 @@ salute: 'Prezados sócios,', sign: 'Atenciosamente,',
 asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
 of: ', ', plan: 'Meu plano: ',
 ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
-copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente.'],
-notCopied: ['Seu navegador não permitiu a cópia. Copie a carta abaixo e cole-a na mensagem do ', '.'],
+subject: (who) => 'Carta de ' + who,
+copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente.'],
+notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
 },
 })[(document.documentElement.lang || 'en').slice(0, 2)] || {};
 const cmSay = (k, en, ...a) => { const v = k in cmWords ? cmWords[k] : en; return typeof v === 'function' ? v(...a) : v; };
@@ -521,6 +523,7 @@ const plan = p.querySelector('.plan-ref') ? '\n\n' + cmSay('plan', 'My plan: ') 
 return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? cmSay('of', ' of ') + of : '');
 };
 const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
+const subject = () => { const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim(); return cmSay('subject', (w) => 'A letter from ' + w, name + (of ? cmSay('of', ' of ') + of : '')); };
 const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
 const asks = cmWords.asks || { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', name: 'your name', company: 'your company' };
 const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' ' + cmSay('and', 'and') + ' ' + a[a.length - 1]);
@@ -555,20 +558,19 @@ return;
 }
 reminding = '';
 if (window.cmCount) window.cmCount('letter' + location.pathname);
-const url = 'https://ig.me/m/centamont', where = 'Instagram';
-const t = text();
+const to = 'office@centamont.com', t = text();
+const url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject()) + '&body=' + encodeURIComponent(t);
 let copying;
 if (syncCopy(t)) copying = Promise.resolve();
 else if (navigator.clipboard && navigator.clipboard.writeText) {
 try { copying = navigator.clipboard.writeText(t); } catch (err) { copying = Promise.reject(err); }
 } else copying = Promise.reject(new Error('copy'));
-const w = window.open(url, '_blank');
-if (w) { try { w.opener = null; } catch (err) {} }
+location.href = url;
 busy = true; setTimeout(() => { busy = false; }, 1200);
-const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = where; return a; };
+const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.textContent = to; return a; };
 const go = (copied) => {
 box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-const [a, b] = copied ? cmSay('copied', ['Your letter is copied. Paste it into the message on ', ', and a partner will reply personally.']) : cmSay('notCopied', ['Your browser did not allow copying. Copy the letter below and paste it into the message on ', '.']);
+const [a, b] = copied ? cmSay('copied', ['Your letter is open in your email, addressed to ', '. If nothing opened, it is copied too: paste it into a new message to that address. A partner will reply personally.']) : cmSay('notCopied', ['Your letter is open in your email, addressed to ', '. If nothing opened, copy the letter below and send it to that address.']);
 say(a, link(), b);
 };
 copying.then(() => go(true), () => go(false));
