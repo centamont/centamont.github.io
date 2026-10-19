@@ -214,3 +214,13 @@
   main.page:not(.wide):not(.lot) .plate.broad > .cap{width:638px;margin-left:var(--rail)}
   main.page:not(.wide):not(.lot) .prose .side{margin-right:-250px}
 }
+.prose .wk .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;margin-right:0}
+.wk .rp-key b{font-weight:500;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;text-align:right}
+@media (min-width:1170px){.prose .wk .rp-key{font-size:13px;letter-spacing:.1em}.prose .wk .rp-key li{white-space:nowrap}}
+.plate.dwg{display:block}
+.plate.dwg > .ticks{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:24px clamp(40px,6vw,96px);padding:clamp(28px,3.4vw,48px) clamp(16px,3vw,48px)}
+.plate.dwg .wk-plan{flex:none;width:auto;height:clamp(320px,30vw,420px)}
+.plate.dwg .rp-t{font-size:15.7px}
+.plate.dwg .rp-key{flex-direction:column;gap:10px;margin:0;font-size:14px;letter-spacing:.14em}
+.plate.dwg .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) 2.4em;gap:12px;align-items:center;white-space:nowrap;margin-right:0}
+.plate.dwg > .cap{margin-top:12px}
