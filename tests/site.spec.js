@@ -967,3 +967,22 @@ test('the developer and markets pages keep their ruled rows', async ({ page }) =
     await expect(page.locator('.co-row').first()).toHaveCSS('display', 'grid');
   }
 });
+
+// The market films load as they come into view: a phone takes the 960px cut, a wider window the full one, and a visitor
+// saving data keeps the still. The opener's still is fetched first.
+test('the films fit the screen and wait for a visitor saving data', async ({ page, isMobile }) => {
+  for (const path of ['/new-york.html', '/es/sur-de-florida.html']) {
+    await page.goto(path);
+    await expect(page.locator('.opener img')).toHaveAttribute('fetchpriority', 'high');
+    await page.locator('video.loop').scrollIntoViewIfNeeded();
+    await expect(page.locator('video.loop source')).toHaveCount(2);
+    for (const src of await page.locator('video.loop source').evaluateAll((s) => s.map((e) => e.getAttribute('src')))) {
+      expect(src.includes('-960.'), `${path} ${src}`).toBe(isMobile);
+    }
+  }
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'connection', { get: () => ({ saveData: true, effectiveType: '4g' }) }));
+  await page.goto('/new-york.html');
+  await page.locator('video.loop').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  await expect(page.locator('video.loop source')).toHaveCount(0);
+});
