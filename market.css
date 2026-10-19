@@ -39,6 +39,16 @@
 .ms-k{margin-top:10px;font-size:14px;line-height:1.5;color:var(--faint)}
 @media (max-width:640px){
   .ms-n{font-size:36px}
+  .ms dl > div,.ms dl > div + div{display:block;padding:12px 0 14px}
+  .ms dd{margin-top:4px}
+  .ms-n{display:inline}
+  .ms-u{display:inline;margin:0 0 0 .4em}
+  .ms-sc{margin-top:10px}
+  .ms-note{margin-top:6px}
+  .mk-facts > .dup{display:none}
+  .mk-facts > div{padding:10px 0 11px}
+  .mk-facts dt{padding-top:0}
+  .prose h2{margin-top:40px}
 }
 .prose .mk-src{font-size:15px}
 .prose .mk-src li{scroll-margin-top:96px}
@@ -62,8 +72,15 @@
 .mk-fig .nyd .rch{--r:1}
 .mk-fig .nyd .cp{fill:var(--patina);stroke:var(--sheet);stroke-width:calc(1.25px * var(--u,1))}
 .mk-fig .nyd .cl text{fill:var(--fg);font:italic 400 calc(19px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
-@media (max-width:600px){.mk-fig .sv{--u:1}.mk-fig .nyd{--u:1.4}.mk-fig .nyd :is(.gl,.sl,.sbar,.scl text:not(:last-child),.li){display:none}.mk-fig .nyd .sea text{letter-spacing:.12em}
+@media (max-width:600px){.mk-fig .sv{--u:1}}
+@media (max-width:429px){.mk-fig .sv{--u:1.1}}
+@media (max-width:374px){.mk-fig .sv{--u:1.15}}
+@media (max-width:359px){.mk-fig .sv{--u:1.22}}
+@media (max-width:340px){.mk-fig .sv{--u:1.3}}
+@media (max-width:600px){.mk-fig .nyd{--u:1.4}.mk-fig .nyd :is(.gl,.sl,.sbar,.scl text:not(:last-child),.li){display:none}.mk-fig .nyd .sea text{letter-spacing:.12em}
   .mk-fig .nyd .cl .c1{text-anchor:start;transform:translate(22px,34px)}}
+.mk-fig .nyd .cl .c1:lang(es){text-anchor:start;transform:translate(22px,34px)}
+.mk-fig .nyd .li{transform:translateY(9px)}
 .mk-fig .dmap{--u:.9;display:block;width:100%;height:auto}
 .mk-fig .dmap .hp line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
 .mk-fig .dmap .zp line{stroke:var(--sold-line);stroke-width:var(--lw-hatch)}
@@ -77,13 +94,29 @@
 .mk-fig .dmap rect.lm{fill:var(--fg)}
 .mk-fig .dmap text{stroke:var(--sheet);stroke-linejoin:round;paint-order:stroke}
 .mk-fig .dmap .dl{fill:var(--fg);font:italic 400 calc(19px * var(--u,1)) var(--display);stroke-width:calc(5px * var(--u,1))}
-.mk-fig .dmap :is(text.lm,.scl text){fill:var(--faint);font:500 calc(12px * var(--u,1)) var(--body);letter-spacing:.14em;stroke-width:calc(4px * var(--u,1))}
+.mk-fig .dmap :is(text.lm,.scl text){fill:var(--faint);font:500 calc(12px * var(--u,1)) var(--body);letter-spacing:.1em;stroke-width:calc(4px * var(--u,1))}
 .mk-fig .dmap .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
 .mk-fig .dmap .wn{fill:var(--faint);font:italic 400 calc(15px * var(--u,1)) var(--display);letter-spacing:.2em;stroke-width:calc(4px * var(--u,1))}
 .mk-fig .dmap :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .mk-fig .dmap .nh{fill:var(--fg)}
 @media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap :is(text.lm,.wn){display:none}}
 @media (forced-colors:active){.mk-fig .dmap :is(.fb,.fw,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
+.mk-fig :is(.nyd,.dmap){--k:1.125}
+@media (min-width:601px) and (max-width:719px){.mk-fig :is(.nyd,.dmap){--k:1.2}}
+@media (min-width:601px) and (max-width:659px){.mk-fig :is(.nyd,.dmap){--k:1.33}}
+@media (max-width:600px){.mk-fig :is(.nyd,.dmap){--k:1.86}}
+@media (max-width:429px){.mk-fig :is(.nyd,.dmap){--k:1.95}}
+@media (max-width:411px){.mk-fig :is(.nyd,.dmap){--k:2.06}}
+@media (max-width:389px){.mk-fig :is(.nyd,.dmap){--k:2.15}}
+@media (max-width:374px){.mk-fig :is(.nyd,.dmap){--k:2.25}}
+@media (max-width:359px){.mk-fig :is(.nyd,.dmap){--k:2.42}}
+@media (max-width:340px){.mk-fig :is(.nyd,.dmap){--k:2.6}}
+.mk-fig .nyd :is(.cn,.scl,.sea,.cl) text,.mk-fig .nyd .gl,.mk-fig .dmap :is(.dl,.wn,text.lm,.scl text){font-size:max(var(--fs),calc(13.2px * var(--k)))}
+.mk-fig .nyd :is(.cn,.scl) text,.mk-fig .nyd .gl{--fs:calc(13px * var(--u,1))}
+.mk-fig .dmap :is(text.lm,.scl text){--fs:calc(12px * var(--u,1))}
+.mk-fig .nyd .sea text,.mk-fig .dmap .wn{--fs:calc(15px * var(--u,1))}
+.mk-fig .nyd .cl text,.mk-fig .dmap .dl{--fs:calc(19px * var(--u,1))}
+@media (max-width:600px){.mk-fig :is(.dmap,.nyd) [style*="--ph"]{transform:var(--ph)}.mk-fig :is(.dmap,.nyd) [style*="--pa"],.mk-fig :is(.dmap,.nyd) [style*="--pa"] tspan{text-anchor:var(--pa)}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
@@ -146,4 +179,17 @@
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{max-width:none}
   main.page:not(.wide):not(.lot) .opener > .cap{width:638px;max-width:none;margin-left:calc((100% - var(--max)) / 2 + var(--gl) + var(--rail))}
 }
+@media (max-width:640px){
+  .opener{margin-block:32px}
+  .mk-el-fig{margin-bottom:32px}
+  .prose,.mk-fig + .prose,.mk-fig{margin-top:32px}
+  .prose .note{margin-top:36px}
+  .next{margin-top:36px}
+  .next + .row{margin-top:32px}
+  .ms-h{row-gap:2px}
+}
 @media print{.film video{display:none}}
+@media (min-width:821px) and (max-width:1169px){
+  .ms,main.page:not(.wide):not(.lot) > .wrap > .ms{max-width:min(100%,880px - var(--gl) - var(--gr))}
+}
+@media (max-width:1139px){.prose .side{display:none}}
