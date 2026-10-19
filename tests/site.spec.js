@@ -377,6 +377,8 @@ test('the launch planner answers its inputs, keeps them in its link and says it 
   await page.locator('#plWrite').click();
   await expect(page.locator('#letter input[name="units"]')).toHaveValue('120');
   await expect(page.locator('#letter input[name="where"]')).toHaveValue('Edgewater');
+  // the planner's launch month, not a year, says when sales begin
+  await expect(page.locator('#letter select[name="when"] option:checked')).toHaveText(/^in [A-Z][a-z]+ \d{4}$/);
   await expect(page).not.toHaveURL(/units=/);
 });
 

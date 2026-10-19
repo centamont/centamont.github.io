@@ -28,7 +28,8 @@ const cmWords = ({
     asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
     of: ', de ', plan: 'Mi plan: ',
     ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
-    copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente.'],
+    copied: ['Su carta está copiada. Péguela en el mensaje de ', ' y un socio le responderá personalmente para concertar una primera conversación.'],
+    launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1] + ' de ' + y,
     notCopied: ['Su navegador no permitió copiar. Copie la carta de abajo y péguela en el mensaje de ', '.'],
   },
   pt: {
@@ -50,7 +51,8 @@ const cmWords = ({
     asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
     of: ', ', plan: 'Meu plano: ',
     ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
-    copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente.'],
+    copied: ['Sua carta foi copiada. Cole-a na mensagem do ', ' e um sócio responderá pessoalmente para marcar uma primeira conversa.'],
+    launchIn: (m, y) => 'em ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][m - 1] + ' de ' + y,
     notCopied: ['Seu navegador não permitiu a cópia. Copie a carta abaixo e cole-a na mensagem do ', '.'],
   },
 })[(document.documentElement.lang || 'en').slice(0, 2)] || {};
@@ -559,6 +561,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const signed = () => [...form.querySelectorAll('.sign input')].filter((i) => !i.closest('[hidden]'));
     // A plan carried from the launch planner: its own link, rebuilt here from plain figures only, closes the developer's letter.
     let planUrl = '';
+    // and its launch month, which the letter then names in place of a year (the planner's launch is a month: "in November 2026")
+    let launchAt = '';
     // Choosing a voice, the letter rewrites itself softly (site.css): the dimension line under the chosen label travels to
     // it (280 ms), the old paragraph goes (120 ms), then the sheet takes the new one's height (240 ms) as it settles in
     // (220 ms). The focus stays on the voice chosen; with motion reduced or paused the change is instant.
@@ -625,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (v === 'dev' && q.get('plan')) {
           const from = new URLSearchParams(q.get('plan')), keep = new URLSearchParams();
           ['u', 'f', 'p', 'c', 'l', 'd', 'g', 'b'].forEach((k) => { const t = from.get(k); if (t && /^-?\d{1,4}(\.\d{1,2})?$/.test(t)) keep.set(k, t); });
-          if (/^\d{4}-\d{2}$/.test(from.get('s') || '')) keep.set('s', from.get('s'));
+          if (/^\d{4}-(0[1-9]|1[0-2])$/.test(from.get('s') || '')) { keep.set('s', from.get('s')); launchAt = from.get('s'); }
           ['n', 'w'].forEach((k) => { const t = (from.get(k) || '').trim(); if (t && word.test(t)) keep.set(k, t); });
           if (keep.has('u')) planUrl = 'https://centamont.com/planner.html?' + keep;
         }
@@ -638,6 +642,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const r = document.createElement('span'), a = document.createElement('a');
       r.className = 'plan-ref'; a.className = 'ul'; a.href = planUrl; a.textContent = planUrl.replace(/^https:\/\//, '');
       r.append(cmSay('plan', 'My plan: '), a); devp.append(' ', r);
+    }
+    const whenSel = form.elements.when;
+    if (launchAt && whenSel) {
+      const [y, m] = launchAt.split('-').map(Number);
+      const o = new Option(cmSay('launchIn', (mm, yy) => 'in ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][mm - 1] + ' ' + yy, m, y));
+      whenSel.add(o); o.selected = true;
     }
     document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
     // Enter in a blank should not send the letter
@@ -727,8 +737,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = where; return a; };
       const go = (copied) => {
         box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-        const [a, b] = copied ? cmSay('copied', ['Your letter is copied. Paste it into the message on ', ', and a partner will reply personally.']) : cmSay('notCopied', ['Your browser did not allow copying. Copy the letter below and paste it into the message on ', '.']);
+        const [a, b] = copied ? cmSay('copied', ['Your letter is copied. Paste it into the message on ', ', and a partner will reply personally to arrange a first conversation.']) : cmSay('notCopied', ['Your browser did not allow copying. Copy the letter below and paste it into the message on ', '.']);
         say(a, link(), b);
+        // the note is filled on the next frame (say); then, if it stands below the fold, the page brings it into view
+        if (copied) requestAnimationFrame(() => { const d = note.getBoundingClientRect().bottom + 24 - innerHeight; if (d > 0) scrollBy({ top: d, behavior: calm() ? 'auto' : 'smooth' }); });
       };
       copying.then(() => go(true), () => go(false));
     });

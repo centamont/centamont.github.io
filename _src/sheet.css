@@ -83,6 +83,30 @@
 .rp-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
 .rp-foot .num{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
 @media (max-width:600px){.rp-foot{grid-template-columns:minmax(0,1fr)}}
+/* deposits, cancellations and the slowest line: four readings in a row, each a label, a figure and what it means, set
+   smaller than the week's four figures above them (two by two where the week's figures go two by two) */
+.rp-ledger{margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.rp-ledger > div{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:4px;align-content:start;padding-right:20px;min-width:0}
+.rp-ledger > div + div{padding-left:20px;border-left:1px solid var(--rule)}
+.rp-ledger dd.fig{font-family:var(--display);font-weight:300;font-size:clamp(34px,3.2vw,48px);line-height:1;font-variant-numeric:lining-nums tabular-nums}
+.rp-ledger dd:not(.fig){font-size:15px;line-height:1.45;color:var(--muted)}
+/* The specimen price list, the report's second sheet: launch prices by band of floors and by line, set as a stacking plan
+   of separate cells (the inventory's own language) with release one outlined in bronze and the residences kept back
+   dashed, beside the reasons for the prices. Each cell also says its status in words, for screen readers. */
+.px-cols{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.px-wrap{margin:0 -4px;overflow-x:auto}
+.px-grid{width:100%;border-collapse:separate;border-spacing:4px;font-variant-numeric:lining-nums tabular-nums}
+.px-grid th{font-size:14px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:left;vertical-align:bottom;padding:0 6px 8px}
+.px-grid thead th span{display:block;margin-top:2px;font-size:13px;line-height:1.35;letter-spacing:.04em;text-transform:none;font-weight:400}
+.px-grid thead th:first-child{padding-left:0}
+.px-grid tbody th{padding:0 8px 0 0;vertical-align:middle;white-space:nowrap;font-family:var(--display);font-size:18px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.px-grid td{padding:12px 8px;border:1px solid var(--rule);text-align:right;font-family:var(--display);font-size:clamp(17px,1.5vw,21px);line-height:1.2;color:var(--faint);white-space:nowrap}
+.px-grid td.r1{border-color:var(--accent);color:var(--fg)}
+.px-grid td.kb{border:1px dashed var(--faint)}
+.rp-key .k-r1{width:14px;height:10px;border:1px solid var(--accent)}
+@media (forced-colors:active){.px-grid td.r1,.rp-key .k-r1{border-width:2px}}
+@media (max-width:520px){.px-wrap{margin:0 -2px}.px-grid{border-spacing:2px}.px-grid td{padding:10px 4px;font-size:15px}.px-grid tbody th{padding-right:4px;font-size:16px}.px-grid thead th{padding:0 2px 8px;letter-spacing:.08em}.px-grid thead th span{letter-spacing:0}}
+@media (max-width:380px){.px-grid td{padding-inline:3px;font-size:14px}.px-grid tbody th{font-size:15px}}
 /* The specimen short list: the report's sheet, with three residences set side by side. Each column is a subgrid of the same rows,
    so the elevations, the facts and the reasons line up across the three and read as one comparison. */
 .sl-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(20px,3vw,48px)}
@@ -211,7 +235,7 @@
   .ps-table td:nth-child(2)::after{content:" sq ft";content:" sq ft" / ""}
   .ps-table td:last-child{font-size:20px}
 }
-@media (max-width:900px){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(2n){padding-right:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
+@media (max-width:900px){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-ledger > div:nth-child(3){padding-left:0;border-left:0}.rp-ledger > div:nth-child(2n){padding-right:0}.rp-ledger > div:nth-child(n+3){margin-top:24px}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(2n){padding-right:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
 /* phones: each bar takes the sheet's full width on its own line, under its label and figures, rather than a stub between them;
    the table's header is hidden, so each week number carries a small WEEK label (silent to screen readers, which still hear the column header) */
 @media (max-width:520px){.rp-funnel,.rp-src{gap:16px}.rp-funnel li{grid-template-columns:minmax(0,1fr) 2.6em 2.8em;gap:4px 10px;font-size:15px}.rp-src li{grid-template-columns:minmax(0,1fr) 2.8em;gap:4px 10px;font-size:15px}.rp-funnel .bar,.rp-src .bar{grid-row:2;grid-column:1/-1}.rp-funnel .bar{height:10px}.rp-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.rp-table tr{display:grid;grid-template-columns:3em minmax(0,1fr);gap:2px 12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}.rp-table td{border:0;padding:0}.rp-table td:nth-child(n+2){grid-column:2}.rp-table td.num{grid-row:span 3}.rp-table td.num::before{content:"Week";content:"Week" / "";display:block;font-family:var(--body);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);line-height:28px}}
@@ -219,7 +243,7 @@
 /* Text enlarged on its own (a text-only zoom) grows the figures but not the sheet: measured in its own text size, the sheet
    takes the two-by-two layout above once four figures no longer fit across (at the set size, only where the rule above does) */
 .sheet-rp{container-type:inline-size}
-@container (max-width:40em){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(2n){padding-right:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
+@container (max-width:40em){.rp-head,.rp-figs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-ledger > div:nth-child(3){padding-left:0;border-left:0}.rp-ledger > div:nth-child(2n){padding-right:0}.rp-ledger > div:nth-child(n+3){margin-top:24px}.rp-head > div:nth-child(3){border-left:0}.rp-head > div:nth-child(n+3){border-top:1px solid var(--rule)}.rp-figs > div:nth-child(3){padding-left:0;border-left:0}.rp-figs > div:nth-child(2n){padding-right:0}.rp-figs > div:nth-child(n+3){margin-top:24px}.rp-grid2{grid-template-columns:1fr}}
 .sheet-rp section{padding-block:0}
 section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 
