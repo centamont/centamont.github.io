@@ -31,7 +31,7 @@
   // nothing stored on the visitor's device. Only on centamont.com, never for a browser driven by a script (the tests),
   // and never when the browser sends Global Privacy Control or Do Not Track (privacy.html says so). A few moments are
   // counted as events by name: a letter sent (and from which page), the launch planner put to use, a step from the
-  // planner to the letter, a way out to Instagram, the developer brief downloaded.
+  // planner to the letter, a way out to Instagram, an email link opened, the developer brief downloaded.
   // window.cmCount(name) counts one; instrument.js and planner.js call it.
   const counting = /^(www\.)?centamont\.com$/.test(location.hostname) && !navigator.webdriver && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1';
   const count = (p, ev) => {
@@ -47,6 +47,7 @@
     if (!a) return;
     if (/^https:\/\/(ig\.me|www\.instagram\.com)\//.test(a.href)) window.cmCount('instagram' + location.pathname);
     else if (/\.pdf(\?|$)/.test(a.getAttribute('href'))) window.cmCount('brief' + location.pathname);
+    else if (/^mailto:/.test(a.href)) window.cmCount('email' + location.pathname);
   }, true);
 
   // Menu
