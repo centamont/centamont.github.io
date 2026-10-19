@@ -576,10 +576,10 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .prose li{margin-top:.4em;padding-left:4px}
 .prose li::marker{color:var(--accent)}
 .prose strong{color:var(--fg);font-weight:400;font-style:italic}
-.prose .ref{font-size:18px}
-.prose .ref li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
-.prose .ref li{margin-top:10px;color:var(--muted)}
-.prose .ref strong{font-style:normal;font-weight:500}
+.prose .ref li{margin-top:10px}
+.prose .mk-src li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
+.prose .mk-src li{color:var(--muted)}
+.prose .mk-src strong{font-style:normal;font-weight:500}
 .prose a{color:var(--accent)}
 .prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
 .prose .note{padding-right:max(0px,calc(100% - 32em));text-wrap:balance}

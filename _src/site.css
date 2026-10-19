@@ -895,11 +895,12 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .prose li::marker{color:var(--accent)}
 /* only Cormorant's 300 and 400 are served, so a term set off in the reading face is set in its italic, never a forged bold */
 .prose strong{color:var(--fg);font-weight:400;font-style:italic}
-/* reference lists (the documents, the questions) and the closing note keep the sans, at the body size */
-.prose .ref{font-size:18px}
-.prose .ref li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
-.prose .ref li{margin-top:10px;color:var(--muted)}
-.prose .ref strong{font-style:normal;font-weight:500}
+/* reference lists (the documents, the questions, the steps) read like the paragraphs around them, in the same face and
+   size, so a column never changes typeface halfway down; only the sources (market.css) and the closing note keep the sans */
+.prose .ref li{margin-top:10px}
+.prose .mk-src li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
+.prose .mk-src li{color:var(--muted)}
+.prose .mk-src strong{font-style:normal;font-weight:500}
 .prose a{color:var(--accent)}
 .prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
 /* (its rules run the column's width; its 16px words keep to about 75 characters a line, in lines of even length) */
