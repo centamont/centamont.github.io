@@ -404,7 +404,7 @@ if (el && !el.disabled) { held = el; el.classList.add('press'); }
 addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
 const rows = document.querySelectorAll('.hoods');
 if (rows.length) {
-const stop = () => rows.forEach((r) => { if (r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
+const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
 let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
 }
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
