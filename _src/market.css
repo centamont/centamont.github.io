@@ -154,6 +154,9 @@
 .opener > picture img.top{object-position:50% 0}
 /* an opener whose horizon sits low (a beach under an empty sky) keeps the shore and the last light, not the sky above them */
 .opener > picture img.low{object-position:50% 85%}
+/* an opener whose tallest tower stands well inside a tall frame (Austin) keeps its crown and a breath of sky above it, and gives
+   up the water under the bridge instead */
+.opener > picture img.crown{object-position:50% 39%}
 .opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
 .js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
 .js .opener.in :is(.frame,picture){clip-path:inset(0)}

@@ -53,7 +53,12 @@
 html{scroll-behavior:smooth;scroll-padding-top:var(--hdr);scrollbar-color:var(--rule) transparent;scrollbar-width:thin;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-weight:400;font-size:18px;line-height:1.7;-webkit-font-smoothing:antialiased;caret-color:var(--accent)}
 ::selection{background:var(--bronze);color:var(--ink)}
-body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55}
+body::after,header.site::after,.vt-cover::after,.vt-veil::after,.copy-note::after,.curtain .half::after{content:"";pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55}
+body::after{position:fixed;inset:0;z-index:5}
+header.site::after{position:absolute;inset:0;z-index:3}
+html.menu-open header.site::after{position:fixed}
+.js body.home header.site.over.top::after{top:var(--hdr)}
+:is(.vt-cover,.vt-veil,.copy-note,.curtain .half)::after{position:absolute;inset:0}
 @media print{body::after{display:none}}
 .n,.num,.gauge b,.begin li::before,.dscale,.table b,.rscale,.lv .when{font-variant-numeric:lining-nums tabular-nums}
 .cv-say,.rp-lede,.rp-next li,.rp-table td,.letter .sheet,.letter .fallback textarea{font-variant-numeric:lining-nums}
@@ -988,7 +993,7 @@ p,li{text-wrap:pretty}
   footer .legal > span:first-child::after{content:" centamont.com"}
 }
 @media print and (min-width:901px){.cv-say{grid-row:2}.cv-read{grid-row:3;margin-top:0}}
-@media (forced-colors:active){body::after{display:none}
+@media (forced-colors:active){:is(body,header.site,.vt-cover,.vt-veil,.copy-note,.curtain .half)::after{display:none}
   .cv-ctl input[type=range]::-webkit-slider-runnable-track{forced-color-adjust:none;background:CanvasText}
   .cv-ctl input[type=range]::-moz-range-track{background:CanvasText}
   .cv-ctl input[type=range]::-webkit-slider-thumb{background:Canvas;border-color:CanvasText;box-shadow:inset 0 0 0 4px Canvas,inset 0 0 0 10px CanvasText}}
@@ -1088,7 +1093,7 @@ nav.main a.press{color:var(--fg);transition:none}
 @media (prefers-reduced-motion:reduce){.js .tl ol::before,.js .tl li,.js .wy .tr i{transform:none;opacity:1;transition:none}}
 :root[data-motion="off"] .tl ol::before,:root[data-motion="off"] .tl li,:root[data-motion="off"] .wy .tr i{transform:none;opacity:1;transition:none}
 .photo{margin:clamp(28px,4vw,48px) 0 clamp(36px,5vw,64px)}
-.photo picture,.photo .frame{display:block;position:relative;overflow:hidden;background:var(--rule)}
+.photo picture,.photo .frame{display:block;position:relative;z-index:6;overflow:hidden;background:var(--rule)}
 .photo img{display:block;width:100%;height:auto}
 .photo .cap{margin-top:12px}
 .cap .credit{font-size:13px;font-weight:400;letter-spacing:.01em;line-height:1.5;text-transform:none;color:var(--faint);white-space:nowrap}
