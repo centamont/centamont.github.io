@@ -555,7 +555,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 :root[data-theme="dark"]{--read:#E2DBCF}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--read:#E2DBCF}}
 @media print{:root,:root[data-theme],:root:not([data-theme="light"]){--read:#2B2924}}
-.prose.lead h2:first-child + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
+.prose.lead h2:first-child + p::first-letter,.prose.lead h2:first-child + .side + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
 .progress{position:fixed;top:64px;left:0;right:0;height:1px;z-index:25;pointer-events:none;transition:opacity .4s var(--ease)}
 .progress.end{opacity:0}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
