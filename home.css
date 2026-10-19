@@ -567,13 +567,13 @@ html:not(.js) .step{min-height:auto}
 }
 .name .cut{margin-left:-.045em}
 .pr:last-child{border-bottom:0}
-.arms{list-style:none;margin:clamp(40px,4.4vw,64px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule)}
-.arms li{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px clamp(16px,2.4vw,36px) 0}
-.arms li + li{border-left:1px solid var(--rule)}
-.arms b{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
-.arms span{font-size:16px;line-height:1.6;color:var(--muted);max-width:36ch}
-.arms .more{margin-top:auto}
-@media (max-width:820px){.arms{display:none}}
+.pr .go{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:28px;margin:auto 0 0;color:inherit}
+.pr .go .more{margin-top:0}
+.pr .go .more + .more{position:relative;z-index:1}
+.pr .go .more + .more::after{content:none}
+@media (max-width:600px){.pr .go .more + .more{display:none}}
+.chart .lv .when .en-tag{font-size:inherit;vertical-align:baseline}
+.chart .lv:is([data-m="ladal"],[data-m="more"]) h3 .en-tag{display:none}
 .head .intro::before{transform-origin:left}
 .js body:not(.no-js) main section:not(.in) .head .intro::before{transform:scaleX(0)}
 .js main section.in .head .intro::before{transition:transform .7s var(--ease-ink)}
