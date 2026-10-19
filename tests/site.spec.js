@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 const sections = [
   ['services', 'One firm, from the first sketch to the last closing'],
   ['developers', 'Your building, sold as if it were the only one we have'],
-  ['clients', 'Residences that never reach the open market'],
+  ['clients', 'Residences chosen for one buyer, some before they reach the market'],
   ['markets', 'South Florida and New York first'],
   ['journal', 'Notes on new development'],
   ['people', 'A seat here is earned'],
@@ -92,9 +92,9 @@ test('a far jump lands on its heading with the story in step', async ({ page, is
   await expect(page.locator('#contact h2.display')).toBeInViewport();
   expect(new URL(page.url()).hash).toBe('#contact');
   if (isMobile) await expect(page.locator('nav.main')).toBeHidden();
-  // (the header's Developers is the developer page; on the home page the services' own link leads to the story, and it is
-  // pressed where it stands, far above, so the jump is a far one)
-  await page.locator('#services a[href="#developers"]').dispatchEvent('click');
+  // (the header's Developers and the first practice's link lead to the developer page; on the home page the hero's own
+  // button leads to the story, and it is pressed where it stands, far above, so the jump is a far one)
+  await page.locator('#top .row a[href="#developers"]').dispatchEvent('click');
   await expect(page.locator('#developers h2')).toBeFocused();
   await expect(page.locator('#stageName')).toHaveText('First sketch');
   await page.locator('a.totop').click();
@@ -574,26 +574,26 @@ test('the letter opens as an email to the office and is copied, without a clipbo
   await page.locator('#letter button[data-to="mail"]').click();
   // the copy settles at once (copied, or the letter shown to copy by hand), never left waiting on a prompt
   await expect(page.locator('#letterNote')).toContainText('office@centamont.com', { timeout: 2000 });
-  // and the address in the note opens the same letter, its subject naming the writer
+  // and the address in the note opens the same letter, its subject naming who is writing, the writer and the building
   const href = await page.locator('#letterNote a').getAttribute('href');
   expect(href.startsWith('mailto:office@centamont.com?subject=')).toBe(true);
   const q = new URLSearchParams(href.split('?')[1]);
-  expect(q.get('subject')).toBe('A letter from Ana Ruiz of Ruiz Development');
-  expect(q.get('body')).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year.\n\nWith regards,\nAna Ruiz of Ruiz Development');
+  expect(q.get('subject')).toBe('Developer: Ana Ruiz of Ruiz Development · Edgewater, 60 residences');
+  expect(q.get('body')).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year. We would like to talk about its launch.\n\nWith regards,\nAna Ruiz of Ruiz Development');
   // the page itself stays where it was
   await expect(page).toHaveURL(/127\.0\.0\.1:4173\/$/);
   if (browserName === 'chromium') {
     await expect(page.locator('#letterNote')).toContainText('it is copied too');
     await context.grantPermissions(['clipboard-read']);
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year.\n\nWith regards,\nAna Ruiz of Ruiz Development');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nWe are developing a building in Edgewater with about 60 residences. The project is in schematic design, and we hope to launch sales next year. We would like to talk about its launch.\n\nWith regards,\nAna Ruiz of Ruiz Development');
   }
 });
 
 // The Spanish and Portuguese developer pages write the developer's letter in their own language, reminder included.
 test('the developer letter composes in Spanish and Portuguese', async ({ page, context, browserName }) => {
-  for (const [path, ask, copied, letter] of [
-    ['/es/desarrolladores.html', 'Complete primero su nombre', 'también está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development'],
-    ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'ela também foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development']]) {
+  for (const [path, ask, copied, letter, subject] of [
+    ['/es/desarrolladores.html', 'Complete primero su nombre', 'también está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año. Nos gustaría hablar de su lanzamiento.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development', 'Desarrollador: Ana Ruiz, de Ruiz Development · Edgewater, 60 residencias'],
+    ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'ela também foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem. Gostaríamos de conversar sobre o lançamento.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development', 'Incorporadora: Ana Ruiz, Ruiz Development · Edgewater, 60 residências']]) {
     await page.goto(path);
     await page.locator('#letter').scrollIntoViewIfNeeded();
     await expect(page.locator('#letter fieldset.as')).toBeHidden();
@@ -605,7 +605,7 @@ test('the developer letter composes in Spanish and Portuguese', async ({ page, c
     await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
     await page.locator('#letter button[data-to="mail"]').click();
     await expect(page.locator('#letterNote')).toContainText('office@centamont.com');
-    expect(new URLSearchParams((await page.locator('#letterNote a').getAttribute('href')).split('?')[1]).get('subject')).toBe('Carta de Ana Ruiz' + letter.split('Ana Ruiz')[1]);
+    expect(new URLSearchParams((await page.locator('#letterNote a').getAttribute('href')).split('?')[1]).get('subject')).toBe(subject);
     if (browserName === 'chromium') {
       await expect(page.locator('#letterNote')).toContainText(copied);
       await context.grantPermissions(['clipboard-read']);
@@ -627,7 +627,9 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
   if (browserName === 'chromium') {
     await expect(page.locator('#letterNote')).toContainText('it is copied too');
     await context.grantPermissions(['clipboard-read']);
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nI am looking for a residence in Palm Beach, with a budget of over $20 million, and hope to move within six months.\n\nWith regards,\nAna Ruiz');
+    // the budget waits for the buyer (no band chosen for them), and the letter closes on its request
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Dear partners,\n\nI am looking for a residence in Palm Beach, with a budget I will share, and hope to move within six months. I would like to ask for an invitation.\n\nWith regards,\nAna Ruiz');
+    expect(new URLSearchParams((await page.locator('#letterNote a').getAttribute('href')).split('?')[1]).get('subject')).toBe('Private client: Ana Ruiz · Palm Beach');
   }
 });
 
@@ -963,7 +965,7 @@ test.describe('every page in the sitemap', () => {
     const [y0, y1] = await page.evaluate(() => [document.getElementById('developers').offsetTop, document.getElementById('markets').offsetTop]);
     for (let y = y0; y <= y1; y += 160) { await page.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), y); await page.waitForTimeout(25); }
     await expect(page.locator('#stageName')).not.toHaveText('First sketch');
-    await page.locator('#services a[href="#developers"]').dispatchEvent('click');
+    await page.locator('#top .row a[href="#developers"]').dispatchEvent('click');
     await expect(page.locator('#stageName')).toHaveText('First sketch');
   });
 
@@ -1034,6 +1036,44 @@ test('Spanish and Portuguese menus and footers mark their English-only links', a
       if (href === '/' || /^\/(es|pt)\//.test(href) || / lang="/.test(attrs)) continue;
       expect(attrs, `${p}: ${href}`).toContain('hreflang="en"');
       expect(body, `${p}: ${href}`).toContain('class="en-tag"');
+    }
+  }
+});
+
+// And in the reading itself: a link in the body of a Spanish or Portuguese page that leads to a page only in English is
+// marked the same way, or, on a card that names its language in its own small print ("En inglés"), carries hreflang.
+test('Spanish and Portuguese pages mark their English-only links in the body', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['es/', 'pt/'].flatMap((d) => readdirSync(d).filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const p of pages) {
+    const main = (readFileSync(p, 'utf8').match(/<main[\s\S]*?<\/main>/) || [''])[0];
+    for (const m of main.matchAll(/<a\s([^>]*?)href="(\/[^"]*)"([^>]*)>([\s\S]*?)<\/a>/g)) {
+      const [, pre, href, post, body] = m;
+      if (href === '/' || /^\/(es|pt)\//.test(href)) continue;
+      expect(pre + post, `${p}: ${href}`).toContain('hreflang="en"');
+      expect(/class="en-tag"|En(&nbsp;| )inglés|Em(&nbsp;| )inglês/.test(body), `${p}: ${href}`).toBe(true);
+    }
+  }
+});
+
+// The not-found page's Spanish and Portuguese menus and footers lead to the Spanish and Portuguese page wherever one
+// exists (an English page names its twins in its hreflang alternates), and mark the rest as English.
+test('the not-found page sends each language to its own pages', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const html = readFileSync('404.html', 'utf8');
+  const twin = (href, lang) => {
+    const f = href.replace(/^\//, '').replace(/#.*$/, '') || 'index.html';
+    let src = ''; try { src = readFileSync(f, 'utf8'); } catch (e) { return null; }
+    const m = src.match(new RegExp('<link rel="alternate" hreflang="' + (lang === 'pt' ? 'pt-BR' : 'es') + '" href="https://centamont.com([^"]*)"'));
+    return m ? m[1] : null;
+  };
+  for (const lang of ['es', 'pt']) {
+    const t = html.match(new RegExp('<template id="nf-' + lang + '">([\\s\\S]*?)</template>'))[1];
+    for (const m of t.matchAll(/<a\s[^>]*?href="(\/[^"#]*)[^"]*"([^>]*)>/g)) {
+      const href = m[1];
+      if (href === '/' || href.startsWith('/' + lang + '/') || / lang="/.test(m[0])) continue;
+      expect(twin(href, lang), `nf-${lang}: ${href} has a ${lang} page`).toBe(null);
+      expect(m[0], `nf-${lang}: ${href}`).toContain('hreflang="en"');
     }
   }
 });

@@ -155,6 +155,10 @@
 .ji-h{margin:clamp(48px,6vw,88px) 0 0;font:300 var(--t-head)/1.1 var(--display)}
 .ji-h + .ji{margin-top:clamp(18px,2vw,26px)}
 .ji-guides{margin:clamp(18px,2vw,26px) 0 0}
+/* the index closes on the letter: one line for either reader, and the way to write */
+.ji-ask{margin-top:clamp(48px,6vw,88px);padding-top:18px;border-top:1px solid var(--rule)}
+.ji-ask p{margin:0;font:300 var(--t-big,clamp(21px,1.8vw,26px))/1.35 var(--display);color:var(--fg)}
+.ji-ask .row{margin-top:24px}
 .ji-guides table{border-top:1px solid var(--fg)}
 .ji-guides thead th{padding-top:18px}
 .ji-guides tbody th{width:16%}

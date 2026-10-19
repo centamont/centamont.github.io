@@ -29,7 +29,8 @@ const cmWords = ({
     asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
     of: ', de ', plan: 'Mi plan: ',
     ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
-    subject: (who) => 'Carta de ' + who,
+    subject: { dev: 'Desarrollador', buy: 'Cliente privado', adv: 'Asesor' },
+    residences: (n) => n + (n === '1' ? ' residencia' : ' residencias'),
     copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente para concertar una primera conversación.'],
     launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1] + ' de ' + y,
     notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
@@ -54,7 +55,8 @@ const cmWords = ({
     asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
     of: ', ', plan: 'Meu plano: ',
     ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
-    subject: (who) => 'Carta de ' + who,
+    subject: { dev: 'Incorporadora', buy: 'Cliente privado', adv: 'Consultor' },
+    residences: (n) => n + (n === '1' ? ' residência' : ' residências'),
     copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente para marcar uma primeira conversa.'],
     launchIn: (m, y) => 'em ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][m - 1] + ' de ' + y,
     notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
@@ -77,11 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
   if (svg) {
     const price = document.getElementById('cvPrice'), loan = document.getElementById('cvLoan');
     const out = (id) => document.getElementById(id);
-    // The illustration's schedule: ground is planned for month 6 and the building takes 24 months from ground breaking,
+    // The illustration's schedule: ground is planned for month 12 (so at par the curve opens close to its plan, not far
+    // behind it) and the building takes 24 months from ground breaking,
     // topping off six months before it is finished. Ground breaks once the lender's threshold is met, never before the
     // planned month (the launch planner's rule, planner.js), so the schedule moves with the price and the threshold, and
     // the months the drawing spans move with it.
-    const PLAN = 6, BUILD = 24;
+    const PLAN = 12, BUILD = 24;
     let M = 36, BREAK = PLAN, TOP = PLAN + BUILD - 6, DONE = PLAN + BUILD;
     const NS = 'http://www.w3.org/2000/svg';
     const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; (parent || svg).appendChild(e); return e; };
@@ -672,17 +675,28 @@ document.addEventListener('DOMContentLoaded', function () {
       // an optional clause left blank stays out of the letter
       p.querySelectorAll('[data-opt]').forEach((o, k) => { if (![...o.querySelectorAll('input')].some((i) => i.value.trim())) c.querySelectorAll('[data-opt]')[k].dataset.drop = ''; });
       c.querySelectorAll('input, select').forEach((f, k) => { f.replaceWith(document.createTextNode(src[k].value.trim() || '…')); });
-      c.querySelectorAll('[data-drop], .plan-ref').forEach((o) => o.remove());
+      // (the letter's request, its last sentence, is set back after the paragraph's own full stop)
+      const req = [...c.querySelectorAll('[data-req]')].map((o) => o.textContent.replace(/\s+/g, ' ').trim()).join(' ');
+      c.querySelectorAll('[data-drop], [data-req], .plan-ref').forEach((o) => o.remove());
       const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim();
       // a dropped clause takes its sentence's full stop with it, so put one back
       let body = c.textContent.replace(/\s+/g, ' ').trim();
       if (!/[.!?…]$/.test(body)) body += '.';
+      if (req) body += ' ' + req;
       const plan = p.querySelector('.plan-ref') ? '\n\n' + cmSay('plan', 'My plan: ') + planUrl : '';
       return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? cmSay('of', ' of ') + of : '');
     };
     const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
-    // (the subject names the writer, so the office can tell one letter from the next at a glance)
-    const subject = () => { const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim(); return cmSay('subject', (w) => 'A letter from ' + w, name + (of ? cmSay('of', ' of ') + of : '')); };
+    // (the subject names who is writing, the writer and what the letter is about, so the office can sort one letter from
+    // the next at a glance: "Developer: Jane Doe of Bay Partners · Edgewater, 64 residences", "Private client: Jane Doe ·
+    // Palm Beach", "Advisor: Jane Doe · Fort Lauderdale")
+    const subject = () => {
+      const v = form.querySelector('input[name="as"]:checked').value, val = (k) => { const i = form.elements[k]; return i && i.value ? i.value.trim() : ''; };
+      const name = val('name'), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim();
+      const role = (cmWords.subject || { dev: 'Developer', buy: 'Private client', adv: 'Advisor' })[v];
+      const units = val('units'), about = v === 'dev' ? [val('where'), units && cmSay('residences', (n) => n + (n === '1' ? ' residence' : ' residences'), units)].filter(Boolean).join(', ') : val(v === 'buy' ? 'area' : 'mkt');
+      return role + ': ' + name + (of ? cmSay('of', ' of ') + of : '') + (about ? ' · ' + about : '');
+    };
     // The status note is built from text and, where it names the address, one link: nothing is ever parsed as HTML.
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
