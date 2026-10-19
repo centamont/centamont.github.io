@@ -424,9 +424,9 @@ test('only the home pages load the home styles', async ({}, info) => {
 test('each page loads site.css and its own template sheet, and nothing else', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   const market = ['south-florida', 'new-york', 'hamptons', 'los-angeles', 'dallas', 'austin', 'houston', 'san-francisco', 'tampa', 'naples', 'orange-county', 'es/sur-de-florida', 'pt/sul-da-florida', 'es/nueva-york', 'pt/nova-york'].map((p) => p + '.html');
-  const practice = ['developers', 'private-clients', 'es/clientes-privados', 'pt/clientes-privados', 'advisors', 'markets', 'es/desarrolladores', 'pt/incorporadoras', 'es/mercados', 'pt/mercados'].map((p) => p + '.html');
+  const practice = ['developers', 'private-clients', 'es/clientes-privados', 'pt/clientes-privados', 'advisors', 'markets', 'es/desarrolladores', 'pt/incorporadoras', 'es/mercados', 'pt/mercados', 'es/asesores', 'pt/consultores'].map((p) => p + '.html');
   const homes = ['index.html', 'es/index.html', 'pt/index.html'];
-  const sheets = ['report', 'planner', 'shortlist', 'project-site'].map((p) => p + '.html');
+  const sheets = ['report', 'planner', 'shortlist', 'project-site', 'es/informe-semanal', 'pt/relatorio-semanal', 'es/planificador', 'pt/planejador'].map((p) => p + '.html');
   const reading = (p) => p.startsWith('journal/') || ['privacy.html', 'terms.html', '404.html'].includes(p) || /^(es|pt)\/comprar-/.test(p);
   const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
   for (const p of pages) {
@@ -523,9 +523,10 @@ test('on a phone the price slider sits right under the sales curve', async ({ pa
   expect(read.y + read.height).toBeLessThanOrEqual(loan.y);
 });
 
-// The home on a phone held upright stays within its length: each language's page measured at 390x844, with about 2%
-// of room over what it measures today (EN 14,065px, ES 14,798, PT 14,876). Anything added comes in against these.
-for (const [path, cap] of [['/', 14350], ['/es/', 15100], ['/pt/', 15180]]) {
+// The home on a phone held upright stays within sixteen screens in every language: each page measured at 390x844 must
+// stand within 16 x 844 = 13,504px. Anything added comes in against this.
+for (const path of ['/', '/es/', '/pt/']) {
+  const cap = 16 * 844;
   test(`the phone home stays within its length (${path})`, async ({ page, isMobile }) => {
     test.skip(!isMobile, 'phone only');
     await page.setViewportSize({ width: 390, height: 844 });
@@ -635,7 +636,7 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
   // some fifty pages, each loaded and scrolled, so the walk gets more than the default half minute
   test.setTimeout(120000);
-  const pages = ['/', '/privacy.html', '/terms.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html',
+  const pages = ['/', '/privacy.html', '/terms.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html', '/es/asesores.html', '/pt/consultores.html', '/es/planificador.html', '/pt/planejador.html', '/es/informe-semanal.html', '/pt/relatorio-semanal.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
     '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html', '/journal/deposit-escrow-for-new-condominiums.html', '/journal/reading-the-pace-of-sales.html', '/journal/working-with-outside-brokers.html', '/journal/releasing-inventory-in-a-new-building.html'];
@@ -700,15 +701,15 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'media/maps.svg'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'home.js', 'media/maps.svg'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
-  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'es/asesores.html', 'pt/consultores.html', 'es/planificador.html', 'pt/planejador.html', 'es/informe-semanal.html', 'pt/relatorio-semanal.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|maps\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|home\.js|maps\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
@@ -731,7 +732,7 @@ test('inline scripts are published without their notes', async ({}, info) => {
     }
   }
   expect(noted, 'move the commented script into _src/inline/ and mark it data-source').toEqual([]);
-  expect(sourced).toBeGreaterThanOrEqual(12);
+  expect(sourced).toBeGreaterThanOrEqual(10);
 });
 
 // The markets maps on the home pages and the markets hub place their plain layers (state lines, borders, the world
@@ -753,7 +754,7 @@ test('the markets maps draw their coastlines from the shared drawing', async ({ 
 // points at it by url(#id) takes the wrong one.
 test('no page repeats an id', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'journal/index.html',
+  const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'es/asesores.html', 'pt/consultores.html', 'es/planificador.html', 'pt/planejador.html', 'es/informe-semanal.html', 'pt/relatorio-semanal.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   for (const p of pages) {
     // (a template's content is inert, apart from the page, so the not-found page's Spanish and Portuguese copies are left out)

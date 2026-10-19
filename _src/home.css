@@ -1083,9 +1083,32 @@ html:not(.js) .step{min-height:auto}
   #journal .notes-list a{padding-block:15px}
   .faq summary{padding-block:17px}
 }
+/* Within sixteen screens in all three languages (a test holds it): on a phone the journal keeps its guide and its line to
+   every note, leaving the two developer notes to the journal itself, and the chapters, bands and close each give up a
+   little of their air (56px over each chapter, 48 at the bands and 40 at the back matter, 56 and 72 round the name; the practices' and
+   markets' rows keep their touch height on 20 and 14px of air) */
+@media (max-width:520px){
+  #journal .notes-list{display:none}
+  #services,#developers,#markets{padding-top:56px}
+  #developers{padding-bottom:48px}
+  #clients,#contact{padding-block:48px}
+  #journal,#people,#questions{padding-block:40px}
+  .name{padding-block:56px 72px}
+  .pr{padding-block:20px}
+  .chart .lv{padding-block:14px}
+  /* the chapter heads take the phone's whole measure: their wide-screen measure, about eleven words, leaves a phone's
+     column a quarter empty and adds a line to most heads */
+  #journal .feature .links a:nth-child(2){display:none}
+  .step{padding-block:18px 16px}
+  main .head h2,main .head.wide h2,#clients h2,.step h3,.cv-txt h3{max-width:none}
+  /* the curve's sentence repeats its two readings above it; a phone shows the readings and still announces the sentence */
+  .cv-say{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;min-height:0}
+}
 /* Spanish and Portuguese say each head in more letters, and on a phone their longer words break a line sooner: their
    heads set a step under the English ones (about 0.92), as the hero's headline already does, so the page keeps the
    English page's length within a few percent */
+/* and their chapter intros and the two bands' lead lines a step under too (18px rather than 19, 22 rather than 24) */
+@media (max-width:520px){:is(:lang(es),:lang(pt)) main .head .intro{font-size:18px}:is(:lang(es),:lang(pt)) main :is(.door,.name) .big{font-size:22px}}
 @media (max-width:520px){:root:is(:lang(es),:lang(pt)){--t-spread:clamp(35px,9.95vw,40.5px);--t-chapter:clamp(31px,9.2vw,37px);--t-section:clamp(31px,9.2vw,37px);--t-head:clamp(24px,6.8vw,27.5px)}}
 /* The story's gauge in Spanish and Portuguese: its first label ("Niveles en estructura", "Pavimentos estruturados") is
    longer than both columns allow on a phone, so the sales counter keeps the width of its own label and the levels' label
