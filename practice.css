@@ -184,7 +184,7 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-method summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media (hover:hover) and (pointer:fine){.cv-method summary:hover{color:var(--fg)}}
 .cv-method .mk-facts{margin:6px 0 14px;max-width:52em}
-.cv-method .mk-facts sup{font-size:.7em;line-height:0}
+.cv-method .mk-facts sup{font-size:max(13px,.7em);line-height:0}
 .cv-method > p{margin:0 0 6px;font-size:15px;line-height:1.5;color:var(--faint)}
 .letter{margin-top:clamp(56px,7vw,96px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(22px,3vw,32px)}.letter > *{min-width:0}
 .letter .as{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 34px;align-items:baseline}

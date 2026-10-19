@@ -170,11 +170,14 @@ document.addEventListener('DOMContentLoaded', function () {
     units.forEach((u) => { u.p = phase(u.m); });
 
     // drawn as a stacking plan is: every floor numbered up the left, the lines numbered along the foot, the building on its
-    // ground line over a band of hatch, and set at one size, about a cell to a finger's width, so a short building never
-    // swells to fill the page and a tall one keeps to the screen
-    const cw = 20, ch = 14, gap = 3, lw = 34, foot = per <= 12 ? 34 : 16, VW = lw + per * (cw + gap), base = F * (ch + gap) + 2, VH = base + foot;
+    // ground line over a band of hatch, and set at one height, so a short building never swells to fill the page and a tall
+    // one keeps to the screen. A building of few lines draws each residence wider (48 units for up to four lines, 32 for up
+    // to eight), so the plan reads as a building, not a strip; its numbers are set to stand at 13px whatever the scale.
+    const cw = per <= 4 ? 48 : per <= 8 ? 32 : 20, ch = 14, gap = 3, lw = 44, foot = per <= 12 ? 34 : 16, VW = lw + per * (cw + gap), base = F * (ch + gap) + 2, VH = base + foot;
+    const sc = Math.min(1.25, 540 / VH);
     plan.setAttribute('viewBox', `-2 -2 ${VW + 4} ${VH + 4}`);
-    plan.style.width = Math.round((VW + 4) * Math.min(1.25, 540 / VH)) + 'px';
+    plan.style.width = Math.round((VW + 4) * sc) + 'px';
+    plan.style.setProperty('--fl', (13 / sc).toFixed(2) + 'px');
     plan.textContent = '';
     units.forEach((u) => el('rect', { class: 'lp-u ' + u.p, x: lw + u.c * (cw + gap), y: (F - 1 - u.f) * (ch + gap), width: cw, height: ch }, plan));
     const lab = F > 30 ? 5 : 1, pad = (n) => String(n).padStart(2, '0');

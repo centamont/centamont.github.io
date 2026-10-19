@@ -1040,7 +1040,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
 .mk-facts dd{margin:0;font-size:18px;line-height:1.6;color:var(--read)}
-.mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
+.mk-facts sup,.prose p sup{font-size:max(13px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 .mk-facts sup a,.prose p sup a{position:relative}
 .mk-facts sup a::after,.prose p sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
