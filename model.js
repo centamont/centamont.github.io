@@ -321,15 +321,15 @@
   const CASCADE = 2400;
   // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, each made from one
   // camera of that hero at 1440 x 900 and lit by one sun (by day, in the early morning and at golden hour, after dark;
-  // the morning's and the evening's are seen from the same bearing, so the low sun lights the east face of the one and the
-  // west face of the other, and the shade side turns over with the day). Each
+  // the morning's is seen from the south-east, as the night's is, its east face lit by the low sun, and the evening's
+  // from the south, the low western sun on its face, so the two hours never look alike). Each
   // runs on past that hero's right and bottom edges, so a wider or taller window is still filled. For each: the crop's place
   // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
     day: { x: 754, y: 168, w: 986, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    morning: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
     gold: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
     night: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
