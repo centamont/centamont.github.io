@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-6KAntrzdG/9+ZdpTKeZskXtIFUpX7BIFLzRDxzUVRFQ=' 'sha256-p74VeG5hTPO0I5NHWx7f6jSwN/T/kAGevKHgOpfIKn4='; style-src 'self'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-6KAntrzdG/9+ZdpTKeZskXtIFUpX7BIFLzRDxzUVRFQ=' 'sha256-QY/ggA4r2SM34X1q5MoTykLu8ExIHHZGTpg8aR/nFfQ='; style-src 'self'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Page not found · Centamont</title>
@@ -244,16 +244,15 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="legal"><span>© 2026 Centamont. Todos os direitos reservados. Miami, Flórida.</span><span><span class="nw"><a href="/privacy.html" hreflang="en">Privacidade e acessibilidade<span class="vh"> (em inglês)</span><span class="en-tag" aria-hidden="true">EN</span></a><i class="sep"> ·</i></span> <span class="nw"><a href="/terms.html" hreflang="en">Termos<span class="vh"> (em inglês)</span><span class="en-tag" aria-hidden="true">EN</span></a><i class="sep"> ·</i></span> <span class="nw eho"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M16 2 31 13.5h-4V30H5V13.5H1ZM10 16.5h12v3H10Zm0 6h12v3H10Z"/></svg>Igualdade de Oportunidades na Habitação</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">Voltar ao topo</a></span></span></div>
   </div>
 </div></template>
-<script>
+<script data-source="_src/inline/404-lang.js">
 (function(){
-  // A page missing under /es/ or /pt/ is answered in that language: its header, text and footer come from the template below.
-  var l=/^\/(es|pt)\//.exec(location.pathname),t=l&&document.getElementById('nf-'+l[1]);
-  if(!t)return;
-  var d=t.content,put=function(sel,k){var n=document.importNode(d.querySelector('[data-p="'+k+'"]'),true);document.querySelector(sel).replaceChildren.apply(document.querySelector(sel),[].slice.call(n.childNodes))};
-  document.documentElement.lang=l[1]==='pt'?'pt-BR':'es';
-  document.title=d.querySelector('title').textContent;
-  document.querySelector('.skip').textContent=d.querySelector('[data-p="skip"]').textContent;
-  put('header.site','header');put('.lot .txt','txt');put('.vacant figcaption','cap');put('footer','footer');
+var l=/^\/(es|pt)\//.exec(location.pathname),t=l&&document.getElementById('nf-'+l[1]);
+if(!t)return;
+var d=t.content,put=function(sel,k){var n=document.importNode(d.querySelector('[data-p="'+k+'"]'),true);document.querySelector(sel).replaceChildren.apply(document.querySelector(sel),[].slice.call(n.childNodes))};
+document.documentElement.lang=l[1]==='pt'?'pt-BR':'es';
+document.title=d.querySelector('title').textContent;
+document.querySelector('.skip').textContent=d.querySelector('[data-p="skip"]').textContent;
+put('header.site','header');put('.lot .txt','txt');put('.vacant figcaption','cap');put('footer','footer');
 })();
 </script>
 </body>
