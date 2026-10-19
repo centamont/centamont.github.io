@@ -208,6 +208,44 @@ test('the open phone menu says close in the page language', async ({ page, isMob
   }
 });
 
+// The drawer lists the markets open now and the page of every market; the planned and later ones wait on that page, so
+// the drawer stays a short walk with the keyboard. The bar's list keeps all of them.
+test('the phone menu keeps to the open markets and the page of every market', async ({ page, isMobile }) => {
+  for (const [path, all] of [['/developers.html', 'markets.html'],['/es/', '/es/mercados.html'], ['/pt/', '/pt/mercados.html']]) {
+    await page.goto(path);
+    if (isMobile) {
+      await page.locator('#menuBtn').click();
+      await expect(page.locator('nav.main')).toBeVisible();
+      await expect(page.locator('nav.main .mk-plan a, nav.main .mk-later a')).toHaveCount(8);
+      for (const a of await page.locator('nav.main .mk-plan a, nav.main .mk-later a').all()) await expect(a).toBeHidden();
+      await expect(page.locator(`nav.main a.mk-all[href$="${all}"]`)).toBeVisible();
+      expect(await page.locator('nav.main a:visible').count()).toBeLessThanOrEqual(11);
+    } else {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.locator('.mk-btn').click();
+      for (const a of await page.locator('nav.main .mk-plan a, nav.main .mk-later a').all()) await expect(a).toBeVisible();
+      // Home and End reach the first and the last market of the list
+      await page.locator('.mk-panel a').first().focus();
+      await page.keyboard.press('End');
+      await expect(page.locator('.mk-panel a').last()).toBeFocused();
+      await page.keyboard.press('Home');
+      await expect(page.locator('.mk-panel a').first()).toBeFocused();
+    }
+  }
+});
+
+// The list of sections in the margin is reached after the page's crumbs and title, in the order they are read.
+test('the list of sections follows the crumbs and the title in the tab order', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the list shows from 1320px');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const path of ['/new-york.html', '/es/sur-de-florida.html', '/journal/working-with-outside-brokers.html', '/privacy.html']) {
+    await page.goto(path);
+    await expect(page.locator('.toc')).toBeVisible();
+    const after = await page.evaluate(() => { const t = document.querySelector('.toc'); return ['.crumbs', 'main h1'].map((s) => !!(document.querySelector(s).compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING)); });
+    expect(after, path).toEqual([true, true]);
+  }
+});
+
 test('first visit plays the intro, then reveals the page', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop', 'the intro plays only on wide screens');
   await page.addInitScript(() => sessionStorage.removeItem('cm-intro'));
@@ -915,6 +953,13 @@ test.describe('every page in the sitemap', () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
       await expect(page.locator('body')).not.toContainText(/\[[A-Z][^\]]*\]/);
       expect(await page.evaluate(() => (document.body.innerText.match(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\uE000-\uF8FF]|\uDB40[\uDC00-\uDC7F]/g) || []).length)).toBe(0);
+      // a mistyped entity leaves its name on screen ("nbsp;financed."), and a list item opened inside another one
+      // leaves the parser holding loose text or a list item directly inside a list item
+      await expect(page.locator('body')).not.toContainText(/\b(nbsp|amp|rsquo|lsquo|rdquo|ldquo|mdash|ndash|hellip|thinsp);/);
+      expect(await page.evaluate(() => [...document.querySelectorAll('ul, ol')].flatMap((l) => [...l.childNodes]
+        .filter((n) => n.nodeType === 1 ? !['LI', 'SCRIPT', 'TEMPLATE'].includes(n.nodeName) : n.nodeType === 3 && n.textContent.trim())
+        .map((n) => (n.textContent || '').trim().slice(0, 60)))
+        .concat([...document.querySelectorAll('li > li')].map((n) => 'li in li: ' + n.textContent.trim().slice(0, 60))))).toEqual([]);
       // a drawing of a building always says it is an illustration
       const label = { es: 'Ilustración, no un proyecto real', 'pt-BR': 'Ilustração, não um projeto real' }[await page.locator('html').getAttribute('lang')] || 'Illustration, not a real project';
       for (const cap of await page.locator('figure.elev figcaption').all()) await expect(cap).toContainText(label);

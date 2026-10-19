@@ -220,6 +220,8 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;bottom:calc(100% + 7px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
 .letter .blank::after{z-index:2;padding:3px 6px 4px;margin-left:-6px;background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
 .letter .blank:focus-within::after{opacity:1}
+.letter .blank::before{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;top:calc(82.5% + 3px);font:500 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);white-space:nowrap;pointer-events:none;transition:opacity var(--t-ui) var(--ease-out)}
+.letter .blank:focus-within::before{opacity:0}
 .letter .plan-ref{display:block;margin-top:.4em;font-size:.7em;line-height:1.5;overflow-wrap:anywhere;color:var(--muted)}
 .letter .send{display:flex;flex-wrap:wrap;gap:14px}
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
