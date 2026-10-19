@@ -772,7 +772,8 @@
       // and only a finished building, its crane gone, is in use: its people and its lamps come in over a third of a second
       const occT = this.occFor();
       this.occ = reduce ? occT : toward(this.occ, occT, 1 / 0.3, 1 / 0.2);
-      // After dark its lights then come on, room by room, over about two seconds (see casT in scene): this is when it
+      // After dark its lights then come on, room by room, over about two seconds (see casT in scene; o.cascadeK runs it
+      // that many times faster): this is when it
       // was finished (-Infinity: always has been, all lit at once). The cascade draws every frame while it runs, but
       // it is not a change anyone made, so it never holds off the orbit's rest.
       if (occT && !this.doneAt) this.doneAt = reduce ? -Infinity : t;
@@ -780,7 +781,7 @@
       // the rendered tower fades in over the drawing's own tower in 0.6 s (at once with motion off, or before anything shows)
       const fading = !!this.r3 && this.r3a < 1;
       if (fading) { this.r3a = reduce ? 1 : Math.min(1, this.r3a + dt / 600); this.dirty = true; }
-      const casting = this.doneAt > 0 && t - this.doneAt < CASCADE && this.dark && !this.o.sun && this.sunNow.night > 0.05;
+      const casting = this.doneAt > 0 && t - this.doneAt < CASCADE / (this.o.cascadeK || 1) && this.dark && !this.o.sun && this.sunNow.night > 0.05;
       // and the photograph over the tower, once it may (see photoOn; after dark, once its lights are on), in 0.8 s each way
       const saT = !casting && this.photoOn() ? 1 : 0, phading = this.sa !== saT;
       if (phading) {
@@ -1085,7 +1086,7 @@
       const glows = dark && !inLens && !this.forced && night > 0.05 && !solid ? [] : null;
       // The lights-on cascade: seconds since the building was finished (99 once it long has been, -1 while it is not),
       // and how far on a lamp that comes on d seconds into it is (each takes 0.18 s)
-      const casT = this.doneAt === -Infinity ? 99 : this.doneAt ? (now - this.doneAt) / 1000 : -1, cas = (d) => clamp((casT - d) / 0.18, 0, 1);
+      const casT = this.doneAt === -Infinity ? 99 : this.doneAt ? ((now - this.doneAt) / 1000) * (this.o.cascadeK || 1) : -1, cas = (d) => clamp((casT - d) / 0.18, 0, 1);
       this.nightNow = night;
       // a vertical band of quads between two rings at heights y0, y1
       const band = (pl, y0, y1, shade, strokeTop) => {
