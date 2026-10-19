@@ -254,11 +254,6 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-hair{stroke:var(--fg);stroke-width:1;opacity:.5;pointer-events:none}
 .cv-hairt{fill:var(--fg);font:400 16px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .cv-hdot{fill:var(--sheet);stroke:var(--sold-line);stroke-width:1.5;pointer-events:none}
-@container (max-width:134.5px){.st .sx.l,.st:has(.sx.l) > .nw + .nw{display:none}}
-@media (min-width:360px) and (max-width:379px){@container (min-width:130.5px){.st .sx.l{display:inline}}
-}
-@media (max-width:359px),(min-width:1024px) and (max-width:1149px){@container (min-width:126.5px){.st .sx.l{display:inline}}
-}
 .page.pc{padding-top:0}
 .pc-door{--floor:clamp(56px,7vw,104px);position:relative;margin-top:-1px;padding-block:clamp(36px,4.4vw,64px) var(--floor);border-top:0;overflow-x:clip}
 :root[data-theme="dark"] .band.pc-door{box-shadow:inset 0 -1px 0 rgba(var(--bronze-rgb),.42)}

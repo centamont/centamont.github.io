@@ -97,7 +97,7 @@ const CARDS = [
     // the market notes: a drawn elevation of the city, its height scale in the page's own numbers (Portuguese writes
     // 1.500 pés, as pt/sul-da-florida.html does)
     {
-      base: 'og-south-florida.png', out: { es: 'es/og-sur-de-florida.png', pt: 'pt/og-sul-da-florida.png' },
+      base: 'og-south-florida.png', out: { es: 'es/og-sur-de-florida.jpg', pt: 'pt/og-sul-da-florida.jpg' },
       patches: [[50, 108, 580, 86, [0, 296]], [50, 194, 580, 82, [480, 300]]],
       words: {
         en: { h1: 'South Florida', p: 'Miami, Fort Lauderdale and West Palm Beach' },
@@ -106,7 +106,7 @@ const CARDS = [
       },
     },
     {
-      base: 'og-new-york.png', out: { es: 'es/og-nueva-york.png', pt: 'pt/og-nova-york.png' },
+      base: 'og-new-york.jpg', out: { es: 'es/og-nueva-york.jpg', pt: 'pt/og-nova-york.jpg' },
       patches: [[50, 108, 400, 168, [680, 104]], [450, 108, 230, 168, [700, 104]]],
       words: {
         en: { h1: 'New York City', p: 'Manhattan’s new condominiums' },

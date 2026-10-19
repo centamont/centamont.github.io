@@ -341,11 +341,6 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-hair{stroke:var(--fg);stroke-width:1;opacity:.5;pointer-events:none}
 .cv-hairt{fill:var(--fg);font:400 16px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .cv-hdot{fill:var(--sheet);stroke:var(--sold-line);stroke-width:1.5;pointer-events:none}
-@container (max-width:134.5px){.st .sx.l,.st:has(.sx.l) > .nw + .nw{display:none}}
-@media (min-width:360px) and (max-width:379px){@container (min-width:130.5px){.st .sx.l{display:inline}}
-}
-@media (max-width:359px),(min-width:1024px) and (max-width:1149px){@container (min-width:126.5px){.st .sx.l{display:inline}}
-}
 
 /* Private clients: the threshold. The page opens on the ink with the home page's door standing in it, open, its three
    promises inside; the reading below is on the sheet, and the door's light falls across the band's floor onto it. */
