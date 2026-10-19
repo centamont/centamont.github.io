@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-G+pvQWhVJw2hLCFqOkHWfiIresY/tRdEIiCVFcsS7Ss=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-kitWSMRCKbq/PbzFXUZm/IAhUL76WCNeGDD8Pamn5Lc=' 'sha256-94w24N+lB2imNjti4xm1nH2eggoTOAXm4LZc/OMciR4=' 'sha256-ZbLuE8D4Y3cj2/MBRzdT+eWDJI1YqD60N60ARkQu/wE='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-G+pvQWhVJw2hLCFqOkHWfiIresY/tRdEIiCVFcsS7Ss=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-FnRdN69llGT83TmiwuDR11OMvySZ/9B/D6w3DMdMpZ8=' 'sha256-94w24N+lB2imNjti4xm1nH2eggoTOAXm4LZc/OMciR4=' 'sha256-duPesZbzVmOasVEu+O1DsfwKgqItMvrhpSXWQ41nV8w='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -39,8 +39,9 @@
 </script>
 <link rel="preload" href="/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/site.css?v=450f2548">
-<link rel="stylesheet" href="/home.css?v=450f2548">
+<link rel="stylesheet" href="/site.css?v=1ed9bf37">
+<link rel="stylesheet" href="/practice.css?v=1ed9bf37">
+<link rel="stylesheet" href="/home.css?v=1ed9bf37">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -48,10 +49,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="/site.js?v=450f2548" defer></script>
-<script src="/model.js?v=450f2548" defer></script>
-<script src="/instrument.js?v=450f2548" defer></script>
-<script src="/tower3d.js?v=450f2548" async fetchpriority="low"></script>
+<script src="/site.js?v=1ed9bf37" defer></script>
+<script src="/model.js?v=1ed9bf37" defer></script>
+<script src="/instrument.js?v=1ed9bf37" defer></script>
+<script src="/tower3d.js?v=1ed9bf37" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -66,7 +67,7 @@ setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.
 // moment, then a hairline cracks the stone and the halves part, each carrying its half of the count, which fades before
 // the headline rises where it stood. Any tap, key or scroll (or a print) goes straight to the parting. The page script
 // starts the tower as the halves begin to part (window.CentamontIntro.go), or at once if they already have. The parting
-// itself runs on the stylesheet's clock (site.css, .curtain.split-on); the class 'part' only lets clicks through.
+// itself runs on the stylesheet's clock (home.css, .curtain.split-on); the class 'part' only lets clicks through.
 (function(){var d=document.documentElement;if(!d.classList.contains('intro-on'))return;
 var c=document.querySelector('.curtain'),bar=document.getElementById('introBar'),I=window.CentamontIntro={open:false,go:null},D=580,done=false,hold=0;
 // running, so the stylesheet's failsafe is not needed: the count and the parting play in full
@@ -97,7 +98,7 @@ addEventListener('beforeprint',function(){finish(true)})})();
       <a class="dw" href="#services">Qué hacemos</a>
       <a href="#developers">Desarrolladores</a>
       <a href="#clients">Clientes privados</a>
-      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Mercados<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><span class="mk-st" role="group" aria-labelledby="mkOpen"><span class="mk-k" id="mkOpen">Abiertos ahora</span> <a href="/es/sur-de-florida.html">Sur de Florida</a> <a href="/es/nueva-york.html">Ciudad de Nueva York</a> <a href="/hamptons.html">Hamptons</a></span> <span class="mk-st mk-plan" role="group" aria-labelledby="mkPlan"><span class="mk-k" id="mkPlan">Previstos</span> <a href="/los-angeles.html">Los Angeles</a> <a href="/dallas.html">Dallas</a></span> <span class="mk-st mk-later" role="group" aria-labelledby="mkLater"><span class="mk-k" id="mkLater">Más adelante</span> <a href="/tampa.html">Tampa</a> <a href="/naples.html">Naples</a> <a href="/austin.html">Austin</a> <a href="/houston.html">Houston</a> <a href="/san-francisco.html">San Francisco</a> <a href="/orange-county.html">Orange County</a></span> <a class="mk-all" href="/markets.html">Todos los mercados</a></div></div>
+      <div class="mk"><button class="mk-btn" type="button" aria-expanded="false" aria-controls="mkPanel">Mercados<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M.5.8 5 5.2 9.5.8" fill="none" stroke="currentColor"/></svg></button><div class="mk-panel" id="mkPanel"><span class="mk-st" role="group" aria-labelledby="mkOpen"><span class="mk-k" id="mkOpen">Abiertos ahora</span> <a href="/es/sur-de-florida.html">Sur de Florida</a> <a href="/es/nueva-york.html">Ciudad de Nueva York</a> <a href="/hamptons.html">Hamptons</a></span> <span class="mk-st mk-plan" role="group" aria-labelledby="mkPlan"><span class="mk-k" id="mkPlan">Previstos</span> <a href="/los-angeles.html">Los Angeles</a> <a href="/dallas.html">Dallas</a></span> <span class="mk-st mk-later" role="group" aria-labelledby="mkLater"><span class="mk-k" id="mkLater">Más adelante</span> <a href="/tampa.html">Tampa</a> <a href="/naples.html">Naples</a> <a href="/austin.html">Austin</a> <a href="/houston.html">Houston</a> <a href="/san-francisco.html">San Francisco</a> <a href="/orange-county.html">Orange County</a></span> <a class="mk-all" href="/es/mercados.html">Todos los mercados</a></div></div>
       <a href="/journal/">Notas</a>
       <a class="dw" href="/advisors.html">Asesores</a>
       <a href="#contact">Contacto</a>
@@ -161,7 +162,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
       <div class="pr"><span class="num" aria-hidden="true">III</span><h3>Asesoría a clientes&nbsp;privados</h3><p>Una práctica reducida, solo por invitación, que asesora a compradores en lo más alto del mercado.</p><a class="more" href="#clients">Clientes privados</a></div>
     </div>
     <ul class="arms" aria-label="Tres formas de trabajar con nosotros">
-      <li><b>Asesoría</b><span>Consultoría de desarrollo desde el primer boceto, con un socio al frente de cada lanzamiento.</span><a class="more" href="/developers.html">Para desarrolladores (en inglés)</a></li>
+      <li><b>Asesoría</b><span>Consultoría de desarrollo desde el primer boceto, con un socio al frente de cada lanzamiento.</span><a class="more" href="/es/desarrolladores.html">Para desarrolladores</a></li>
       <li><b>Sistemas</b><span>Ventas medidas cada semana: la curva de ventas, el planificador de lanzamientos y el informe&nbsp;semanal.</span><a class="more" href="/planner.html">Planifique un lanzamiento (en inglés)</a></li>
       <li><b>Clientes privados</b><span>Una práctica reducida para compradores en lo más alto del mercado, con acceso por&nbsp;recomendación.</span><a class="more" href="/es/clientes-privados.html">Cómo funciona</a></li>
     </ul>
@@ -186,13 +187,13 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
       <ol class="steps" id="steps">
         <li class="step" data-built="0" data-sold="0" data-name="Primer boceto">
           <h3>Llegamos <span class="nw">cuando el edificio</span> <span class="nw">es aún un&nbsp;boceto.</span></h3>
-          <p>La asesoría comienza antes de que el diseño sea definitivo, para que el edificio tome forma en torno al comprador que realmente vivirá en él.</p>
+          <p>La asesoría empieza antes de cerrar el diseño, para que el edificio tome forma en torno al comprador que vivirá en él.</p>
           <ul><li>Precios y mezcla de unidades</li><li>Planos y amenidades</li><li>Perfil del comprador y estrategia de lanzamiento</li></ul>
           <p class="vh">Ilustración, no un proyecto real: una torre genérica, antes de que el diseño sea definitivo.</p>
         </li>
         <li class="step" data-built="0" data-sold="0" data-name="Estrategia">
           <h3>Una estrategia escrita solo para este&nbsp;edificio.</h3>
-          <p>Sin plantillas. El posicionamiento, los compradores objetivo y las campañas se diseñan en torno a su proyecto. Un fundador está al frente de su cuenta desde la primera reunión hasta el último cierre, sin delegarla en personal junior tras la firma.</p>
+          <p>Sin plantillas: el posicionamiento, los compradores objetivo y las campañas se diseñan en torno a su proyecto, y un fundador lo acompaña desde la primera reunión hasta el último cierre.</p>
           <p class="vh">Ilustración: la primera etapa de venta, planificada en los pisos superiores.</p>
         </li>
         <li class="step" id="launch" data-built="0" data-sold="18" data-name="Primeros 90 días">
@@ -203,13 +204,13 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         </li>
         <li class="step" data-built="3" data-sold="32" data-name="En venta">
           <h3>Las cifras, cada&nbsp;semana.</h3>
-          <p>Consultas, visitas, reservas, contratos y ajustes de precio llegan en un solo informe semanal. Usted siempre sabe en qué punto está el edificio y qué vamos a cambiar a continuación.</p>
+          <p>Consultas, visitas, reservas, contratos y ajustes de precio llegan en un solo informe semanal, junto con lo que vamos a cambiar a continuación.</p>
           <a class="more" href="/report.html">Vea un informe de ejemplo (en inglés)</a>
           <p class="vh">Ilustración: 32 de 62 residencias bajo contrato, por encima del umbral del 50 por ciento del prestamista, así que empieza la obra; 3 de 34 niveles en estructura.</p>
         </li>
         <li class="step" data-built="34" data-sold="46" data-name="Coronación">
           <h3>Estructura coronada, y aún un paso&nbsp;adelante.</h3>
-          <p>A medida que sube la estructura, los precios y las etapas de venta se ajustan a la demanda, de modo que los últimos pisos se valoran con el mismo cuidado que los primeros.</p>
+          <p>Mientras sube la estructura, los precios y las etapas de venta siguen a la demanda, y los últimos pisos se valoran con el mismo cuidado que los primeros.</p>
           <p class="vh">Ilustración: la estructura se corona en el nivel 34 mientras la fachada aún se cierra; 46 de 62 residencias bajo contrato.</p>
         </li>
         <li class="step" data-built="34" data-sold="62" data-name="Último cierre">
@@ -251,6 +252,20 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         <input type="range" id="cvLoan" min="30" max="70" step="5" value="50" aria-valuetext="50 por ciento">
       </div>
     </div>
+    <details class="cv-method">
+      <summary>Cómo se calcula la curva</summary>
+      <dl class="mk-facts">
+        <div><dt>Ritmo a la par</dt><dd>Cada mes pasa a estar bajo contrato el 3.5 por ciento de las residencias que siguen a la venta.</dd></div>
+        <div><dt>Lanzamiento</dt><dd>El triple de ese ritmo en los tres primeros meses.</dd></div>
+        <div><dt>Inicio de obra</dt><dd>1.3 veces el ritmo en los dos meses siguientes al inicio de obra.</dd></div>
+        <div><dt>Coronación</dt><dd>1.5 veces el ritmo en los tres meses siguientes a la coronación del edificio.</dd></div>
+        <div><dt>Terminación</dt><dd>1.25 veces el ritmo una vez terminado el edificio.</dd></div>
+        <div><dt>Precio de lanzamiento</dt><dd>Cada ritmo se multiplica por e<sup>−0.05p</sup>, donde p es el precio frente a edificios comparables en por ciento, de −10 a +10: alrededor de un 5 por ciento más lento por cada punto por encima, y más rápido por&nbsp;debajo.</dd></div>
+        <div><dt>Umbral</dt><dd>El 50 por ciento de las residencias bajo contrato, salvo que el control lo fije entre el 30 y el 70&nbsp;por&nbsp;ciento.</dd></div>
+        <div><dt>Calendario</dt><dd>La obra empieza en el mes&nbsp;6 previsto, o en el mes en que se alcanza el umbral si llega después. La construcción dura 24&nbsp;meses, y la coronación llega 6&nbsp;meses antes de la terminación.</dd></div>
+      </dl>
+      <p>Una ilustración con ritmos supuestos, no un pronóstico ni una promesa de resultados.</p>
+    </details>
 
     <div class="begin">
       <div class="b-l">
@@ -390,7 +405,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
       <li class="lv" data-m="intl"><span class="no" aria-hidden="true">05</span><span class="when">Más adelante</span><h3>Internacional</h3><p>A través de socios locales con licencia.</p></li>
       </ol>
     </div>
-    <p class="links"><a class="more" href="/markets.html">Todos los mercados, en el orden en que abrimos (en inglés)</a></p>
+    <p class="links"><a class="more" href="/es/mercados.html">Todos los mercados, en el orden en que abrimos</a></p>
     <p class="ask">¿Planea un edificio en uno de estos mercados? <a class="ul" href="#contact" data-as="dev">Escriba a los socios</a>.</p>
   </div>
 </section>
@@ -523,8 +538,8 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
       <div class="t-dr"><dt>Dibujado</dt><dd class="num">Octubre de 2026</dd></div>
       <div class="t-sc"><dt>Escala</dt><dd>Sin escala</dd></div>
       <div class="t-sh"><dt>Lámina</dt><dd><span class="sn">01</span><span class="st dots"><span class="nw">Índice</span> <span class="nw">de 10</span></span></dd></div>
-      <div class="t-wk"><dt>Trabaje con nosotros</dt><dd><ul><li><a href="#developers">Desarrolladores</a></li><li><a href="/es/clientes-privados.html">Clientes privados</a></li><li><a href="/advisors.html">Asesores</a></li></ul></dd></div>
-      <div class="t-mk"><dt>Mercados</dt><dd><ul><li><a href="/es/sur-de-florida.html">Sur de Florida</a></li><li><a href="/es/nueva-york.html">Ciudad de Nueva York</a></li><li><a href="/hamptons.html">Hamptons</a></li><li><a href="/markets.html">Todos los mercados</a></li></ul></dd></div>
+      <div class="t-wk"><dt>Trabaje con nosotros</dt><dd><ul><li><a href="/es/desarrolladores.html">Desarrolladores</a></li><li><a href="/es/clientes-privados.html">Clientes privados</a></li><li><a href="/advisors.html">Asesores</a></li></ul></dd></div>
+      <div class="t-mk"><dt>Mercados</dt><dd><ul><li><a href="/es/sur-de-florida.html">Sur de Florida</a></li><li><a href="/es/nueva-york.html">Ciudad de Nueva York</a></li><li><a href="/hamptons.html">Hamptons</a></li><li><a href="/es/mercados.html">Todos los mercados</a></li></ul></dd></div>
       <div class="t-ss"><dt>Láminas</dt><dd><ul class="ss">
         <li><a href="/es/" aria-current="page"><span class="n">01</span><span class="t">Índice</span></a></li>
         <li><a href="/journal/"><span class="n">02</span><span class="t">Notas</span></a></li>
@@ -534,7 +549,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         <li><a href="/advisors.html"><span class="n">06</span><span class="t">Asesores</span></a></li>
         <li><a href="/planner.html"><span class="n">07</span><span class="t">Planificador</span></a></li>
         <li><a href="/shortlist.html"><span class="n">08</span><span class="t">Selección</span></a></li>
-        <li><a href="/developers.html"><span class="n">09</span><span class="t">Para desarrolladores</span></a></li>
+        <li><a href="/es/desarrolladores.html"><span class="n">09</span><span class="t">Para desarrolladores</span></a></li>
         <li><a href="/project-site.html"><span class="n">10</span><span class="t">Sitio del proyecto</span></a></li>
       </ul></dd></div>
       <div class="t-fo"><dt>Síganos</dt><dd><ul>
@@ -543,7 +558,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         <li><a href="https://x.com/centamont" target="_blank" rel="noopener">X (Twitter)<span class="vh"> (se abre en una pestaña nueva)</span></a></li>
       </ul></dd></div>
     </dl>
-    <div class="legal"><span>© 2026 Centamont. Todos los derechos reservados. Miami, Florida.</span><span><span class="nw"><a href="/privacy.html">Privacidad y accesibilidad</a><i class="sep"> ·</i></span> <span class="nw eho"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M16 2 31 13.5h-4V30H5V13.5H1ZM10 16.5h12v3H10Zm0 6h12v3H10Z"/></svg>Igualdad de Oportunidades en la Vivienda</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">Volver arriba</a></span><span class="nw"><i class="sep"> · </i><a href="/" hreflang="en" lang="en">English</a> · <a href="/pt/" hreflang="pt-BR" lang="pt-BR">Português</a></span></span></div>
+    <div class="legal"><span>© 2026 Centamont. Todos los derechos reservados. Miami, Florida.</span><span><span class="nw"><a href="/privacy.html">Privacidad y accesibilidad</a><i class="sep"> ·</i></span> <span class="nw"><a href="/terms.html" hreflang="en">Términos</a><i class="sep"> ·</i></span> <span class="nw eho"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M16 2 31 13.5h-4V30H5V13.5H1ZM10 16.5h12v3H10Zm0 6h12v3H10Z"/></svg>Igualdad de Oportunidades en la Vivienda</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">Volver arriba</a></span><span class="nw"><i class="sep"> · </i><a href="/" hreflang="en" lang="en">English</a> · <a href="/pt/" hreflang="pt-BR" lang="pt-BR">Português</a></span></span></div>
   </div>
 </footer>
 
@@ -597,7 +612,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const side=()=>matchMedia('(orientation:landscape) and (max-height:500px)').matches;
   // Text enlarged on its own (a browser's text-only zoom, which leaves the window as wide as it was) leaves no room beside
   // the headline for the tower, so from one and a half times the set size the hero stacks as it does on a phone: the
-  // tower above, the copy under it (site.css, .hero.stack). At the set size this never applies.
+  // tower above, the copy under it (home.css, .hero.stack). At the set size this never applies.
   let stack=false;
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
   const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.3:2.1,offsetX:wide?.25:mid?.28:.22}};

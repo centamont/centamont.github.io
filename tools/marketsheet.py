@@ -24,7 +24,7 @@ SHEETS = {
         'asof': ('2026-09', 'the third quarter of 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
             ('Manhattan supply', '3,027', 'new development units', 'On the market, against a ten&#8209;year average of 4,209', 1, (3027, 4209, '4,209')),
-            ('Contracts', '240', 'in the quarter', 'Down 27 percent from a year earlier', 1, (240, 329, '329')),
+            ('Contracts', '240', 'in the quarter', 'Down 27 percent from a year earlier', 1, (240, 331, '331')),
             ('Closed prices', '$2,070', 'a square foot', 'On average, roughly flat on a year earlier', 1, None),
         ]},
     'hamptons.html': {
