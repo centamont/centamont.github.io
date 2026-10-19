@@ -90,8 +90,18 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-
 ::selection{background:var(--bronze);color:var(--ink)}
 /* Vellum: a faint grain over every ground, so nothing reads as flat screen color. The tile is AVIF (13 KB, the same
    texture: its spread over ivory within 2% of the original), with the PNG (26 KB) for a browser without AVIF; random grain
-   barely compresses, and WebP comes to 25 KB lossless and larger lossy, so it isn't offered. */
-body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55}
+   barely compresses, and WebP comes to 25 KB lossless and larger lossy, so it isn't offered.
+   The grain is the paper's, never the photographs': the page's sheet lies at z-index 5, above every ground and drawing,
+   and the photographs and films (.photo, the journal's thumbnails) stand at 6, just over it and still well under the
+   header (20). Whatever stands above the sheet on a ground of its own carries its own: the header (and the drawer it
+   opens, which covers the window while the menu is open), the page-change cover and veil, the copy note, and the halves
+   of the home page's curtain. The home header is clear over the hero, so it lays none of its own there. */
+body::after,header.site::after,.vt-cover::after,.vt-veil::after,.copy-note::after,.curtain .half::after{content:"";pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55}
+body::after{position:fixed;inset:0;z-index:5}
+header.site::after{position:absolute;inset:0;z-index:3}
+html.menu-open header.site::after{position:fixed}
+.js body.home header.site.over.top::after{top:var(--hdr)}
+:is(.vt-cover,.vt-veil,.copy-note,.curtain .half)::after{position:absolute;inset:0}
 @media print{body::after{display:none}}
 /* Numerals stand upright wherever they carry a count */
 .n,.num,.gauge b,.begin li::before,.dscale,.table b,.rscale,.lv .when{font-variant-numeric:lining-nums tabular-nums}
@@ -1537,7 +1547,7 @@ p,li{text-wrap:pretty}
 }
 /* printed side by side (the sliders left off the page), the readouts simply follow the figure down its column */
 @media print and (min-width:901px){.cv-say{grid-row:2}.cv-read{grid-row:3;margin-top:0}}
-@media (forced-colors:active){body::after{display:none}
+@media (forced-colors:active){:is(body,header.site,.vt-cover,.vt-veil,.copy-note,.curtain .half)::after{display:none}
   /* the sliders keep their track, and the voice the letter is written in keeps the only underline */
   .cv-ctl input[type=range]::-webkit-slider-runnable-track{forced-color-adjust:none;background:CanvasText}
   .cv-ctl input[type=range]::-moz-range-track{background:CanvasText}
@@ -1663,7 +1673,7 @@ nav.main a.press{color:var(--fg);transition:none}
    The film loops are a few muted seconds of water and light; their still stands in until they play, and stays when
    motion is reduced or paused (site.js). */
 .photo{margin:clamp(28px,4vw,48px) 0 clamp(36px,5vw,64px)}
-.photo picture,.photo .frame{display:block;position:relative;overflow:hidden;background:var(--rule)}
+.photo picture,.photo .frame{display:block;position:relative;z-index:6;overflow:hidden;background:var(--rule)}
 .photo img{display:block;width:100%;height:auto}
 .photo .cap{margin-top:12px}
 /* the credit is a quiet note after the caption, never a label: sentence case at 13px, in the faint tone, so it never

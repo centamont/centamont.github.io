@@ -729,6 +729,10 @@ html:not(.js) .seam{display:none}
 .hero.stack .coords{top:80px}
 .hero.stack .coords > :not(.cap){display:none}
 
+/* On a large, tall screen (a 2560 x 1440 display) the copy rises toward the middle of the hero, level with the tower's
+   lower half, instead of sitting at its foot under a field of empty ink */
+@media (min-width:1800px) and (min-height:1100px){.hero .wrap{padding-bottom:clamp(96px,17vh,280px)}}
+
 /* Intro: a hundred blows */
 .curtain{display:none}
 
@@ -880,10 +884,11 @@ html:not(.js) .step{min-height:auto}
 #services{scroll-margin-top:calc(var(--hdr) * -1)}
 @media (max-width:820px){.hero .coords{display:flex;top:80px;font-size:13px;letter-spacing:.14em}
 
-/* the caption, and under it on one line of its own, the sun the drawing is lit by (the drawing is framed under both,
-     so the line never meets the crown) */
-  .hero .coords > :not(.cap):not(#sunline){display:none}
-.hero .coords #sunline{flex-basis:100%;white-space:nowrap;line-height:1}
+/* the place and the caption, and under them on a line of their own, the hour and the sun the drawing is lit by, as on a
+     desktop (the drawing is framed under both lines, so they never meet the crown) */
+  .hero .coords{column-gap:18px}
+  .hero .coords::after{content:"";flex-basis:100%;height:0;order:2}
+  .hero .coords > :is(#clock,#sunline){order:3;white-space:nowrap;line-height:1}
 .gauge{font-size:13px}
 }
 @media (min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.hero .coords #sunline{display:none}}

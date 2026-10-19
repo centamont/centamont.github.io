@@ -45,8 +45,8 @@
 .mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-.mk-fig .sv .ttl{text-anchor:end;transform:translate(328px,262px)}
-.mk-fig .sv .scl{transform:translate(232px,-92px)}
+.mk-fig .sv .ttl{text-anchor:end;transform:translate(316px,262px)}
+.mk-fig .sv .scl{transform:translate(220px,-92px)}
 .mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
 .mk-fig .nyd #nyHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
 .mk-fig .nyd .land{fill:url(#nyHatch);opacity:.5}
@@ -71,6 +71,7 @@
 .mk-fig .dmap .wl{fill:var(--fg);opacity:.3}
 .mk-fig .dmap .coast use{stroke-width:calc(.8px * var(--u,1));opacity:.8}
 .mk-fig .dmap .fb{fill:none;stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-linejoin:round;opacity:.22}
+.mk-fig .dmap .fw{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-linejoin:round;stroke-opacity:.6}
 .mk-fig .dmap .dz path{stroke:var(--sold-line);stroke-width:calc(1px * var(--u,1))}
 .mk-fig .dmap .dzl{fill:none;stroke:var(--sold-line);stroke-width:calc(4px * var(--u,1));stroke-linecap:round;stroke-linejoin:round;opacity:.75}
 .mk-fig .dmap rect.lm{fill:var(--fg)}
@@ -82,7 +83,7 @@
 .mk-fig .dmap :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .mk-fig .dmap .nh{fill:var(--fg)}
 @media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap :is(text.lm,.wn){display:none}}
-@media (forced-colors:active){.mk-fig .dmap :is(.fb,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
+@media (forced-colors:active){.mk-fig .dmap :is(.fb,.fw,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
@@ -127,6 +128,7 @@
 .opener > picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .opener > picture img.top{object-position:50% 0}
 .opener > picture img.low{object-position:50% 85%}
+.opener > picture img.crown{object-position:50% 39%}
 .opener > .cap{width:min(100vw - var(--gl) - var(--gr),880px - var(--gl) - var(--gr));margin-inline:auto}
 .js .opener[data-draw] :is(.frame,picture){clip-path:inset(0 max(var(--gl),calc((100% - 880px) / 2 + var(--gl))));transition:clip-path 1.4s var(--ease-display) .15s}
 .js .opener.in :is(.frame,picture){clip-path:inset(0)}
