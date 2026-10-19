@@ -473,7 +473,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart .sv .land{fill:url(#svHatch);opacity:.5}
 .chart .sv .wl{fill:var(--fg);opacity:.3}
 .chart .sv .swp{transform:translateY(calc((1 - var(--c,1)) * 600px))}
-.chart .sv .coast path,.chart .sv .isle path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+.chart .sv :is(.coast,.isle) :is(path,use){fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
 .chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .cn{opacity:var(--t,1)}

@@ -672,7 +672,7 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'media/maps.svg'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
@@ -680,12 +680,43 @@ test('assets carry the current version', async ({}, info) => {
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|maps\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
   }
   expect(refs).toBeGreaterThanOrEqual(23);
+});
+
+// Inline scripts carry no notes either: a commented one is written in _src/inline/ and marked
+// <script data-source="_src/inline/NAME.js">, and tools/version.py writes the page's copy without them.
+test('inline scripts are published without their notes', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const noted = [];
+  let sourced = 0;
+  for (const p of pages) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/<script([^>]*)>(.*?)<\/script>/gs)) {
+      if (/src=|ld\+json|speculationrules/.test(m[1].replace(/data-source="[^"]*"/, ''))) continue;
+      if (m[1].includes('data-source=')) sourced++;
+      if (m[2].split('\n').some((l) => /^\s*(\/\/|\/\*)/.test(l))) noted.push(p);
+    }
+  }
+  expect(noted, 'move the commented script into _src/inline/ and mark it data-source').toEqual([]);
+  expect(sourced).toBeGreaterThanOrEqual(12);
+});
+
+// The markets maps on the home pages and the markets hub place their coastlines from one cached drawing,
+// media/maps.svg, and the Spanish and Portuguese home pages read their sun note's words from the page's language.
+test('the markets maps draw their coastlines from the shared drawing', async ({ page }) => {
+  for (const [path, sun] of [['/', /^Sun /], ['/markets.html', null], ['/es/', /^Sol /], ['/pt/mercados.html', null]]) {
+    await page.goto(path);
+    await page.locator('.chart .map').scrollIntoViewIfNeeded();
+    for (const sel of ['.chart .ov use.lnd', '.chart .ov .coast use', '.chart .sv .coast use', '.chart .sv .isle use']) {
+      await expect.poll(() => page.locator(sel).first().evaluate((u) => Math.round(u.getBBox().width)), `${path} ${sel}`).toBeGreaterThan(20);
+    }
+    if (sun) await expect(page.locator('#sunline')).toHaveText(sun);
+  }
 });
 
 // An id names one element on its page: a second one (a drawing's pattern, say) silently loses to the first, and whatever
