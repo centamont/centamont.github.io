@@ -329,6 +329,21 @@
     let queued = false;
     addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); }); } }, { passive: true });
     mark();
+    // A page that closes on the date it was last updated (privacy, terms) carries that date in the right margin too, with
+    // where to ask about it, held in view beside the text as the list of sections is on the left (reading.css, .rail);
+    // it is set in the text's own column, just before that closing line, and hung out into the margin.
+    const upd = page.querySelector('.prose > p.note:last-child'), on = upd && /^Last updated (.+?)\.?$/.exec(upd.textContent.trim());
+    if (on) {
+      const rail = document.createElement('aside'), box = document.createElement('div');
+      rail.className = 'rail'; rail.setAttribute('aria-label', 'About this page');
+      const row = (label, value) => { const k = document.createElement('p'), v = document.createElement('p'); k.className = 'toc-k'; k.textContent = label; v.className = 'rail-v'; v.append(value); box.append(k, v); };
+      row('Last updated', on[1]);
+      const ask = document.createElement('a'), note = document.createElement('span');
+      ask.className = 'ul'; ask.href = 'https://ig.me/m/centamont'; ask.target = '_blank'; ask.rel = 'noopener'; ask.textContent = '@centamont';
+      note.className = 'vh'; note.textContent = ' on Instagram (opens in a new tab)'; ask.append(note);
+      row('Questions', ask);
+      rail.append(box); upd.before(rail);
+    }
   }
 
   // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
