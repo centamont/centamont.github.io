@@ -80,6 +80,15 @@
 }
 @media (max-width:387px){.wk .rp-t{font-size:27px}.prose .wk .rp-key li{align-items:baseline}
 }
+/* under the not-found page's buttons, the four ways in, one ruled row each, the whole row a link: the practice's two
+   arms, the markets and the journal */
+.ways{list-style:none;max-width:460px;margin:clamp(28px,4vw,40px) 0 0;padding:0;border-top:1px solid var(--fg)}
+.ways li{border-bottom:1px solid var(--rule)}
+.ways a{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:52px;padding:10px 0;font-family:var(--display);font-size:22px;font-weight:400;line-height:1.2;color:var(--fg);text-decoration:none;transition:color var(--t-ui)}
+.ways svg{flex:none;width:22px;height:10px;color:var(--accent);transition:transform .6s var(--ease)}
+.ways a:focus-visible{color:var(--accent)}
+@media (hover:hover) and (pointer:fine){.ways a:hover{color:var(--accent)}.ways a:hover svg{transform:translateX(5px);transition-duration:300ms}}
+@media (max-width:820px){.ways{max-width:none;margin-top:28px}}
 /* the empty lot sits in its cell (not on the story's sticky offset), and its survey grid dissolves into the vellum at the sides */
 .lot .vacant{top:auto}
 .vacant canvas{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
@@ -259,3 +268,33 @@
   main.page:not(.wide):not(.lot) .plate.broad > .cap{width:638px;margin-left:var(--rail)}
   main.page:not(.wide):not(.lot) .prose .side{margin-right:-250px}
 }
+/* the stacking plan's key: each count stands in a column of its own at the right, so a label never breaks from its number;
+   hung in the margin the key sets at 13px on .1em, so every label holds one line */
+.prose .wk .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;margin-right:0}
+.wk .rp-key b{font-weight:500;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;text-align:right}
+@media (min-width:1170px){.prose .wk .rp-key{font-size:13px;letter-spacing:.1em}.prose .wk .rp-key li{white-space:nowrap}}
+/* A developer note can open on its own drawing rather than a photograph: the plate takes the photograph's place at the
+   full measure, framed by corner ticks, with the stacking plan drawn at a reading size (its level numbers at 13px or more)
+   and its key beside it, bottom-aligned as on a sheet, then the caption strip under the frame. On a phone the key
+   follows the plan. */
+.plate.dwg{display:block}
+.plate.dwg > .ticks{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:24px clamp(40px,6vw,96px);padding:clamp(28px,3.4vw,48px) clamp(16px,3vw,48px)}
+.plate.dwg .wk-plan{flex:none;width:auto;height:clamp(320px,30vw,420px)}
+.plate.dwg .rp-t{font-size:15.7px}
+.plate.dwg .rp-key{flex-direction:column;gap:10px;margin:0;font-size:14px;letter-spacing:.14em}
+.plate.dwg .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) 2.4em;gap:12px;align-items:center;white-space:nowrap;margin-right:0}
+.plate.dwg > .cap{margin-top:12px}
+/* The right margin of a page that closes on its date (privacy, terms): the date it was last updated and where to ask,
+   in the list of sections' voice, in the 210px margin 40px right of the text (as the notes' side figures stand), level
+   with the first section and held in view beside the text. It shows
+   where the list does, from 1320px with a pointer, and is not printed. */
+.rail{display:none}
+@media (min-width:1320px) and (hover:hover) and (pointer:fine){
+  .prose:has(> .rail){position:relative}
+  .rail{display:block;position:absolute;top:0;bottom:0;left:calc(100% + 40px);width:210px}
+  .rail > div{position:sticky;top:calc(var(--hdr,64px) + 40px);padding-top:14px;border-top:1px solid var(--rule)}
+  .prose .rail .toc-k{margin:0 0 6px;font:500 var(--t-label)/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .prose .rail-v{margin:0 0 26px;font:400 15px/1.45 var(--body);color:var(--muted)}
+  .prose .rail-v:last-child{margin-bottom:0}
+}
+@media print{.rail{display:none!important}}

@@ -246,7 +246,7 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-method summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media (hover:hover) and (pointer:fine){.cv-method summary:hover{color:var(--fg)}}
 .cv-method .mk-facts{margin:6px 0 14px;max-width:52em}
-.cv-method .mk-facts sup{font-size:.7em;line-height:0}
+.cv-method .mk-facts sup{font-size:max(13px,.7em);line-height:0}
 .cv-method > p{margin:0 0 6px;font-size:15px;line-height:1.5;color:var(--faint)}
 
 /* The letter to the partners */
@@ -286,14 +286,15 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:2px solid var(--accent);outline-offset:3px;background-color:rgba(var(--bronze-rgb),.16)}
 /* (over that tint a placeholder steps up from faint to muted, so it keeps AA by night: 6.7:1, where faint falls to 4.2) */
 .letter .sheet input:focus-visible::placeholder{color:var(--muted)}
-/* Each blank keeps a small label under its line once it has the focus or a value, so the cue its placeholder gave is not
+/* Each blank shows a small label over its line while it has the focus, so the cue its placeholder gave is not
    lost once the writer types (the label is the blank's own name, which a screen reader already hears, so it is not read
    twice). The lines with blanks stand a little further apart to make room for it. */
 .letter .sheet :is(.body,.sign){line-height:2.05}
 .letter .blank{position:relative;display:inline-block;max-width:100%}
-.letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;top:calc(100% + 4px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
-/* the label shows while its blank has focus, on a chip of the letter's own sheet so it can sit over the line below it
-   without the two reading as one; once filled, the sentence around the value says what it is */
+.letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;bottom:calc(100% + 7px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
+/* the label shows while its blank has focus, on a chip of the letter's own sheet set just above the blank, clear of its
+   focus ring, so it never meets the words that follow and can sit over the line above without the two reading as one;
+   once filled, the sentence around the value says what it is */
 .letter .blank::after{z-index:2;padding:3px 6px 4px;margin-left:-6px;background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
 .letter .blank:focus-within::after{opacity:1}
 /* a plan carried from the launch planner: its link, under the developer's paragraph, as it will be sent */
@@ -341,11 +342,6 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-hair{stroke:var(--fg);stroke-width:1;opacity:.5;pointer-events:none}
 .cv-hairt{fill:var(--fg);font:400 16px var(--display);font-variant-numeric:lining-nums tabular-nums;paint-order:stroke;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .cv-hdot{fill:var(--sheet);stroke:var(--sold-line);stroke-width:1.5;pointer-events:none}
-@container (max-width:134.5px){.st .sx.l,.st:has(.sx.l) > .nw + .nw{display:none}}
-@media (min-width:360px) and (max-width:379px){@container (min-width:130.5px){.st .sx.l{display:inline}}
-}
-@media (max-width:359px),(min-width:1024px) and (max-width:1149px){@container (min-width:126.5px){.st .sx.l{display:inline}}
-}
 
 /* Private clients: the threshold. The page opens on the ink with the home page's door standing in it, open, its three
    promises inside; the reading below is on the sheet, and the door's light falls across the band's floor onto it. */
@@ -490,13 +486,30 @@ html.js .pc-nojs{display:none}
 @media (max-width:820px){.co-row{grid-template-columns:1fr}}
 .devs .co-row .notes-list{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--rule)}
 .devs .co-row .more{justify-self:start}
-/* the developers page: one tower in six stages beside the six steps, and the specimen report's pace chart on its sheet */
-.dv-head{display:grid;align-content:start;gap:clamp(28px,3.4vw,48px)}
+/* the developers page. Its fold: the title, the standfirst and the two ways on (a letter, the one-page brief) on seven
+   columns, and on the other five one tower in six stages, drawn about one and a half times its size, its foot on the
+   line of the buttons. On narrower screens the drawing follows the buttons. */
+.dv-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px clamp(32px,6vw,96px);align-items:end}
+.dv-top > *{min-width:0}
+.devs .dv-lead .standfirst{max-width:26em}
+.devs .dv-cta{margin-top:clamp(28px,3.4vw,40px);align-items:center;gap:14px 32px}
 .dv-rise-f{margin:0}
-.dv-rise{display:block;width:100%;max-width:400px;height:auto;overflow:visible}
+.dv-rise{display:block;width:100%;max-width:480px;height:auto;margin-left:auto;overflow:visible}
 .dr .crx{stroke:var(--fg);stroke-width:.5;opacity:.6}
 .dv-rise .sn{fill:var(--accent);font:italic 400 17px var(--display);font-variant-numeric:lining-nums}
-.dv-rise .sl{fill:var(--faint);font:500 9.5px var(--body);letter-spacing:.12em;text-transform:uppercase}
+.dv-rise .sl{fill:var(--faint);font:500 10px var(--body);letter-spacing:.12em;text-transform:uppercase}
+@media (max-width:820px){.dv-top{grid-template-columns:minmax(0,1fr)}.dv-rise{margin-left:0;max-width:420px}.dv-rise .sl{font-size:12px;letter-spacing:.08em}}
+/* what a developer receives: six ruled rows, each a deliverable, a line on it and the way to its specimen or note */
+.dv-get{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.dv-get li{display:grid;gap:4px;padding:16px 0 18px;border-bottom:1px solid var(--rule)}
+.dv-get b{font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
+.dv-get span{color:var(--muted);max-width:34em}
+.dv-get .more{justify-self:start;margin-top:4px}
+/* the questions a developer asks first, each answered in full where it can be read without opening anything */
+.dv-qa{margin:0;border-top:1px solid var(--rule)}
+.dv-qa > div{padding:16px 0 18px;border-bottom:1px solid var(--rule)}
+.dv-qa dt{font-family:var(--display);font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
+.dv-qa dd{margin:6px 0 0;color:var(--muted);max-width:34em}
 .dv-report{max-width:520px;margin:6px 0 2px;padding:clamp(16px,2vw,24px) clamp(16px,2vw,28px) clamp(12px,1.6vw,18px);background:var(--sheet);border:1px solid var(--rule)}
 .dv-report .rp-pace .rp-t{font-size:13px}
 @media (max-width:600px){.dv-report .rp-pace .rp-t{font-size:21px}}
@@ -521,7 +534,18 @@ html.js .pc-nojs{display:none}
 .trio .cap{grid-template-columns:minmax(0,1fr)}
 /* three credits side by side are too long for one line each, so they wrap inside their own column */
 .trio .cap .credit{white-space:normal}
-@media (max-width:700px){.trio{grid-template-columns:minmax(0,1fr)}}
+/* The three come from different rooms and hours, so they share one grade: a little colour taken out and an ivory warmth
+   put back, the sea warmed the most since it is the coolest. Written to outrank the site's photo grade, and dimmed at night. */
+.trio{--trio-b:1}
+:root[data-theme="dark"] .trio{--trio-b:.92}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .trio{--trio-b:.92}}
+.pc-photos .trio .photo img{filter:grayscale(.45) sepia(.2) contrast(1.02) brightness(calc(.98 * var(--trio-b)))}
+.pc-photos .trio .photo:nth-child(2) img{filter:grayscale(.45) sepia(.3) contrast(1.06) brightness(calc(.94 * var(--trio-b)))}
+/* Phones: the stone floor across the measure, cut to 3:2, and the two windows side by side beneath it, so the row reads
+   as one plate instead of three screens of photographs */
+@media (max-width:700px){.trio{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 16px}
+  .trio .photo:first-child{grid-column:1/-1}
+  .trio .photo:first-child img{aspect-ratio:3/2;object-fit:cover;width:100%;height:auto}}
 
 /* Phones: the advisors' seat plan drawn at three quarters of its height, so the section reads as one screen */
 @media (max-width:820px){.people .table .ph{width:122px;height:auto}}

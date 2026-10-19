@@ -20,7 +20,8 @@ asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona',
 of: ', de ', plan: 'Mi plan: ',
 ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
 subject: (who) => 'Carta de ' + who,
-copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente.'],
+copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente para concertar una primera conversación.'],
+launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1] + ' de ' + y,
 notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
 },
 pt: {
@@ -43,7 +44,8 @@ asks: { where: 'o bairro', units: 'o número de residências', area: 'a região'
 of: ', ', plan: 'Meu plano: ',
 ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
 subject: (who) => 'Carta de ' + who,
-copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente.'],
+copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente para marcar uma primeira conversa.'],
+launchIn: (m, y) => 'em ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][m - 1] + ' de ' + y,
 notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
 },
 })[(document.documentElement.lang || 'en').slice(0, 2)] || {};
@@ -435,6 +437,7 @@ const show = () => { const v = form.querySelector('input[name="as"]:checked').va
 let reminding = '';
 const signed = () => [...form.querySelectorAll('.sign input')].filter((i) => !i.closest('[hidden]'));
 let planUrl = '';
+let launchAt = '';
 const as = form.querySelector('fieldset.as'), first = paras[0];
 let wrap = null, dim = null, placed = null, turn = 0;
 if (first && paras.every((p) => p.parentNode === first.parentNode)) { wrap = document.createElement('div'); wrap.className = 'bodies'; first.before(wrap); paras.forEach((p) => wrap.appendChild(p)); }
@@ -489,7 +492,7 @@ if (v === 'dev') [['units', /^\d{1,4}$/], ['where', word]].forEach(([k, ok]) => 
 if (v === 'dev' && q.get('plan')) {
 const from = new URLSearchParams(q.get('plan')), keep = new URLSearchParams();
 ['u', 'f', 'p', 'c', 'l', 'd', 'g', 'b'].forEach((k) => { const t = from.get(k); if (t && /^-?\d{1,4}(\.\d{1,2})?$/.test(t)) keep.set(k, t); });
-if (/^\d{4}-\d{2}$/.test(from.get('s') || '')) keep.set('s', from.get('s'));
+if (/^\d{4}-(0[1-9]|1[0-2])$/.test(from.get('s') || '')) { keep.set('s', from.get('s')); launchAt = from.get('s'); }
 ['n', 'w'].forEach((k) => { const t = (from.get(k) || '').trim(); if (t && word.test(t)) keep.set(k, t); });
 if (keep.has('u')) planUrl = 'https://centamont.com/planner.html?' + keep;
 }
@@ -502,6 +505,12 @@ if (planUrl && devp) {
 const r = document.createElement('span'), a = document.createElement('a');
 r.className = 'plan-ref'; a.className = 'ul'; a.href = planUrl; a.textContent = planUrl.replace(/^https:\/\//, '');
 r.append(cmSay('plan', 'My plan: '), a); devp.append(' ', r);
+}
+const whenSel = form.elements.when;
+if (launchAt && whenSel) {
+const [y, m] = launchAt.split('-').map(Number);
+const o = new Option(cmSay('launchIn', (mm, yy) => 'in ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][mm - 1] + ' ' + yy, m, y));
+whenSel.add(o); o.selected = true;
 }
 document.querySelectorAll('a[data-as]').forEach((a) => a.addEventListener('click', () => preset(a.dataset.as)));
 form.querySelectorAll('.sheet input').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); }));
@@ -570,8 +579,9 @@ busy = true; setTimeout(() => { busy = false; }, 1200);
 const link = () => { const a = document.createElement('a'); a.className = 'ul'; a.href = url; a.textContent = to; return a; };
 const go = (copied) => {
 box.hidden = copied; if (!copied) { area.value = t; area.focus(); area.select(); }
-const [a, b] = copied ? cmSay('copied', ['Your letter is open in your email, addressed to ', '. If nothing opened, it is copied too: paste it into a new message to that address. A partner will reply personally.']) : cmSay('notCopied', ['Your letter is open in your email, addressed to ', '. If nothing opened, copy the letter below and send it to that address.']);
+const [a, b] = copied ? cmSay('copied', ['Your letter is open in your email, addressed to ', '. If nothing opened, it is copied too: paste it into a new message to that address. A partner will reply personally to arrange a first conversation.']) : cmSay('notCopied', ['Your letter is open in your email, addressed to ', '. If nothing opened, copy the letter below and send it to that address.']);
 say(a, link(), b);
+if (copied) requestAnimationFrame(() => { const d = note.getBoundingClientRect().bottom + 24 - innerHeight; if (d > 0) scrollBy({ top: d, behavior: calm() ? 'auto' : 'smooth' }); });
 };
 copying.then(() => go(true), () => go(false));
 });

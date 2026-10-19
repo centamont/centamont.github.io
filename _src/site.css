@@ -167,9 +167,15 @@ header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:
 .mark .sym{height:var(--sym);color:var(--seal)}
 .mark .wm{height:var(--wm)}
 nav.main{display:flex;gap:clamp(18px,2.1vw,30px)}
+/* Spanish and Portuguese say each section in more letters: between 1280 and 1599px their bar sets its sections a little
+   closer, so the switches still end on the page's right edge */
+@media (min-width:1280px) and (max-width:1599px){:is(:lang(es),:lang(pt)) nav.main{gap:clamp(14px,1.5vw,22px)}}
 nav.main a{white-space:nowrap;font-size:var(--t-nav);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding-block:6px;border-bottom:1px solid transparent;transition:color var(--t-ui),border-color var(--t-ui)}
 nav.main a:focus-visible,nav.main a[aria-current="true"]{color:var(--fg)}
 @media (hover:hover) and (pointer:fine){nav.main a:hover{color:var(--fg)}}
+/* on a Spanish or Portuguese page, a link in the menu, the footer or the path that leads to a page only in English says so
+   before it is pressed: a small EN after its name, in the link's own colour (screen readers hear "in English" instead) */
+.en-tag{display:inline-block;margin-left:.55em;font-family:var(--body);font-size:max(10px,min(.75em,12px));font-weight:500;font-style:normal;line-height:1;letter-spacing:.12em;text-indent:0;text-transform:uppercase;vertical-align:.12em;white-space:nowrap}
 /* wide enough for Close, with its tracking, so the label swap never shifts the day/night button */
 .menu-btn{display:none;min-width:86px;text-align:center;background:none;border:1px solid var(--rule);color:var(--fg);font:inherit;font-size:var(--t-label);letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:border-color var(--t-ui) var(--ease-out),background-color var(--t-ui) var(--ease-out)}
 @property --dp{syntax:'<number>';inherits:false;initial-value:0}
@@ -294,6 +300,9 @@ header.site{container:site/inline-size;max-width:100vw}
   .js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.62)}
   .mk-st.mk-later{grid-template-columns:repeat(2,max-content);column-gap:24px}
   .mk-st.mk-later .mk-k{grid-column:1/-1}
+  /* (on a Spanish or Portuguese page the planned and later markets are all in English: in the list the group's label says
+     so once, rather than every city, so the list keeps its width; in the drawer below, each city says so) */
+  .mk-panel :is(.mk-plan,.mk-later) a .en-tag{display:none}
   .mk-st.mk-plan{grid-column:1}
   .mk-st.mk-later{grid-column:2;grid-row:1 / span 2}
   nav.main .mk-panel a.mk-all{grid-column:1/-1;margin-top:10px;padding:12px 0 4px;border-top:1px solid var(--rule);border-bottom:0}
@@ -305,6 +314,7 @@ header.site{container:site/inline-size;max-width:100vw}
 @media (max-width:1279px),(max-width:79.9375em){
   .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
   nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  .mk-k .en-tag{display:none}
   .mk-k{flex-basis:100%;padding:2px 0 0;font-family:var(--body);font-weight:400;font-size:var(--t-label);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:6px 0 3px;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
   .js header.site.over .mk-st{border-color:rgba(var(--ivory-rgb),.14)}.js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.72)}
@@ -315,6 +325,7 @@ header.site{container:site/inline-size;max-width:100vw}
 @media (min-width:1280px){@container site (max-width:71em){
   header.site .mk-st{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:clamp(12px,3.75vw,24px);row-gap:0;padding-block:min(5px,.7svh);border-bottom:1px solid var(--rule);opacity:0;transform:translateY(10px);transition:opacity 160ms var(--ease-out),transform 0s linear 240ms;--k:6}
   header.site nav.main.open .mk-st{opacity:1;transform:none;transition:opacity 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms),transform 320ms var(--ease-out) calc(var(--k) * 30ms + 80ms)}
+  header.site .mk-k .en-tag{display:none}header.site .mk-panel :is(.mk-plan,.mk-later) a .en-tag{display:inline-block}
   header.site .mk-k{flex-basis:100%;padding:2px 0 0;font-family:var(--body);font-weight:400;font-size:var(--t-label);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   header.site nav.main .mk-st a{font-family:var(--body);font-weight:400;font-size:var(--t-nav);line-height:1.2;letter-spacing:.14em;text-transform:uppercase;padding:6px 0 3px;margin:0;border:0;opacity:1;transform:none;transition:color var(--t-ui)}
   .js header.site.over .mk-st{border-color:rgba(var(--ivory-rgb),.14)}.js header.site.over .mk-k{color:rgba(var(--ivory-rgb),.72)}
@@ -603,8 +614,10 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 /* in the bar the motion switch says what it is: its glyph, then the word, in the small labels' voice */
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
-/* the word is English, so the Spanish and Portuguese pages keep the glyph alone, which also leaves room for their longer menu */
-@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+/* the Spanish and Portuguese pages say it in their own word, a touch closer set, from 1600px, where their longer menu
+   leaves room for it; below that they keep the glyph alone */
+@media (min-width:1280px) and (max-width:1599px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1600px){:lang(es) .motion::after{content:"Animación";letter-spacing:.1em}:lang(pt) .motion::after{content:"Animação";letter-spacing:.1em}}
 /* Motion switched off on this site: everything arrives in its final state, and anchors jump rather than glide (no
    transition at all, as with motion reduced: even a .001ms one would start on every element a change of night or day
    touches, and a list of them, even at 0s, is weighed on every element at every restyle) */
@@ -747,7 +760,9 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 /* (and the sea takes the overview's water lines, finer and closer, as a survey would) */
 .chart .sv .wl{fill:var(--fg);opacity:.3}
 .chart .sv .swp{transform:translateY(calc((1 - var(--c,1)) * 600px))}
-.chart .sv .coast path,.chart .sv .isle path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+/* (on the home pages and the markets hub the coast and its islands come from media/maps.svg through <use>, whose drawing
+   keeps its own hairline: vector-effect does not inherit) */
+.chart .sv :is(.coast,.isle) :is(path,use){fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
 .chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .cn{opacity:var(--t,1)}
@@ -862,8 +877,9 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--read:#E2DBCF}}
 @media print{:root,:root[data-theme],:root:not([data-theme="light"]){--read:#2B2924}}
 /* A two-line initial: its cap height spans line 1's cap line to line 2's baseline (34.1px + Cormorant's 13.75px caps = its
-   .625 cap at 3.48em), and the line height drops that baseline onto line 2's */
-.prose.lead h2:first-child + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
+   .625 cap at 3.48em), and the line height drops that baseline onto line 2's; a margin figure set between the first
+   heading and its paragraph keeps the initial */
+.prose.lead h2:first-child + p::first-letter,.prose.lead h2:first-child + .side + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
 .progress{position:fixed;top:64px;left:0;right:0;height:1px;z-index:25;pointer-events:none;transition:opacity .4s var(--ease)}
 .progress.end{opacity:0}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
@@ -880,11 +896,12 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .prose li::marker{color:var(--accent)}
 /* only Cormorant's 300 and 400 are served, so a term set off in the reading face is set in its italic, never a forged bold */
 .prose strong{color:var(--fg);font-weight:400;font-style:italic}
-/* reference lists (the documents, the questions) and the closing note keep the sans, at the body size */
-.prose .ref{font-size:18px}
-.prose .ref li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
-.prose .ref li{margin-top:10px;color:var(--muted)}
-.prose .ref strong{font-style:normal;font-weight:500}
+/* reference lists (the documents, the questions, the steps) read like the paragraphs around them, in the same face and
+   size, so a column never changes typeface halfway down; only the sources (market.css) and the closing note keep the sans */
+.prose .ref li{margin-top:10px}
+.prose .mk-src li,.prose .note{font-family:var(--body);line-height:1.7;font-variant-numeric:normal}
+.prose .mk-src li{color:var(--muted)}
+.prose .mk-src strong{font-style:normal;font-weight:500}
 .prose a{color:var(--accent)}
 .prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
 /* (its rules run the column's width; its 16px words keep to about 75 characters a line, in lines of even length) */
@@ -1207,20 +1224,15 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .t-pr{grid-area:pr}.t-of{grid-area:of}.t-dr{grid-area:dr}.t-sc{grid-area:sc}.t-sh{grid-area:sh}.t-wk{grid-area:wk}.t-mk{grid-area:mk}.t-ss{grid-area:ss}.t-fo{grid-area:fo}
 .tb > div{min-height:96px}
 /* the sheet number is the block's largest figure, set directly under its label like every other value, then a rule and
-   the sheet's name with the size of the set. The name keeps to one line: where the cell is too narrow for both, the size
-   of the set drops to the line below, which is clipped, and takes its dot with it. */
+   the sheet's name with the size of the set. Where the cell is too narrow for both on one line, the size of the set takes
+   the line below, its dot left outside the box; where it is too narrow for the name, the name turns between its words
+   (a long Spanish or Portuguese word at its marked syllable), so no word is ever cut off. */
 .t-sh dd{display:grid;justify-items:start}
 .sn{margin-top:4px;font-family:var(--display);font-weight:300;font-size:72px;line-height:.9;letter-spacing:-.02em;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}
 .sn small{font-size:40px;letter-spacing:0}
-.st{justify-self:stretch;height:calc(1.4em + 9px);margin-top:12px;padding-top:8px;border-top:1px solid var(--rule);font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-.st > .nw{white-space:nowrap}
-/* the name is the one the Sheets list gives the sheet. The container thresholds are the name's width in the fallback face at
-   the tracking in force, so a late web font never clips it; where even the whole name will not fit (a phone of 320 to 342px),
-   it keeps its last word, as a drawing's title does in a small title block, and the set size goes with the dropped word */
+.st{justify-self:stretch;min-height:calc(1.4em + 9px);margin-top:12px;padding-top:8px;border-top:1px solid var(--rule);font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.st > .nw:last-child{white-space:nowrap}
 .t-sh{container-type:inline-size}
-@container (max-width:129.5px){.st .sx,.st:has(.sx) > .nw + .nw{display:none}}
-@media (min-width:360px) and (max-width:379px){@container (min-width:126px){.st .sx{display:inline}}}
-@media (max-width:359px),(min-width:1024px) and (max-width:1149px){@container (min-width:122.5px){.st .sx{display:inline}}}
 .t-dr small{display:block;margin-top:8px;font-family:var(--body);font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 /* the sheet set, one row a sheet in tabular figures: the sheet you are on stands in ink, underlined */
 .ss{--n:2.2em}
@@ -1233,7 +1245,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .tb .ss a[aria-current]{color:var(--fg)}
 /* where the cell is wide enough for two columns, the set takes them, five and five */
 .t-ss{container-type:inline-size}
-@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-auto-columns:max-content;column-gap:2.2em}}
+@container (min-width:20.5em){.tb .ss{grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-auto-columns:minmax(min-content,max-content);column-gap:2.2em}}
 /* a date keeps whole, taking the next line as one piece where its line is full; only text set far larger than the cell (a
    browser's text zoom) breaks it, so it never runs on into the next cell. The sheet number's revision does the same. */
 .t-dr time,.sn small{display:inline-block;max-width:100%}
@@ -1244,7 +1256,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* phones: practice across the sheet, then two columns, the sheet standing beside the office and the date as it stands
    beside the top row on a wide screen, the ways in beside the markets, then the set across, five and five. The scale, which says only that
    nothing here is drawn to one, is left off. Every link keeps a 43px target, set edge to edge. */
-@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk mk" "ss ss" "fo fo"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
+@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of sh" "dr sh" "wk mk" "ss ss" "fo fo"}.tb > .t-sc{display:none}.sn{font-size:40px}.sn small{font-size:24px}.st{margin-top:8px;padding-top:6px;min-height:calc(1.4em + 7px)}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
@@ -1592,7 +1604,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
 .mk-facts dd{margin:0;font-size:18px;line-height:1.6;color:var(--read)}
-.mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
+.mk-facts sup,.prose p sup{font-size:max(13px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 /* footnote numerals are tiny; a 24px hit area around each keeps them easy to tap on a phone */
 .mk-facts sup a,.prose p sup a{position:relative}
@@ -1706,9 +1718,8 @@ main{overflow-x:clip}
   main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
   main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
   main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
-  /* (the market sheet, then the text and all that follows it, come after the view) */
-  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
-  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  /* (the market sheet stands after the view and its elevation in the page itself, at every width) */
+  main.page:not(.wide):not(.lot) > .wrap > .ms{margin-top:clamp(40px,5vw,64px)}
   main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
   /* the body's own column, where it stood in the 880px page */

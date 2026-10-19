@@ -330,6 +330,20 @@
     let queued = false;
     addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); }); } }, { passive: true });
     mark();
+    // A page that closes on the date it was last updated (privacy, terms) carries that date in the right margin too, with
+    // where to ask about it, held in view beside the text as the list of sections is on the left (reading.css, .rail);
+    // it is set in the text's own column, just before that closing line, and hung out into the margin.
+    const upd = page.querySelector('.prose > p.note:last-child'), on = upd && /^Last updated (.+?)\.?$/.exec(upd.textContent.trim());
+    if (on) {
+      const rail = document.createElement('aside'), box = document.createElement('div');
+      rail.className = 'rail'; rail.setAttribute('aria-label', 'About this page');
+      const row = (label, value) => { const k = document.createElement('p'), v = document.createElement('p'); k.className = 'toc-k'; k.textContent = label; v.className = 'rail-v'; v.append(value); box.append(k, v); };
+      row('Last updated', on[1]);
+      const ask = document.createElement('a');
+      ask.className = 'ul'; ask.href = 'mailto:office@centamont.com'; ask.append('office@', document.createElement('wbr'), 'centamont.com');
+      row('Questions', ask);
+      rail.append(box); upd.before(rail);
+    }
   }
 
   // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
@@ -557,10 +571,11 @@
   addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
 
   // A row of neighborhoods that scrolls sideways (a market page on a phone) takes the keyboard's focus, so its cards can be
-  // scrolled from the keys; where the cards stand in a column and nothing scrolls, it is no stop at all.
+  // scrolled from the keys; where the cards stand in a column and nothing scrolls, it is no stop at all. (On a wide
+  // screen the captions hang into the margin, so the column is wider than its box without scrolling: overflow decides.)
   const rows = document.querySelectorAll('.hoods');
   if (rows.length) {
-    const stop = () => rows.forEach((r) => { if (r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
+    const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
     let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
   }
 
@@ -572,14 +587,17 @@
   // Film loops: a few muted seconds of water and light. Each loads only as it comes into view, plays while it is on
   // screen and pauses once it leaves; the still beneath it shows until the first frame is ready. With motion reduced
   // or paused, the still stays. (The page names its files on the video, data-webm and data-mp4; the sources are made
-  // here, as it arrives, so the markup carries no source without a file.)
+  // here, as it arrives, so the markup carries no source without a file.) A phone takes the 960px cut, data-webm-sm and
+  // data-mp4-sm, a quarter of the weight; a visitor saving data, or on a slow connection, keeps the still.
   const films = document.querySelectorAll('video.loop');
-  if (films.length && !stillPage) {
+  const conn = navigator.connection, lean = !!conn && (conn.saveData || /(^|-)[23]g$/.test(conn.effectiveType || ''));
+  const small = matchMedia('(max-width:820px)').matches;
+  if (films.length && !stillPage && !lean) {
     const fo = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting: on }) => {
       if (on) {
         if (!v.dataset.ready) {
           v.dataset.ready = '1';
-          [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { if (!v.dataset[k]) return; const s = document.createElement('source'); s.src = v.dataset[k]; s.type = type; v.appendChild(s); });
+          [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { const src = (small && v.dataset[k + 'Sm']) || v.dataset[k]; if (!src) return; const s = document.createElement('source'); s.src = src; s.type = type; v.appendChild(s); });
           v.addEventListener('playing', () => v.classList.add('on'), { once: true });
           v.load();
         }

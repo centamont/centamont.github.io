@@ -6,13 +6,13 @@
 # the not-found page) and sheet.css (the report, the planner, the short list, the project site). The shared scripts
 # site.js, instrument.js and planner.js are written and commented there too (Jekyll never publishes an underscore
 # folder). This tool writes each published copy from its source with the comments and blank lines taken out, so what
-# the browser fetches carries no notes. Edit the sources, never the built files. model.js, tower3d.js and
-# project-site.js are published as written.
+# the browser fetches carries no notes. Edit the sources, never the built files. model.js, tower3d.js,
+# project-site.js and media/maps.svg (the markets maps' coastlines) are published as written.
 # The token is the first 8 hex digits of a sha256 over the published files, so it changes whenever any of them does.
 # Run from the repo root after editing any of them (or a source in _src/), then python3 tools/csp.py:
 #   python3 tools/version.py
-# python3 tools/version.py --check writes nothing: it names a stale built file or each page with a stale token and
-# exits 1 if there is one. The "the stylesheet is built from its source" Playwright test runs it.
+# python3 tools/version.py --check writes nothing: it names a stale built file or each page with a stale token or a
+# stale inline script and exits 1 if there is one. The "the stylesheet is built from its source" Playwright test runs it.
 import re,hashlib,glob,sys
 check='--check' in sys.argv[1:]
 stale=[]
@@ -43,7 +43,7 @@ def strip_css(src,name='site.css'):
 
 # A slash starts a regular expression, not a division, after one of these (or at the start).
 REGEX_AFTER=set('( , = : [ ! & | ? { } ; + - * % < > ~ ^ => && || ?? == === != !== <= >= += -= *= /= return typeof case do else in instanceof new void delete throw yield await of'.split())
-def strip_js(src,name):
+def strip_js(src,name,head=True):
     # Reads the script token by token, so a // or /* inside a string, a template literal or a regular expression is
     # never taken for a comment. Comments go; a block comment that spans lines still ends its line, so semicolon
     # insertion reads the script as before. Each line loses its indent and trailing spaces, and blank lines go. A
@@ -102,7 +102,7 @@ def strip_js(src,name):
         m=re.compile(r'[A-Za-z_$][\w$]*|\d[\w.]*|=>|===|!==|==|!=|<=|>=|&&|\|\||\?\?|[+\-*/]=|\.\.\.|.').match(src,i)
         cur.append(m.group(0));prev=m.group(0);i=m.end()
     end_line()
-    return '// Built from _src/%s by tools/version.py: edit the source, not this file.\n'%name+'\n'.join(lines)+'\n'
+    return ('// Built from _src/%s by tools/version.py: edit the source, not this file.\n'%name if head else '')+'\n'.join(lines)+'\n'
 
 built={}
 for f in CSS+JS:
@@ -112,15 +112,27 @@ for f in CSS+JS:
         if open(f).read()!=built[f]: stale.append(f); print(f,'stale: run python3 tools/version.py')
     else: open(f,'w').write(built[f])
 
-assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css','media/maps.svg']
 h=hashlib.sha256()
 for a in assets: h.update(built[a].encode() if a in built else open(a,'rb').read())
 token=h.hexdigest()[:8]
 pages=['index.html','privacy.html','terms.html','404.html','private-clients.html','advisors.html','planner.html','shortlist.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html','developers.html','markets.html','project-site.html']+sorted(glob.glob('journal/*.html'))+sorted(glob.glob('es/*.html'))+sorted(glob.glob('pt/*.html'))
-ref=re.compile(r'((?:href|src)="[^"]*?(?<![\w-])(?:'+'|'.join(re.escape(a) for a in assets)+r'))(?:\?v=[0-9a-f]*)?"')
+# (the markets maps place their coastlines from media/maps.svg by fragment: href="/media/maps.svg?v=…#ovLand")
+ref=re.compile(r'((?:href|src)="[^"]*?(?<![\w-])(?:'+'|'.join(re.escape(a) for a in assets)+r'))(?:\?v=[0-9a-f]*)?(#[\w-]+)?"')
+# A page's inline script marked <script data-source="_src/inline/NAME.js"> is written from that source the same way, with
+# its notes taken out (the home pages' four scripts: one source each, shared by the English, Spanish and Portuguese
+# pages, which read their words from the page's language). Edit the source, run this, then python3 tools/csp.py, since
+# the page's policy allows each inline script by the hash of what is published.
+inline={}
+def inline_body(m):
+    src=m.group(1)
+    if not src.startswith('_src/inline/') or '..' in src: sys.exit('data-source must name a file in _src/inline/: '+src)
+    if src not in inline: inline[src]=strip_js(open(src).read(),src[5:],head=False)
+    return '<script data-source="%s">\n%s</script>'%(src,inline[src])
 for f in pages:
     t=open(f).read()
-    t,n=ref.subn(lambda m:m.group(1)+'?v='+token+'"',t)
+    t=re.sub(r'<script data-source="([^"]+)">.*?</script>',inline_body,t,flags=re.S)
+    t,n=ref.subn(lambda m:m.group(1)+'?v='+token+(m.group(2) or '')+'"',t)
     if check:
         if t!=open(f).read(): stale.append(f); print(f,'stale')
     else: open(f,'w').write(t); print(f,n)

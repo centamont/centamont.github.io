@@ -1,6 +1,6 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -91,11 +91,10 @@ test('a far jump lands on its heading with the story in step', async ({ page, is
   await expect(page.locator('#contact h2.display')).toBeFocused();
   await expect(page.locator('#contact h2.display')).toBeInViewport();
   expect(new URL(page.url()).hash).toBe('#contact');
-  if (isMobile) {
-    await expect(page.locator('nav.main')).toBeHidden();
-    await page.getByRole('button', { name: 'Menu' }).click();
-  }
-  await page.locator('nav.main a[href="#developers"]').click();
+  if (isMobile) await expect(page.locator('nav.main')).toBeHidden();
+  // (the header's Developers is the developer page; on the home page the services' own link leads to the story, and it is
+  // pressed where it stands, far above, so the jump is a far one)
+  await page.locator('#services a[href="#developers"]').dispatchEvent('click');
   await expect(page.locator('#developers h2')).toBeFocused();
   await expect(page.locator('#stageName')).toHaveText('First sketch');
   await page.locator('a.totop').click();
@@ -108,9 +107,10 @@ test('a far jump lands on its heading with the story in step', async ({ page, is
 // the sheet for the places after the door and the name.
 test('the header lands on the ground of the place it lands on', async ({ page, isMobile }) => {
   await page.goto('/');
-  for (const [id, ink] of [['clients', true], ['contact', false]]) {
-    if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
-    await page.locator(`nav.main a[href="#${id}"]`).click();
+  // (the private door from the hero's button, the close from the header's Contact)
+  for (const [id, ink, from] of [['clients', true, '.hero a[href="#clients"]'], ['contact', false, 'nav.main a[href="#contact"]']]) {
+    if (isMobile && from.startsWith('nav')) await page.getByRole('button', { name: 'Menu' }).click();
+    await page.locator(from).click();
     await expect.poll(() => page.evaluate((id) => Math.round(document.getElementById(id).getBoundingClientRect().top), id)).toBe(64);
     if (ink) await expect(page.locator('header.site')).toHaveClass(/\bover\b/);
     else await expect(page.locator('header.site')).not.toHaveClass(/\bover\b/);
@@ -377,6 +377,8 @@ test('the launch planner answers its inputs, keeps them in its link and says it 
   await page.locator('#plWrite').click();
   await expect(page.locator('#letter input[name="units"]')).toHaveValue('120');
   await expect(page.locator('#letter input[name="where"]')).toHaveValue('Edgewater');
+  // the planner's launch month, not a year, says when sales begin
+  await expect(page.locator('#letter select[name="when"] option:checked')).toHaveText(/^in [A-Z][a-z]+ \d{4}$/);
   await expect(page).not.toHaveURL(/units=/);
 });
 
@@ -520,6 +522,23 @@ test('on a phone the price slider sits right under the sales curve', async ({ pa
   expect(price.y + price.height).toBeLessThanOrEqual(read.y);
   expect(read.y + read.height).toBeLessThanOrEqual(loan.y);
 });
+
+// The home on a phone held upright stays within its length: each language's page measured at 390x844, with about 2%
+// of room over what it measures today (EN 14,065px, ES 14,798, PT 14,876). Anything added comes in against these.
+for (const [path, cap] of [['/', 14350], ['/es/', 15100], ['/pt/', 15180]]) {
+  test(`the phone home stays within its length (${path})`, async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone only');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    await page.waitForLoadState('load');
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    expect(height).toBeLessThanOrEqual(cap);
+    // the questions after the fourth fold behind one more row, and every question is still on the page
+    await expect(page.locator('.faq details:not(.fq-more)')).toHaveCount(6);
+    await expect(page.locator('.faq .fq-more > summary')).toBeVisible();
+    await expect(page.locator('.begin-go a')).toBeVisible();
+  });
+}
 
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
@@ -681,7 +700,7 @@ test('the stylesheet is built from its source', async ({}, info) => {
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'media/maps.svg'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
@@ -689,12 +708,45 @@ test('assets carry the current version', async ({}, info) => {
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js)(\?v=[0-9a-f]*)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|maps\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
   }
   expect(refs).toBeGreaterThanOrEqual(23);
+});
+
+// Inline scripts carry no notes either: a commented one is written in _src/inline/ and marked
+// <script data-source="_src/inline/NAME.js">, and tools/version.py writes the page's copy without them.
+test('inline scripts are published without their notes', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const noted = [];
+  let sourced = 0;
+  for (const p of pages) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/<script([^>]*)>(.*?)<\/script>/gs)) {
+      if (/src=|ld\+json|speculationrules/.test(m[1].replace(/data-source="[^"]*"/, ''))) continue;
+      if (m[1].includes('data-source=')) sourced++;
+      if (m[2].split('\n').some((l) => /^\s*(\/\/|\/\*)/.test(l))) noted.push(p);
+    }
+  }
+  expect(noted, 'move the commented script into _src/inline/ and mark it data-source').toEqual([]);
+  expect(sourced).toBeGreaterThanOrEqual(12);
+});
+
+// The markets maps on the home pages and the markets hub place their plain layers (state lines, borders, the world
+// inset, the survey's coast and islands) from one cached drawing, media/maps.svg, and the Spanish and Portuguese home pages read their sun note's words from the page's language.
+test('the markets maps draw their coastlines from the shared drawing', async ({ page }) => {
+  for (const [path, sun] of [['/', /^Sun /], ['/markets.html', null], ['/es/', /^Sol /], ['/pt/mercados.html', null]]) {
+    await page.goto(path);
+    await page.locator('.chart .map').scrollIntoViewIfNeeded();
+    // masks and clip paths draw from the page's own land; only plain layers come from the shared file
+    expect(await page.locator('.chart :is(mask, clipPath) use').evaluateAll((us) => us.filter((u) => !u.getAttribute('href').startsWith('#')).length), path).toBe(0);
+    for (const sel of ['.chart .ov use.lnd', '.chart .ov use.st', '.chart .ov use.wo', '.chart .sv .coast use', '.chart .sv .isle use']) {
+      await expect.poll(() => page.locator(sel).first().evaluate((u) => Math.round(u.getBBox().width)), `${path} ${sel}`).toBeGreaterThan(20);
+    }
+    if (sun) await expect(page.locator('#sunline')).toHaveText(sun);
+  }
 });
 
 // An id names one element on its page: a second one (a drawing's pattern, say) silently loses to the first, and whatever
@@ -704,7 +756,8 @@ test('no page repeats an id', async ({}, info) => {
   const pages = ['index.html', 'privacy.html', 'terms.html', '404.html', 'private-clients.html', 'planner.html', 'shortlist.html', 'report.html', 'south-florida.html', 'new-york.html', 'hamptons.html', 'los-angeles.html', 'dallas.html', 'austin.html', 'houston.html', 'san-francisco.html', 'tampa.html', 'naples.html', 'orange-county.html', 'developers.html', 'markets.html', 'project-site.html', 'es/index.html', 'es/clientes-privados.html', 'es/sur-de-florida.html', 'pt/index.html', 'pt/clientes-privados.html', 'pt/sul-da-florida.html', 'es/nueva-york.html', 'pt/nova-york.html', 'es/comprar-preconstruccion-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-na-planta-florida.html', 'pt/comprar-imovel-novo-florida.html', 'es/desarrolladores.html', 'pt/incorporadoras.html', 'es/mercados.html', 'pt/mercados.html', 'journal/index.html',
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   for (const p of pages) {
-    const ids = [...readFileSync(p, 'utf8').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+    // (a template's content is inert, apart from the page, so the not-found page's Spanish and Portuguese copies are left out)
+    const ids = [...readFileSync(p, 'utf8').replace(/<template\b[\s\S]*?<\/template>/g, '').matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
     expect(ids.filter((v, i) => ids.indexOf(v) !== i), `${p} repeats an id`).toEqual([]);
   }
 });
@@ -909,8 +962,7 @@ test.describe('every page in the sitemap', () => {
     const [y0, y1] = await page.evaluate(() => [document.getElementById('developers').offsetTop, document.getElementById('markets').offsetTop]);
     for (let y = y0; y <= y1; y += 160) { await page.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), y); await page.waitForTimeout(25); }
     await expect(page.locator('#stageName')).not.toHaveText('First sketch');
-    if (isMobile) await page.getByRole('button', { name: 'Menu' }).click();
-    await page.locator('nav.main a[href="#developers"]').click();
+    await page.locator('#services a[href="#developers"]').dispatchEvent('click');
     await expect(page.locator('#stageName')).toHaveText('First sketch');
   });
 
@@ -944,4 +996,123 @@ test('the developer and markets pages keep their ruled rows', async ({ page }) =
     await page.goto(path);
     await expect(page.locator('.co-row').first()).toHaveCSS('display', 'grid');
   }
+});
+
+// Every page's header names the same places: Developers and Private clients are the two pages of the practice (in the
+// page's own language), and Contact is the page's own letter where it has one, the home page's letter everywhere else.
+test('the header leads Developers and Private clients to their pages on every page', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const own = { en: ['/developers.html', '/private-clients.html', '/'], es: ['/es/desarrolladores.html', '/es/clientes-privados.html', '/es/'], pt: ['/pt/incorporadoras.html', '/pt/clientes-privados.html', '/pt/'] };
+  const letters = ['developers.html', 'private-clients.html', 'es/desarrolladores.html', 'es/clientes-privados.html', 'pt/incorporadoras.html', 'pt/clientes-privados.html'];
+  for (const p of pages) {
+    const html = readFileSync(p, 'utf8');
+    const nav = html.match(/<nav class="main"[\s\S]*?<\/nav>/)[0];
+    const links = [...nav.replace(/<div class="mk">[\s\S]*?<\/div><\/div>/, '').matchAll(/<a[^>]* href="([^"]*)"[^>]*>([^<]*)</g)];
+    const at = (href) => new URL(href, 'https://centamont.com/' + p).pathname.replace(/index\.html$/, '');
+    const [dev, pc, home] = own[p.startsWith('es/') ? 'es' : p.startsWith('pt/') ? 'pt' : 'en'];
+    expect(at(links[1][1]), `${p}: ${links[1][2]}`).toBe(dev);
+    expect(at(links[2][1]), `${p}: ${links[2][2]}`).toBe(pc);
+    const contact = links[links.length - 1][1];
+    expect(contact.endsWith('#contact'), p).toBe(true);
+    expect(at(contact), `${p}: Contact`).toBe(letters.includes(p) ? '/' + p : home);
+    if (letters.includes(p)) expect(html, p).toContain('id="contact"');
+  }
+});
+
+// On a Spanish or Portuguese page, every link in the menu, the footer or the path that leads to a page only in English
+// is marked, for the browser (hreflang) and for the reader (a small EN, and "in English" for a screen reader).
+test('Spanish and Portuguese menus and footers mark their English-only links', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['es/', 'pt/'].flatMap((d) => readdirSync(d).filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const p of pages) {
+    const html = readFileSync(p, 'utf8');
+    const parts = [/<nav class="main"[\s\S]*?<\/nav>/, /<footer>[\s\S]*?<\/footer>/, /<nav class="crumbs"[\s\S]*?<\/nav>/].map((r) => (html.match(r) || [''])[0]).join('');
+    for (const m of parts.matchAll(/<a href="(\/[^"]*)"([^>]*)>([\s\S]*?)<\/a>/g)) {
+      const [, href, attrs, body] = m;
+      if (href === '/' || /^\/(es|pt)\//.test(href) || / lang="/.test(attrs)) continue;
+      expect(attrs, `${p}: ${href}`).toContain('hreflang="en"');
+      expect(body, `${p}: ${href}`).toContain('class="en-tag"');
+    }
+  }
+});
+
+// GitHub Pages answers every missing address with /404.html; under /es/ or /pt/ the page reads in that language, and
+// in any language it offers the practice's four ways in.
+test('the not-found page answers in the language of the address', async ({ page }) => {
+  const body = readFileSync('404.html');
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  for (const [path, lang, h1, dev] of [['/es/no-existe', 'es', 'Esta página nunca se construyó.', '/es/desarrolladores.html'], ['/pt/nao-existe', 'pt-BR', 'Esta página nunca foi construída.', '/pt/incorporadoras.html'], ['/no-such-page', 'en', 'This page was never built.', '/developers.html']]) {
+    await page.route('**' + path, (r) => r.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body }));
+    await page.goto(path);
+    await expect(page.locator('html')).toHaveAttribute('lang', lang);
+    await expect(page.locator('h1')).toHaveText(h1);
+    await expect(page.locator('.ways a')).toHaveCount(4);
+    await expect(page.locator('.ways a').first()).toHaveAttribute('href', dev);
+    await expect(page.locator('header nav.main > a').nth(1)).toHaveAttribute('href', dev);
+    expect(await page.locator('[id]').evaluateAll((els) => els.map((e) => e.id).filter((v, i, a) => a.indexOf(v) !== i))).toEqual([]);
+  }
+  expect(errors).toEqual([]);
+});
+
+// The share cards stay small enough for a messaging app to show them, the descriptions short enough for a search result,
+// and no image is both lazy and first in line (lazy loading hides it from the preload scanner, so the priority does nothing).
+test('share cards, descriptions and the first image stay within their limits', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const p of pages) {
+    const html = readFileSync(p, 'utf8');
+    const img = (html.match(/<meta property="og:image" content="https:\/\/centamont\.com\/([^"?]*)/) || [])[1];
+    if (img) expect(statSync(img).size, `${p}: ${img}`).toBeLessThanOrEqual(250 * 1024);
+    const d = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1];
+    if (d) expect(d.replace(/&[a-z#0-9]+;/g, '.').length, `${p}: description`).toBeLessThanOrEqual(160);
+    for (const tag of html.matchAll(/<img\b[^>]*>/g)) expect(/fetchpriority="high"/.test(tag[0]) && /loading="lazy"/.test(tag[0]), `${p}: ${tag[0].slice(0, 80)}`).toBe(false);
+  }
+});
+
+// The developer notes read in sequence: from the newest, each one's Next note leads on until every note is read.
+test('every developer note is reached by following Next from the newest', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const index = readFileSync('journal/index.html', 'utf8');
+  const list = index.slice(index.indexOf('id="developer-notes"'), index.indexOf('id="buyer-guides"'));
+  const notes = [...list.matchAll(/<li><a href="([^"]+\.html)"/g)].map((m) => m[1]);
+  expect(notes.length).toBeGreaterThan(3);
+  const seen = [];
+  for (let n = notes[0]; n && notes.includes(n) && !seen.includes(n);) {
+    seen.push(n);
+    n = (readFileSync('journal/' + n, 'utf8').match(/<a class="next" href="([^"]+)"/) || [])[1];
+  }
+  expect([...seen].sort()).toEqual([...notes].sort());
+});
+
+// On a wide screen a market's neighborhoods stand in a column whose captions hang into the margin: nothing scrolls, so
+// it is no tab stop. On a phone the row scrolls sideways and takes the focus.
+test('the neighborhoods are a tab stop only where they scroll', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'sets its own widths');
+  for (const [w, stop] of [[1440, false], [390, true]]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    await page.goto('/new-york.html');
+    await page.waitForLoadState('load');
+    expect(await page.locator('.hoods').first().getAttribute('tabindex'), `${w}px`).toBe(stop ? '0' : null);
+  }
+});
+
+// The market films load as they come into view: a phone takes the 960px cut, a wider window the full one, and a visitor
+// saving data keeps the still. The opener's still is fetched first.
+test('the films fit the screen and wait for a visitor saving data', async ({ page, isMobile }) => {
+  for (const path of ['/new-york.html', '/es/sur-de-florida.html']) {
+    await page.goto(path);
+    await expect(page.locator('.opener img')).toHaveAttribute('fetchpriority', 'high');
+    await page.locator('video.loop').scrollIntoViewIfNeeded();
+    await expect(page.locator('video.loop source')).toHaveCount(2);
+    for (const src of await page.locator('video.loop source').evaluateAll((s) => s.map((e) => e.getAttribute('src')))) {
+      expect(src.includes('-960.'), `${path} ${src}`).toBe(isMobile);
+    }
+  }
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'connection', { get: () => ({ saveData: true, effectiveType: '4g' }) }));
+  await page.goto('/new-york.html');
+  await page.locator('video.loop').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  await expect(page.locator('video.loop source')).toHaveCount(0);
 });
