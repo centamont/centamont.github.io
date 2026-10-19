@@ -29,11 +29,6 @@
   #journal .deposit{grid-area:1 / 2 / span 2}
 }
 @media (min-width:421px){.page h1 br.sm{display:none}}
-.prose .side{float:right;width:min(210px,40%);margin:6px 0 16px 28px;padding-top:12px;border-top:1px solid var(--accent);display:grid;gap:6px}
-.prose .side b{font-family:var(--display);font-weight:300;font-size:72px;line-height:.85;color:var(--fg);font-variant-numeric:lining-nums}
-.prose .side span{font-size:15px;line-height:1.5;color:var(--faint)}
-@media (max-width:560px){.prose .side{float:none;width:auto;margin:28px 0;grid-template-columns:auto minmax(0,1fr);align-items:end;gap:16px}}
-@media (min-width:1140px){.prose .side{margin-right:-258px}}
 .prose .deposit{margin:36px 0 8px}
 .cp-plot{position:relative;height:clamp(190px,40vw,224px);margin:30px 0 58px 44px}
 .cp-svg{display:block}
@@ -58,13 +53,13 @@
   .js:not([data-motion="off"]) .cp:not(.in) :is(.cp-marks,.cp-m){opacity:0}
 }
 .wk-plan{display:block;width:100%;height:auto;overflow:visible}
-.wk .rp-t{font-size:15.7px}
+.wk .rp-t{font-size:17.2px}
 .prose .wk .rp-key{flex-direction:column;gap:2px;margin:0;padding:0}
-@media (max-width:560px){.wk .rp-t{font-size:23.8px}
+@media (max-width:560px){.wk .rp-t{font-size:24.4px}
 }
 @media (max-width:420px){.prose .wk .rp-key{letter-spacing:.12em}
 }
-@media (max-width:387px){.wk .rp-t{font-size:27px}.prose .wk .rp-key li{align-items:baseline}
+@media (max-width:387px){.wk .rp-t{font-size:27.8px}.prose .wk .rp-key li{align-items:baseline}
 }
 .ways{list-style:none;max-width:460px;margin:clamp(28px,4vw,40px) 0 0;padding:0;border-top:1px solid var(--fg)}
 .ways li{border-bottom:1px solid var(--rule)}
@@ -176,7 +171,7 @@
 .taxf .mvd{fill:var(--bg);stroke:var(--fg)}
 .taxf .pu{fill:none;stroke:var(--sold-line);stroke-dasharray:var(--lt-hidden)}
 .taxf text{text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
-.taxf :is(.yr,.nt){fill:var(--faint);font:500 11px var(--body);letter-spacing:.14em;text-transform:uppercase;font-variant-numeric:lining-nums}
+.taxf :is(.yr,.nt){fill:var(--faint);font:500 max(12.6px,calc(26.7px - 2.02vw)) var(--body);letter-spacing:.14em;text-transform:uppercase;font-variant-numeric:lining-nums}
 .taxf .nt{fill:var(--muted)}
 .taxf .it{fill:var(--fg);font:italic 400 17px var(--display);font-variant-numeric:lining-nums;stroke:none}
 .taxf .s{text-anchor:start}.taxf .e{text-anchor:end}
@@ -222,7 +217,6 @@
 .plate + .prose.lead{margin-top:clamp(32px,4vw,48px)}
 @media (min-width:1320px) and (hover:hover) and (pointer:fine){
   main.page:not(.wide):not(.lot) .plate.broad > .cap{width:638px;margin-left:var(--rail)}
-  main.page:not(.wide):not(.lot) .prose .side{margin-right:-250px}
 }
 .prose .wk .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;margin-right:0}
 .wk .rp-key b{font-weight:500;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;text-align:right}
@@ -230,7 +224,7 @@
 .plate.dwg{display:block}
 .plate.dwg > .ticks{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:24px clamp(40px,6vw,96px);padding:clamp(28px,3.4vw,48px) clamp(16px,3vw,48px)}
 .plate.dwg .wk-plan{flex:none;width:auto;height:clamp(320px,30vw,420px)}
-.plate.dwg .rp-t{font-size:15.7px}
+.plate.dwg .rp-t{font-size:17.2px}
 .plate.dwg .rp-key{flex-direction:column;gap:10px;margin:0;font-size:14px;letter-spacing:.14em}
 .plate.dwg .rp-key li{display:grid;grid-template-columns:14px minmax(0,1fr) 2.4em;gap:12px;align-items:center;white-space:nowrap;margin-right:0}
 .plate.dwg > .cap{margin-top:12px}

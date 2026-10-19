@@ -165,10 +165,18 @@
 .ps-planwrap{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:32px clamp(28px,4vw,56px);align-items:start}
 .ps-plan-d{display:block;width:100%;height:auto}
 .ps-np circle{fill:none;stroke:var(--faint);stroke-width:.8}.ps-np path{fill:var(--faint);stroke:var(--faint);stroke-width:.8}
-/* the plan is drawn 600 units wide and shown at about the screen less 80px on a phone, so its numbers and labels are sized
-   in drawing units to read at 12px or more on screen there, and keep their drawing size on a wide sheet */
-.ps-plan-d .rp-t{font-size:max(11px,calc(31px - 2.8vw))}
-.ps-no{fill:var(--accent);font:400 max(18px,calc(36.8px - 3.48vw)) var(--display);font-variant-numeric:lining-nums}
+/* the plan is drawn 600 units wide and shown at about the screen less 80px on a phone, alone across the sheet to 900px and
+   beside its room schedule above that, so its labels are sized in drawing units (--pf) by each layout's width to read at
+   13px or more on screen, and the room numbers, in the display face, stand half as large again */
+.ps-plan-d{--pf:max(12.7px,calc(27.4px - 1.19vw))}
+@media (max-width:900px){.ps-plan-d{--pf:calc(26.6px - 1.77vw)}}
+@media (max-width:600px){.ps-plan-d{--pf:calc(53.2px - 6.21vw)}}
+.ps-plan-d .rp-t{font-size:var(--pf)}
+.ps-no{fill:var(--accent);font:400 calc(var(--pf) * 1.5) var(--display);font-variant-numeric:lining-nums}
+/* (the elevation's one label keeps 13px on screen as the elevation narrows on the smallest phones) */
+.ps-fa .rp-t{font-size:14px}
+@media (max-width:389px){.ps-fa .rp-t{font-size:15px}}
+@media (max-width:359px){.ps-fa .rp-t{font-size:17px}}
 /* it draws in from the left, as a pen would cross the sheet, once the plan arrives */
 .js .ps-plan[data-draw] .ps-pg{clip-path:inset(0 0 0 0);transition:clip-path 1.6s var(--ease-ink)}
 .js .ps-plan[data-draw]:not(.in) .ps-pg{clip-path:inset(0 100% 0 0)}
@@ -286,7 +294,8 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .lp-read dd{align-self:start}
 .lp-read small{display:block;margin-top:6px;font:400 15px/1.4 var(--body);color:var(--faint);letter-spacing:0}
 .lp-say{margin:0}
-.lp-stack{display:grid;gap:12px;border-top:1px solid var(--fg);padding-top:14px}
+/* (the plan is not a page section: it keeps none of a section's padding under it, only the sheet's own gap before its actions) */
+.lp-stack{display:grid;gap:12px;border-top:1px solid var(--fg);padding-top:14px;padding-bottom:0}
 .lp-stack h2{margin:0;font-family:var(--display);font-size:var(--t-head);font-weight:300;line-height:1.15}
 .lp-lede{margin:0;color:var(--muted);max-width:40em}
 /* on a wide screen the stacking plan reads like the developers page's rows: its head on the left four of twelve columns,
@@ -311,10 +320,12 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .lp-gr{stroke:var(--fg);stroke-width:1.5;vector-effect:non-scaling-stroke}
 .lp-key{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:8px 28px;font-size:15px;color:var(--muted)}
 /* beside the plan on a wide screen, the key stands as a schedule: ruled rows, each count set in the display face at the
-   right, the four together reading down to the plan's ground line */
+   right, the four together reading down to the plan's ground line, where its last rule meets it (planner.js hands the
+   figure the height of the plan's foot under that line) */
 @media (min-width:721px){
-  .lp-plan{grid-template-columns:auto minmax(15em,22em);column-gap:clamp(40px,6vw,96px);justify-content:center}
-  .lp-key{display:grid;gap:0;padding:0;border-top:1px solid var(--fg);margin-bottom:6px}
+  .lp-plan{grid-template-columns:auto minmax(13em,20em);column-gap:clamp(32px,4.4vw,72px);justify-content:center}
+  .lp-plan svg{max-width:none}
+  .lp-key{display:grid;gap:0;padding:0;border-top:1px solid var(--fg);align-self:end;margin-bottom:calc(var(--plan-foot,38px) - 1px)}
   .lp-key li{padding:12px 0;border-bottom:1px solid var(--rule)}
   .lp-key b{margin-left:auto;font:300 26px/1 var(--display)}
 }
