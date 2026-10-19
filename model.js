@@ -13,9 +13,9 @@
   // the drawing's few words, in the page's language (the Spanish and Portuguese pages set it on <html>)
   const LANG = document.documentElement.lang;
   const WORDS = ({
-    es: { roof: 'CUBIERTA', release: 'PRIMERA ETAPA', rise: 'AMANECER', set: 'ATARDECER', frame: 'ESTRUCTURA', time: 'es-US' },
-    'pt-BR': { roof: 'COBERTURA', release: 'PRIMEIRA ETAPA', rise: 'NASCER DO SOL', set: 'PÔR DO SOL', frame: 'ESTRUTURA', time: 'pt-BR' },
-  })[LANG] || { roof: 'ROOF', release: 'FIRST RELEASE', rise: 'SUNRISE', set: 'SUNSET', frame: 'STRUCTURE', time: 'en-US' };
+    es: { roof: 'CUBIERTA', release: 'PRIMERA ETAPA', rise: 'AMANECER', set: 'ATARDECER', noon: 'MEDIODÍA', frame: 'ESTRUCTURA', time: 'es-US' },
+    'pt-BR': { roof: 'COBERTURA', release: 'PRIMEIRA ETAPA', rise: 'NASCER DO SOL', set: 'PÔR DO SOL', noon: 'MEIO-DIA', frame: 'ESTRUTURA', time: 'pt-BR' },
+  })[LANG] || { roof: 'ROOF', release: 'FIRST RELEASE', rise: 'SUNRISE', set: 'SUNSET', noon: 'NOON', frame: 'STRUCTURE', time: 'en-US' };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const hash = (a, b, c = 0) => { const x = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return x - Math.floor(x); };
   const smooth = (t) => t * t * (3 - 2 * t);
@@ -327,10 +327,10 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 827, y: 168, w: 913, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 890, y: 151, w: 850, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 827, y: 156, w: 913, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 827, y: 151, w: 913, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 754, y: 168, w: 986, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    morning: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
@@ -2422,7 +2422,8 @@
       else if (fits(rt, st)) put(rt, st, base + 9);
       const pk = arc.reduce((a, q) => (q.el > a.el ? q : a), arc[0]);
       g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillStyle = `rgba(${sr},${sg},${sb},0.9)`;
-      g.fillText(Math.round(pk.el) + '°', X(pk.t), base - H - 6);
+      // (named as noon's height, so it never reads as a second figure for the sun's height now that the survey note gives)
+      g.fillText(WORDS.noon + ' ' + Math.round(pk.el) + '°', X(pk.t), base - H - 6);
       g.restore();
     }
 
