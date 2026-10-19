@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes the dated market sheet under the title of each open market's page.
+"""Writes the dated market sheet of each open market's page, under its view and elevation.
 
 The figures live here, one entry per page, each carrying its as-of date and the
 footnote it rests on; the quarterly refresh edits this table, reruns the script
@@ -66,7 +66,8 @@ for name, s in SHEETS.items():
     p = ROOT / name
     html = p.read_text()
     html = re.sub(r'\n<aside class="ms".*?</aside>', '', html, flags=re.S)
-    html, n = re.subn(r'(<div class="meta">.*?</div>)', lambda m: m.group(1) + '\n' + sheet(s), html, count=1)
+    # the sheet follows the page's view and its elevation, so a phone opens on the place before the figures
+    html, n = re.subn(r'(<figure class="mk-el-fig">.*?</figure>)', lambda m: m.group(1) + '\n' + sheet(s), html, count=1, flags=re.S)
     assert n == 1, name
     p.write_text(html)
     print('market sheet', name)

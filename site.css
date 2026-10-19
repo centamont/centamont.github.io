@@ -388,7 +388,8 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 @media (max-width:599px) and (prefers-reduced-motion:no-preference){html.menu-open .lang{animation:motion-in .5s var(--ease) .35s backwards}}
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
-@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1280px) and (max-width:1599px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1600px){:lang(es) .motion::after{content:"Animación";letter-spacing:.1em}:lang(pt) .motion::after{content:"Animação";letter-spacing:.1em}}
 :root[data-motion="off"]{scroll-behavior:auto}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
 .theme .sun{display:none}
@@ -1041,7 +1042,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
 .mk-facts dd{margin:0;font-size:18px;line-height:1.6;color:var(--read)}
-.mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
+.mk-facts sup,.prose p sup{font-size:max(13px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 .mk-facts sup a,.prose p sup a{position:relative}
 .mk-facts sup a::after,.prose p sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
@@ -1127,8 +1128,7 @@ main{overflow-x:clip}
   main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
   main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
   main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
-  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
-  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  main.page:not(.wide):not(.lot) > .wrap > .ms{margin-top:clamp(40px,5vw,64px)}
   main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
   main.page:not(.wide):not(.lot) > .wrap > :is(.ms,.mk-el-fig,.prose,.mk-fig,.next,.row,.links){margin-left:max(0px,(100% - 880px + var(--gl) + var(--gr)) / 2);max-width:min(100%,880px - var(--gl) - var(--gr))}

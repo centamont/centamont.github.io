@@ -42,7 +42,7 @@
 .ms-sc[style*="--then:100.0%"] b{transform:translateX(-100%)}
 @media (forced-colors:active){.ms-sc{forced-color-adjust:none}.ms-sc :is(.now,.then),.ms-sc::after{background:CanvasText}.ms-sc .ref{background:repeating-linear-gradient(90deg,CanvasText 0 1px,transparent 1px 4px)}.ms-sc b{color:CanvasText}}
 .ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}
-.ms .ms-note sup{font-size:max(12px,.62em);line-height:0}
+.ms .ms-note sup{font-size:max(13px,.62em);line-height:0}
 .ms .ms-note sup a{position:relative;color:var(--accent);text-decoration:none;padding-inline:2px}
 .ms .ms-note sup a::after{content:"";position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%)}
 .ms-k{margin-top:10px;font-size:14px;line-height:1.5;color:var(--faint)}
@@ -116,7 +116,13 @@
 .mk-el .sh{fill:var(--fg);fill-opacity:.075}
 .js .mk-el :is(.tn,.sh){opacity:0;transition:opacity .9s var(--ease-out) .9s}
 .js .mk-el.in :is(.tn,.sh){opacity:1}
-.mk-el text{font:500 calc(11px * var(--fu)) var(--body);letter-spacing:.2em;fill:var(--faint)}
+/* (its two labels, the water's name and the ruler's heights, are set in the drawing's own units so they stand at 13px or a
+   little more on the screen at every width that shows them: the drawing is 752 to 790px wide from 901px, 888px and up
+   from 1320px, and from 601 to 900px, cropped to 2:1, it draws at its width over 800) */
+.mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
+@media (min-width:1320px){.mk-el text{font-size:17.6px}}
+@media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
+@media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
 .mk-el .rl text{text-anchor:end;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .js .mk-el path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--t-ink) var(--ease-ink) calc(var(--i,0) * 90ms)}
 .js .mk-el.in path{stroke-dashoffset:0}

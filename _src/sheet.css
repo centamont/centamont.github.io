@@ -267,7 +267,7 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
    the sliders are in view */
 .lp-now{display:none}
 @media (max-width:900px){
-  .lp-now{display:flex;position:sticky;bottom:0;z-index:5;margin:0 calc(var(--gutter) * -1);padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom));justify-content:space-between;gap:12px;background:var(--sheet);border-top:1px solid var(--fg);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .lp-now{display:flex;position:sticky;bottom:0;z-index:5;margin:0 calc(var(--gutter) * -1);padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom));justify-content:space-between;gap:12px;background:var(--sheet);border-top:1px solid var(--fg);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .lp-now span{display:grid}
   .lp-now b{font:300 22px/1.2 var(--display);letter-spacing:0;text-transform:none;color:var(--fg);font-variant-numeric:lining-nums}
 }
@@ -289,6 +289,13 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .lp-stack{display:grid;gap:12px;border-top:1px solid var(--fg);padding-top:14px}
 .lp-stack h2{margin:0;font-family:var(--display);font-size:var(--t-head);font-weight:300;line-height:1.15}
 .lp-lede{margin:0;color:var(--muted);max-width:40em}
+/* on a wide screen the stacking plan reads like the developers page's rows: its head on the left four of twelve columns,
+   and the plan with its schedule centred as one figure in the right eight */
+@media (min-width:1100px){
+  .lp-stack{grid-template-columns:minmax(0,4fr) minmax(0,8fr);grid-template-rows:auto 1fr;column-gap:clamp(32px,5vw,80px);align-items:start}
+  .lp-stack > :is(h2,.lp-lede){grid-column:1}
+  .lp-stack > .lp-plan{grid-column:2;grid-row:1 / span 2;margin-top:6px}
+}
 .lp-plan{margin:12px 0 0;display:grid;gap:18px;align-items:end}
 /* (planner.js sets the plan's width, so every building is drawn at one scale) */
 .lp-plan svg{display:block;max-width:100%;height:auto;overflow:visible}
@@ -297,7 +304,8 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 .lp-u.mid,.lp-key .mid{fill:var(--sold);fill-opacity:.45}
 .lp-u.post,.lp-key .post{fill:var(--sold);fill-opacity:.14}
 .lp-u.open,.lp-key .open{fill:none;stroke:var(--faint)}
-.lp-fl{fill:var(--faint);font:500 10.5px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+/* (the numbers take the size planner.js gives them, so they stand at 13px at any scale) */
+.lp-fl{fill:var(--faint);font:500 var(--fl,13px) var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
 .lp-ln{text-transform:uppercase;letter-spacing:.12em}
 .lp-h{stroke:var(--fg);stroke-width:var(--lw-hatch);vector-effect:non-scaling-stroke;opacity:.5}
 .lp-gr{stroke:var(--fg);stroke-width:1.5;vector-effect:non-scaling-stroke}
@@ -305,7 +313,7 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
 /* beside the plan on a wide screen, the key stands as a schedule: ruled rows, each count set in the display face at the
    right, the four together reading down to the plan's ground line */
 @media (min-width:721px){
-  .lp-plan{grid-template-columns:auto minmax(15em,22em);column-gap:clamp(40px,6vw,96px);justify-content:start}
+  .lp-plan{grid-template-columns:auto minmax(15em,22em);column-gap:clamp(40px,6vw,96px);justify-content:center}
   .lp-key{display:grid;gap:0;padding:0;border-top:1px solid var(--fg);margin-bottom:6px}
   .lp-key li{padding:12px 0;border-bottom:1px solid var(--rule)}
   .lp-key b{margin-left:auto;font:300 26px/1 var(--display)}
@@ -341,3 +349,11 @@ section.sheet-rp + section,.sheet-rp section + section{border-top:0}
   .lp-plan svg{max-height:120mm}
   .lp-u,.lp-key i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* on a phone each head cell's label holds one line ("Weekly report" as well as "Building"): the labels set at 13px on
+   .08em, the cells close in to 12px, and the first column takes a little more of the width (under 341px they may wrap) */
+@media (max-width:520px){
+  .rp-head{grid-template-columns:minmax(0,1.14fr) minmax(0,1fr)}
+  .rp-head > div{padding-inline:12px}
+  .rp-head dt{font-size:13px;letter-spacing:.08em}
+}
+@media (min-width:341px) and (max-width:520px){.rp-head dt{white-space:nowrap}}

@@ -611,8 +611,10 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
 .motion .play{display:none}.motion[aria-pressed="true"] .play{display:block}.motion[aria-pressed="true"] .pause{display:none}
 /* in the bar the motion switch says what it is: its glyph, then the word, in the small labels' voice */
 @media (min-width:1280px){.motion{width:auto;display:inline-flex;align-items:center;gap:8px;padding-inline:6px 10px}.motion::after{content:"Motion";font:500 13px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}.motion svg{width:16px;height:16px}}
-/* the word is English, so the Spanish and Portuguese pages keep the glyph alone, which also leaves room for their longer menu */
-@media (min-width:1280px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+/* the Spanish and Portuguese pages say it in their own word, a touch closer set, from 1600px, where their longer menu
+   leaves room for it; below that they keep the glyph alone */
+@media (min-width:1280px) and (max-width:1599px){html:not([lang="en"]) .motion{width:44px;display:grid;padding:0}html:not([lang="en"]) .motion::after{content:none}html:not([lang="en"]) .motion svg{width:18px;height:18px}}
+@media (min-width:1600px){:lang(es) .motion::after{content:"Animación";letter-spacing:.1em}:lang(pt) .motion::after{content:"Animação";letter-spacing:.1em}}
 /* Motion switched off on this site: everything arrives in its final state, and anchors jump rather than glide (no
    transition at all, as with motion reduced: even a .001ms one would start on every element a change of night or day
    touches, and a list of them, even at 0s, is weighed on every element at every restyle) */
@@ -1593,7 +1595,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .mk-facts > div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,1fr);gap:4px 24px;padding:14px 0;border-bottom:1px solid var(--rule)}
 .mk-facts dt{padding-top:4px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;color:var(--faint)}
 .mk-facts dd{margin:0;font-size:18px;line-height:1.6;color:var(--read)}
-.mk-facts sup,.prose p sup{font-size:max(12px,.62em);line-height:0}
+.mk-facts sup,.prose p sup{font-size:max(13px,.62em);line-height:0}
 .mk-facts sup a,.prose p sup a{color:var(--accent);text-decoration:none;padding-inline:2px}
 /* footnote numerals are tiny; a 24px hit area around each keeps them easy to tap on a phone */
 .mk-facts sup a,.prose p sup a{position:relative}
@@ -1707,9 +1709,8 @@ main{overflow-x:clip}
   main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
   main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
   main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
-  /* (the market sheet, then the text and all that follows it, come after the view) */
-  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
-  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  /* (the market sheet stands after the view and its elevation in the page itself, at every width) */
+  main.page:not(.wide):not(.lot) > .wrap > .ms{margin-top:clamp(40px,5vw,64px)}
   main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
   /* the body's own column, where it stood in the 880px page */

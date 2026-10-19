@@ -246,7 +246,7 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .cv-method summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 @media (hover:hover) and (pointer:fine){.cv-method summary:hover{color:var(--fg)}}
 .cv-method .mk-facts{margin:6px 0 14px;max-width:52em}
-.cv-method .mk-facts sup{font-size:.7em;line-height:0}
+.cv-method .mk-facts sup{font-size:max(13px,.7em);line-height:0}
 .cv-method > p{margin:0 0 6px;font-size:15px;line-height:1.5;color:var(--faint)}
 
 /* The letter to the partners */
@@ -286,14 +286,15 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 .letter .sheet input:focus-visible,.letter .sheet select:focus-visible{outline:2px solid var(--accent);outline-offset:3px;background-color:rgba(var(--bronze-rgb),.16)}
 /* (over that tint a placeholder steps up from faint to muted, so it keeps AA by night: 6.7:1, where faint falls to 4.2) */
 .letter .sheet input:focus-visible::placeholder{color:var(--muted)}
-/* Each blank keeps a small label under its line once it has the focus or a value, so the cue its placeholder gave is not
+/* Each blank shows a small label over its line while it has the focus, so the cue its placeholder gave is not
    lost once the writer types (the label is the blank's own name, which a screen reader already hears, so it is not read
    twice). The lines with blanks stand a little further apart to make room for it. */
 .letter .sheet :is(.body,.sign){line-height:2.05}
 .letter .blank{position:relative;display:inline-block;max-width:100%}
-.letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;top:calc(100% + 4px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
-/* the label shows while its blank has focus, on a chip of the letter's own sheet so it can sit over the line below it
-   without the two reading as one; once filled, the sentence around the value says what it is */
+.letter .blank::after{content:attr(data-l);content:attr(data-l) / "";position:absolute;left:2px;bottom:calc(100% + 7px);font:500 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
+/* the label shows while its blank has focus, on a chip of the letter's own sheet set just above the blank, clear of its
+   focus ring, so it never meets the words that follow and can sit over the line above without the two reading as one;
+   once filled, the sentence around the value says what it is */
 .letter .blank::after{z-index:2;padding:3px 6px 4px;margin-left:-6px;background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
 .letter .blank:focus-within::after{opacity:1}
 /* a plan carried from the launch planner: its link, under the developer's paragraph, as it will be sent */
