@@ -1704,9 +1704,8 @@ main{overflow-x:clip}
   main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
   main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
   main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
-  /* (the market sheet, then the text and all that follows it, come after the view) */
-  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
-  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  /* (the market sheet stands after the view and its elevation in the page itself, at every width) */
+  main.page:not(.wide):not(.lot) > .wrap > .ms{margin-top:clamp(40px,5vw,64px)}
   main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
   /* the body's own column, where it stood in the 880px page */

@@ -1126,8 +1126,7 @@ main{overflow-x:clip}
   main.page:not(.wide):not(.lot) > .wrap > .standfirst{grid-column:1;max-width:22em;margin-top:20px}
   main.page:not(.wide):not(.lot) > .wrap > .toc{grid-column:auto;grid-row:auto}
   main.page:not(.wide):not(.lot) > .wrap > .meta{grid-column:2;align-self:end;margin-top:0;max-width:none}
-  main.page:not(.wide):not(.lot) > .wrap > .ms{order:1;margin-top:clamp(40px,5vw,64px)}
-  main.page:not(.wide):not(.lot) > .wrap > :is(.prose,.prose ~ *){order:2}
+  main.page:not(.wide):not(.lot) > .wrap > .ms{margin-top:clamp(40px,5vw,64px)}
   main.page:not(.wide):not(.lot) > .wrap > .plate{margin-top:clamp(24px,2.2vw,32px)}
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig{margin-bottom:0}
   main.page:not(.wide):not(.lot) > .wrap > :is(.ms,.mk-el-fig,.prose,.mk-fig,.next,.row,.links){margin-left:max(0px,(100% - 880px + var(--gl) + var(--gr)) / 2);max-width:min(100%,880px - var(--gl) - var(--gr))}
