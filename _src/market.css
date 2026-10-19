@@ -54,8 +54,8 @@
 .mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-.mk-fig .sv .ttl{text-anchor:end;transform:translate(328px,262px)}
-.mk-fig .sv .scl{transform:translate(232px,-92px)}
+.mk-fig .sv .ttl{text-anchor:end;transform:translate(316px,262px)}
+.mk-fig .sv .scl{transform:translate(220px,-92px)}
 /* the New York survey, drawn like South Florida's: hatched land, the sea's water lines, state lines, the two markets
    opening now joined by the reach, a scale and a north point */
 .mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
@@ -84,6 +84,8 @@
 .mk-fig .dmap .wl{fill:var(--fg);opacity:.3}
 .mk-fig .dmap .coast use{stroke-width:calc(.8px * var(--u,1));opacity:.8}
 .mk-fig .dmap .fb{fill:none;stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-linejoin:round;opacity:.22}
+/* the main freeways, where a sheet draws them (Dallas): a band of paper edged in faint ink, under the districts */
+.mk-fig .dmap .fw{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(.6px * var(--u,1));stroke-linejoin:round;stroke-opacity:.6}
 .mk-fig .dmap .dz path{stroke:var(--sold-line);stroke-width:calc(1px * var(--u,1))}
 .mk-fig .dmap .dzl{fill:none;stroke:var(--sold-line);stroke-width:calc(4px * var(--u,1));stroke-linecap:round;stroke-linejoin:round;opacity:.75}
 .mk-fig .dmap rect.lm{fill:var(--fg)}
@@ -95,7 +97,7 @@
 .mk-fig .dmap :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .mk-fig .dmap .nh{fill:var(--fg)}
 @media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap :is(text.lm,.wn){display:none}}
-@media (forced-colors:active){.mk-fig .dmap :is(.fb,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
+@media (forced-colors:active){.mk-fig .dmap :is(.fb,.fw,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 /* Each market page opens on its city seen from the water: a composite elevation, drawn to the same scale in feet for both
    cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the

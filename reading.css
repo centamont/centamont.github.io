@@ -39,7 +39,7 @@
 .cp-svg{display:block}
 .cp-grid line{stroke:var(--grid);stroke-dasharray:2 4}
 .cp-t text{fill:var(--faint);font:500 13px var(--body);letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
-.cp-lt{fill:var(--fg);font:500 13px var(--body)}
+.cp-lt{fill:var(--fg);font:500 13px var(--body);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
 .cp-m text{fill:var(--fg);font:italic 400 15px var(--display);font-variant-numeric:lining-nums;paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
 .prose .cp-key{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
 .prose .cp-key li{display:flex;align-items:center;gap:8px;margin-right:-.14em}
@@ -177,7 +177,7 @@
 .taxf .nt{fill:var(--muted)}
 .taxf .it{fill:var(--fg);font:italic 400 17px var(--display);font-variant-numeric:lining-nums;stroke:none}
 .taxf .s{text-anchor:start}.taxf .e{text-anchor:end}
-@media (max-width:600px){.taxf :is(.yr,.nt){font-size:18px;letter-spacing:.08em}.taxf .it{font-size:22px}}
+@media (max-width:600px){.taxf :is(.yr,.nt){font-size:18px;letter-spacing:.08em}.taxf .it{font-size:22px}.taxf .nt.in{font-size:15px;letter-spacing:.04em}}
 @media (forced-colors:active){.taxf :is(.ax,.tk,.val,.new,.fut,.cp,.mv,.mvd,.pu){stroke:CanvasText}.taxf text{fill:CanvasText}}
 .prose .wy ul{list-style:none;margin:0;padding:0;display:grid;gap:20px}
 .prose .wy li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;align-items:baseline;margin:0;padding:0;font:400 16px/1.45 var(--body);color:var(--muted)}
