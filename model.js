@@ -2174,11 +2174,10 @@
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        // (over the photograph's bright haze, each name stands on a soft ink halo, so the lowest still read)
+        // (over the photograph's bright haze, each name stands on a faint, wide ink halo, so the lowest still read without
+        // the names looking embossed on the sky)
         const halo = this.sa > 0 && this.dark && !this.forced;
-        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 7; }
-        // (by day, on the pale sky, the halo is laid twice, so it holds there without hardening into an outline)
-        if (halo && night < 0.5) for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
+        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.6 * this.sa).toFixed(3)})`; g.shadowBlur = 10; }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
         g.globalAlpha = 1;
