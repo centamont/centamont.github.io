@@ -321,14 +321,15 @@
   const CASCADE = 2400;
   // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, each made from one
   // camera of that hero at 1440 x 900 and lit by one sun (by day, in the early morning and at golden hour, after dark;
-  // the morning's is seen from the south-east, as the night's is, so its low sun rakes across the face in view). Each
+  // the morning's and the evening's are seen from the same bearing, so the low sun lights the east face of the one and the
+  // west face of the other, and the shade side turns over with the day). Each
   // runs on past that hero's right and bottom edges, so a wider or taller window is still filled. For each: the crop's place
   // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
     day: { x: 754, y: 168, w: 986, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    morning: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
     gold: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
     night: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
@@ -959,7 +960,7 @@
           const yt = lv(FLOORS), [bx] = pr(-c * 9.15 * sd - s * rel.nr, 0, s * 9.15 * sd - c * rel.nr), z = this.o.labelSize;
           if (!this.relAlong(w, K.f / K.d, Math.abs(lv(rel.k0) - yt), rel.tw)) {
             const r = sd > 0, lx0 = r ? bx - 1 : bx + 1 - rel.tw;
-            x0 = Math.min(x0, lx0); x1 = Math.max(x1, lx0 + rel.tw); y0 = Math.min(y0, yt - 0.55 * z - z);
+            x0 = Math.min(x0, lx0); x1 = Math.max(x1, lx0 + rel.tw); y0 = Math.min(y0, yt - 0.5 * z - 8 - z);
           }
         }
         for (const [x, y, z] of spec.crane && !spec.plan ? pts.concat(crane(K.f / K.d)) : pts) { const [u, v] = pr(x, y, z); x0 = Math.min(x0, u); x1 = Math.max(x1, u); y0 = Math.min(y0, v); y1 = Math.max(y1, v); }
@@ -1247,9 +1248,10 @@
           g.save(); g.globalAlpha = skyA * gA; sky.land(g, this, sp); g.restore();
           g.lineWidth = 1; g.strokeStyle = ink(0.34 * (r3 ? 1 : skyA)); g.beginPath(); sp.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); if (pw === SHORE) g.closePath(); g.stroke();
         }
+        // (o.gridK strengthens the grid where it is the whole drawing, as on the empty lot)
         g.lineWidth = 1;
         for (let i = 0; i <= 30; i += 3) {
-          g.strokeStyle = ink(0.07 * bo * (1 - i / 34)); g.beginPath();
+          g.strokeStyle = ink(0.07 * bo * (this.o.gridK || 1) * (1 - i / 34)); g.beginPath();
           for (const v of i ? [i, -i] : [0]) { gseg(v, -30, v, 30); gseg(-30, v, 30, v); }
           g.stroke();
         }
@@ -2116,11 +2118,14 @@
         // the roof is always named; on a small drawing, where the last numbered level would crowd it, that level gives way,
         // fading rather than blinking
         const lastN = Math.floor(FLOORS / 5) * 5 - 1, give = smooth(clamp((Math.abs(ys[FLOORS] - ys[lastN]) - z) / (0.5 * z), 0, 1));
+        // where the names would stand closer than 24px, only every tenth level keeps its name (L10, L20, L30), the others
+        // fading as the drawing shrinks
+        const thin = smooth(clamp((24 - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
         // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
         for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
           if (!named(i)) continue;
           // (over the photograph, a name below the horizon would sit on its palms: it gives way as the photograph comes in)
-          const a = ra * (i === lastN ? give : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
+          const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
           if (a <= 0.01) continue;
           const t = 'L' + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
         }
@@ -2171,6 +2176,8 @@
         // (over the photograph's bright haze, each name stands on a soft ink halo, so the lowest still read)
         const halo = this.sa > 0 && this.dark && !this.forced;
         if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 7; }
+        // (by day, on the pale sky, the halo is laid twice, so it holds there without hardening into an outline)
+        if (halo && night < 0.5) for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
         g.globalAlpha = 1;
@@ -2199,10 +2206,11 @@
             g.textAlign = 'center'; g.textBaseline = 'middle';
             g.fillText(lab, 0, 0);
           } else {
-            // (from the bracket's spine toward the tower, kept inside the canvas)
+            // (from the bracket's spine toward the tower, kept inside the canvas, standing 8px clear above the roof's name
+            // and the crown, rather than across them)
             const r = xk > xb;
             g.textAlign = r ? 'left' : 'right'; g.textBaseline = 'alphabetic';
-            g.fillText(lab, r ? Math.min(xb - 1, w - 4 - tw) : Math.max(xb + 1, tw + 4), Math.max(yt - 0.55 * z, z + 2));
+            g.fillText(lab, r ? Math.min(xb - 1, w - 4 - tw) : Math.max(xb + 1, tw + 4), Math.max(yt - 0.5 * z - 8, z + 2));
           }
         }
         g.restore();
