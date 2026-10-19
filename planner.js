@@ -1,21 +1,74 @@
 // Built from _src/planner.js by tools/version.py: edit the source, not this file.
+const plMonths = {
+es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+pt: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+};
+const plComma = (t) => t.replace('.', ',');
+const plWords = ({
+es: {
+money: (v) => (v >= 1e9 ? '$' + Math.round(v / 1e6).toLocaleString('en-US') + 'M' : v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M' : '$' + Math.round(v / 1e3) + ' mil'),
+says: (v) => (v >= 1e9 ? (v / 1e9).toFixed(2) + ' mil millones de dólares' : (v / 1e6).toFixed(1) + ' millones de dólares'),
+residences: (v) => v + ' residencias', floors: (v) => v + ' pisos',
+par: 'A la par', above: (n) => n + '% por encima', below: (n) => n + '% por debajo',
+parTell: (n) => Math.abs(n) + ' por ciento ' + (n > 0 ? 'por encima' : 'por debajo'),
+pct: (v) => v + ' por ciento', month: (m) => 'Mes ' + m, months: (v) => v + ' meses',
+when: (m, y) => plMonths.es[m] + ' de ' + y,
+axis: 'Meses desde el lanzamiento', ground: 'Inicio de obra', done: 'Terminación', planned: 'Previsto',
+lim: 'Umbral de preventa', limShort: 'Umbral', forSale: (n) => n + '% en venta', line: 'Línea',
+stack: (F, c) => `Plano de inventario de ${F} pisos: ${c.pre} residencias pasan a estar bajo contrato antes del inicio de obra, ${c.mid} durante la construcción, ${c.post} en el año siguiente a la terminación, y ${c.open} siguen en venta entonces.`,
+notMet: 'No alcanzado', inFive: 'en cinco años', notYet: 'Todavía no', limNotMet: 'umbral no alcanzado',
+late: (n) => n + (n === 1 ? ' mes' : ' meses') + ' después de lo previsto', onPlan: (w) => 'según lo previsto, ' + w,
+of: (k, n, w) => k + ' de ' + n + ', ' + w, depOf: (d, m) => d + '% de ' + m + ' bajo contrato',
+yours: 'Su edificio', size: (n, f) => n + ' residencias en ' + f + ' pisos', launch: (w) => 'lanzamiento en ' + w,
+prepared: (d, m, y) => 'Preparado el ' + d + ' de ' + plMonths.es[m] + ' de ' + y,
+sayNot: (p, t) => 'Con precios ' + (p === 0 ? 'a la par de' : 'un ' + Math.abs(p) + ' por ciento ' + (p > 0 ? 'por encima de' : 'por debajo de')) +
+' los edificios comparables, el umbral del ' + t + ' por ciento no se alcanza en cinco años. Un precio o un umbral más bajos ponen el inicio de obra a su alcance.',
+sayMet: (c) => 'El umbral se alcanza en el mes ' + c.T + (c.late > 0 ? ', así que la obra empieza ' + c.late + (c.late === 1 ? ' mes' : ' meses') + ' más tarde de lo previsto' : ', a tiempo para empezar la obra como estaba previsto') +
+'. Al terminar, en ' + c.C + ', alrededor del ' + c.pct + ' por ciento del edificio está bajo contrato, ' + c.v + ' en total.',
+copied: 'Enlace copiado. Abre este plan tal como está ahora.', copyIt: 'Copie la dirección de su navegador para compartir este plan.',
+},
+pt: {
+money: (v) => (v >= 1e9 ? 'US$ ' + plComma((v / 1e9).toFixed(2)) + ' bi' : v >= 1e6 ? 'US$ ' + plComma((v / 1e6).toFixed(1)) + ' mi' : 'US$ ' + Math.round(v / 1e3) + ' mil'),
+says: (v) => (v >= 1e9 ? plComma((v / 1e9).toFixed(2)) + (v < 2e9 ? ' bilhão' : ' bilhões') : plComma((v / 1e6).toFixed(1)) + (v < 2e6 ? ' milhão' : ' milhões')) + ' de dólares',
+residences: (v) => v + ' residências', floors: (v) => v + ' andares',
+par: 'Em paridade', above: (n) => n + '% acima', below: (n) => n + '% abaixo',
+parTell: (n) => Math.abs(n) + ' por cento ' + (n > 0 ? 'acima' : 'abaixo'),
+pct: (v) => v + ' por cento', month: (m) => 'Mês ' + m, months: (v) => v + ' meses',
+when: (m, y) => plMonths.pt[m] + ' de ' + y,
+axis: 'Meses desde o lançamento', ground: 'Início da obra', done: 'Conclusão', planned: 'Previsto',
+lim: 'Patamar de pré-venda', limShort: 'Patamar', forSale: (n) => n + '% à venda', line: 'Final',
+stack: (F, c) => `Espelho de vendas de ${F} andares: ${c.pre} residências ficam sob contrato antes do início da obra, ${c.mid} durante a construção, ${c.post} no ano seguinte à conclusão, e ${c.open} ainda estão à venda depois disso.`,
+notMet: 'Não atingido', inFive: 'em cinco anos', notYet: 'Ainda não', limNotMet: 'patamar não atingido',
+late: (n) => n + (n === 1 ? ' mês' : ' meses') + ' depois do previsto', onPlan: (w) => 'como previsto, ' + w,
+of: (k, n, w) => k + ' de ' + n + ', ' + w, depOf: (d, m) => d + '% de ' + m + ' sob contrato',
+yours: 'Seu edifício', size: (n, f) => n + ' residências em ' + f + ' andares', launch: (w) => 'lançamento em ' + w,
+prepared: (d, m, y) => 'Preparado em ' + d + ' de ' + plMonths.pt[m] + ' de ' + y,
+sayNot: (p, t) => 'Com preços ' + (p === 0 ? 'em paridade com os' : Math.abs(p) + ' por cento ' + (p > 0 ? 'acima dos' : 'abaixo dos')) +
+' edifícios comparáveis, o patamar de ' + t + ' por cento não é atingido em cinco anos. Um preço ou um patamar mais baixo põe o início da obra ao alcance.',
+sayMet: (c) => 'O patamar é atingido no mês ' + c.T + (c.late > 0 ? ', então a obra começa ' + c.late + (c.late === 1 ? ' mês' : ' meses') + ' depois do previsto' : ', a tempo de a obra começar como previsto') +
+'. Na conclusão, em ' + c.C + ', cerca de ' + c.pct + ' por cento do edifício está sob contrato, ' + c.v + ' no total.',
+copied: 'Link copiado. Ele abre este plano como está agora.', copyIt: 'Copie o endereço no seu navegador para compartilhar este plano.',
+},
+})[(document.documentElement.lang || 'en').slice(0, 2)] || {};
+const plSay = (k, en, ...a) => { const v = k in plWords ? plWords[k] : en; return typeof v === 'function' ? v(...a) : v; };
 document.addEventListener('DOMContentLoaded', function () {
 const form = document.getElementById('plan'); if (!form) return;
 const NS = 'http://www.w3.org/2000/svg';
 const $ = (id) => document.getElementById(id);
 const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; };
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const money = (v) => (v >= 1e9 ? '$' + (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M' : '$' + Math.round(v / 1e3) + 'K');
-const says = (v) => (v >= 1e9 ? (v / 1e9).toFixed(2) + ' billion dollars' : (v / 1e6).toFixed(1) + ' million dollars');
+const money = (v) => plSay('money', (v) => (v >= 1e9 ? '$' + (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M' : '$' + Math.round(v / 1e3) + 'K'), v);
+const says = (v) => plSay('says', (v) => (v >= 1e9 ? (v / 1e9).toFixed(2) + ' billion dollars' : (v / 1e6).toFixed(1) + ' million dollars'), v);
 const S = {
-units: { k: 'u', show: (v) => String(v), tell: (v) => v + ' residences' },
-floors: { k: 'f', show: (v) => String(v), tell: (v) => v + ' floors' },
+units: { k: 'u', show: (v) => String(v), tell: (v) => plSay('residences', (v) => v + ' residences', v) },
+floors: { k: 'f', show: (v) => String(v), tell: (v) => plSay('floors', (v) => v + ' floors', v) },
 price: { k: 'p', show: (v) => money(v * 1e6), tell: (v) => says(v * 1e6) },
-par: { k: 'c', show: (v) => (+v === 0 ? 'At par' : v > 0 ? v + '% above' : -v + '% below'), tell: (v) => (+v === 0 ? 'At par' : Math.abs(v) + ' percent ' + (v > 0 ? 'above' : 'below')) },
-loan: { k: 'l', show: (v) => v + '%', tell: (v) => v + ' percent' },
-dep: { k: 'd', show: (v) => v + '%', tell: (v) => v + ' percent' },
-planned: { k: 'g', show: (v) => 'Month ' + v, tell: (v) => 'Month ' + v },
-build: { k: 'b', show: (v) => v + ' months', tell: (v) => v + ' months' },
+par: { k: 'c', show: (v) => (+v === 0 ? plSay('par', 'At par') : v > 0 ? plSay('above', (n) => n + '% above', v) : plSay('below', (n) => n + '% below', -v)),
+tell: (v) => (+v === 0 ? plSay('par', 'At par') : plSay('parTell', (n) => Math.abs(n) + ' percent ' + (n > 0 ? 'above' : 'below'), +v)) },
+loan: { k: 'l', show: (v) => v + '%', tell: (v) => plSay('pct', (v) => v + ' percent', v) },
+dep: { k: 'd', show: (v) => v + '%', tell: (v) => plSay('pct', (v) => v + ' percent', v) },
+planned: { k: 'g', show: (v) => plSay('month', (m) => 'Month ' + m, v), tell: (v) => plSay('month', (m) => 'Month ' + m, v) },
+build: { k: 'b', show: (v) => plSay('months', (v) => v + ' months', v), tell: (v) => plSay('months', (v) => v + ' months', v) },
 };
 const R = {}; for (const n in S) R[n] = form.elements[n];
 const name = form.elements.name, where = form.elements.where, start = form.elements.start;
@@ -28,7 +81,7 @@ const now = new Date(), next = new Date(now.getFullYear(), now.getMonth() + 1, 1
 const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 start.value = /^\d{4}-\d{2}$/.test(q.get('s') || '') ? q.get('s') : iso(next);
 const launch = () => { const m = /^(\d{4})-(\d{2})$/.exec(start.value); return m ? new Date(+m[1], +m[2] - 1, 1) : next; };
-const when = (k) => { const d = launch(); d.setMonth(d.getMonth() + k); return MON[d.getMonth()] + ' ' + d.getFullYear(); };
+const when = (k) => { const d = launch(); d.setMonth(d.getMonth() + k); return plSay('when', (m, y) => MON[m] + ' ' + y, d.getMonth(), d.getFullYear()); };
 function model(o) {
 const base = 0.035 * Math.exp(-0.05 * o.par) * Math.pow(62 / o.units, 0.3), s = [0];
 let left = 1, G = -1, T = -1;
@@ -67,11 +120,11 @@ const g = el('g', { class: 'cv-grid' }, svg);
 el('line', { class: 'axis', x1: X0, x2: X1, y1: Y1, y2: Y1 }, g);
 const step = M > 72 ? 24 : phone || M > 48 ? 12 : 6;
 for (let m = 0; m <= M; m += step) { el('line', { class: 'axis', x1: x(m), x2: x(m), y1: Y1, y2: Y1 + 5 }, g); el('text', { x: x(m), y: Y1 + 20, 'text-anchor': m ? 'middle' : 'start' }, g, String(m)); }
-el('text', { class: 'ph', x: X1, y: Y1 + 38, 'text-anchor': 'end' }, g, 'Months from launch');
+el('text', { class: 'ph', x: X1, y: Y1 + 38, 'text-anchor': 'end' }, g, plSay('axis', 'Months from launch'));
 if (r.G > -1) {
 el('rect', { class: 'lp-band', x: x(r.G), y: y(1), width: x(r.C) - x(r.G), height: Y1 - y(1) }, g);
-const names = [[r.G, 'Ground broken'], [r.C, 'Completion']];
-if (r.G > o.planned) names.unshift([o.planned, 'Planned']);
+const names = [[r.G, plSay('ground', 'Ground broken')], [r.C, plSay('done', 'Completion')]];
+if (r.G > o.planned) names.unshift([o.planned, plSay('planned', 'Planned')]);
 const rows = [], lines = names.map(([m]) => x(m));
 names.forEach(([m, t], i) => {
 const ln = el('line', { class: i === 0 && r.G > o.planned ? 'phase plan' : 'phase', x1: x(m), x2: x(m), y1: 6, y2: Y1 }, g);
@@ -90,7 +143,7 @@ const pathD = r.s.map((f, m) => (m ? 'L' : 'M') + x(m).toFixed(1) + ' ' + y(f).t
 el('path', { class: 'cv-area', d: pathD + ` L${x(M)} ${Y1} L${x(0)} ${Y1} Z` }, svg);
 el('path', { class: 'cv-line', d: pathD }, svg);
 el('line', { class: 'cv-lim', x1: X0, x2: X1, y1: y(o.loan), y2: y(o.loan) }, svg);
-const lt = el('text', { class: 'cv-limt', x: X1, y: y(o.loan) - 8, 'text-anchor': 'end' }, svg, phone ? 'Threshold' : 'Pre-sale threshold');
+const lt = el('text', { class: 'cv-limt', x: X1, y: y(o.loan) - 8, 'text-anchor': 'end' }, svg, phone ? plSay('limShort', 'Threshold') : plSay('lim', 'Pre-sale threshold'));
 const b = lt.getBBox(), m0 = Math.floor((b.x - X0) / (X1 - X0) * M), m1 = Math.ceil((b.x + b.width - X0) / (X1 - X0) * M);
 if (r.s.slice(Math.max(0, m0), m1 + 1).some((f) => y(f) > b.y - 4 && y(f) < b.y + b.height + 4)) lt.setAttribute('y', y(o.loan) + 20);
 const pts = [];
@@ -109,7 +162,7 @@ t.remove(); return false;
 };
 if (r.T > -1) {
 el('circle', { class: 'cv-dot', r: 4.5, cx: x(r.T), cy: y(o.loan) }, svg);
-const t = el('text', { class: 'cv-dott' }, svg, 'Month ' + r.T), tx = x(r.T), ty = y(o.loan);
+const t = el('text', { class: 'cv-dott' }, svg, plSay('month', (m) => 'Month ' + m, r.T)), tx = x(r.T), ty = y(o.loan);
 place(t, [[tx + 10, 'start', ty + 22], [tx - 10, 'end', ty - 12], [tx + 10, 'start', ty + 38], [tx - 10, 'end', ty + 22], [tx + 10, 'start', ty - 12], [tx - 10, 'end', ty - 28]]);
 }
 if (r.C > -1 && r.C <= M) {
@@ -118,7 +171,7 @@ const sl = (yy) => `M${xd - 4} ${yy + 4} L${xd + 4} ${yy - 4}`, room = 1 - done 
 const dl = room ? el('path', { class: 'cv-dim', d: `M${xd} ${yd - 6} L${xd} ${yt} ${sl(yt)} ${sl(yd - 6)}` }, svg) : null;
 el('circle', { class: 'cv-dimr', r: 3.5, cx: xd, cy: yd }, svg);
 if (room) {
-const t = el('text', { class: 'cv-dimt' }, svg, Math.round((1 - done) * 100) + '% for sale'), ym = (yd + yt) / 2 + 5;
+const t = el('text', { class: 'cv-dimt' }, svg, plSay('forSale', (n) => n + '% for sale', Math.round((1 - done) * 100))), ym = (yd + yt) / 2 + 5;
 if (!place(t, [[xd + 8, 'start', ym], [xd - 8, 'end', ym]])) dl.remove();
 }
 }
@@ -151,13 +204,13 @@ el('line', { class: 'lp-h', x1: 0, y1: 0, x2: 0, y2: 5 }, hatch);
 el('path', { d: `M${lw - 4} ${base}H${VW}v6H${lw - 4}Z`, fill: 'url(#plH)' }, plan);
 el('line', { class: 'lp-gr', x1: lw - 4, x2: VW, y1: base, y2: base }, plan);
 if (per <= 12) {
-el('text', { class: 'lp-fl lp-ln', x: lw - 8, y: base + 24, 'text-anchor': 'end' }, plan, 'Line');
+el('text', { class: 'lp-fl lp-ln', x: lw - 8, y: base + 24, 'text-anchor': 'end' }, plan, plSay('line', 'Line'));
 for (let c = 0; c < per; c++) el('text', { class: 'lp-fl', x: lw + c * (cw + gap) + cw / 2, y: base + 24, 'text-anchor': 'middle' }, plan, pad(c + 1));
 }
 const c = { pre: 0, mid: 0, post: 0, open: 0 }, v = { pre: 0, mid: 0, post: 0 };
 units.forEach((u) => { c[u.p]++; if (u.p !== 'open') v[u.p] += u.v; });
 ['pre', 'mid', 'post', 'open'].forEach((p) => { $('plK' + p).textContent = c[p]; });
-plan.setAttribute('aria-label', `Stacking plan of ${F} floors: ${c.pre} residences go under contract before ground breaks, ${c.mid} during construction, ${c.post} in the year after completion, and ${c.open} are still for sale then.`);
+plan.setAttribute('aria-label', plSay('stack', (F, c) => `Stacking plan of ${F} floors: ${c.pre} residences go under contract before ground breaks, ${c.mid} during construction, ${c.post} in the year after completion, and ${c.open} are still for sale then.`, F, c));
 return { c, v, units };
 }
 const say = $('plSay');
@@ -169,24 +222,26 @@ const o = read(), r = model(o), st = stack(o, r);
 curve(o, r);
 const n = o.units, done = r.C > -1 ? r.s[r.C] : r.s[r.s.length - 1];
 const late = r.G - o.planned;
-$('plT').textContent = r.T > -1 ? 'Month ' + r.T : 'Not met';
-$('plTd').textContent = r.T > -1 ? when(r.T) : 'within five years';
-$('plG').textContent = r.G > -1 ? 'Month ' + r.G : 'Not yet';
-$('plGd').textContent = r.G < 0 ? 'threshold not met' : late > 0 ? late + (late === 1 ? ' month' : ' months') + ' after plan' : 'on plan, ' + when(r.G);
+const mo = (m) => plSay('month', (m) => 'Month ' + m, m);
+$('plT').textContent = r.T > -1 ? mo(r.T) : plSay('notMet', 'Not met');
+$('plTd').textContent = r.T > -1 ? when(r.T) : plSay('inFive', 'within five years');
+$('plG').textContent = r.G > -1 ? mo(r.G) : plSay('notYet', 'Not yet');
+$('plGd').textContent = r.G < 0 ? plSay('limNotMet', 'threshold not met') : late > 0 ? plSay('late', (late) => late + (late === 1 ? ' month' : ' months') + ' after plan', late) : plSay('onPlan', (w) => 'on plan, ' + w, when(r.G));
 $('plDone').textContent = r.C > -1 ? Math.round(done * 100) + '%' : '–';
-$('plDoned').textContent = r.C > -1 ? Math.round(done * n) + ' of ' + n + ', ' + when(r.C) : '';
+$('plDoned').textContent = r.C > -1 ? plSay('of', (k, n, w) => k + ' of ' + n + ', ' + w, Math.round(done * n), n, when(r.C)) : '';
 const atC = st.v.pre + st.v.mid, dep = st.v.pre * o.dep / 100;
 $('plNowT').textContent = $('plT').textContent; $('plNowG').textContent = $('plG').textContent; $('plNowD').textContent = $('plDone').textContent;
 $('plV').textContent = r.C > -1 ? money(atC) : '–';
 $('plDep').textContent = r.G > -1 ? money(dep) : '–';
-$('plDepd').textContent = r.G > -1 ? o.dep + '% of ' + money(st.v.pre) + ' under contract' : '';
+$('plDepd').textContent = r.G > -1 ? plSay('depOf', (d, m) => d + '% of ' + m + ' under contract', o.dep, money(st.v.pre)) : '';
 const nm = name.value.trim();
-$('plTitle').textContent = nm || 'Your building';
-$('plWhere').textContent = [where.value.trim(), n + ' residences on ' + o.floors + ' floors', 'launch ' + when(0)].filter(Boolean).join(' · ');
-$('plOn').textContent = 'Prepared ' + MON[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+$('plTitle').textContent = nm || plSay('yours', 'Your building');
+$('plWhere').textContent = [where.value.trim(), plSay('size', (n, f) => n + ' residences on ' + f + ' floors', n, o.floors), plSay('launch', (w) => 'launch ' + w, when(0))].filter(Boolean).join(' · ');
+$('plOn').textContent = plSay('prepared', (d, m, y) => 'Prepared ' + MON[m] + ' ' + d + ', ' + y, now.getDate(), now.getMonth(), now.getFullYear());
 let s;
-if (r.G < 0) s = 'At ' + S.par.tell(o.par).toLowerCase() + ' comparable buildings, the threshold of ' + Math.round(o.loan * 100) + ' percent is not met within five years. A lower price or a lower threshold brings ground breaking within reach.';
-else s = 'The threshold is met in month ' + r.T + (late > 0 ? ', so ground breaks ' + late + (late === 1 ? ' month' : ' months') + ' later than planned' : ', in time for ground breaking as planned') + '. By completion in ' + when(r.C) + ', about ' + Math.round(done * 100) + ' percent of the building is under contract, ' + money(atC) + ' in all.';
+if (r.G < 0) s = plSay('sayNot', (p, t) => 'At ' + S.par.tell(p).toLowerCase() + ' comparable buildings, the threshold of ' + t + ' percent is not met within five years. A lower price or a lower threshold brings ground breaking within reach.', o.par, Math.round(o.loan * 100));
+else s = plSay('sayMet', (c) => 'The threshold is met in month ' + c.T + (c.late > 0 ? ', so ground breaks ' + c.late + (c.late === 1 ? ' month' : ' months') + ' later than planned' : ', in time for ground breaking as planned') + '. By completion in ' + c.C + ', about ' + c.pct + ' percent of the building is under contract, ' + c.v + ' in all.',
+{ T: r.T, late, C: when(r.C), pct: Math.round(done * 100), v: money(atC) });
 clearTimeout(sayT); sayT = setTimeout(() => { if (s !== said) { say.textContent = s; said = s; } }, 600);
 if (!said) { say.textContent = s; said = s; }
 const p = new URLSearchParams();
@@ -214,8 +269,8 @@ const tell = (t) => { note.textContent = ''; setTimeout(() => { note.textContent
 $('plPrint').addEventListener('click', () => window.print());
 $('plCopy').addEventListener('click', () => {
 const url = location.href.split('#')[0];
-const ok = () => tell('Link copied. It opens this plan as it stands.');
-if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, () => tell('Copy the address in your browser to share this plan.'));
-else tell('Copy the address in your browser to share this plan.');
+const ok = () => tell(plSay('copied', 'Link copied. It opens this plan as it stands.')), no = () => tell(plSay('copyIt', 'Copy the address in your browser to share this plan.'));
+if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, no);
+else no();
 });
 });

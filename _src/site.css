@@ -1260,6 +1260,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
 /* and the three follow links stand in one row across the sheet's foot, each still a full-height target */
 @media (max-width:600px){.t-fo ul{display:flex;flex-wrap:wrap;column-gap:24px}}
+/* the set's two columns stand a little closer on a phone (1.2em rather than 2.2), so the longer Spanish and Portuguese
+   names keep to one line where they can */
+@container (min-width:20.5em){@media (max-width:600px){.tb .ss{column-gap:1.2em}}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
 /* the office's address sits on one line in its half-width cell down to a 360px phone; below that it breaks after the @ */

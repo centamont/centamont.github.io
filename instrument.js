@@ -1,6 +1,7 @@
 // Built from _src/instrument.js by tools/version.py: edit the source, not this file.
 const cmWords = ({
 es: {
+planner: 'https://centamont.com/es/planificador.html?',
 planned: 'Previsto', ground: 'Inicio de obra', top: 'Coronación', done: 'Terminación', axis: 'Meses desde el lanzamiento',
 build: 'Construcción', par: 'A la par', signed: 'Contratos firmados', lim: 'Umbral de preventa', limShort: 'Umbral',
 above: (n) => n + '% por encima', below: (n) => n + '% por debajo', month: (m) => 'Mes ' + m, pct: (n) => n + ' por ciento',
@@ -25,6 +26,7 @@ launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'juni
 notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
 },
 pt: {
+planner: 'https://centamont.com/pt/planejador.html?',
 planned: 'Previsto', ground: 'Início da obra', top: 'Estrutura concluída', done: 'Conclusão', axis: 'Meses desde o lançamento',
 build: 'Construção', par: 'Em paridade', signed: 'Contratos assinados', lim: 'Patamar de pré-venda', limShort: 'Patamar',
 above: (n) => n + '% acima', below: (n) => n + '% abaixo', month: (m) => 'Mês ' + m, pct: (n) => n + ' por cento',
@@ -494,7 +496,7 @@ const from = new URLSearchParams(q.get('plan')), keep = new URLSearchParams();
 ['u', 'f', 'p', 'c', 'l', 'd', 'g', 'b'].forEach((k) => { const t = from.get(k); if (t && /^-?\d{1,4}(\.\d{1,2})?$/.test(t)) keep.set(k, t); });
 if (/^\d{4}-(0[1-9]|1[0-2])$/.test(from.get('s') || '')) { keep.set('s', from.get('s')); launchAt = from.get('s'); }
 ['n', 'w'].forEach((k) => { const t = (from.get(k) || '').trim(); if (t && word.test(t)) keep.set(k, t); });
-if (keep.has('u')) planUrl = 'https://centamont.com/planner.html?' + keep;
+if (keep.has('u')) planUrl = cmSay('planner', 'https://centamont.com/planner.html?') + keep;
 }
 q.delete('plan');
 history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);

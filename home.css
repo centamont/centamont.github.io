@@ -722,14 +722,19 @@ html:not(.js) .step{min-height:auto}
 }
 @media (max-width:520px){
   #journal .notes-list{display:none}
-  #services,#developers,#markets{padding-top:60px}
+  #services,#developers,#markets{padding-top:56px}
   #developers{padding-bottom:48px}
-  #clients,#contact{padding-block:52px}
-  #journal,#people,#questions{padding-block:44px}
+  #clients,#contact{padding-block:48px}
+  #journal,#people,#questions{padding-block:40px}
   .name{padding-block:56px 72px}
+  .pr{padding-block:20px}
+  .chart .lv{padding-block:14px}
+  #journal .feature .links a:nth-child(2){display:none}
+  .step{padding-block:18px 16px}
   main .head h2,main .head.wide h2,#clients h2,.step h3,.cv-txt h3{max-width:none}
   .cv-say{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;min-height:0}
 }
+@media (max-width:520px){:is(:lang(es),:lang(pt)) main .head .intro{font-size:18px}:is(:lang(es),:lang(pt)) main :is(.door,.name) .big{font-size:22px}}
 @media (max-width:520px){:root:is(:lang(es),:lang(pt)){--t-spread:clamp(35px,9.95vw,40.5px);--t-chapter:clamp(31px,9.2vw,37px);--t-section:clamp(31px,9.2vw,37px);--t-head:clamp(24px,6.8vw,27.5px)}}
 @media (max-width:820px){
   :is(:lang(es),:lang(pt)) .gauge{grid-template-columns:minmax(0,1fr) max-content}
