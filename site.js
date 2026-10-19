@@ -34,6 +34,7 @@ const a = e.target.closest && e.target.closest('a[href]');
 if (!a) return;
 if (/^https:\/\/(ig\.me|www\.instagram\.com)\//.test(a.href)) window.cmCount('instagram' + location.pathname);
 else if (/\.pdf(\?|$)/.test(a.getAttribute('href'))) window.cmCount('brief' + location.pathname);
+else if (/^mailto:/.test(a.href)) window.cmCount('email' + location.pathname);
 }, true);
 const nav = document.getElementById('mainNav'), btn = document.getElementById('menuBtn');
 if (nav && btn) {
@@ -245,9 +246,8 @@ const rail = document.createElement('aside'), box = document.createElement('div'
 rail.className = 'rail'; rail.setAttribute('aria-label', 'About this page');
 const row = (label, value) => { const k = document.createElement('p'), v = document.createElement('p'); k.className = 'toc-k'; k.textContent = label; v.className = 'rail-v'; v.append(value); box.append(k, v); };
 row('Last updated', on[1]);
-const ask = document.createElement('a'), note = document.createElement('span');
-ask.className = 'ul'; ask.href = 'https://ig.me/m/centamont'; ask.target = '_blank'; ask.rel = 'noopener'; ask.textContent = '@centamont';
-note.className = 'vh'; note.textContent = ' on Instagram (opens in a new tab)'; ask.append(note);
+const ask = document.createElement('a');
+ask.className = 'ul'; ask.href = 'mailto:office@centamont.com'; ask.append('office@', document.createElement('wbr'), 'centamont.com');
 row('Questions', ask);
 rail.append(box); upd.before(rail);
 }

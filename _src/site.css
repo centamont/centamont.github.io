@@ -1258,6 +1258,8 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
   footer .sig{margin-top:24px;padding-bottom:8px}.tb{margin-top:8px}.ss{--n:1.9em}}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so 'Work with us' and
    'Weekly report' each keep to one line in their half of the sheet */
+/* the office's address sits on one line in its half-width cell down to a 360px phone; below that it breaks after the @ */
+@media (max-width:600px){.t-of a{font-size:.9em}}
 @media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.st{letter-spacing:.1em}.ss{--n:1.7em}}
 /* (and under 340px, at the labels' 14px, the cells open 2px more each side and the labels track at .08em, for the same reason) */
 @media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}

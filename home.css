@@ -465,7 +465,7 @@ html:not(.js) .seam{display:none}
 }
 .hero{position:relative;background:rgb(var(--hero-rgb));color:var(--ivory);overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:var(--ivory);--sold:var(--bronze-500);--sold-line:var(--bronze-500);isolation:isolate}
 .hero.loupe{cursor:none}
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.86) 34%,rgba(var(--hero-rgb),0) 64%),radial-gradient(54% 40% at 0 100%,rgba(var(--hero-rgb),.9) 0%,rgba(var(--hero-rgb),.9) 40%,rgba(var(--hero-rgb),0) 100%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(64% 120% at 0 58%,rgba(var(--hero-rgb),.97) 0%,rgba(var(--hero-rgb),.9) 42%,rgba(var(--hero-rgb),.55) 70%,rgba(var(--hero-rgb),0) 100%),linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.5) 24%,rgba(var(--hero-rgb),0) 44%)}
 .hero .lede{font-size:var(--t-intro);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
 .hero .coords{align-items:baseline}
