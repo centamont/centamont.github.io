@@ -521,6 +521,23 @@ test('on a phone the price slider sits right under the sales curve', async ({ pa
   expect(read.y + read.height).toBeLessThanOrEqual(loan.y);
 });
 
+// The home on a phone held upright stays within its length: each language's page measured at 390x844, with about 2%
+// of room over what it measures today (EN 14,065px, ES 14,798, PT 14,876). Anything added comes in against these.
+for (const [path, cap] of [['/', 14350], ['/es/', 15100], ['/pt/', 15180]]) {
+  test(`the phone home stays within its length (${path})`, async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone only');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    await page.waitForLoadState('load');
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    expect(height).toBeLessThanOrEqual(cap);
+    // the questions after the fourth fold behind one more row, and every question is still on the page
+    await expect(page.locator('.faq details:not(.fq-more)')).toHaveCount(6);
+    await expect(page.locator('.faq .fq-more > summary')).toBeVisible();
+    await expect(page.locator('.begin-go a')).toBeVisible();
+  });
+}
+
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await page.goto('/');

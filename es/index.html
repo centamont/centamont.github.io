@@ -39,9 +39,9 @@
 </script>
 <link rel="preload" href="/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/site.css?v=df2da987">
-<link rel="stylesheet" href="/practice.css?v=df2da987">
-<link rel="stylesheet" href="/home.css?v=df2da987">
+<link rel="stylesheet" href="/site.css?v=50a3506f">
+<link rel="stylesheet" href="/practice.css?v=50a3506f">
+<link rel="stylesheet" href="/home.css?v=50a3506f">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -49,10 +49,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="/site.js?v=df2da987" defer></script>
-<script src="/model.js?v=df2da987" defer></script>
-<script src="/instrument.js?v=df2da987" defer></script>
-<script src="/tower3d.js?v=df2da987" async fetchpriority="low"></script>
+<script src="/site.js?v=50a3506f" defer></script>
+<script src="/model.js?v=50a3506f" defer></script>
+<script src="/instrument.js?v=50a3506f" defer></script>
+<script src="/tower3d.js?v=50a3506f" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -298,6 +298,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         </div>
       </div>
     </div>
+    <p class="begin-go"><a class="more" href="/es/desarrolladores.html#dvBegin">Cómo empieza una colaboración</a></p>
   </div>
 </section>
 
@@ -467,13 +468,16 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('es-US',{timeZone
         <summary>¿Asesoran a compradores?</summary>
         <p>Sí, mediante una práctica reducida y solo por invitación para compradores en lo más alto del mercado, con acceso anticipado a nuevos desarrollos antes de su lanzamiento, cuando es posible. Para solicitar una invitación, escríbanos indicando su mercado y su rango de precio. <a class="ul nw" href="/es/clientes-privados.html">Cómo funciona la asesoría a clientes privados</a>.</p>
       </details>
-      <details>
-        <summary>¿De qué lado están cuando asesoran tanto a desarrolladores como a compradores?</summary>
-        <p>En un edificio que asesoramos para su desarrollador, trabajamos para el desarrollador, y no asesoramos a clientes privados sobre ese edificio.</p>
-      </details>
-      <details>
-        <summary>¿En qué mercados trabajan?</summary>
-        <p>Miami, Broward y Palm&nbsp;Beach, junto con Nueva York y los Hamptons, con un lanzamiento conjunto. Después, Los Angeles y Dallas. Tampa, Naples, Austin, Houston, San Francisco y Orange County llegarán más adelante, y luego los mercados internacionales. Abrimos los mercados en orden, y el siguiente solo cuando el anterior se sostiene por sí solo.</p>
+      <details class="fq-more">
+        <summary>Más preguntas</summary>
+        <details>
+          <summary>¿De qué lado están cuando asesoran tanto a desarrolladores como a compradores?</summary>
+          <p>En un edificio que asesoramos para su desarrollador, trabajamos para el desarrollador, y no asesoramos a clientes privados sobre ese edificio.</p>
+        </details>
+        <details>
+          <summary>¿En qué mercados trabajan?</summary>
+          <p>Miami, Broward y Palm&nbsp;Beach, junto con Nueva York y los Hamptons, con un lanzamiento conjunto. Después, Los Angeles y Dallas. Tampa, Naples, Austin, Houston, San Francisco y Orange County llegarán más adelante, y luego los mercados internacionales. Abrimos los mercados en orden, y el siguiente solo cuando el anterior se sostiene por sí solo.</p>
+        </details>
       </details>
     </div>
     <p class="ask">¿Tiene una pregunta que no está aquí? <a class="ul" href="#contact">Escriba a los socios</a>.</p>

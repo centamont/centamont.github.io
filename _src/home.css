@@ -915,7 +915,7 @@ html:not(.js) .step{min-height:auto}
 .faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 28px;align-items:center;gap:24px;padding:20px 0;font-family:var(--display);font-weight:400;font-size:var(--t-big);line-height:1.25;color:var(--fg);transition:color .3s var(--ease)}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"";width:13px;height:13px;justify-self:end;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
-.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details[open] > summary::after{transform:rotate(45deg)}
 
 /* a question answers in ink, as the ruled rows do: its foot rule takes the ink from the left (300 ms), and the title
    keeps its colour */
@@ -941,6 +941,21 @@ html:not(.js) .step{min-height:auto}
 .faq summary::before{content:counter(q,decimal-leading-zero);font-weight:300;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.02em;color:var(--faint)}
 .faq summary::after{align-self:center}
 #questions .ask{margin-left:var(--qn);border-top:0;padding-top:0}
+/* the last questions stand behind one more row, "More questions", set as a label on the ledger's indent; it carries no
+   number of its own, so the questions inside it keep theirs. From 521px it steps aside and they stand open in the
+   ledger, as before, wherever the browser can open a closed row's content from the stylesheet */
+.faq .fq-more{counter-increment:none}
+.faq .fq-more > summary{font:500 14px/1.3 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);min-height:44px}
+.faq .fq-more > summary::before{content:""}
+.faq .fq-more[open]{border-bottom:0}
+.faq .fq-more[open]::after{content:none}
+@supports selector(::details-content){@media screen and (min-width:521px){
+  .faq .fq-more{border-bottom:0}
+  .faq .fq-more::after{content:none}
+  .faq .fq-more > summary{display:none}
+  .faq details.fq-more::details-content{content-visibility:visible;display:block;block-size:auto;overflow-y:visible}
+}}
+@media print{.faq .fq-more > summary{display:none}.faq .fq-more{border-bottom:0}}
 @media (min-width:821px){#questions .head{padding-left:var(--qn);grid-template-columns:minmax(0,1fr);row-gap:0}
 #questions .intro{margin-top:18px}
 .faq summary{padding:22px 0}
@@ -1008,18 +1023,42 @@ html:not(.js) .step{min-height:auto}
 .seat-plan .ch:not(.on) .rl{fill:none;stroke:var(--fg)}
 @media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}.seat-plan :is(rect,path){stroke:CanvasText}}
 
-/* The home page on a phone held upright, kept close to sixteen screens. The markets list reads as the notes list does:
-   each market's name across the measure, its status under it as a meta line, then its places. Two practices leave their
-   words to where the page says them in full (the first to the story's first step and the first question, the third to
-   the private door); the second keeps its own, which name the gallery. The specimen sheet folds to its link, the report
-   step 04 and the third question also open. Nothing else is left out. */
+/* The home page on a phone held upright, kept close to sixteen screens by saying each thing once. The markets list reads
+   as the notes list does: each market's name across the measure and its status under it as a meta line, its places left
+   to the market's own page. The practices leave their words to where the page says them in full (the first to the story's
+   first step and the first question, the second to the launch step, the third to the private door). The specimen sheet
+   folds to its link, the report step 04 and the third question also open. */
 @media (max-width:600px){
   .chart .lv{grid-template-columns:minmax(0,1fr);row-gap:6px;padding-block:20px}
   .chart .lv h3{grid-column:1;grid-row:1}
   .chart .lv .when{grid-column:1;grid-row:2}
   .chart .lv p{grid-column:1;grid-row:3;margin-top:4px}
-  .pr:is(:nth-of-type(1),:nth-of-type(3)) h3 + p{display:none}
+  .pr h3 + p{display:none}
   .spec .sp-sheet,.sp-cap > span{display:none}
+}
+/* on a phone the first steps of an engagement live on the developers page: the home keeps one line that leads there,
+   and the name band keeps its lead line, leaving the paragraph after it to wider screens */
+.begin-go{display:none}
+@media (max-width:520px){
+  .begin{display:none}
+  .begin-go{display:block;margin:32px 0 0}
+  .name .cols p:not(.big){display:none}
+}
+/* and what a phone reads elsewhere stays there: the markets' places on their own pages (and the close's line to the
+   partners at the close itself), the deposit schedule in the guide it draws, the advisors' table on the Advisors page,
+   the third note in the journal, and the handle, which the letter's own line under its button carries. The heads and
+   their intros, the drawings that hold the page's information and every step's words all stay. */
+@media (max-width:520px){
+  .chart .lv p,#markets .ask,#questions .ask,#contact .reach,#people .seat-plan,#journal .jr-strip{display:none}
+  #journal .notes-list li:nth-child(n+3){display:none}
+}
+/* the back matter and the two bands close up a step on a phone (48 and 60px rather than 56 and 72), the markets' rows
+   keep a 44px touch height on 16px of air, and the letter stands 44px under its heading */
+@media (max-width:520px){
+  #journal,#people,#questions{padding-block:48px}
+  #clients,#contact{padding-block:60px}
+  .chart .lv{padding-block:16px}
+  #contact .letter{margin-top:44px}
 }
 /* and on a phone the chapters open at 72px rather than 88, and close on the same 48 to 56px as the markets, so each
    chapter's last rule and the next one's first stand one even step apart; the ruled rows (practices, notes, questions)

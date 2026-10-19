@@ -39,9 +39,9 @@
 </script>
 <link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="site.css?v=df2da987">
-<link rel="stylesheet" href="practice.css?v=df2da987">
-<link rel="stylesheet" href="home.css?v=df2da987">
+<link rel="stylesheet" href="site.css?v=50a3506f">
+<link rel="stylesheet" href="practice.css?v=50a3506f">
+<link rel="stylesheet" href="home.css?v=50a3506f">
 <script>
 (function(){var d=document.documentElement;d.classList.add('js');if(/[?&]motion=off(&|$)/.test(location.search))d.dataset.motion='off';var q=/[?&]theme=(dark|light)(&|$)/.exec(location.search);if(q)d.dataset.theme=q[1];
 try{var t=localStorage.getItem('cm-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('cm-motion')==='off')d.dataset.motion='off';
@@ -49,10 +49,10 @@ if(!sessionStorage.getItem('cm-intro')&&!localStorage.getItem('cm-intro')&&!loca
 // if the shared script (site.js) has not arrived four seconds on, the header falls back to its plain list of links
 setTimeout(function(){var b=document.body;if(b&&b.classList.contains('no-js'))d.classList.add('nosite')},4000)})();
 </script>
-<script src="site.js?v=df2da987" defer></script>
-<script src="model.js?v=df2da987" defer></script>
-<script src="instrument.js?v=df2da987" defer></script>
-<script src="tower3d.js?v=df2da987" async fetchpriority="low"></script>
+<script src="site.js?v=50a3506f" defer></script>
+<script src="model.js?v=50a3506f" defer></script>
+<script src="instrument.js?v=50a3506f" defer></script>
+<script src="tower3d.js?v=50a3506f" async fetchpriority="low"></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[download], [target=_blank], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body class="no-js home">
@@ -298,6 +298,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
         </div>
       </div>
     </div>
+    <p class="begin-go"><a class="more" href="developers.html#dvBegin">How an engagement begins</a></p>
   </div>
 </section>
 
@@ -467,13 +468,16 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat('en-US',{timeZone
         <summary>Do you advise buyers?</summary>
         <p>Yes, through a small, invitation-only practice for buyers at the very top of the market, with early access to new developments before they launch, when we can. To ask for an invitation, write with your market and price range. <a class="ul nw" href="private-clients.html">How private client advisory works</a>.</p>
       </details>
-      <details>
-        <summary>Whose side are you on when you advise both developers and buyers?</summary>
-        <p>On a building we advise for its developer, we act for the developer, and we don’t advise private clients on that building.</p>
-      </details>
-      <details>
-        <summary>Which markets do you work in?</summary>
-        <p>Miami, Broward and Palm&nbsp;Beach, with New York and the Hamptons, launching together. Then Los Angeles and Dallas. Tampa, Naples, Austin, Houston, San Francisco and Orange County come later, then international markets. We open markets in order, the next only once the last stands on its own.</p>
+      <details class="fq-more">
+        <summary>More questions</summary>
+        <details>
+          <summary>Whose side are you on when you advise both developers and buyers?</summary>
+          <p>On a building we advise for its developer, we act for the developer, and we don’t advise private clients on that building.</p>
+        </details>
+        <details>
+          <summary>Which markets do you work in?</summary>
+          <p>Miami, Broward and Palm&nbsp;Beach, with New York and the Hamptons, launching together. Then Los Angeles and Dallas. Tampa, Naples, Austin, Houston, San Francisco and Orange County come later, then international markets. We open markets in order, the next only once the last stands on its own.</p>
+        </details>
       </details>
     </div>
     <p class="ask">A question not answered here? <a class="ul" href="#contact">Write to the partners</a>.</p>
