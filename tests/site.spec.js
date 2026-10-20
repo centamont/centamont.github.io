@@ -280,8 +280,9 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   await page.addInitScript(() => { window.__cmForce3D = true; });
   await page.goto('/');
   await expect(page.locator('#heroModel')).toHaveAttribute('data-render', '3d', { timeout: 20000 });
-  // once it has faded in, the sky stands behind it as the canvas's background
-  await expect.poll(() => page.locator('#heroModel').evaluate((c) => c.style.backgroundImage), { timeout: 10000 }).toContain('linear-gradient');
+  // once it has faded in, the sky stands behind it as the canvas's background, or is laid on the canvas under the
+  // photograph if that has taken over already (without the intro the tower stands finished at once, so it soon does)
+  await expect.poll(() => page.locator('#heroModel').evaluate((c) => (c.dataset.still ? 'still' : c.style.backgroundImage)), { timeout: 10000 }).toMatch(/linear-gradient|still/);
   expect(errors).toEqual([]);
   const plain = await page.context().newPage();
   await plain.setViewportSize({ width: 1100, height: 720 });
@@ -293,8 +294,8 @@ test('hero tower renders in 3D where it can, and is drawn where it cannot', asyn
   await plain.close();
 });
 
-// Once built, the finished tower is a photograph (hero/), one of four picked by the hour's sun and fetched only once the
-// page has loaded, on a phone as on a desktop: one file, whichever the screen.
+// Once built, the finished tower is a photograph (hero/), one of four picked by the hour's sun and fetched once the page
+// has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the screen.
 test('the hero shows a photograph of the tower, on a phone as on a desktop', async ({ page }) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
