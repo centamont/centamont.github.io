@@ -15,8 +15,7 @@ weekly reports, in the step the list gives them. On a phone the street runs side
                   foundations in; 4 the building rising under a crane; 5 finished, closings begun, a few residences
                   still the sponsor's.
   South Florida   1 pricing set, refundable reservations (not bronze: not committed); 2 documents filed, contracts
-                  signed; 3 the building rising under a crane; 4 finished, closings; 5 the owners take the association,
-                  the lobby and amenity floors with it.
+                  signed; 3 the building rising under a crane; 4 finished, closings; 5 the owners take the association.
 """
 import random
 import re
@@ -136,7 +135,7 @@ def frame(m, s, x0, width, blocks):
     k, cx = s['built'], width * s.get('at', .5)
     dx = cx - 64
     o = [f'<path class="bk" d="{roofline(m, blocks, x0, x0 + width)}"/>']
-    g = [crane(30)] if s.get('crane') else []
+    g = [crane(24)] if s.get('crane') else []
     g += [f'<path class="ko" d="{outline(LEVELS)}Z"/>', f'<path class="hid" d="{outline(LEVELS)}"/>']
     shell = s.get('shell', k)
     if s['share']:   # the planned floors, faint, so a residence under contract stands in its place
@@ -155,9 +154,6 @@ def frame(m, s, x0, width, blocks):
     if s.get('found'):   # the foundations, poured below grade
         g.append(f'<path class="ko" d="M{PL} {GROUND}V148H{PR}V{GROUND}Z"/><path class="pr" d="M{PL} {GROUND}V148H{PR}V{GROUND}"/>')
         g.append(f'<path class="dt" d="M{PL} 144H{PR}M{L} {GROUND}V148M{R} {GROUND}V148"/>')
-    if s.get('common'):   # the owners hold the common parts too: lobby and amenity floors
-        g.append(f'<path class="sold" d="M{PL + .7} {top(2) + .7}H{PR - .7}V{GROUND - .7}H{PL + .7}Z"/>')
-        g.append(f'<path class="dt" d="M{PL} {top(1)}H{PR}M57 133.5H71M58 133.5V140M70 133.5V140"/>')
     if s.get('mark'):
         low = top(min(f for f, u in order(m)[:round(s['share'] * len(UNITS))]))
         g.append(f'<path class="dt" d="M{R + 1} {low}H{R + 5}V{top(LEVELS)}H{R + 8}"/>'
@@ -174,7 +170,7 @@ def frame(m, s, x0, width, blocks):
         o.append(f'<path class="ob" d="M{width - .5} 153V163"/>')
     if s.get('weeks'):
         o.append('<path class="dt" d="' + ''.join(f'M{x} 154.5V158' for x in range(4, width, 4)) + '"/>')
-    return f'<svg viewBox="0 16 {width} 150" aria-hidden="true" focusable="false">{"".join(o)}</svg>'
+    return f'<svg viewBox="0 6 {width} 160" aria-hidden="true" focusable="false">{"".join(o)}</svg>'
 
 
 STEPS = {
@@ -190,7 +186,7 @@ STEPS = {
         dict(built=0, share=.3),
         dict(built=11, shell=9, share=.7, crane=True, weeks=True, wide=True),
         dict(built=18, share=.9),
-        dict(built=18, share=1, common=True, last=True),
+        dict(built=18, share=1, last=True),
     ],
 }
 
