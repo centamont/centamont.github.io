@@ -566,12 +566,12 @@
       this.touch();
     }
 
-    // The hero's photograph (key, one of STILLS, from the folder base), fetched only once the page has loaded and gone
-    // quiet, at the density the screen and the framing call for. It takes over from the tower, drawn or rendered, once
-    // that is built and lit, and only while the camera stands where the photograph was made from, the sun is the hour's
+    // The hero's photograph (key, one of STILLS, from the folder base), fetched once the page has loaded and gone quiet
+    // (or at once, soon, when the tower stands finished from the start), at the density the screen and the framing call
+    // for. It takes over from the tower, drawn or rendered, once that is built and lit, and only while the camera stands where the photograph was made from, the sun is the hour's
     // own (not moved along its path) and the sheet is ink; it fades in over 0.8 s (at once with motion off) and gives
     // the tower back the same way. The sky and the bay are tower3d.js's, drawn under it with or without WebGL.
-    photo(key, base) {
+    photo(key, base, soon) {
       const s = STILLS[key];
       if (this.dead || !s) return;
       this.ph = { key, s, img: null, fc: null, fk: '' };
@@ -582,7 +582,7 @@
         img.decode().then(() => { if (this.ph && this.ph.s === s) { this.ph.img = img; this.touch(); } }, () => {});
       };
       const idle = () => (window.requestIdleCallback ? requestIdleCallback(get, { timeout: 2500 }) : setTimeout(get, 200));
-      if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+      if (soon) get(); else if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
     }
     // whether the photograph may stand in for the tower now
     photoOn() {
