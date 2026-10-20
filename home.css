@@ -409,8 +409,8 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 #clients{position:relative;overflow:hidden;isolation:isolate}
 .door{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,7vw,120px);align-items:center}
 @media (min-width:1181px){
-  .door{grid-template-columns:minmax(0,1fr) auto;gap:clamp(64px,6vw,128px);align-items:start}
-  .door h2{max-width:none;margin-top:-.1em}
+  .door{grid-template-columns:minmax(0,1fr) auto;gap:clamp(64px,6vw,128px);align-items:end}
+  .door h2{max-width:none}
   .door .big{max-width:34ch;font-size:clamp(24px,1.85vw,calc(27px + var(--wide) * .008));line-height:1.4}
   .door .doorway{width:calc(440px + var(--wide) * .12);max-width:none}
 }
@@ -672,7 +672,7 @@ html:not(.js) .step{min-height:auto}
 .sp-go.press{color:var(--fg);transition:none}
 .pr:has(.more.press)::after{transform:none;transition-duration:var(--t-press)}
 .doorway .room{position:absolute;left:5.5%;right:5.5%;top:4.667%;bottom:0;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0;opacity:calc(var(--o) * .78);pointer-events:none}
-.doorway .room img{object-position:28% 18%}
+.doorway .room img{height:122%;object-position:28% 0}
 .doorway .room::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(var(--ink-rgb),.08),rgba(var(--ink-rgb),.3) 24%,rgba(var(--ink-rgb),.9) var(--floor-at,46%),rgba(var(--ink-rgb),.96))}
 @media (min-width:821px){.head.statement.turn .intro{grid-column:1/span 5}}
 .hero .row .write{align-self:center;margin:0 0 0 10px;padding-block:6px 3px;color:inherit;opacity:.86}

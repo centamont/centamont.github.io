@@ -43,8 +43,8 @@ section.band + section,section + section.band{border-top:0}
 .leaf.r{transform-origin:100% 50%;transform:rotateY(calc(var(--o) * -86deg));border-top-right-radius:100% 31.1%;border-left-color:rgba(var(--bronze-rgb),.45)}
 /* the leaves take the light on their faces as they swing, darker toward the hinge, so a leaf seen edge-on reads as a
    door's thickness and not as a flat strip */
-.leaf.l{background-image:linear-gradient(to right,rgba(0,0,0,calc(var(--o) * .45)),rgba(0,0,0,0) 70%)}
-.leaf.r{background-image:linear-gradient(to left,rgba(0,0,0,calc(var(--o) * .45)),rgba(0,0,0,0) 70%)}
+.leaf.l{background-image:linear-gradient(to right,rgba(0,0,0,calc(var(--o) * .2)),rgba(0,0,0,0) 70%)}
+.leaf.r{background-image:linear-gradient(to left,rgba(0,0,0,calc(var(--o) * .2)),rgba(0,0,0,0) 70%)}
 /* a sunk panel in each leaf, and one bronze knob where they meet; the panel fades as the leaf turns away, since seen
    edge-on its lines would only cross the jamb as stray diagonals */
 .leaf::before{content:"";position:absolute;inset:34% 16% 9%;border:1px solid rgba(var(--bronze-rgb),.4);opacity:calc(1 - clamp(0,(var(--o) - .3) / .4,1))}
@@ -75,7 +75,7 @@ section.band + section,section + section.band{border-top:0}
 @media (max-width:820px){
   .door .big{margin-top:22px}
   .door .row{margin-top:28px}
-  .door .doorway{margin:44px 0 46px}
+  .door .doorway{margin:44px 0 34px}
 }
 /* phones held upright: the door is as tall as its promises need, under a crown of light, and no taller */
 @media (max-width:520px){.door .doorway{min-height:0;padding:min(44%,170px) calc(13.5% + 6px) 24px}}
