@@ -144,9 +144,8 @@
 .ruler.struck + .rscale span:last-child{color:var(--bronze)}
 .name .cols > *{min-width:0}
 .name .cols div{display:grid;gap:20px}
-.name .cols div p:not(.big){font-size:var(--t-intro);line-height:1.5;max-width:30em}
 .name .cols .big{color:var(--band-fg)}
-@media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
+@media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}}
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
 .handle:focus-visible svg{transform:translateX(.12em)}
 @media (hover:hover) and (pointer:fine){.handle:hover svg{transform:translateX(.12em)}}
@@ -718,7 +717,6 @@ html:not(.js) .step{min-height:auto}
 @media (max-width:520px){
   .begin{display:none}
   .begin-go{display:block;margin:32px 0 0}
-  .name .cols p:not(.big){display:none}
 }
 @media (max-width:520px){
   .chart .lv p,#markets .ask,#questions .ask,#contact .reach,#journal .jr-strip{display:none}
