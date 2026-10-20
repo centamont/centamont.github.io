@@ -14,7 +14,7 @@
 .lsq > .w2{grid-column:span 2}
 .lsq svg{display:block;width:100%;height:auto;overflow:visible}
 .lsq p{margin:10px 14px 0 0;display:flex;flex-direction:column;gap:2px}
-.lsq .n{font:italic 400 26px/1 var(--display);color:var(--accent);font-variant-numeric:lining-nums}
+.lsq .n{font:italic 400 26px/1 var(--display);color:var(--fg);font-variant-numeric:lining-nums}
 .lsq .f{font-family:var(--body);font-size:14px;line-height:1.45;color:var(--muted)}
 :where(.lsq,.mk-lfig .key) path{fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 :is(.lsq,.mk-lfig .key) .pr{stroke-width:var(--lw-profile)}
@@ -30,8 +30,8 @@
 .mk-lfig .key{gap:6px 18px;font-size:13px;font-weight:400;letter-spacing:.08em;color:var(--muted)}
 .mk-lfig .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .mk-lfig .key svg{width:22px;height:10px;overflow:visible}
-:root[data-theme="dark"] .lsq .bk{opacity:.55}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.55}}
+:root[data-theme="dark"] .lsq .bk{opacity:.7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.7}}
 @media (max-width:600px){
   .lsq{display:flex;margin:0 calc(-1 * var(--gl)) 16px;padding:0 var(--gl) 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .lsq::-webkit-scrollbar{display:none}
