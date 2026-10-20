@@ -34,9 +34,9 @@
 .mk-lfig .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .mk-lfig .key svg{width:28px;height:6px;overflow:visible}
 @media (max-width:600px){
-  .lsq{grid-template-columns:minmax(0,1fr);gap:10px}
-  .lsq > div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;align-items:end}
-  .lsq p{margin:0 0 30px}
+  .lsq{grid-template-columns:minmax(0,1fr);gap:6px}
+  .lsq > div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:end}
+  .lsq p{margin:0 0 26px}
   .lsq .n{font-size:30px}
   .lsq .f{font-size:15px}
 }
