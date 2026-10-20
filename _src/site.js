@@ -93,6 +93,11 @@
         const ls = [...mk.querySelectorAll('.mk-panel a')], i = ls.indexOf(e.target) + (e.key === 'ArrowDown' ? 1 : -1);
         e.preventDefault(); (i < 0 ? mb : ls[Math.min(i, ls.length - 1)]).focus();
       }
+      // Home and End go to the first and last market
+      if ((e.key === 'Home' || e.key === 'End') && e.target.closest('.mk-panel') && inBar()) {
+        const ls = [...mk.querySelectorAll('.mk-panel a')];
+        e.preventDefault(); ls[e.key === 'Home' ? 0 : ls.length - 1].focus();
+      }
     });
     mk.addEventListener('focusout', (e) => { if (!mk.contains(e.relatedTarget)) set(false); });
     document.addEventListener('click', (e) => { if (!e.target.closest('.mk')) set(false); });
@@ -317,7 +322,11 @@
       li.appendChild(a); list.appendChild(li); links.set(h, a);
     });
     box.appendChild(list); toc.appendChild(box);
-    page.prepend(toc);
+    // In the page's order it follows the opening (crumbs, title, standfirst, date line), so Tab reaches those first;
+    // where it shows, it is hung in the margin by position, so its place in the order doesn't move it.
+    const head = [...page.querySelectorAll(':scope > h1, :scope > .standfirst, :scope > .meta')]
+      .filter((e) => e.compareDocumentPosition(heads[0]) & Node.DOCUMENT_POSITION_FOLLOWING).pop();
+    if (head) head.after(toc); else page.prepend(toc);
     // it starts level with the first section, below the page's opening film
     const place = () => toc.style.setProperty('--toc-top', Math.round(heads[0].getBoundingClientRect().top - page.getBoundingClientRect().top) + 'px');
     place(); addEventListener('resize', place); addEventListener('load', place); if (document.fonts) document.fonts.ready.then(place);

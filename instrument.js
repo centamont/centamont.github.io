@@ -20,7 +20,8 @@ salute: 'Estimados socios:', sign: 'Saludos cordiales,',
 asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
 of: ', de ', plan: 'Mi plan: ',
 ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
-subject: (who) => 'Carta de ' + who,
+subject: { dev: 'Desarrollador', buy: 'Cliente privado', adv: 'Asesor' },
+residences: (n) => n + (n === '1' ? ' residencia' : ' residencias'),
 copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente para concertar una primera conversación.'],
 launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1] + ' de ' + y,
 notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
@@ -45,7 +46,8 @@ salute: 'Prezados sócios,', sign: 'Atenciosamente,',
 asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
 of: ', ', plan: 'Meu plano: ',
 ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
-subject: (who) => 'Carta de ' + who,
+subject: { dev: 'Incorporadora', buy: 'Cliente privado', adv: 'Consultor' },
+residences: (n) => n + (n === '1' ? ' residência' : ' residências'),
 copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente para marcar uma primeira conversa.'],
 launchIn: (m, y) => 'em ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][m - 1] + ' de ' + y,
 notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
@@ -65,7 +67,7 @@ const svg = document.getElementById('cvSvg');
 if (svg) {
 const price = document.getElementById('cvPrice'), loan = document.getElementById('cvLoan');
 const out = (id) => document.getElementById(id);
-const PLAN = 6, BUILD = 24;
+const PLAN = 12, BUILD = 24;
 let M = 36, BREAK = PLAN, TOP = PLAN + BUILD - 6, DONE = PLAN + BUILD;
 const NS = 'http://www.w3.org/2000/svg';
 const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; (parent || svg).appendChild(e); return e; };
@@ -526,15 +528,23 @@ const text = () => {
 const p = paras.find((x) => !x.hidden), c = p.cloneNode(true), src = [...p.querySelectorAll('input, select')];
 p.querySelectorAll('[data-opt]').forEach((o, k) => { if (![...o.querySelectorAll('input')].some((i) => i.value.trim())) c.querySelectorAll('[data-opt]')[k].dataset.drop = ''; });
 c.querySelectorAll('input, select').forEach((f, k) => { f.replaceWith(document.createTextNode(src[k].value.trim() || '…')); });
-c.querySelectorAll('[data-drop], .plan-ref').forEach((o) => o.remove());
+const req = [...c.querySelectorAll('[data-req]')].map((o) => o.textContent.replace(/\s+/g, ' ').trim()).join(' ');
+c.querySelectorAll('[data-drop], [data-req], .plan-ref').forEach((o) => o.remove());
 const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim();
 let body = c.textContent.replace(/\s+/g, ' ').trim();
 if (!/[.!?…]$/.test(body)) body += '.';
+if (req) body += ' ' + req;
 const plan = p.querySelector('.plan-ref') ? '\n\n' + cmSay('plan', 'My plan: ') + planUrl : '';
 return cmSay('salute', 'Dear partners,') + '\n\n' + body + plan + '\n\n' + cmSay('sign', 'With regards,') + '\n' + (name || '') + (of ? cmSay('of', ' of ') + of : '');
 };
 const box = document.getElementById('letterCopy'), area = document.getElementById('letterText');
-const subject = () => { const name = form.querySelector('input[name="name"]').value.trim(), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim(); return cmSay('subject', (w) => 'A letter from ' + w, name + (of ? cmSay('of', ' of ') + of : '')); };
+const subject = () => {
+const v = form.querySelector('input[name="as"]:checked').value, val = (k) => { const i = form.elements[k]; return i && i.value ? i.value.trim() : ''; };
+const name = val('name'), co = signed().find((i) => i.name === 'company'), of = co && co.value.trim();
+const role = (cmWords.subject || { dev: 'Developer', buy: 'Private client', adv: 'Advisor' })[v];
+const units = val('units'), about = v === 'dev' ? [val('where'), units && cmSay('residences', (n) => n + (n === '1' ? ' residence' : ' residences'), units)].filter(Boolean).join(', ') : val(v === 'buy' ? 'area' : 'mkt');
+return role + ': ' + name + (of ? cmSay('of', ' of ') + of : '') + (about ? ' · ' + about : '');
+};
 const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
 const asks = cmWords.asks || { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', name: 'your name', company: 'your company' };
 const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' ' + cmSay('and', 'and') + ' ' + a[a.length - 1]);

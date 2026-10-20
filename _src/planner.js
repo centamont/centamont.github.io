@@ -235,17 +235,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // drawn as a stacking plan is: every floor numbered up the left, the lines numbered along the foot, the building on its
     // ground line over a band of hatch, and set at one height, so a short building never swells to fill the page and a tall
-    // one keeps to the screen. A building of few lines draws each residence wider (48 units for up to four lines, 32 for up
-    // to eight), so the plan reads as a building, not a strip; its numbers are set to stand at 13px whatever the scale.
-    const cw = per <= 4 ? 48 : per <= 8 ? 32 : 20, ch = 14, gap = 3, lw = 44, foot = per <= 12 ? 34 : 16, VW = lw + per * (cw + gap), base = F * (ch + gap) + 2, VH = base + foot;
+    // one keeps to the screen. A building of few lines draws each residence wider (up to four lines share about 200 units,
+    // so a two-line tower stands about 240px wide, as a floor plate reads; 32 units each for up to eight), so the plan reads as a
+    // building, not a strip; its numbers are set to stand at 13px whatever the scale.
+    const gap = 3, cw = per <= 4 ? Math.min(100, Math.round(200 / per) - gap) : per <= 8 ? 32 : 20, ch = 14, lw = 44, foot = per <= 12 ? 34 : 16, VW = lw + per * (cw + gap), base = F * (ch + gap) + 2, VH = base + foot;
     const sc = Math.min(1.25, 540 / VH);
     plan.setAttribute('viewBox', `-2 -2 ${VW + 4} ${VH + 4}`);
     plan.style.width = Math.round((VW + 4) * sc) + 'px';
     plan.style.setProperty('--fl', (13 / sc).toFixed(2) + 'px');
+    // (the key beside it ends on the plan's ground line: the plan's foot, under that line, is handed to the figure)
+    plan.parentElement.style.setProperty('--plan-foot', ((foot + 2) * sc).toFixed(1) + 'px');
     plan.textContent = '';
     units.forEach((u) => el('rect', { class: 'lp-u ' + u.p, x: lw + u.c * (cw + gap), y: (F - 1 - u.f) * (ch + gap), width: cw, height: ch }, plan));
-    const lab = F > 30 ? 5 : 1, pad = (n) => String(n).padStart(2, '0');
-    for (let f = 0; f < F; f++) if ((f + 1) % lab === 0 || f === 0 || f === F - 1) el('text', { class: 'lp-fl', x: lw - 8, y: (F - 1 - f) * (ch + gap) + ch - 3, 'text-anchor': 'end' }, plan, pad(f + 1));
+    // every fifth floor is numbered on a tall building, with the first and the top; a fifth that would stand within a
+    // label's height of the top floor's number gives way to it, so the two never touch
+    const lab = F > 30 ? 5 : 1, pad = (n) => String(n).padStart(2, '0'), near = (f) => f !== F - 1 && (F - 1 - f) * (ch + gap) * sc < 19;
+    for (let f = 0; f < F; f++) if (((f + 1) % lab === 0 && !(lab > 1 && near(f))) || f === 0 || f === F - 1) el('text', { class: 'lp-fl', x: lw - 8, y: (F - 1 - f) * (ch + gap) + ch - 3, 'text-anchor': 'end' }, plan, pad(f + 1));
     const hatch = el('pattern', { id: 'plH', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, el('defs', {}, plan));
     el('line', { class: 'lp-h', x1: 0, y1: 0, x2: 0, y2: 5 }, hatch);
     el('path', { d: `M${lw - 4} ${base}H${VW}v6H${lw - 4}Z`, fill: 'url(#plH)' }, plan);
