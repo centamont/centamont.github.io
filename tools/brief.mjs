@@ -14,6 +14,6 @@ await page.goto(pathToFileURL(resolve(ROOT, '_src/brief/developer-brief.html')).
 await page.evaluate(() => document.fonts.ready);
 const pages = await page.evaluate(() => Math.ceil(document.documentElement.scrollHeight / (11 * 96)));
 if (pages > 1) { console.error('The brief runs to ' + pages + ' pages; it must fit on one.'); process.exit(1); }
-await page.pdf({ path: resolve(ROOT, 'developer-brief.pdf'), format: 'Letter', printBackground: true, preferCSSPageSize: true });
+await page.pdf({ path: resolve(ROOT, 'developer-brief.pdf'), format: 'Letter', printBackground: true, preferCSSPageSize: true, tagged: true, outline: true });
 await browser.close();
 console.log('developer-brief.pdf');
