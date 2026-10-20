@@ -77,8 +77,8 @@ def sold(m, share):
 
 
 def crane(t):
-    """A tower crane standing behind the building: lattice mast, jib out over the building, counter-jib and its weight,
-    tower head and ties. The building, drawn after it, hides the jib where it passes behind, so nothing crosses it."""
+    """A tower crane beside the building, climbed above its crown: lattice mast, jib out over the roof, counter-jib and
+    its weight, tower head and ties. Its jib at t clears the planned crown, so nothing crosses the building."""
     a, b = 96, 100
     lat, y, s = '', GROUND, 0
     while y - 5 > t:
@@ -135,7 +135,7 @@ def frame(m, s, x0, width, blocks):
     k, cx = s['built'], width * s.get('at', .5)
     dx = cx - 64
     o = [f'<path class="bk" d="{roofline(m, blocks, x0, x0 + width)}"/>']
-    g = [crane(top(k) - 14)] if s.get('crane') else []
+    g = [crane(24)] if s.get('crane') else []
     g += [f'<path class="ko" d="{outline(LEVELS)}Z"/>', f'<path class="hid" d="{outline(LEVELS)}"/>']
     shell = s.get('shell', k)
     if s['share']:   # the planned floors, faint, so a residence under contract stands in its place
@@ -151,24 +151,33 @@ def frame(m, s, x0, width, blocks):
         g.append(f'<path class="sold" d="{sold(m, s["share"])}"/>')
     if k:
         g.append(f'<path class="pr" d="{outline(k)}"/>')
+    if s.get('found'):   # the foundations, poured below grade
+        g.append(f'<path class="ko" d="M{PL} {GROUND}V148H{PR}V{GROUND}Z"/><path class="pr" d="M{PL} {GROUND}V148H{PR}V{GROUND}"/>')
+        g.append(f'<path class="dt" d="M{PL} 144H{PR}M{L} {GROUND}V148M{R} {GROUND}V148"/>')
     if s.get('mark'):
-        g.append(f'<text class="thr" x="{R + 6}" y="{top(LEVELS) + 6}">{s["mark"]}</text>')
+        low = top(min(f for f, u in order(m)[:round(s['share'] * len(UNITS))]))
+        g.append(f'<path class="dt" d="M{R + 1} {low}H{R + 5}V{top(LEVELS)}H{R + 8}"/>'
+                 f'<text class="thr" x="{R + 10}" y="{top(LEVELS) + 4}">{s["mark"]}</text>')
     o.append(f'<g transform="translate({n(dx)} 0)">{"".join(g)}</g>')
-    hat = ''.join(f'M{x} 149L{x + 9} {GROUND}' for x in range(-((x0 + 4) % 12) + 2, width - 8, 12) if x >= 0)
+    hat = ''
+    for x in range(-((x0 + 4) % 12) + 2 - 12, width + 12, 12):
+        a, b = max(x, 0), min(x + 9, width)
+        if b > a:
+            hat += f'M{n(a)} {n(149 - (a - x))}L{n(b)} {n(149 - (b - x))}'
     o.append(f'<path class="dt hat" d="{hat}"/><path class="pr" d="M-1 {GROUND}H{width + 1}"/>')
     o.append(f'<path class="ob" d="M-1 158H{width + 1}M0.5 153V163"/>')
     if s.get('last'):
         o.append(f'<path class="ob" d="M{width - .5} 153V163"/>')
     if s.get('weeks'):
         o.append('<path class="dt" d="' + ''.join(f'M{x} 154.5V158' for x in range(4, width, 4)) + '"/>')
-    return f'<svg viewBox="0 16 {width} 150" aria-hidden="true" focusable="false">{"".join(o)}</svg>'
+    return f'<svg viewBox="0 6 {width} 160" aria-hidden="true" focusable="false">{"".join(o)}</svg>'
 
 
 STEPS = {
     'ny': [
         dict(built=0, share=0),
         dict(built=0, share=.06),
-        dict(built=2, share=.15, crane=True, mark='15%'),
+        dict(built=0, share=.15, found=True, mark='15%'),
         dict(built=12, shell=10, share=.6, crane=True, weeks=True, wide=True),
         dict(built=18, share=.92, last=True),
     ],
