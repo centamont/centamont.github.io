@@ -117,7 +117,7 @@
   
   .gauge > span{display:block;white-space:nowrap}
   .gauge em{display:block;margin:0 0 3px}
-  .gauge b{font-size:24px;line-height:.8}
+  .gauge b{font-size:30px;line-height:.8}
   
   .gauge .lim small{top:1.154em;left:auto;right:0;transform:none;letter-spacing:.1em}
   /* the drawing is masked off a few pixels short of the caption strip above it and the gauge's rule below it, so the
@@ -524,6 +524,15 @@ html.js .step:nth-last-child(2){padding-bottom:var(--hand)}
 html.js .step:last-child{padding-top:calc(2 * var(--pad) - var(--hand))}
 }
 
+/* On a desktop, the step where ground breaks is the frame's runway: the building climbs floor by floor across it
+   (home.js), so the step runs on for a third of a window past its words; and the first step reaches the reading line
+   only once the drawing has settled under the header, so the plan and the words that name it arrive together. */
+@media screen and (min-width:1041px){html.js .step[data-rise]{padding-bottom:calc(var(--pad) + 30svh)}
+html.js .step:first-child{padding-top:max(var(--pad),calc(50svh - 175px))}
+}
+/* On a large screen the steps' words step up with the drawing beside them */
+@media (min-width:1900px){.step p,.step li{font-size:19px}}
+
 /* the last step's words are a coda: a box of their own inside the runway (on a phone it simply stands in the step) */
 .coda{display:flex;flex-direction:column;gap:inherit}
 @media screen and (min-width:821px) and (min-height:600px){html.js .step:last-child{--hold:calc(clamp(14px,2.4vh,28px) - 1px);justify-content:flex-end;padding-bottom:var(--hold)}
@@ -543,7 +552,8 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 }
 /* A phone held upright reads the story one step at a time, so it keeps each step to its heading and its first paragraph:
    the first step's three subjects are already the first practice's and the first question's answer, and the launch's
-   second paragraph (the sales team, each owning a segment) is the advisors' intro further down. Nothing else is left out. */
+   second paragraph (the sales team, each owning a segment) is the advisors' intro further down; ground broken's second (the
+   weekly report) is the specimen report its link opens. Nothing else is left out. */
 @media (max-width:600px){#steps .step:first-child ul,#steps .step p:not(.vh) ~ p:not(.vh){display:none}}
 @media (max-width:820px),(min-width:480px) and (max-width:1040px) and (max-height:500px) and (orientation:landscape){.gauge{order:1;display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:clamp(16px,100cqw - 270px,48px);align-items:end;padding:6px 0 2.77em;border-top:1px solid var(--rule);font-size:13px;line-height:1}
 .gauge .meter{bottom:-1em}
