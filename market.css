@@ -1,12 +1,39 @@
 /* Built from _src/market.css by tools/version.py: edit the source, not this file. */
 @media print{.js .mk-el text{opacity:1!important}
 }
-.mk-lfig{margin:28px 0 8px}
-.mk-launch{display:block;width:100%;height:auto;overflow:visible}
-.mk-launch .ru{fill:none;stroke:var(--fg)}
-.mk-launch .wk{fill:none;stroke:var(--fg);opacity:.45}
-.mk-launch .sn{fill:var(--accent);font:italic 400 21px var(--display);text-anchor:middle;font-variant-numeric:lining-nums}
-@media (max-width:600px){.mk-launch .sn{font-size:34px}.mk-launch .ru{stroke-width:1.6}}
+.mk-lfig{margin:32px 0 8px}
+.lsq{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 14px;margin-bottom:14px}
+.lsq svg{display:block;width:100%;height:auto;overflow:visible}
+.lsq p{margin:10px 0 0;display:flex;flex-direction:column;gap:2px}
+.lsq .n{font:italic 400 26px/1 var(--display);color:var(--accent);font-variant-numeric:lining-nums}
+.lsq .f{font-family:var(--body);font-size:14px;line-height:1.45;color:var(--muted)}
+:where(.lsq,.mk-lfig .key) path{fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
+:is(.lsq,.mk-lfig .key) .pr{stroke-width:var(--lw-profile)}
+.lsq .dt{stroke-width:var(--lw-detail)}
+:is(.lsq,.mk-lfig .key) .hid{stroke-dasharray:var(--lt-hidden);opacity:.72}
+.lsq .hat{stroke-width:var(--lw-hatch);opacity:.38}
+.lsq .fe{opacity:.7}
+.lsq .fl{opacity:.55}
+.lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.42;stroke-linejoin:round}
+.lsq .ko{fill:var(--bg);stroke:none}
+.lsq .halo{stroke:var(--bg);stroke-width:3px}
+:is(.lsq,.mk-lfig .key) .sold{fill:var(--sold);fill-opacity:.38;stroke:var(--sold-line)}
+.lsq .sl{stroke:var(--sold-line);stroke-width:var(--lw-detail)}
+.lsq .cw{fill:var(--fg);stroke:none}
+.lsq .tr{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke}
+:is(.lsq,.mk-lfig .key) .wk{stroke-width:var(--lw-detail)}
+.mk-lfig .cap{grid-template-columns:minmax(0,1fr)}
+.mk-lfig .key{order:-1}
+.mk-lfig .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.mk-lfig .key svg{width:28px;height:6px;overflow:visible}
+@media (max-width:600px){
+  .lsq{grid-template-columns:minmax(0,1fr);gap:10px}
+  .lsq > div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;align-items:end}
+  .lsq p{margin:0 0 30px}
+  .lsq .n{font-size:30px}
+  .lsq .f{font-size:15px}
+}
+@media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq :is(.ko,.halo){fill:Canvas;stroke:Canvas}.lsq .tr{stroke:CanvasText}.lsq .cw{fill:CanvasText}}
 .hood:first-child > h3:first-child{margin-top:24px}
 .hoods:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 @media (max-width:700px){
