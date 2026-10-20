@@ -9,7 +9,7 @@ step (construction) takes a double frame, as it takes the most time. Three pens,
 the street behind, the crane's lattice, the hatch). Hidden line is what is planned; continuous is what stands. Bronze
 marks only what is committed: the residences under contract, each in its place in the stacking plan, sold off the plan
 before they are built, upper floors first; the ones still ivory at the end are the sponsor's. Ticks on the rule are
-weekly reports, from the opening of sales on. On a phone the street runs sideways under the finger, a frame at a time.
+weekly reports, in the step the list gives them. On a phone the street runs sideways under the finger, a frame at a time.
 
   New York        1 offering plan drafted; 2 accepted, sales open; 3 fifteen percent under contract, plan effective,
                   foundations in; 4 the building rising under a crane; 5 finished, closings begun, a few residences
@@ -77,8 +77,8 @@ def sold(m, share):
 
 
 def crane(t):
-    """A tower crane beside the building: lattice mast, jib out over the building, counter-jib and its weight, tower
-    head and ties, trolley and hook, the hook clear of the floor below it."""
+    """A tower crane standing behind the building: lattice mast, jib out over the building, counter-jib and its weight,
+    tower head and ties. The building, drawn after it, hides the jib where it passes behind, so nothing crosses it."""
     a, b = 96, 100
     lat, y, s = '', GROUND, 0
     while y - 5 > t:
@@ -92,9 +92,7 @@ def crane(t):
         x += 5
         s ^= 1
     head = f'M98 {t - 2.5}V{t - 12}L52 {t - 2.5}M98 {t - 12}L114 {t - 2.5}'
-    hook = f'M62 {t}V{t + 7}M60.6 {t + 7}h2.8M62 {t + 7}v1.6q0 1.6 -1.6 1.6'
-    return (f'<path class="halo" d="M38 {t - 1.2}H114{head}"/>'
-            f'<path class="dt" d="{lat}{jib}{hook}"/>'
+    return (f'<path class="dt" d="{lat}{jib}"/>'
             f'<path class="ob" d="M{a} {GROUND}V{t}M{b} {GROUND}V{t}M{b} {t}H114M{b} {t - 2.5}H114V{t}{head}'
             f'M108 {t}v5h6v-5M{b} {t}v3.5h4v-3.5"/>')
 
@@ -137,9 +135,12 @@ def frame(m, s, x0, width, blocks):
     k, cx = s['built'], width * s.get('at', .5)
     dx = cx - 64
     o = [f'<path class="bk" d="{roofline(m, blocks, x0, x0 + width)}"/>']
-    g = [f'<path class="ko" d="{outline(LEVELS)}Z"/>', f'<path class="hid" d="{outline(LEVELS)}"/>']
+    g = [crane(top(k) - 14)] if s.get('crane') else []
+    g += [f'<path class="ko" d="{outline(LEVELS)}Z"/>', f'<path class="hid" d="{outline(LEVELS)}"/>']
+    shell = s.get('shell', k)
+    if s['share']:   # the planned floors, faint, so a residence under contract stands in its place
+        g.append(f'<path class="dt plan" d="{floors(max(shell, 2), LEVELS + 1)}M59 {top(max(shell, 2))}V{top(LEVELS)}M69 {top(max(shell, 2))}V{top(LEVELS)}"/>')
     if k:
-        shell = s.get('shell', k)
         g.append(f'<path class="ko" d="{outline(k)}Z"/>')
         g.append(f'<path class="dt" d="{floors(0, shell)}M59 {top(2)}V{top(shell)}M69 {top(2)}V{top(shell)}"/>')
         if shell < k:   # the top floors still an open frame: slabs and columns, no facade yet
@@ -150,12 +151,12 @@ def frame(m, s, x0, width, blocks):
         g.append(f'<path class="sold" d="{sold(m, s["share"])}"/>')
     if k:
         g.append(f'<path class="pr" d="{outline(k)}"/>')
-    if s.get('crane'):
-        g.append(crane(top(k) - 14))
+    if s.get('mark'):
+        g.append(f'<text class="mk" x="{R + 6}" y="{top(LEVELS) + 6}">{s["mark"]}</text>')
     o.append(f'<g transform="translate({n(dx)} 0)">{"".join(g)}</g>')
     hat = ''.join(f'M{x} 149L{x + 9} {GROUND}' for x in range(-((x0 + 4) % 12) + 2, width - 8, 12) if x >= 0)
-    o.append(f'<path class="dt hat" d="{hat}"/><path class="pr" d="M0 {GROUND}H{width}"/>')
-    o.append(f'<path class="ob" d="M0 158H{width}M0.5 153V163"/>')
+    o.append(f'<path class="dt hat" d="{hat}"/><path class="pr" d="M-1 {GROUND}H{width + 1}"/>')
+    o.append(f'<path class="ob" d="M-1 158H{width + 1}M0.5 153V163"/>')
     if s.get('last'):
         o.append(f'<path class="ob" d="M{width - .5} 153V163"/>')
     if s.get('weeks'):
@@ -166,16 +167,16 @@ def frame(m, s, x0, width, blocks):
 STEPS = {
     'ny': [
         dict(built=0, share=0),
-        dict(built=0, share=.06, weeks=True),
-        dict(built=2, share=.15, crane=True, weeks=True),
-        dict(built=12, shell=10, share=.6, crane=True, weeks=True, wide=True, at=.36),
-        dict(built=18, share=.92, weeks=True, last=True),
+        dict(built=0, share=.06),
+        dict(built=2, share=.15, crane=True, mark='15%'),
+        dict(built=12, shell=10, share=.6, crane=True, weeks=True, wide=True),
+        dict(built=18, share=.92, last=True),
     ],
     'fl': [
         dict(built=0, share=0),
-        dict(built=0, share=.3, weeks=True),
-        dict(built=11, shell=9, share=.7, crane=True, weeks=True, wide=True, at=.36),
-        dict(built=18, share=.9, weeks=True),
+        dict(built=0, share=.3),
+        dict(built=11, shell=9, share=.7, crane=True, weeks=True, wide=True),
+        dict(built=18, share=.9),
         dict(built=18, share=1, last=True),
     ],
 }
@@ -201,36 +202,36 @@ LABEL = {
                   'contract. 2, the plan accepted and sales open, the first residences under contract. 3, 15 percent '
                   'under contract, the plan effective and the foundations in. 4, the building rising under a crane, '
                   'more than half the residences under contract, the longest step. 5, the building finished and '
-                  'closings begun, with a few residences still the sponsor’s. A weekly report runs from the '
-                  'opening of sales on.',
+                  'closings begun, with a few residences still the sponsor’s. A weekly report runs through '
+                  'construction.',
     ('ny', 'es'): 'El lanzamiento en un mismo solar, en cinco pasos a lo largo de una calle. 1, el plan de oferta '
                   'redactado, nada bajo contrato. 2, el plan aceptado y las ventas abiertas, las primeras residencias '
                   'bajo contrato. 3, el 15 por ciento bajo contrato, el plan vigente y los cimientos hechos. 4, el '
                   'edificio se levanta bajo una grúa, con más de la mitad de las residencias bajo contrato, el paso más '
                   'largo. 5, el edificio terminado y los cierres comenzados, con algunas residencias aún del promotor. '
-                  'Un informe semanal acompaña desde la apertura de ventas.',
+                  'Un informe semanal acompaña la obra.',
     ('ny', 'pt'): 'O lançamento num mesmo terreno, em cinco passos ao longo de uma rua. 1, o plano de oferta redigido, '
                   'nada sob contrato. 2, o plano aceito e as vendas abertas, as primeiras unidades sob contrato. 3, 15 '
                   'por cento sob contrato, o plano em vigor e as fundações prontas. 4, o edifício sobe sob uma grua, '
                   'com mais da metade das unidades sob contrato, o passo mais longo. 5, o edifício pronto e os '
                   'fechamentos começados, com algumas unidades ainda da incorporadora. Um relatório semanal acompanha '
-                  'desde a abertura das vendas.',
+                  'a obra.',
     ('fl', 'en'): 'The launch on one site, in five steps along one street. 1, pricing set and refundable reservations '
                   'taken, nothing under contract. 2, documents filed and the first contracts signed. 3, the building '
                   'rising under a crane, most residences under contract, the longest step. 4, the building finished and '
                   'closings under way. 5, every residence sold and the owners running the association. A weekly report '
-                  'runs from the opening of sales to completion.',
+                  'runs through construction.',
     ('fl', 'es'): 'El lanzamiento en un mismo solar, en cinco pasos a lo largo de una calle. 1, precios definidos y '
                   'reservas reembolsables, nada bajo contrato. 2, documentos registrados y los primeros contratos '
                   'firmados. 3, el edificio se levanta bajo una grúa, con la mayoría de las residencias bajo contrato, '
                   'el paso más largo. 4, el edificio terminado, con los cierres en curso. 5, todas las residencias '
-                  'vendidas y la asociación en manos de los propietarios. Un informe semanal acompaña desde la apertura '
-                  'de ventas hasta la terminación.',
+                  'vendidas y la asociación en manos de los propietarios. Un informe semanal acompaña la '
+                  'obra.',
     ('fl', 'pt'): 'O lançamento num mesmo terreno, em cinco passos ao longo de uma rua. 1, preços definidos e reservas '
                   'reembolsáveis, nada sob contrato. 2, documentos registrados e os primeiros contratos assinados. 3, o '
                   'edifício sobe sob uma grua, com a maioria das unidades sob contrato, o passo mais longo. 4, o '
                   'edifício pronto, com os fechamentos em andamento. 5, todas as unidades vendidas e a associação nas '
-                  'mãos dos proprietários. Um relatório semanal acompanha da abertura das vendas até a conclusão.',
+                  'mãos dos proprietários. Um relatório semanal acompanha a obra.',
 }
 
 KEY = {
@@ -262,7 +263,7 @@ def figure(m, lang):
         steps += f'<div{cls}>{frame(m, s, x0, width, blocks)}<p><span class="n">{i}</span><span class="f">{w}</span></p></div>'
         x0 += width
     key = ''.join(f'<span><svg viewBox="0 0 22 10">{sw}</svg>{k}</span>' for sw, k in zip(SWATCH, keys))
-    return (f'<figure class="mk-lfig"><div class="lsq" role="img" aria-label="{LABEL[(m, lang)]}">{steps}</div>'
+    return (f'<figure class="mk-lfig"><div class="lsq" role="img" tabindex="0" aria-label="{LABEL[(m, lang)]}">{steps}</div>'
             f'<figcaption class="cap"><span class="key" aria-hidden="true">{key}</span><span>{cap}</span></figcaption></figure>')
 
 

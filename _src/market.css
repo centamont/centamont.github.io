@@ -21,28 +21,27 @@
 :is(.lsq,.mk-lfig .key) .dt{stroke-width:var(--lw-detail)}
 :is(.lsq,.mk-lfig .key) .hid{stroke-dasharray:var(--lt-hidden);opacity:.7}
 .lsq .hat{opacity:.5}
-.lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.45;stroke-linejoin:round}
+.lsq .plan{opacity:.25}
+.lsq .mk{font:italic 400 16px/1 var(--display);fill:var(--accent)}
+.lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.28;stroke-linejoin:round}
 .lsq .ko{fill:var(--bg);stroke:none}
-.lsq .halo{stroke:var(--bg);stroke-width:3.5px}
-:is(.lsq,.mk-lfig .key) .sold{fill:var(--sold);fill-opacity:.62;stroke:none}
+:is(.lsq,.mk-lfig .key) .sold{fill:var(--sold);stroke:var(--sold-line);stroke-width:var(--lw-detail)}
 .mk-lfig .cap{grid-template-columns:minmax(0,1fr)}
-.mk-lfig .key{gap:6px 18px;font-size:13px;letter-spacing:.1em;color:var(--muted)}
+.mk-lfig .key{gap:6px 18px;font-size:13px;font-weight:400;letter-spacing:.08em;color:var(--muted)}
 .mk-lfig .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .mk-lfig .key svg{width:22px;height:10px;overflow:visible}
-:root[data-theme="dark"] .lsq .sold,:root[data-theme="dark"] .mk-lfig .key .sold{fill:var(--bronze-300);fill-opacity:.5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.lsq,.mk-lfig .key) .sold{fill:var(--bronze-300);fill-opacity:.5}}
-:root[data-theme="dark"] .lsq .bk{opacity:.9}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.9}}
+:root[data-theme="dark"] .lsq .bk{opacity:.4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.4}}
 @media (max-width:600px){
   .lsq{display:flex;margin:0 calc(-1 * var(--gl)) 16px;padding:0 var(--gl) 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .lsq::-webkit-scrollbar{display:none}
-  .lsq > div{flex:0 0 62%;scroll-snap-align:start}
-  .lsq > .w2{flex-basis:124%}
+  .lsq > div{flex:0 0 78%;scroll-snap-align:start}
+  .lsq > .w2{flex-basis:156%}
   .lsq > .w2 p{max-width:50%}
   .lsq .f{font-size:15px}
   .lsq:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 }
-@media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq :is(.ko,.halo){fill:Canvas;stroke:Canvas}:is(.lsq,.mk-lfig .key) .sold{fill:CanvasText;stroke:none}}
+@media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq .ko{fill:Canvas;stroke:Canvas}.lsq .mk{fill:CanvasText}:is(.lsq,.mk-lfig .key) .sold{fill:CanvasText;stroke:none}}
 /* The neighbourhoods of an open market: one after another on a wide screen; on a phone a row of cards, photograph first,
    swiped sideways with the next card showing at the edge, so seven places take one card's height and not seven. */
 .hood:first-child > h3:first-child{margin-top:24px}
