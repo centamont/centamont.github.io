@@ -83,7 +83,8 @@
 .mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-.mk-fig .sv .ttl{text-anchor:end;transform:translate(316px,262px)}
+.mk-fig .sv .ttl{text-anchor:end;transform:translate(326px,190px)}
+.mk-fig .sv .lake{display:none}
 .mk-fig .sv .scl{transform:translate(220px,-92px)}
 .mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
 .mk-fig .nyd #nyHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}

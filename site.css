@@ -494,10 +494,13 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart .sv .wl{fill:var(--fg);opacity:.3}
 .chart .sv .swp{transform:translateY(calc((1 - var(--c,1)) * 600px))}
 .chart .sv :is(.coast,.isle) :is(path,use){fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+.chart .sv .rd path{fill:none;stroke:var(--fg);stroke-width:calc(.9px * var(--u,1));stroke-linejoin:round;stroke-linecap:round;opacity:.32}
+.chart .sv .lake text{fill:var(--faint);font:italic 400 calc(11.5px * var(--u,1)) var(--display);letter-spacing:.08em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
 .chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .cn{opacity:var(--t,1)}
 .chart .sv .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+.chart .sv .s10{display:none}
 .chart .sv :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .sv .nh{fill:var(--fg)}
 .chart .sv .now-k{fill:var(--patina);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
@@ -507,7 +510,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart.pulse .ring{animation:ring 2.4s var(--ease) both}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
 @media (max-width:1199px){.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-  .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
+  .chart .sv .ttl{text-anchor:end;transform:translate(338px,190px)}.chart .sv .lake{display:none}.chart .sv .scl{transform:translate(232px,-92px)}}
 @media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
 @media (max-width:599px){
   .chart :is(.gl,.far){display:none}.chart .lb{font-size:calc(14px * var(--u,1))}}

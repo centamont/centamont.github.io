@@ -789,10 +789,15 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 /* (on the home pages and the markets hub the coast and its islands come from media/maps.svg through <use>, whose drawing
    keeps its own hairline: vector-effect does not inherit) */
 .chart .sv :is(.coast,.isle) :is(path,use){fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+/* the survey's interstates and the Turnpike, faint under the coast, and Lake Okeechobee's name */
+.chart .sv .rd path{fill:none;stroke:var(--fg);stroke-width:calc(.9px * var(--u,1));stroke-linejoin:round;stroke-linecap:round;opacity:.32}
+.chart .sv .lake text{fill:var(--faint);font:italic 400 calc(11.5px * var(--u,1)) var(--display);letter-spacing:.08em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
 .chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .cn{opacity:var(--t,1)}
 .chart .sv .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+/* (the bar is 20 km at the survey's true scale, too short to carry three numbers; its middle tick stands for 10) */
+.chart .sv .s10{display:none}
 .chart .sv :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .sv .nh{fill:var(--fg)}
 .chart .sv .now-k{fill:var(--patina);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
@@ -805,7 +810,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
    (y 36 to 286, its slice of the viewBox; its land and sea run on out to the plate's edges) with its scale and title moved out
    into the empty ocean, then the overview, in its crop on a phone; the leaders fold away */
 @media (max-width:1199px){.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-  .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
+  .chart .sv .ttl{text-anchor:end;transform:translate(338px,190px)}.chart .sv .lake{display:none}.chart .sv .scl{transform:translate(232px,-92px)}}
 @media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
 /* the overview's phone crop (x 290 to 720, y 20 to 306) is cut by its frame, so it holds without the page script too; the
    world key keeps its label above it, in the open Atlantic. */
