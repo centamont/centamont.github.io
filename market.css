@@ -170,8 +170,8 @@
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
 .mk-el .dt,.mk-el .bk{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.6}
 .mk-el .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu));opacity:.5}
-.mk-el .br{stroke:var(--sold-line)}
-.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu))}
+.mk-el .br{stroke:var(--sold-line);opacity:.62}
+.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.45}
 .mk-el :is(.tn,.sh){stroke:none}
 .mk-el .tn{fill:var(--fg);fill-opacity:0}
 .mk-el .tn.r2{fill-opacity:.05}.mk-el .tn.r3{fill-opacity:.09}
@@ -195,6 +195,8 @@
 @media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
 .mk-el .dt.q{opacity:.3}.mk-el .dt.q.far{opacity:.2}
+.mk-el .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el .isl{fill:var(--sheet)}
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
