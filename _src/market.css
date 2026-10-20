@@ -242,6 +242,10 @@
    dashed outline at their planned height (the dashes are drawn as geometry, so they still draw in). On a phone it is not
    cropped: it keeps its full width and pans sideways in its frame, with its labels, so every tower can be reached. */
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
+/* (the towers it does not name keep their outline but quieten their floor lines, so the named ones lead) */
+.mk-el .dt.q{opacity:.3}.mk-el .dt.q.far{opacity:.2}
+/* (and names its districts on the water under their towers, a step quieter than the water's own name) */
+.mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
 /* its key: the numbers in ink, the names in the caption's voice, the towers still going up marked in words */
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
@@ -255,6 +259,7 @@
   .mk-el-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
+  .mk-el-pan .mk-el .ds text{font-size:17px}
 }
 /* farther towers draw at a lighter weight than the waterfront, as a draughtsman would */
 .mk-el .far{opacity:.62}
