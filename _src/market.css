@@ -22,19 +22,20 @@
 :is(.lsq,.mk-lfig .key) .hid{stroke-dasharray:var(--lt-hidden);opacity:.7}
 .lsq .hat{opacity:.5}
 .lsq .plan{opacity:.25}
-.lsq .thr{font:italic 400 16px/1 var(--display);fill:var(--accent)}
-.lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.28;stroke-linejoin:round}
+.lsq .thr{font:italic 400 15px/1 var(--display);fill:var(--fg)}
+.lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.36;stroke-linejoin:round}
 .lsq .ko{fill:var(--bg);stroke:none}
 :is(.lsq,.mk-lfig .key) .sold{fill:var(--sold);stroke:var(--sold-line);stroke-width:var(--lw-detail)}
 .mk-lfig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-lfig .key{gap:6px 18px;font-size:13px;font-weight:400;letter-spacing:.08em;color:var(--muted)}
 .mk-lfig .key > span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .mk-lfig .key svg{width:22px;height:10px;overflow:visible}
-:root[data-theme="dark"] .lsq .bk{opacity:.4}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.4}}
+:root[data-theme="dark"] .lsq .bk{opacity:.55}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsq .bk{opacity:.55}}
 @media (max-width:600px){
   .lsq{display:flex;margin:0 calc(-1 * var(--gl)) 16px;padding:0 var(--gl) 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .lsq::-webkit-scrollbar{display:none}
+  .lsq{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent 98%);mask-image:linear-gradient(90deg,#000 82%,transparent 98%)}
   .lsq > div{flex:0 0 78%;scroll-snap-align:start}
   .lsq > .w2{flex-basis:156%}
   .lsq > .w2 p{max-width:50%}
