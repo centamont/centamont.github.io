@@ -14,6 +14,7 @@ rows with their words beside them.
   South Florida   1 pricing set, refundable reservations (not bronze: not committed); 2 documents filed, contracts signed;
                   3 the building rising under a crane; 4 finished, closings; 5 every floor sold, the owners' association.
 """
+import math
 import re
 from pathlib import Path
 
@@ -64,6 +65,22 @@ def floors(k0, k1):
     return d
 
 
+def balconies(k):
+    """The balcony slabs of the enclosed floors, reaching out more or less floor by floor on each side, with their edges
+    joined in one line, so the shaft carries the same slow wave as the tower on the home page."""
+    if k < 3:
+        return ''
+    stubs, lt, rt = '', [], []
+    for f in range(3, k + 1):
+        y = top(f)
+        wl = 2.2 + 2 * math.sin(f * .55)
+        wr = 2.2 + 2 * math.sin(f * .55 + math.pi * .85)
+        stubs += f'M{n(L - wl)} {y}H{L}M{R} {y}H{n(R + wr)}'
+        lt.append(f'{n(L - wl)} {y}')
+        rt.append(f'{n(R + wr)} {y}')
+    return stubs, 'M' + 'L'.join(lt) + 'M' + 'L'.join(rt)
+
+
 def crane(t):
     """A tower crane: lattice mast, jib out over the building, counter-jib and weight, tower head and ties, hook."""
     a, b = MAST, MAST + 4
@@ -81,11 +98,12 @@ def crane(t):
         s ^= 1
     cj = f'M{b} {t}H114M{b} {t - 2}H114V{t}'
     head = f'M{a + 2} {t - 2}V{t - 11}L52 {t - 2}M{a + 2} {t - 11}L114 {t - 2}'
-    hook = f'M60 {t}V{t + 12}M58.6 {t + 12}h2.8v1.4q0 2 -1.4 2'
+    hook = f'M60 {t}V{t + 11}M60 {t + 13.4}v1q0 2 -1.6 1.6'
     halo = f'<path class="halo" d="M38 {t - 1}H114{head}"/>'
     return (halo + f'<path class="dt" d="{lat}{jib}"/>'
             + f'<path class="ob" d="M{a} {GROUND}V{t}M{b} {GROUND}V{t}{cj}{head}"/>'
-            + f'<path class="dt" d="{hook}"/><path class="cw" d="M108 {t}h6v5h-6Z"/>')
+            + f'<path class="dt" d="{hook}"/><path class="cw" d="M108 {t}h6v5h-6ZM58.8 {t + 11}h2.4v2.4h-2.4Z"/>'
+            + f'<path class="ob" d="M{b} {t}h4v4h-4"/>')
 
 
 def gallery():
@@ -132,6 +150,9 @@ def frame(m, s):
         if shell < k:   # the top floors still an open frame: slabs and columns, no facade yet
             cols = ''.join(f'M{x} {top(shell)}V{top(k)}' for x in (59, 69))
             o.append(f'<path class="dt" d="{floors(shell - 1, k)}{cols}"/>')
+        if shell >= 3:
+            stubs, edge = balconies(shell)
+            o.append(f'<path class="dt" d="{stubs}"/><path class="ob" d="{edge}"/>')
         o.append(f'<path class="pr" d="{outline(k)}"/>')
         if k >= LEVELS:
             o.append('<path class="dt" d="M53 42H75M61 34V42M67 34V42"/>')
