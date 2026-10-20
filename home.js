@@ -105,7 +105,7 @@ const gauge=document.querySelector('.rise .gauge'),gB=document.getElementById('g
 const RES=+document.getElementById('gR').textContent.replace('/',''),LIM=.5;
 const data=steps.map((s,n)=>({e:n>0,b:+s.dataset.built,s:+s.dataset.sold/2,c:+s.dataset.built>0&&n<steps.length-1}));
 data.forEach((d,n)=>{d.rel=n===1||n===2?data[2].s:0});
-const VIEWS=[[-0.7,-0.74],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
+const VIEWS=[[-0.7,-1.3],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
 const view=n=>{const [th,ph]=VIEWS[n],d=data[n],tight=narrow||towerM.h<360,bl=Math.max(0,gauge.getBoundingClientRect().left-towerM.c.getBoundingClientRect().left);
 if(!n)return towerM.fit(th,ph,{plan:true,margin:tight?[12,24,12,24+bl]:[40,40,40,40+bl]});
 const m=tight?[14,12,10,12]:[30,22,22,22],v=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:m});
@@ -119,7 +119,7 @@ const put=d=>{Object.assign(st,d);if(!towerM)return;
 towerM.o.soldRate=Math.max(6,Math.abs(st.s-towerM.S)/.1);towerM.o.rate=Math.max(11,(Math.abs(st.b-towerM.L)+1.1)/.15);
 towerM.release(st.rel);towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c)};
 const story=()=>{if(towerM||!Model)return;
-towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
+towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
 if(!towerM)return;models.push(towerM);
 let lb=-1,ls=-1,lf=-1,lm=null,ps=0;
 towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S*2+.02),f=Math.min(1,m.S*2/RES),met=m.S*2>=RES*LIM-.001;
@@ -128,14 +128,24 @@ if(Math.abs(f-lf)>.0005){lf=f;gM.style.transform='scaleX('+f.toFixed(4)+')'}
 if(met!==lm){gauge.classList.toggle('met',met);
 if(met&&reading&&ps*2<RES*LIM&&lm!==null){gauge.classList.remove('pulse');void gauge.offsetWidth;gauge.classList.add('pulse')}lm=met}
 ps=m.S};
-towerM.o.onResize=()=>{narrow=mq.matches;if(cur>=0)towerM.camTo(view(cur),true)};
-towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true)};
+towerM.o.onResize=()=>{narrow=mq.matches;vs=null;if(cur===riseN)rise(true);else if(cur>=0)towerM.camTo(view(cur),true)};
+towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true);if(cur===riseN){vs=null;rise(true)}};
+const state=d=>{Object.assign(st,d);gB.textContent=pad(d.b);gS.textContent=pad(d.s*2);gM.style.transform='scaleX('+Math.min(1,d.s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',d.s*2>=RES*LIM)};
+const riseN=steps.findIndex(s=>s.hasAttribute('data-rise'));let lr=-1,vs=null;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const riseAt=()=>{const r=steps[riseN].getBoundingClientRect(),p=Math.min(1,Math.max(0,((innerHeight*(narrow?.63:.5)-r.top)/r.height-.12)/.8));return p*p*(3-2*p)};
+const rise=force=>{if(riseN<0||cur!==riseN)return;const e=riseAt();if(!force&&Math.abs(e-lr)<.002)return;lr=e;
+const a=data[riseN],b=data[riseN+1],d={e:true,b:Math.round(lerp(a.b,b.b,e)),s:Math.round(lerp(a.s*2,b.s*2,e))/2,c:a.c,rel:0};
+if(!towerM){state(d);return}
+if(!vs)vs=[view(riseN),view(riseN+1)];
+const[va,vb]=vs;towerM.camTo({theta:lerp(va.theta,vb.theta,e),phi:lerp(va.phi,vb.phi,e),ty:lerp(va.ty,vb.ty,e),scale:lerp(va.scale,vb.scale,e),offsetX:lerp(va.offsetX,vb.offsetX,e)});put(d)};
 function stage(n){
 if(n===cur)return;
 const now=performance.now(),fwd=n===cur+1,skim=now-last<450;last=now;cur=n;
 reading=fwd&&!skim&&!motionOff();
-if(towerM){towerM.camTo(view(n));put(data[n])}
-else{Object.assign(st,data[n]);gB.textContent=pad(data[n].b);gS.textContent=pad(data[n].s*2);gM.style.transform='scaleX('+Math.min(1,data[n].s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',data[n].s*2>=RES*LIM)}
+if(n===riseN)rise(true);
+else if(towerM){towerM.camTo(view(n));put(data[n])}
+else state(data[n]);
 steps.forEach((x,i)=>x.classList.toggle('on',i===n));
 name.textContent=steps[n].dataset.name;
 }
@@ -146,7 +156,9 @@ let stepIO=null;
 const watch=()=>{if(stepIO)stepIO.disconnect();stepIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)stage(steps.indexOf(e.target))}),{rootMargin:narrow?'-62% 0px -36% 0px':'-48% 0px -48% 0px'});steps.forEach(s=>stepIO.observe(s))};
 const list=document.getElementById('steps');let er=0;
 const ends=()=>{er=0;const r=list.getBoundingClientRect(),y=innerHeight*(narrow?.63:.5);if(r.top>y)stage(0);else if(r.bottom<y)stage(steps.length-1)};
-addEventListener('scroll',()=>{if(!er)er=requestAnimationFrame(ends)},{passive:true});
+const back=()=>{if(cur<1)return;const y=innerHeight*(narrow?.64:.52),k=steps.findIndex(s=>{const r=s.getBoundingClientRect();return r.top<=y&&r.bottom>y});if(k>=0&&k<cur)stage(k)};
+const onS=()=>{ends();back();rise(false)};
+addEventListener('scroll',()=>{if(!er)er=requestAnimationFrame(onS)},{passive:true});
 watch();onMQ(mq,()=>{narrow=mq.matches;watch()});
 const facade=document.querySelector('.facade');
 const hair=()=>{const w=facade&&facade.getBoundingClientRect().width;if(w)facade.parentNode.style.setProperty('--fu',(1200/w).toFixed(4))};

@@ -13,9 +13,9 @@
   // the drawing's few words, in the page's language (the Spanish and Portuguese pages set it on <html>)
   const LANG = document.documentElement.lang;
   const WORDS = ({
-    es: { roof: 'CUBIERTA', release: 'PRIMERA ETAPA', rise: 'AMANECER', set: 'ATARDECER', noon: 'MEDIODÍA', frame: 'ESTRUCTURA', time: 'es-US' },
-    'pt-BR': { roof: 'COBERTURA', release: 'PRIMEIRA ETAPA', rise: 'NASCER DO SOL', set: 'PÔR DO SOL', noon: 'MEIO-DIA', frame: 'ESTRUTURA', time: 'pt-BR' },
-  })[LANG] || { roof: 'ROOF', release: 'FIRST RELEASE', rise: 'SUNRISE', set: 'SUNSET', noon: 'NOON', frame: 'STRUCTURE', time: 'en-US' };
+    es: { roof: 'CUBIERTA', release: 'PRIMERA ETAPA', rise: 'AMANECER', set: 'ATARDECER', noon: 'MEDIODÍA', frame: 'ESTRUCTURA', time: 'es-US', lv: 'N', site: 'TERRENO', street: 'CALLE', tower: 'TORRE' },
+    'pt-BR': { roof: 'COBERTURA', release: 'PRIMEIRA ETAPA', rise: 'NASCER DO SOL', set: 'PÔR DO SOL', noon: 'MEIO-DIA', frame: 'ESTRUTURA', time: 'pt-BR', lv: 'P', site: 'TERRENO', street: 'RUA', tower: 'TORRE' },
+  })[LANG] || { roof: 'ROOF', release: 'FIRST RELEASE', rise: 'SUNRISE', set: 'SUNSET', noon: 'NOON', frame: 'STRUCTURE', time: 'en-US', lv: 'L', site: 'SITE', street: 'STREET', tower: 'TOWER' };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const hash = (a, b, c = 0) => { const x = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return x - Math.floor(x); };
   const smooth = (t) => t * t * (3 - 2 * t);
@@ -142,6 +142,9 @@
   // the sea wall round the point the site stands on (a rounded square in plan, 33 out from the tower), the bay beyond
   const SHORE = (() => { const o = [], A = 33, r = 9; for (let q = 0; q < 4; q++) for (let i = 0; i <= 6; i++) { const a = (q + i / 6) * Math.PI / 2, cx = (q === 0 || q === 3 ? 1 : -1) * (A - r), cz = (q < 2 ? 1 : -1) * (A - r); o.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); } return o; })();
   const PALMS = [[-8.3, -6.1, 3.9, 0.5, 3.6], [-6.3, -7.1, 4.2, 0.45, 4.4], [5.0, -7.3, 3.6, 0.4, 5.2], [-8.6, 5.6, 3.5, 0.4, 2.4], [8.4, 5.8, 3.7, 0.5, 0.4], [-0.6, 6.7, 3.3, 0.35, 1.4], [9.0, 0.6, 3.1, 0.3, 0.1]];
+  // where the story names its plan: the site's name past its far line, the tower's on its footprint, the street's past its
+  // far kerb, and the north point's ring, as [x, z, which] (which: 0 site, 1 tower, 2 street, 3 the north point's reach)
+  const PLAN_NOTES = [[3.6, 8.6, 0], [0, 0, 1], [-3.5, -15.6, 2], [12.5, 11.6, 3], [13.6, 9.5, 3], [11.4, 9.5, 3]];
   // People at the entrance, for scale (a level is about 3.8 m): [x, z, height]. Two stand under the porte-cochère.
   const FIGS = [[-1.3, -5.5, 0.47], [-0.95, -5.6, 0.44], [1.5, -5.15, 0.46], [2.5, -7.2, 0.46], [-5.4, -7.25, 0.45], [6.1, -6.8, 0.47]];
   // A porte-cochère on the entrance side of the podium, its soffit high enough for a coach (about 5.9 m)
@@ -929,6 +932,8 @@
       if (spec.plan) {
         for (const [x, z] of [[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]]) pts.push([x, 0, z]);
         for (const [x, z, hh] of PALMS) { const r = 0.55 + hh * 0.18; pts.push([x - r, 0, z], [x + r, 0, z], [x, 0, z - r], [x, 0, z + r]); }
+        // (and, where the plan is named, the street's name and the north point)
+        if (this.o.planNotes) pts.push(...PLAN_NOTES.map(([x, z]) => [x, 0, z]));
       }
       else {
         for (const k of [0, 2, 3, ...Array.from({ length: Math.ceil((CROWN - 6) / 4) }, (_, i) => 6 + 4 * i), CROWN, FLOORS - 1, FLOORS]) for (const p of slabPlan(k)) pts.push([p.x, k, p.z], [p.x, k + SLAB, p.z]);
@@ -1280,16 +1285,34 @@
           }
           g.globalAlpha = gA;
           // north point, only where the view looks down enough to read it
-          if (this.o.north) {
+          // (on the story's plan it goes with the plan's names as the view lifts off it)
+          const pn = this.o.planNotes ? clamp((-this.phi - 0.3) / 0.3, 0, 1) : 1;
+          if (this.o.north && pn > 0.01) {
+          g.globalAlpha = gA * pn;
           const nc = [12.5, 9.5];
           g.strokeStyle = bronze(0.7); g.lineWidth = 0.8; g.beginPath();
           for (let i = 0; i <= 28; i++) { const a = TAU * i / 28, q = this.P(nc[0] + Math.cos(a) * 1, 0, nc[1] + Math.sin(a) * 1); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
           g.stroke(); poly([this.P(nc[0], 0, nc[1] + 1.35), this.P(nc[0] - 0.32, 0, nc[1] - 0.5), this.P(nc[0], 0, nc[1] - 0.2), this.P(nc[0] + 0.32, 0, nc[1] - 0.5)]); g.fillStyle = bronze(0.75); g.fill();
-          if (this.o.labels && w > 280) { const t = this.P(nc[0], 0, nc[1] + 1.9); g.fillStyle = bronze(0.9); g.font = '500 10px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', t[0], t[1]); }
+          if (this.o.labels && w > 280) { const t = this.P(nc[0], 0, nc[1] + 1.9); g.fillStyle = bronze(0.9); g.font = '500 ' + (this.o.planNotes ? this.o.labelSize : 10) + 'px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', t[0], t[1]); }
+          g.globalAlpha = gA;
           }
         }
         g.setLineDash([4, 5]); g.strokeStyle = bronze(Math.min(0.9, 0.55 * bo));
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
+        // The story's plan is lettered as a site plan is (o.planNotes): the site, the tower on its footprint, the street.
+        // The names lie flat on the sheet and go as the view lifts off the plan.
+        if (this.o.planNotes && this.o.labels && this.o.site !== false) {
+          const f = clamp((-this.phi - 0.3) / 0.3, 0, 1);
+          if (f > 0.01) {
+            g.save(); g.globalAlpha = gA * f; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+            if ('letterSpacing' in g) g.letterSpacing = '0.14em';
+            for (const [x, z, k] of PLAN_NOTES) {
+              if (k > 2) continue;
+              const p = this.P(x, 0, z); g.fillStyle = k ? ink(dark ? 0.62 : 0.56) : bronze(0.95); g.fillText([WORDS.site, WORDS.tower, WORDS.street][k], p[0], p[1]);
+            }
+            g.restore();
+          }
+        }
         if (L > 0.01) {
           // the drop-off drive under the canopy, and the walk to the street
           g.strokeStyle = ink(dark ? 0.26 : 0.24); g.lineWidth = 0.8; g.beginPath();
@@ -2128,7 +2151,7 @@
           // (over the photograph, a name below the horizon would sit on its palms: it gives way as the photograph comes in)
           const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
           if (a <= 0.01) continue;
-          const t = 'L' + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
+          const t = WORDS.lv + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
         }
         labs.push([WORDS.roof, fx(xl, WORDS.roof), ys[FLOORS], ra]);
       }

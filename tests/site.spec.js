@@ -133,11 +133,13 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
 
   const steps = page.locator('#steps .step');
   await steps.nth(3).scrollIntoViewIfNeeded();
-  await page.evaluate(() => {
+  // (puts the reading line, mid-window on a desktop and 63% down a phone, f of the way through Ground broken)
+  const through = (f) => page.evaluate((f) => {
     const s = document.querySelectorAll('#steps .step')[3];
-    window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight / 2 - innerHeight / 2);
-  });
-  // Selling: the lender's 50% threshold is met (32 of 62 residences under contract), then ground breaks (the podium framed)
+    window.scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight * f - innerHeight * (innerWidth <= 820 ? 0.63 : 0.5));
+  }, f);
+  await through(0.06);
+  // Ground broken: the lender's 50% threshold is met (32 of 62 residences under contract), then ground breaks (the podium framed)
   await expect.poll(built).toBe(3);
   await expect.poll(sold).toBe(32);
   // and the gauge reads what the drawing shows once it settles
@@ -145,6 +147,17 @@ test('the building rises as the story scrolls', async ({ page }, info) => {
   await expect.poll(() => page.locator('#gB').textContent()).toBe('03');
   await page.waitForTimeout(1200);
   await page.screenshot({ path: info.outputPath('rising.png') });
+  // reading on, the frame climbs with the reader: part way through the step it stands part way up
+  await through(0.5);
+  await expect.poll(built).toBeGreaterThan(8);
+  expect(await built()).toBeLessThan(30);
+  // and at the step's foot it stands as Topped off has it, so nothing jumps there
+  await through(0.995);
+  await expect.poll(built).toBe(34);
+  await expect.poll(sold).toBe(46);
+  // reading back up takes it down again
+  await through(0.06);
+  await expect.poll(built).toBe(3);
 
   await page.evaluate(() => {
     const s = document.querySelectorAll('#steps .step')[5];

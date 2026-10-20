@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const data=steps.map((s,n)=>({e:n>0,b:+s.dataset.built,s:+s.dataset.sold/2,c:+s.dataset.built>0&&n<steps.length-1}));
   // the first release, as Strategy plans it and the first 90 days sell it: the residences of step 03, marked from Strategy
   data.forEach((d,n)=>{d.rel=n===1||n===2?data[2].s:0});
-  const VIEWS=[[-0.7,-0.74],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
+  const VIEWS=[[-0.7,-1.3],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
   // every resting view holds the whole tower, its crown and the crane inside the canvas, refitted to the canvas's size
   // (a phone, or any short figure such as a phone on its side, keeps tight margins)
   // (the site plan is centred on the column the gauge and caption share, not on the canvas's bleed to the page edge)
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const story=()=>{if(towerM||!Model)return;
     // by day the story keeps the draughtsman's light (from the south-west, high over the left shoulder), since its views
     // turn toward the south; after dark its homes are lit only once the building is finished (Last closing)
-    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
+    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
     if(!towerM)return;models.push(towerM);
     let lb=-1,ls=-1,lf=-1,lm=null,ps=0;
     towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S*2+.02),f=Math.min(1,m.S*2/RES),met=m.S*2>=RES*LIM-.001;
@@ -243,15 +243,31 @@ document.addEventListener('DOMContentLoaded',function(){
         // crossing the threshold while reading forward marks it once
         if(met&&reading&&ps*2<RES*LIM&&lm!==null){gauge.classList.remove('pulse');void gauge.offsetWidth;gauge.classList.add('pulse')}lm=met}
       ps=m.S};
-    towerM.o.onResize=()=>{narrow=mq.matches;if(cur>=0)towerM.camTo(view(cur),true)};
-    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true)};
+    towerM.o.onResize=()=>{narrow=mq.matches;vs=null;if(cur===riseN)rise(true);else if(cur>=0)towerM.camTo(view(cur),true)};
+    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true);if(cur===riseN){vs=null;rise(true)}};
+  // without a drawing the gauge states the figures directly
+  const state=d=>{Object.assign(st,d);gB.textContent=pad(d.b);gS.textContent=pad(d.s*2);gM.style.transform='scaleX('+Math.min(1,d.s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',d.s*2>=RES*LIM)};
+  // Ground broken, the building goes up as the reader reads on. Across the step marked data-rise (Ground broken), from its
+  // heading on the reading line to its foot, the frame climbs a floor at a time from that step's levels to the next
+  // step's, the sales count on with it and the camera turns toward the next step's view, so at the step's foot the
+  // drawing stands exactly as the next step has it and nothing jumps. Reading back up takes it down again.
+  const riseN=steps.findIndex(s=>s.hasAttribute('data-rise'));let lr=-1,vs=null;
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  // (how far through the step the reading line is, eased in and out, 0 to 1; it starts once the heading is past)
+  const riseAt=()=>{const r=steps[riseN].getBoundingClientRect(),p=Math.min(1,Math.max(0,((innerHeight*(narrow?.63:.5)-r.top)/r.height-.12)/.8));return p*p*(3-2*p)};
+  const rise=force=>{if(riseN<0||cur!==riseN)return;const e=riseAt();if(!force&&Math.abs(e-lr)<.002)return;lr=e;
+    const a=data[riseN],b=data[riseN+1],d={e:true,b:Math.round(lerp(a.b,b.b,e)),s:Math.round(lerp(a.s*2,b.s*2,e))/2,c:a.c,rel:0};
+    if(!towerM){state(d);return}
+    // (the two views it turns between are framed once a size, not each frame)
+    if(!vs)vs=[view(riseN),view(riseN+1)];
+    const[va,vb]=vs;towerM.camTo({theta:lerp(va.theta,vb.theta,e),phi:lerp(va.phi,vb.phi,e),ty:lerp(va.ty,vb.ty,e),scale:lerp(va.scale,vb.scale,e),offsetX:lerp(va.offsetX,vb.offsetX,e)});put(d)};
   function stage(n){
     if(n===cur)return;
     const now=performance.now(),fwd=n===cur+1,skim=now-last<450;last=now;cur=n;
     reading=fwd&&!skim&&!motionOff();
-    if(towerM){towerM.camTo(view(n));put(data[n])}
-    // without a drawing the gauge states the step's figures directly
-    else{Object.assign(st,data[n]);gB.textContent=pad(data[n].b);gS.textContent=pad(data[n].s*2);gM.style.transform='scaleX('+Math.min(1,data[n].s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',data[n].s*2>=RES*LIM)}
+    if(n===riseN)rise(true);
+    else if(towerM){towerM.camTo(view(n));put(data[n])}
+    else state(data[n]);
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));
     name.textContent=steps[n].dataset.name;
   }
@@ -264,7 +280,11 @@ document.addEventListener('DOMContentLoaded',function(){
   // so the drawing takes the first or the last step's state rather than keeping the one it had.
   const list=document.getElementById('steps');let er=0;
   const ends=()=>{er=0;const r=list.getBoundingClientRect(),y=innerHeight*(narrow?.63:.5);if(r.top>y)stage(0);else if(r.bottom<y)stage(steps.length-1)};
-  addEventListener('scroll',()=>{if(!er)er=requestAnimationFrame(ends)},{passive:true});
+  // (and reading back up, a step the reading band never left is taken again once the band's foot is back inside it: the
+  // observer reports a step only as it comes into the band, and two steps can share it)
+  const back=()=>{if(cur<1)return;const y=innerHeight*(narrow?.64:.52),k=steps.findIndex(s=>{const r=s.getBoundingClientRect();return r.top<=y&&r.bottom>y});if(k>=0&&k<cur)stage(k)};
+  const onS=()=>{ends();back();rise(false)};
+  addEventListener('scroll',()=>{if(!er)er=requestAnimationFrame(onS)},{passive:true});
   watch();onMQ(mq,()=>{narrow=mq.matches;watch()});
 
   // Practices: the elevation keeps a one-pixel line at any width.
