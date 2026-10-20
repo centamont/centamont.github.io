@@ -205,7 +205,7 @@ html.nosite body.no-js .doorway .arch path{stroke-dashoffset:0}
 .chart .lb.now{font-style:italic;font-size:calc(21px * var(--u,1))}
 @media (max-width:1199px){.chart .plate{grid-template-columns:minmax(0,1fr);overflow:hidden}.chart .plate::after,.chart .ldr{display:none}
 }
-@media (max-width:599px){.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-8.392%}.chart .lb.now{font-size:calc(18px * var(--u,1))}
+@media (max-width:599px){.chart .ov{position:absolute;width:167.442%;max-width:none;left:-67.442%;top:-6.993%}.chart .lb.now{font-size:calc(18px * var(--u,1))}
 }
 /* on a phone the map's left edge runs close by Austin, so its name sits under its dot instead of beside it, clear of Houston's */
 @media (max-width:599px){.chart .lb.au{text-anchor:middle;transform:translate(-6px,calc(12px * var(--u,1)))}}
