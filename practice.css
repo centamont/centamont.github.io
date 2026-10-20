@@ -38,7 +38,7 @@ section.band + section,section + section.band{border-top:0}
 .doorway::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--bronze);opacity:.6;z-index:3}
 .door .doorway{padding-inline:calc(13.5% + 20px)}
 .door .terms{display:grid}
-.door .terms p{padding:16px 0;font-size:calc(17px + var(--wide) * .004);line-height:1.5;color:var(--band-fg)}
+.door .terms p{padding:16px 0;font-size:calc(17px + var(--wide) * .004);line-height:1.5;color:var(--band-fg);text-wrap:pretty}
 .door .terms p + p{border-top:var(--lw-detail) solid rgba(var(--bronze-rgb),.32)}
 .door .terms b{display:block;font-family:var(--display);font-weight:400;font-size:28px;color:var(--band-fg);line-height:1.2;margin-bottom:4px}
 @media (min-width:821px) and (max-width:1180px){
