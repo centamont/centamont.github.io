@@ -209,8 +209,8 @@
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
 .mk-el .dt,.mk-el .bk{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.6}
 .mk-el .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu));opacity:.5}
-.mk-el .br{stroke:var(--sold-line);opacity:.62}
-.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.45}
+.mk-el .br{stroke:var(--sold-line);opacity:.85}
+.mk-el .br.dtl{stroke-width:calc(var(--lw-detail) * var(--fu));opacity:.65}
 /* depth in tone, as a presentation elevation shades it: the nearest rank stays paper, each rank behind takes more ink,
    and every tower turns its right-hand side from the light; the tone washes in once the lines are drawn */
 .mk-el :is(.tn,.sh){stroke:none}
@@ -246,7 +246,7 @@
 .mk-el .dt.q{opacity:.3}.mk-el .dt.q.far{opacity:.2}
 /* the towers the key names carry the profile weight; an island in front (Brickell Key) hides the bases behind it */
 .mk-el .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
-.mk-el .isl{fill:var(--sheet)}
+.mk-el .isl{fill:var(--sheet);opacity:1}
 /* (and names its districts on the water under their towers, a step quieter than the water's own name) */
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
 /* its key: the numbers in ink, the names in the caption's voice, the towers still going up marked in words */
