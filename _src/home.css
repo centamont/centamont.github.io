@@ -624,8 +624,7 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
   .door{grid-template-columns:minmax(0,1fr) auto;gap:clamp(64px,6vw,128px);align-items:end}
   .door h2{max-width:none}
   .door .big{max-width:34ch;font-size:clamp(24px,1.85vw,calc(27px + var(--wide) * .008));line-height:1.4}
-  /* (no wider than 520px: past that the arch outruns the 2000px dash it inks itself with) */
-  .door .doorway{width:calc(440px + var(--wide) * .12);max-width:none}
+  .door .doorway{width:calc(440px + var(--wide) * .25);max-width:none}
 }
 
 /* light falls out of the open door across the floor, feathered at every edge, so it reads as light and never as a shape */
