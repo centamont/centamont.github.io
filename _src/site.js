@@ -386,7 +386,7 @@
   }
 
   // The advisors' table: with motion off, the seats are shown taken.
-  if (stillPage) document.querySelectorAll('.people .table').forEach((t) => t.classList.add('in'));
+  if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.add('in'));
 
   // The footer signature is engraved as it arrives: outline first, then the fill.
   const sig = document.querySelector('footer .sig');

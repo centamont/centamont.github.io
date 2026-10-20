@@ -283,7 +283,7 @@ new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { 
 if (stillPage) strike();
 else { addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll(); }
 }
-if (stillPage) document.querySelectorAll('.people .table').forEach((t) => t.classList.add('in'));
+if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.add('in'));
 const sig = document.querySelector('footer .sig');
 if (sig && !stillPage && 'IntersectionObserver' in window) {
 sig.classList.add('eng');
