@@ -231,11 +231,10 @@
 
 .name .cols > *{min-width:0}
 .name .cols div{display:grid;gap:20px}
-.name .cols div p:not(.big){font-size:var(--t-intro);line-height:1.5;max-width:30em}
 .name .cols .big{color:var(--band-fg)}
-/* the lead line stands in the wider left column and the paragraph in the right, the two on one first baseline, and both
-   end short of the crack's vein, which runs down the measure's last few percent to the foot */
-@media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
+/* the lead line stands alone in the wider left column, ending well short of the crack's vein, which runs down the
+   measure's last few percent to the foot */
+@media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}}
 
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
 .handle:focus-visible svg{transform:translateX(.12em)}
@@ -1099,7 +1098,6 @@ html:not(.js) .step{min-height:auto}
 @media (max-width:520px){
   .begin{display:none}
   .begin-go{display:block;margin:32px 0 0}
-  .name .cols p:not(.big){display:none}
 }
 /* and what a phone reads elsewhere stays there: the markets' places on their own pages (and the close's line to the
    partners at the close itself), the deposit schedule in the guide it draws,
