@@ -67,6 +67,10 @@ if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && e.target.closest('.mk-pane
 const ls = [...mk.querySelectorAll('.mk-panel a')], i = ls.indexOf(e.target) + (e.key === 'ArrowDown' ? 1 : -1);
 e.preventDefault(); (i < 0 ? mb : ls[Math.min(i, ls.length - 1)]).focus();
 }
+if ((e.key === 'Home' || e.key === 'End') && e.target.closest('.mk-panel') && inBar()) {
+const ls = [...mk.querySelectorAll('.mk-panel a')];
+e.preventDefault(); ls[e.key === 'Home' ? 0 : ls.length - 1].focus();
+}
 });
 mk.addEventListener('focusout', (e) => { if (!mk.contains(e.relatedTarget)) set(false); });
 document.addEventListener('click', (e) => { if (!e.target.closest('.mk')) set(false); });
@@ -229,7 +233,9 @@ a.href = '#' + h.id; a.textContent = h.textContent.replace(/\s+/g, ' ').trim();
 li.appendChild(a); list.appendChild(li); links.set(h, a);
 });
 box.appendChild(list); toc.appendChild(box);
-page.prepend(toc);
+const head = [...page.querySelectorAll(':scope > h1, :scope > .standfirst, :scope > .meta')]
+.filter((e) => e.compareDocumentPosition(heads[0]) & Node.DOCUMENT_POSITION_FOLLOWING).pop();
+if (head) head.after(toc); else page.prepend(toc);
 const place = () => toc.style.setProperty('--toc-top', Math.round(heads[0].getBoundingClientRect().top - page.getBoundingClientRect().top) + 'px');
 place(); addEventListener('resize', place); addEventListener('load', place); if (document.fonts) document.fonts.ready.then(place);
 const mark = () => {
