@@ -743,7 +743,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart > *{min-width:0}
 
 .chart svg{display:block}
-.chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(5px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
+.chart .edge{display:none;fill:var(--faint);font:italic 400 calc(14px * var(--u,1)) var(--display);stroke:var(--sheet);stroke-width:calc(8px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .cap .key{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase}
 .chart .sv{grid-column:3;grid-row:1;width:100%;height:100%}
 
@@ -763,7 +763,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart .sv .ctx{transition:opacity .4s var(--ease)}
 .chart[data-hl="sf"] .sv .ctx{opacity:.35}
 
-.chart .grid line{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
+.chart .grid :is(line,path){fill:none;stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:2 4}
 .chart .gl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.12em}
 .chart mask path{fill:none;stroke:#fff;stroke-width:14;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
@@ -790,10 +790,14 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 /* (on the home pages and the markets hub the coast and its islands come from media/maps.svg through <use>, whose drawing
    keeps its own hairline: vector-effect does not inherit) */
 .chart .sv :is(.coast,.isle) :is(path,use){fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.8}
+/* the survey's interstates and the Turnpike, faint under the coast */
+.chart .sv .rd path{fill:none;stroke:var(--fg);stroke-width:calc(.9px * var(--u,1));stroke-linejoin:round;stroke-linecap:round;opacity:.32}
 .chart .sv .county path{fill:none;stroke:var(--fg);stroke-width:var(--lw-detail);vector-effect:non-scaling-stroke;stroke-dasharray:var(--lt-datum);opacity:.6;transform-box:fill-box;transform-origin:100% 50%;transform:scaleX(var(--t,1))}
 .chart .sv :is(.cn,.ttl,.scl) text,.chart .sv .ttl{fill:var(--faint);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke}
 .chart .sv .cn{opacity:var(--t,1)}
 .chart .sv .scl text{letter-spacing:.04em;font-variant-numeric:lining-nums tabular-nums}
+/* (the bar is 20 km at the survey's true scale, too short to carry three numbers; its middle tick stands for 10) */
+.chart .sv .s10{display:none}
 .chart .sv :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .chart .sv .nh{fill:var(--fg)}
 .chart .sv .now-k{fill:var(--patina);font:500 calc(13px * var(--u,1)) var(--body);letter-spacing:.14em;stroke:var(--sheet);stroke-width:calc(4px * var(--u,1));stroke-linejoin:round;paint-order:stroke;opacity:clamp(0,calc(var(--r,1) * 40),1)}
@@ -805,14 +809,13 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 /* below 1200px (where the survey's type would crowd it beside the overview) the survey comes first, cut wide and short
    (y 36 to 286, its slice of the viewBox; its land and sea run on out to the plate's edges) with its scale and title moved out
    into the empty ocean, then the overview, in its crop on a phone; the leaders fold away */
-@media (max-width:1199px){.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}.chart .lk{transform:translateY(calc(48px + 10px * var(--u,1)))}
-  .chart .sv .ttl{text-anchor:end;transform:translate(328px,262px)}.chart .sv .scl{transform:translate(232px,-92px)}}
+@media (max-width:1199px){.chart .sv{grid-column:1;grid-row:1;justify-self:center;width:min(100%,500px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
+  .chart .sv .ttl{text-anchor:end;transform:translate(338px,190px)}.chart .sv .scl{transform:translate(232px,-92px)}}
 @media (min-width:821px) and (max-width:1199px){.chart .sv{width:min(100%,560px)}}
-/* the overview's phone crop (x 290 to 720, y 24 to 310) is cut by its frame, so it holds without the page script too. Its
-   foot runs 10 units past the world key's label, and the label stands 2px further in, so it keeps 8px clear of the
-   frame's corner ticks down to a 320px phone. */
+/* the overview's phone crop (x 290 to 720, y 20 to 306) is cut by its frame, so it holds without the page script too; the
+   world key keeps its label above it, in the open Atlantic. */
 @media (max-width:599px){
-  .chart :is(.gl,.far){display:none}.chart .lb{font-size:calc(14px * var(--u,1))}.chart .lk{transform:translate(calc(-6px - 2px * var(--u,1)),calc(48px + 10px * var(--u,1)))}}
+  .chart :is(.gl,.far){display:none}.chart .lb{font-size:calc(14px * var(--u,1))}}
 @media (max-width:374px){.chart .sv .s10{display:none}.chart .sv .cn text:last-child{transform:translateY(-12px)}.chart .sv .ttl{letter-spacing:.1em}.chart .sv .scl :is(.na,.nh,text:last-child){transform:translateX(14px)}}
 /* (narrower still, the survey's title no longer fits beside the coast; the overview below names South Florida) */
 @media (max-width:340px){.chart .sv .ttl{display:none}}

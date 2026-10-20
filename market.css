@@ -83,7 +83,7 @@
 .mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
-.mk-fig .sv .ttl{text-anchor:end;transform:translate(316px,262px)}
+.mk-fig .sv .ttl{text-anchor:end;transform:translate(326px,190px)}
 .mk-fig .sv .scl{transform:translate(220px,-92px)}
 .mk-fig .nyd{--u:.8;display:block;width:100%;height:auto}
 .mk-fig .nyd #nyHatch line{stroke:var(--grid);stroke-width:var(--lw-hatch)}
@@ -127,7 +127,24 @@
 .mk-fig .dmap .wn{fill:var(--faint);font:italic 400 calc(15px * var(--u,1)) var(--display);letter-spacing:.2em;stroke-width:calc(4px * var(--u,1))}
 .mk-fig .dmap :is(.sbar,.sl,.na){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
 .mk-fig .dmap .nh{fill:var(--fg)}
-@media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap :is(text.lm,.wn){display:none}}
+@media (max-width:600px){.mk-fig .dmap{--u:1.15}.mk-fig .dmap:not(.dm2) :is(text.lm,.wn){display:none}}
+.mk-fig .dm2 .wt{fill:var(--fg);opacity:.045}
+.mk-fig .dm2 .wl{opacity:.22}
+.mk-fig .dm2 :is(.r2,.r3,.r4,.r5,.coast use){fill:none;stroke:var(--fg);stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.mk-fig .dm2 .r5{stroke-width:.5px;opacity:.2}
+.mk-fig .dm2 .r4{stroke-width:.6px;opacity:.32}
+.mk-fig .dm2 .r3{stroke-width:.8px;opacity:.42}
+.mk-fig .dm2 .r2{stroke-width:1.1px;opacity:.55}
+.mk-fig .dm2 :is(.mwc,.mwf){fill:none;stroke-linejoin:round;stroke-linecap:round}
+.mk-fig .dm2 .mwc{stroke:var(--fg);stroke-width:calc(5px * var(--u,1));opacity:.62}
+.mk-fig .dm2 .mwf{stroke:var(--sheet);stroke-width:calc(3.2px * var(--u,1))}
+.mk-fig .dm2 .coast use{stroke-width:.9px;opacity:.75}
+.mk-fig .dm2 .dz path{stroke-width:1.3px;vector-effect:non-scaling-stroke}
+.mk-fig .dm2 .rl{fill:var(--muted);font:500 calc(10.5px * var(--u,1)) var(--body);letter-spacing:.12em;stroke-width:calc(4px * var(--u,1))}
+.mk-fig .dm2 :is(.sbg,.nbg){fill:var(--sheet);opacity:.88}
+.mk-fig .dm2 .dl{font-weight:500}
+@media (max-width:600px){.mk-fig .dm2 .mwc{stroke-width:calc(4px * var(--u,1))}.mk-fig .dm2 .mwf{stroke-width:calc(2.4px * var(--u,1))}.mk-fig .dm2 .po{display:none}}
+@media (forced-colors:active){.mk-fig .dm2 :is(.r2,.r3,.r4,.r5,.mwc){stroke:CanvasText}}
 @media (forced-colors:active){.mk-fig .dmap :is(.fb,.fw,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
 .mk-fig :is(.nyd,.dmap){--k:1.125}
 @media (min-width:601px) and (max-width:719px){.mk-fig :is(.nyd,.dmap){--k:1.2}}
@@ -139,9 +156,10 @@
 @media (max-width:374px){.mk-fig :is(.nyd,.dmap){--k:2.25}}
 @media (max-width:359px){.mk-fig :is(.nyd,.dmap){--k:2.42}}
 @media (max-width:340px){.mk-fig :is(.nyd,.dmap){--k:2.6}}
-.mk-fig .nyd :is(.cn,.scl,.sea,.cl) text,.mk-fig .nyd .gl,.mk-fig .dmap :is(.dl,.wn,text.lm,.scl text){font-size:max(var(--fs),calc(13.2px * var(--k)))}
+.mk-fig .nyd :is(.cn,.scl,.sea,.cl) text,.mk-fig .nyd .gl,.mk-fig .dmap :is(.dl,.wn,text.lm,.scl text,.rl){font-size:max(var(--fs),calc(13.2px * var(--k)))}
 .mk-fig .nyd :is(.cn,.scl) text,.mk-fig .nyd .gl{--fs:calc(13px * var(--u,1))}
 .mk-fig .dmap :is(text.lm,.scl text){--fs:calc(12px * var(--u,1))}
+.mk-fig .dmap .rl{--fs:calc(10.5px * var(--u,1))}
 .mk-fig .nyd .sea text,.mk-fig .dmap .wn{--fs:calc(15px * var(--u,1))}
 .mk-fig .nyd .cl text,.mk-fig .dmap .dl{--fs:calc(19px * var(--u,1))}
 @media (max-width:600px){.mk-fig :is(.dmap,.nyd) [style*="--ph"]{transform:var(--ph)}.mk-fig :is(.dmap,.nyd) [style*="--pa"],.mk-fig :is(.dmap,.nyd) [style*="--pa"] tspan{text-anchor:var(--pa)}}
@@ -161,6 +179,7 @@
 .js .mk-el :is(.tn,.sh){opacity:0;transition:opacity .9s var(--ease-out) .9s}
 .js .mk-el.in :is(.tn,.sh){opacity:1}
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
+.mk-el .wl{stroke:var(--sheet);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
 @media (min-width:1320px){.mk-el text{font-size:17.6px}}
 @media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
 @media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
