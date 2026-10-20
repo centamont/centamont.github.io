@@ -137,7 +137,7 @@ def frame(m, s):
     k, sold = s['built'], s['sold']
     o = [f'<path class="bk" d="{BACK[m]}"/>']
     o.append(f'<path class="ko" d="{outline(LEVELS)}Z"/>')
-    o.append(f'<path class="hid" d="{outline(LEVELS)}M53 42H75M61 34V42M67 34V42"/>')
+    o.append(f'<path class="hid" d="{outline(LEVELS)}"/>')
     if k:
         o.append(f'<path class="ko" d="{outline(k)}Z"/>')
     if sold:
