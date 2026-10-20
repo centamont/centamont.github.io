@@ -582,7 +582,8 @@
   // A row of neighborhoods that scrolls sideways (a market page on a phone) takes the keyboard's focus, so its cards can be
   // scrolled from the keys; where the cards stand in a column and nothing scrolls, it is no stop at all. (On a wide
   // screen the captions hang into the margin, so the column is wider than its box without scrolling: overflow decides.)
-  const rows = document.querySelectorAll('.hoods');
+  // A skyline that pans on a phone (Miami) is the same kind of stop.
+  const rows = document.querySelectorAll('.hoods, .mk-el-pan');
   if (rows.length) {
     const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
     let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
