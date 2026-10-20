@@ -331,10 +331,10 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 754, y: 168, w: 986, h: 882, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 754, y: 156, w: 986, h: 894, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 754, y: 151, w: 986, h: 899, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 754, y: 143, w: 986, h: 907, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+    morning: { x: 750, y: 140, w: 990, h: 910, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    gold: { x: 754, y: 140, w: 986, h: 910, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+    night: { x: 750, y: 140, w: 990, h: 910, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
   };
   // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
