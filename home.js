@@ -170,7 +170,7 @@ let armed=false;const arm=()=>{armed=true;const defs=ov.insertBefore(document.cr
 chart.querySelectorAll('.arc').forEach((p,k)=>{const mk=defs.appendChild(document.createElementNS(NS,'mask'));mk.id='route'+k;
 ['maskUnits','userSpaceOnUse','x','-20','y','-100','width','760','height','480'].forEach((v,j,a)=>{if(j%2===0)mk.setAttribute(v,a[j+1])});
 const d=mk.appendChild(document.createElementNS(NS,'path'));d.setAttribute('d',p.getAttribute('d'));p.setAttribute('mask','url(#route'+k+')');
-const o=mk.appendChild(document.createElementNS(NS,'rect'));['x','y','width','height'].forEach(n=>o.setAttribute(n,loc.getAttribute(n)));
+const o=mk.appendChild(document.createElementNS(NS,'rect'));['x','y','width','height','transform'].forEach(n=>{if(loc.hasAttribute(n))o.setAttribute(n,loc.getAttribute(n))});
 d.style.setProperty('--len',Math.ceil(p.getTotalLength())+'px');groups[order.indexOf(p.dataset.m)].draw.push(d)})};
 const wide=matchMedia('(min-width:1200px)'),held={},hold=(k,v)=>{v=v.toFixed(4);if(held[k]!==v){held[k]=v;chart.style.setProperty(k,v)}};
 let mraf=0,near=false,tS=0,tR=0;
