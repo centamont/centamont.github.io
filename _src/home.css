@@ -1060,18 +1060,25 @@ html:not(.js) .step{min-height:auto}
 @media (max-width:820px){.jr-strip ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* (six to a row, a step's label may take two lines at 13px, so every label keeps two, and the steps stand on one line) */
 @media (min-width:821px){.jr-strip .w{min-height:2.7em}}
-/* the advisors' table under the seat line, the ten seats at launch in ink and the ten more it can ever take in dashes */
-#people .seat-plan{grid-column:1/-1;margin:clamp(28px,3.4vw,48px) 0 0;max-width:820px}
-.seat-plan svg{display:block;width:100%;height:auto}
-.seat-plan :is(rect,path){fill:none;stroke:var(--fg);stroke-width:var(--lw-object);vector-effect:non-scaling-stroke}
-.seat-plan .top{stroke-width:var(--lw-profile)}
-.seat-plan .top.in{stroke-width:var(--lw-detail)}
-.seat-plan .leaf{stroke-dasharray:var(--lt-hidden);opacity:.6}
-.seat-plan .ch .rl{fill:var(--fg);stroke:none}
-.seat-plan .ch:not(.on){opacity:.45}
-.seat-plan .ch:not(.on) rect{stroke-dasharray:var(--lt-hidden)}
-.seat-plan .ch:not(.on) .rl{fill:none;stroke:var(--fg)}
-@media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}.seat-plan :is(rect,path){stroke:CanvasText}}
+/* the advisors' table under the seat line, the same plan the Advisors page opens with (its drawing and strings are styled in
+   practice.css): the full measure of the page, so its leaves end on the margins, and the two strings say what the seats mean */
+.seat .table{grid-area:auto;grid-column:1/-1;width:auto;justify-self:stretch;margin:clamp(36px,4vw,56px) 0 0}
+/* a phone keeps the plan along the screen, its strings' labels set smaller to stand on them */
+/* and there it comes straight under the seat line, before the copy, whose first sentence it says, so that sentence
+   stays with the wider screens and the phone reads the plan, then who sits at it */
+@media (max-width:520px){
+  .head.seat > h2{order:0}.seat .table{order:1}.head.seat > .intro{order:2}.head.seat > .links{order:3}
+  .head.seat .pn{display:none}
+  /* the plan's own strings rule the copy off from the heading, so the seat line's bronze rule stands down, and the four
+     close up a step */
+  .head.seat{row-gap:16px}.head.seat .intro::before{display:none}
+  .seat .table{margin:6px 0 4px}.head.seat .links{margin-top:0}
+  .seat .table .dm{font-size:10px;letter-spacing:.1em;gap:6px;transform:translate(-50%,calc(-100% - 2px))}
+  .seat .table b{font-size:19px}
+  /* at a quarter of their size the hidden seats and leaves would break into crumbs, so they stand a step darker */
+  .seat .table .ch:not(.on){opacity:.75}.seat .table .leaf{opacity:.8}
+}
+@media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}}
 
 /* The home page on a phone held upright, kept close to sixteen screens by saying each thing once. The markets list reads
    as the notes list does: each market's name across the measure and its status under it as a meta line, its places left
@@ -1095,11 +1102,11 @@ html:not(.js) .step{min-height:auto}
   .name .cols p:not(.big){display:none}
 }
 /* and what a phone reads elsewhere stays there: the markets' places on their own pages (and the close's line to the
-   partners at the close itself), the deposit schedule in the guide it draws, the advisors' table on the Advisors page,
+   partners at the close itself), the deposit schedule in the guide it draws,
    the third note in the journal, and the handle, which the letter's own line under its button carries. The heads and
    their intros, the drawings that hold the page's information and every step's words all stay. */
 @media (max-width:520px){
-  .chart .lv p,#markets .ask,#questions .ask,#contact .reach,#people .seat-plan,#journal .jr-strip{display:none}
+  .chart .lv p,#markets .ask,#questions .ask,#contact .reach,#journal .jr-strip{display:none}
   #journal .notes-list li:nth-child(n+3){display:none}
 }
 /* the back matter and the two bands close up a step on a phone (48 and 60px rather than 56 and 72), the markets' rows
