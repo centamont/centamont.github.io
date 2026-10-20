@@ -102,7 +102,6 @@
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
 .mk-fig .sv .ttl{text-anchor:end;transform:translate(326px,190px)}
-.mk-fig .sv .lake{display:none}
 .mk-fig .sv .scl{transform:translate(220px,-92px)}
 /* the New York survey, drawn like South Florida's: hatched land, the sea's water lines, state lines, the two markets
    opening now joined by the reach, a scale and a north point */
@@ -224,6 +223,8 @@
    little more on the screen at every width that shows them: the drawing is 752 to 790px wide from 901px, 888px and up
    from 1320px, and from 601 to 900px, cropped to 2:1, it draws at its width over 800) */
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
+/* (the water's name keeps a margin of paper, so the water lines stop short of it) */
+.mk-el .wl{stroke:var(--sheet);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
 @media (min-width:1320px){.mk-el text{font-size:17.6px}}
 @media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
 @media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
