@@ -365,15 +365,15 @@
     const ticks = [...ruler.querySelectorAll('line:not(.base)')];
     const hit = new Array(ticks.length).fill(false);
     let done = false, seamSeen = false, raf = 0, risen = 0;
-    // The vein is drawn in the band's own pixels: down from the hundredth tick, past the end of the copy (which stops short
+    // The vein is drawn in the band's own pixels: down from under the hundredth tick's mark, past the end of the copy (which stops short
     // of it), to the apex of the opening, which stands under the tick unless the mountain's foot would run off the screen's
     // edge (on a phone it stands a little in, and the vein leans to meet it), then on down the opening to the foot.
     const [v1, v2, fl] = vein.querySelectorAll('path');
     const lay = () => {
-      const h = house.getBoundingClientRect(), r = ruler.getBoundingClientRect(), c = house.querySelector('.cols').getBoundingClientRect(), s = seam.getBoundingClientRect();
+      const h = house.getBoundingClientRect(), r = ruler.getBoundingClientRect(), sc = ruler.nextElementSibling.getBoundingClientRect(), c = house.querySelector('.cols').getBoundingClientRect(), s = seam.getBoundingClientRect();
       if (!h.width) return;
       const w = h.width, ht = h.height, tx = r.left - h.left + r.width * 0.98412, hb = s.height * 0.714;
-      const sx = Math.max(hb + 8, Math.min(tx, w - hb - 8)), y0 = r.bottom - h.top, yc = Math.min(c.bottom - h.top + 12, s.top - h.top), ys = s.top - h.top;
+      const sx = Math.max(hb + 8, Math.min(tx, w - hb - 8)), y0 = Math.max(r.bottom, sc.bottom + 4) - h.top, yc = Math.min(c.bottom - h.top + 12, s.top - h.top), ys = s.top - h.top;
       const jag = (x1, ya, x2, yb, step) => { const n = Math.max(2, Math.round((yb - ya) / step)); let d = ''; for (let i = 1; i <= n; i++) { const t = i / n, j = i < n ? (i % 2 ? 1.2 : -1) : 0; d += `L${(x1 + (x2 - x1) * t + j).toFixed(1)} ${(ya + (yb - ya) * t).toFixed(1)}`; } return d; };
       vein.setAttribute('viewBox', `0 0 ${w.toFixed(1)} ${ht.toFixed(1)}`);
       v1.setAttribute('d', `M${tx.toFixed(1)} ${y0.toFixed(1)}${jag(tx, y0, tx, yc, 46)}${jag(tx, yc, sx, ys, 14)}`);
@@ -398,10 +398,11 @@
       if (!risen) risen = performance.now();
       if (performance.now() - risen < 800) { setTimeout(onScroll, 800 - (performance.now() - risen)); return; }
       const r = ruler.getBoundingClientRect(), vh = innerHeight;
-      // the hundredth lands with the ruler's top at 58% of the viewport, or higher on a short screen, where the name's
-      // first line would already be under the header: there it lands as that line reaches the header's foot. The strike
-      // takes a third of the viewport's height of scroll before it, or what is left of it below the screen's foot.
-      const end = Math.max(vh * 0.58, r.top - cut.getBoundingClientRect().top + 96), start = Math.min(vh, end + vh * 0.34);
+      // the hundredth lands with the ruler's top at 58% of the viewport, or lower on a short screen, where the name's
+      // first line would already be under the header: there it lands as that line reaches the header's foot, though never
+      // so low that the ruler's scale and the lead line's first words are below the screen. The strike takes a third of
+      // the viewport's height of scroll before it, or what is left of it below the screen's foot.
+      const end = Math.max(vh * 0.58, Math.min(r.top - cut.getBoundingClientRect().top + 96, vh - 230)), start = Math.min(vh, end + vh * 0.34);
       const p = Math.max(0, Math.min(1, (start - r.top) / Math.max(1, start - end)));
       const n = Math.floor(p * 100);
       if (n >= 100) { strike(); return; }

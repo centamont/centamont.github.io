@@ -138,13 +138,13 @@
 .name .cut i{color:var(--bronze)}
 .ruler line.base{stroke:var(--band-muted);stroke-width:var(--lw-object);opacity:.5}
 .rscale span{position:absolute;top:0;transform:translateX(-50%);transition:color .6s var(--ease) .3s}
-.rscale span:nth-child(1){left:.6%;transform:none}
+.rscale span:nth-child(1){left:.6%}
 .rscale span:nth-child(2){left:49.012%}
-.rscale span:nth-child(3){left:98.412%;transform:translateX(calc(-100% - 9px))}
+.rscale span:nth-child(3){left:98.412%}
 .ruler.struck + .rscale span:last-child{color:var(--bronze)}
 .name .cols > *{min-width:0}
 .name .cols div{display:grid;gap:20px}
-.name .cols div p:not(.big){font-size:var(--t-intro);line-height:1.6;max-width:30em}
+.name .cols div p:not(.big){font-size:var(--t-intro);line-height:1.5;max-width:30em}
 .name .cols .big{color:var(--band-fg)}
 @media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
@@ -450,6 +450,7 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 .js .ruler:not(.struck) .crack{stroke-dashoffset:110}
 .ruler line[y2="51"]{stroke-width:.8px}
 @media (max-width:520px){.ruler{aspect-ratio:auto;height:40px}.ruler line[y2="57"]{display:none}}
+@media (max-width:520px){.ruler,.rscale{width:calc(100% - 40px)}.name .cols{padding-right:72px}}
 .js .ruler.struck .crack{opacity:.6}
 .js .ruler.flash .crack{opacity:.8;animation:crack-flash .6s var(--ease-out)}
 @media (prefers-reduced-motion:reduce){.js .ruler.flash .crack{animation:none}}
@@ -465,7 +466,7 @@ html:not(.js) :is(.seam,.vein){display:none}
 .vein path{fill:none;stroke:var(--bronze);stroke-width:1;stroke-dasharray:1 1;stroke-dashoffset:1}
 .vein .v1{opacity:.55;transition:stroke-dashoffset .8s var(--ease-ink) .35s}
 .vein .v2{transition:stroke-dashoffset .5s var(--ease-ink)}
-.vein .fl{display:none;stroke:var(--bronze-800);stroke-dashoffset:0;opacity:0;transition:opacity .6s var(--ease) .7s}
+.vein .fl{display:none;stroke:var(--bronze-600);stroke-dashoffset:0;opacity:0;transition:opacity .6s var(--ease) .7s}
 #house.struck .vein .v1,.seam.crack + .vein .v2{stroke-dashoffset:0}
 .seam.split + .vein .fl{opacity:1}
 :root[data-theme="dark"] .vein .fl{display:inline}

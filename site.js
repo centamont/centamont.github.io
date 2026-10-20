@@ -266,10 +266,10 @@ const hit = new Array(ticks.length).fill(false);
 let done = false, seamSeen = false, raf = 0, risen = 0;
 const [v1, v2, fl] = vein.querySelectorAll('path');
 const lay = () => {
-const h = house.getBoundingClientRect(), r = ruler.getBoundingClientRect(), c = house.querySelector('.cols').getBoundingClientRect(), s = seam.getBoundingClientRect();
+const h = house.getBoundingClientRect(), r = ruler.getBoundingClientRect(), sc = ruler.nextElementSibling.getBoundingClientRect(), c = house.querySelector('.cols').getBoundingClientRect(), s = seam.getBoundingClientRect();
 if (!h.width) return;
 const w = h.width, ht = h.height, tx = r.left - h.left + r.width * 0.98412, hb = s.height * 0.714;
-const sx = Math.max(hb + 8, Math.min(tx, w - hb - 8)), y0 = r.bottom - h.top, yc = Math.min(c.bottom - h.top + 12, s.top - h.top), ys = s.top - h.top;
+const sx = Math.max(hb + 8, Math.min(tx, w - hb - 8)), y0 = Math.max(r.bottom, sc.bottom + 4) - h.top, yc = Math.min(c.bottom - h.top + 12, s.top - h.top), ys = s.top - h.top;
 const jag = (x1, ya, x2, yb, step) => { const n = Math.max(2, Math.round((yb - ya) / step)); let d = ''; for (let i = 1; i <= n; i++) { const t = i / n, j = i < n ? (i % 2 ? 1.2 : -1) : 0; d += `L${(x1 + (x2 - x1) * t + j).toFixed(1)} ${(ya + (yb - ya) * t).toFixed(1)}`; } return d; };
 vein.setAttribute('viewBox', `0 0 ${w.toFixed(1)} ${ht.toFixed(1)}`);
 v1.setAttribute('d', `M${tx.toFixed(1)} ${y0.toFixed(1)}${jag(tx, y0, tx, yc, 46)}${jag(tx, yc, sx, ys, 14)}`);
@@ -293,7 +293,7 @@ if (!cut.classList.contains('in')) return;
 if (!risen) risen = performance.now();
 if (performance.now() - risen < 800) { setTimeout(onScroll, 800 - (performance.now() - risen)); return; }
 const r = ruler.getBoundingClientRect(), vh = innerHeight;
-const end = Math.max(vh * 0.58, r.top - cut.getBoundingClientRect().top + 96), start = Math.min(vh, end + vh * 0.34);
+const end = Math.max(vh * 0.58, Math.min(r.top - cut.getBoundingClientRect().top + 96, vh - 230)), start = Math.min(vh, end + vh * 0.34);
 const p = Math.max(0, Math.min(1, (start - r.top) / Math.max(1, start - end)));
 const n = Math.floor(p * 100);
 if (n >= 100) { strike(); return; }
