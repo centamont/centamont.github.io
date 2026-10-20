@@ -152,7 +152,7 @@ def frame(m, s, x0, width, blocks):
     if k:
         g.append(f'<path class="pr" d="{outline(k)}"/>')
     if s.get('mark'):
-        g.append(f'<text class="mk" x="{R + 6}" y="{top(LEVELS) + 6}">{s["mark"]}</text>')
+        g.append(f'<text class="thr" x="{R + 6}" y="{top(LEVELS) + 6}">{s["mark"]}</text>')
     o.append(f'<g transform="translate({n(dx)} 0)">{"".join(g)}</g>')
     hat = ''.join(f'M{x} 149L{x + 9} {GROUND}' for x in range(-((x0 + 4) % 12) + 2, width - 8, 12) if x >= 0)
     o.append(f'<path class="dt hat" d="{hat}"/><path class="pr" d="M-1 {GROUND}H{width + 1}"/>')

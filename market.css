@@ -14,7 +14,7 @@
 :is(.lsq,.mk-lfig .key) .hid{stroke-dasharray:var(--lt-hidden);opacity:.7}
 .lsq .hat{opacity:.5}
 .lsq .plan{opacity:.25}
-.lsq .mk{font:italic 400 16px/1 var(--display);fill:var(--accent)}
+.lsq .thr{font:italic 400 16px/1 var(--display);fill:var(--accent)}
 .lsq .bk{stroke:var(--faint);stroke-width:var(--lw-detail);opacity:.28;stroke-linejoin:round}
 .lsq .ko{fill:var(--bg);stroke:none}
 :is(.lsq,.mk-lfig .key) .sold{fill:var(--sold);stroke:var(--sold-line);stroke-width:var(--lw-detail)}
@@ -33,7 +33,7 @@
   .lsq .f{font-size:15px}
   .lsq:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 }
-@media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq .ko{fill:Canvas;stroke:Canvas}.lsq .mk{fill:CanvasText}:is(.lsq,.mk-lfig .key) .sold{fill:CanvasText;stroke:none}}
+@media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq .ko{fill:Canvas;stroke:Canvas}.lsq .thr{fill:CanvasText}:is(.lsq,.mk-lfig .key) .sold{fill:CanvasText;stroke:none}}
 .hood:first-child > h3:first-child{margin-top:24px}
 .hoods:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 @media (max-width:700px){
