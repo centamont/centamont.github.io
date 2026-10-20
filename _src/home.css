@@ -220,21 +220,21 @@
 }
 
 .name .cut i{color:var(--bronze)}
-.ruler line.base{stroke:var(--band-rule);stroke-width:var(--lw-object);opacity:1}
+.ruler line.base{stroke:var(--band-muted);stroke-width:var(--lw-object);opacity:.5}
 
 .rscale span{position:absolute;top:0;transform:translateX(-50%);transition:color .6s var(--ease) .3s}
-.rscale span:nth-child(1){left:.6%;transform:none}
+.rscale span:nth-child(1){left:.6%}
 .rscale span:nth-child(2){left:49.012%}
-.rscale span:nth-child(3){left:98.412%;transform:translateX(-100%);margin-right:-.12em}
+/* (every mark stands centred on its tick; the vein starts under the scale, so the crack seems to pass behind the 100) */
+.rscale span:nth-child(3){left:98.412%}
 .ruler.struck + .rscale span:last-child{color:var(--bronze)}
 
 .name .cols > *{min-width:0}
 .name .cols div{display:grid;gap:20px}
-/* on the widest screens the column outgrows a comfortable line, so the prose keeps to one */
-.name .cols div p:not(.big){max-width:32em}
+.name .cols div p:not(.big){font-size:var(--t-intro);line-height:1.5;max-width:30em}
 .name .cols .big{color:var(--band-fg)}
-/* the lead line stands in the left column, under the ruler's first half, and the paragraph in the right, under its second,
-   the two on one first baseline */
+/* the lead line stands in the wider left column and the paragraph in the right, the two on one first baseline, and both
+   end short of the crack's vein, which runs down the measure's last few percent to the foot */
 @media (min-width:821px){.name .cols > div{display:contents}.name .cols .big{grid-column:1}.name .cols div p:not(.big){grid-column:2}}
 
 .handle svg{width:.5em;height:auto;color:var(--accent);translate:0 .12em;transition:transform .6s var(--ease)}
@@ -441,11 +441,9 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
    The practices' head turns: the statement runs the full measure and its intro steps down on the left, where the three
    practices begin, rather than on the right as the developer story's does. */
 
-/* The name: the hundredth blow set as a pull quote across most of the measure, the paragraph answering it beneath, on the right */
+/* The name: the lead line set a step below the name, across the wider column, beside the paragraph */
 @media (min-width:821px){
-  
-  .name .cols .big{grid-column:1/span 10;font-size:var(--t-section);line-height:1.12;letter-spacing:-.012em;text-wrap:balance}
-  .name .cols div p:not(.big){grid-column:7/-1;grid-row:2}
+  .name .cols .big{font-size:var(--t-head);line-height:1.18;letter-spacing:-.01em;text-wrap:balance}
 }
 
 /* The score: the chapters open loud, the back matter reads quiet (the ink bands and the close keep their own) */
@@ -678,9 +676,17 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 /* The house */
 .name .cut{font-family:var(--display);font-weight:300;font-size:var(--t-spread);line-height:1;letter-spacing:-.02em;color:var(--band-fg);max-width:none}
 @media (max-width:520px){.name .cut{font-size:var(--t-chapter)}}
-.ruler{display:block;width:100%;height:auto;margin-top:clamp(40px,5vw,72px);overflow:visible}
-.ruler .crack{fill:none;stroke:var(--bronze);stroke-width:1.5;stroke-dasharray:90;stroke-dashoffset:0;transition:stroke-dashoffset .6s var(--ease-ink)}
-.js .ruler:not(.struck) .crack{stroke-dashoffset:90}
+/* The ruler is the band's one rule: its base ends where the hundredth tick cracks, and the crack runs up out of it and
+   down through it into the vein below. Its height is set apart from its width (preserveAspectRatio none), so a phone
+   keeps ticks it can read; the strokes keep their screen width. */
+.ruler{display:block;width:100%;height:auto;aspect-ratio:1000/74;margin-top:clamp(48px,5.6vw,84px);overflow:visible}
+.ruler .crack{fill:none;stroke:var(--bronze);stroke-width:1.5px;vector-effect:non-scaling-stroke;stroke-dasharray:110;stroke-dashoffset:0;transition:stroke-dashoffset .6s var(--ease-ink)}
+.js .ruler:not(.struck) .crack{stroke-dashoffset:110}
+.ruler line[y2="51"]{stroke-width:.8px}
+/* on a phone the ruler stands 40px tall and keeps the fives and tens: a hundred ticks 3.5px apart would only read as hatching */
+@media (max-width:520px){.ruler{aspect-ratio:auto;height:40px}.ruler line[y2="57"]{display:none}}
+/* and stops 40px short of the measure, so the mountain can open straight under its hundredth tick without leaving the screen */
+@media (max-width:520px){.ruler,.rscale{width:calc(100% - 40px)}}
 
 /* struck, the crack rests a little dim; as the seam below splits it flashes once (site.js marks .flash) and stays brighter */
 .js .ruler.struck .crack{opacity:.6}
@@ -689,16 +695,31 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 
 /* The scale under the ruler is set in type, not drawn, so it keeps the 13px annotation size at every width.
    Its marks sit on ticks 1, 50 and 100 (x = 6, 490.12 and 984.12 of the 1000-unit drawing). */
-.rscale{position:relative;height:20px;margin-top:8px;font:500 13px/20px var(--body);letter-spacing:.12em;color:var(--band-muted)}
-.name .cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,7vw,120px);margin-top:clamp(48px,7vw,96px);border-top:1px solid var(--band-rule);padding-top:36px}
+.rscale{position:relative;height:20px;margin-top:10px;font:500 clamp(13px,.6vw,16px)/20px var(--body);letter-spacing:.12em;color:var(--band-muted)}
+.name .cols{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:24px clamp(32px,5vw,80px);margin-top:clamp(40px,4.4vw,64px);padding-right:max(32px,4%)}
 @media (min-width:821px){.name .cols{align-items:baseline}}
 @media (max-width:820px){.name .cols{grid-template-columns:1fr}}
+/* (on a phone the copy keeps clear of the vein, which comes down 40px inside the measure) */
+@media (max-width:520px){.name .cols{padding-right:68px}}
 
 /* The band's foot splits along the crack and parts onto Contact. A decorative overlay below the text, never the text itself. */
-#house{position:relative;padding-bottom:clamp(104px,11vw,152px)}
-.seam{--seam-h:clamp(80px,9vw,136px);--hb:calc(var(--seam-h) * .714);position:absolute;left:0;right:0;bottom:-1px;height:var(--seam-h);overflow:hidden;pointer-events:none;background:var(--band)}
+#house{--sx:50%;position:relative;padding-bottom:clamp(112px,11vw,160px)}
+.seam{--seam-h:clamp(64px,9vw,136px);--hb:calc(var(--seam-h) * .714);position:absolute;left:0;right:0;bottom:-1px;height:var(--seam-h);overflow:hidden;pointer-events:none;background:var(--band)}
 .seam.split{background:linear-gradient(var(--band) 3px,var(--bg) 3px)}
-html:not(.js) .seam{display:none}
+html:not(.js) :is(.seam,.vein){display:none}
+/* The vein: the hundredth tick's crack carried down the band to the foot, where the seam opens under it into the mountain.
+   site.js draws it in the band's own pixels (one unit a pixel), so its dashes need no screen correction. */
+.vein{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:1}
+.vein path{fill:none;stroke:var(--bronze);stroke-width:1;stroke-dasharray:1 1;stroke-dashoffset:1}
+.vein .v1{opacity:.55;transition:stroke-dashoffset .8s var(--ease-ink) .35s}
+.vein .v2{transition:stroke-dashoffset .5s var(--ease-ink)}
+.vein .fl{display:none;stroke:var(--bronze);stroke-dashoffset:0;opacity:0;transition:opacity .6s var(--ease) .7s}
+#house.struck .vein .v1,.seam.crack + .vein .v2{stroke-dashoffset:0}
+.seam.split + .vein .fl{opacity:1}
+/* at night the opening is graphite on graphite, so the mountain's flanks take a bronze hairline */
+:root[data-theme="dark"] .vein .fl{display:inline}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vein .fl{display:inline}}
+@media (prefers-reduced-motion:reduce){.seam i,.vein path,.ruler .crack{transition:none}}
 
 /* Contact: the page closes at display scale */
 .display{font-size:var(--t-display);text-wrap:balance;font-weight:300;letter-spacing:-.03em;line-height:.95;max-width:none}
@@ -992,7 +1013,6 @@ html:not(.js) .step{min-height:auto}
 .doorway .room{position:absolute;left:5.5%;right:5.5%;top:4.667%;bottom:0;overflow:hidden;border-radius:50% 50% 0 0/31.1% 31.1% 0 0;opacity:calc(var(--o) * .3);pointer-events:none}
 .doorway .room::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(var(--ink-rgb),0) 30%,rgba(var(--ink-rgb),.75))}
 @media (min-width:821px){.head.statement.turn .intro{grid-column:1/span 5}}
-@media (min-width:821px){.name .cols{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(32px,6vw,96px);row-gap:clamp(28px,3vw,44px);align-items:start}}
 
 /* A quiet way to the partners at the foot of the places a reader decides: under the hero's buttons (wide screens), the
    markets and the questions. */

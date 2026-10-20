@@ -355,34 +355,63 @@
     }
   }
 
-  // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past; on the hundredth
-  // the crack draws, and once the foot of the band is in view it splits and parts onto Contact.
-  // With motion off, everything is shown struck and parted.
-  const ruler = document.getElementById('ruler'), seam = document.getElementById('seam');
-  if (ruler && seam) {
+  // The hundredth blow. The ruler's ticks strike one by one as the name band scrolls past, once its three lines have
+  // risen, and the hundredth lands while the whole name is still on the screen (the ruler's top at 58% of it): the crack
+  // breaks the ruler and runs down the band as a vein to the foot, and once the foot is in view the band splits there,
+  // under the crack, and parts onto Contact in the shape of the mountain. With motion off, everything is shown struck and parted.
+  const ruler = document.getElementById('ruler'), seam = document.getElementById('seam'), vein = document.getElementById('vein');
+  const house = document.getElementById('house'), cut = document.getElementById('cut');
+  if (ruler && seam && vein && house) {
     const ticks = [...ruler.querySelectorAll('line:not(.base)')];
     const hit = new Array(ticks.length).fill(false);
-    let done = false, seamSeen = false, raf = 0;
-    const split = () => { if (done && (seamSeen || stillPage) && !seam.classList.contains('crack')) { seam.classList.add('crack'); setTimeout(() => { seam.classList.add('split'); ruler.classList.add('flash'); }, stillPage ? 0 : 650); } };
+    let done = false, seamSeen = false, raf = 0, risen = 0;
+    // The vein is drawn in the band's own pixels: down from under the hundredth tick's mark, past the end of the copy (which stops short
+    // of it), to the apex of the opening, which stands under the tick unless the mountain's foot would run off the screen's
+    // edge (on a phone it stands a little in, and the vein leans to meet it), then on down the opening to the foot.
+    const [v1, v2, fl] = vein.querySelectorAll('path');
+    const lay = () => {
+      const h = house.getBoundingClientRect(), r = ruler.getBoundingClientRect(), sc = ruler.nextElementSibling.getBoundingClientRect(), c = house.querySelector('.cols').getBoundingClientRect(), s = seam.getBoundingClientRect();
+      if (!h.width) return;
+      const w = h.width, ht = h.height, tx = r.left - h.left + r.width * 0.98412, hb = s.height * 0.714;
+      const sx = Math.max(hb + 8, Math.min(tx, w - hb - 8)), y0 = Math.max(r.bottom, sc.bottom + 4) - h.top, yc = Math.min(c.bottom - h.top + 12, s.top - h.top), ys = s.top - h.top;
+      const jag = (x1, ya, x2, yb, step) => { const n = Math.max(2, Math.round((yb - ya) / step)); let d = ''; for (let i = 1; i <= n; i++) { const t = i / n, j = i < n ? (i % 2 ? 1.2 : -1) : 0; d += `L${(x1 + (x2 - x1) * t + j).toFixed(1)} ${(ya + (yb - ya) * t).toFixed(1)}`; } return d; };
+      vein.setAttribute('viewBox', `0 0 ${w.toFixed(1)} ${ht.toFixed(1)}`);
+      v1.setAttribute('d', `M${tx.toFixed(1)} ${y0.toFixed(1)}${jag(tx, y0, tx, yc, 46)}${jag(tx, yc, sx, ys, 14)}`);
+      v2.setAttribute('d', `M${sx.toFixed(1)} ${ys.toFixed(1)}${jag(sx, ys, sx, ht, 18)}`);
+      fl.setAttribute('d', `M${(sx - hb).toFixed(1)} ${ht.toFixed(1)}L${sx.toFixed(1)} ${ys.toFixed(1)}L${(sx + hb).toFixed(1)} ${ht.toFixed(1)}`);
+      house.style.setProperty('--sx', `${sx.toFixed(1)}px`);
+    };
+    lay();
+    if (window.ResizeObserver) new ResizeObserver(lay).observe(house); else addEventListener('resize', lay);
+    if (document.fonts) document.fonts.ready.then(lay);
+    const split = () => { if (done && (seamSeen || stillPage) && !seam.classList.contains('crack')) { setTimeout(() => { seam.classList.add('crack'); setTimeout(() => { seam.classList.add('split'); ruler.classList.add('flash'); }, stillPage ? 0 : 500); }, stillPage ? 0 : 1100); } };
     const strike = () => {
       done = true; ticks.forEach((t) => t.classList.add('hit'));
-      ruler.classList.add('struck');
+      ruler.classList.add('struck'); house.classList.add('struck');
       removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll);
       split();
     };
     const frame = () => {
       raf = 0;
+      // the ticks wait for the name's lines to finish rising (most of a second after they start)
+      if (!cut.classList.contains('in')) return;
+      if (!risen) risen = performance.now();
+      if (performance.now() - risen < 800) { setTimeout(onScroll, 800 - (performance.now() - risen)); return; }
       const r = ruler.getBoundingClientRect(), vh = innerHeight;
-      // 0 when the ruler's top reaches 85% of the viewport, 1 at 30%
-      const p = Math.max(0, Math.min(1, (vh * 0.85 - r.top) / (vh * 0.55)));
+      // the hundredth lands with the ruler's top at 58% of the viewport, or lower on a short screen, where the name's
+      // first line would already be under the header: there it lands as that line reaches the header's foot, though never
+      // so low that the ruler's scale and the lead line's first words are below the screen. The strike takes a third of
+      // the viewport's height of scroll before it, or what is left of it below the screen's foot.
+      const end = Math.max(vh * 0.58, Math.min(r.top - cut.getBoundingClientRect().top + 96, vh - 230)), start = Math.min(vh, end + vh * 0.34);
+      const p = Math.max(0, Math.min(1, (start - r.top) / Math.max(1, start - end)));
       const n = Math.floor(p * 100);
       if (n >= 100) { strike(); return; }
       for (let i = 0; i < ticks.length; i++) { const on = i < n; if (on !== hit[i]) { hit[i] = on; ticks[i].classList.toggle('hit', on); } }
     };
     function onScroll() { if (!raf) raf = requestAnimationFrame(frame); }
-    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { seamSeen = true; o.disconnect(); split(); } }), { threshold: 0.9 }).observe(seam);
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { seamSeen = true; o.disconnect(); split(); } }), { threshold: 0.5 }).observe(seam);
     if (stillPage) strike();
-    else { addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll(); }
+    else { addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll(); new MutationObserver(onScroll).observe(cut, { attributes: true, attributeFilter: ['class'] }); }
   }
 
   // The advisors' table: with motion off, the seats are shown taken.

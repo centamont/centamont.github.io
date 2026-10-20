@@ -350,13 +350,10 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .js .ruler line.hit{transform:none}
 @keyframes crack-flash{0%{opacity:.6}35%{opacity:1}100%{opacity:.8}}
 .seam i{position:absolute;inset:0;background:var(--band);transition:clip-path .9s var(--ease-ink)}
-.seam .l{clip-path:polygon(0 0,50% 0%,49.85% 12%,50.1% 26%,49.9% 41%,50.15% 55%,49.95% 70%,50.1% 85%,50% 100%,0 100%)}
-.seam .r{clip-path:polygon(100% 0,100% 100%,50% 100%,50.1% 85%,49.95% 70%,50.15% 55%,49.9% 41%,50.1% 26%,49.85% 12%,50% 0%)}
-.seam svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.seam path{fill:none;stroke:var(--bronze);stroke-width:1;vector-effect:non-scaling-stroke;stroke-dasharray:1.4;stroke-dashoffset:1.4;transition:stroke-dashoffset .6s var(--ease-ink)}
-.seam.crack path{stroke-dashoffset:0}
-.seam.split .l{clip-path:polygon(0 0,50% 0%,calc(50% - var(--hb) * .12) 12%,calc(50% - var(--hb) * .26) 26%,calc(50% - var(--hb) * .41) 41%,calc(50% - var(--hb) * .55) 55%,calc(50% - var(--hb) * .7) 70%,calc(50% - var(--hb) * .85) 85%,calc(50% - var(--hb)) 100%,0 100%)}
-.seam.split .r{clip-path:polygon(100% 0,100% 100%,calc(50% + var(--hb)) 100%,calc(50% + var(--hb) * .85) 85%,calc(50% + var(--hb) * .7) 70%,calc(50% + var(--hb) * .55) 55%,calc(50% + var(--hb) * .41) 41%,calc(50% + var(--hb) * .26) 26%,calc(50% + var(--hb) * .12) 12%,50% 0%)}
+.seam .l{clip-path:polygon(0 0,var(--sx) 0%,var(--sx) 12%,var(--sx) 26%,var(--sx) 41%,var(--sx) 55%,var(--sx) 70%,var(--sx) 85%,var(--sx) 100%,0 100%)}
+.seam .r{clip-path:polygon(100% 0,100% 100%,var(--sx) 100%,var(--sx) 85%,var(--sx) 70%,var(--sx) 55%,var(--sx) 41%,var(--sx) 26%,var(--sx) 12%,var(--sx) 0%)}
+.seam.split .l{clip-path:polygon(0 0,var(--sx) 0%,calc(var(--sx) - var(--hb) * .12) 12%,calc(var(--sx) - var(--hb) * .26) 26%,calc(var(--sx) - var(--hb) * .41) 41%,calc(var(--sx) - var(--hb) * .55) 55%,calc(var(--sx) - var(--hb) * .70) 70%,calc(var(--sx) - var(--hb) * .85) 85%,calc(var(--sx) - var(--hb)) 100%,0 100%)}
+.seam.split .r{clip-path:polygon(100% 0,100% 100%,calc(var(--sx) + var(--hb)) 100%,calc(var(--sx) + var(--hb) * .85) 85%,calc(var(--sx) + var(--hb) * .70) 70%,calc(var(--sx) + var(--hb) * .55) 55%,calc(var(--sx) + var(--hb) * .41) 41%,calc(var(--sx) + var(--hb) * .26) 26%,calc(var(--sx) + var(--hb) * .12) 12%,var(--sx) 0%)}
 .seam i{background:linear-gradient(0deg,var(--band) 1px,var(--band-edge,var(--band)) 1px 2px,var(--band) 2px)}
 :root[data-theme="dark"]{--band-edge:var(--bronze-800)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--band-edge:var(--bronze-800)}}
@@ -991,7 +988,7 @@ p,li{text-wrap:pretty}
 @media (max-width:1279px),(max-width:79.9375em){:is(html:not(.js),html.nosite body.no-js) .bar{flex-wrap:wrap;height:auto;padding-block:16px 10px;row-gap:10px}:is(html:not(.js),html.nosite body.no-js) nav.main{position:static;visibility:visible;clip-path:none;height:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:2px 18px;padding:0;background:none;overflow:visible}:is(html:not(.js),html.nosite body.no-js) nav.main a{opacity:1;transform:none;margin:0;font-family:var(--body);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;border:0;padding-block:6px}:is(html:not(.js),html.nosite body.no-js) header.site{position:static}html.nosite .no-js.home header.site.over{background:rgb(var(--hero-rgb))}}
 @media print{
   :root,:root[data-theme],:root:not([data-theme="light"]){--bg:#fff;--sheet:#fff;--fg:var(--ink);--muted:#4A463F;--faint:#6E675D;--rule:#D6CDBB;--grid:#D6CDBB;--accent:var(--bronze-700);--seal:var(--ink);--sold:var(--bronze-500);--sold-line:var(--bronze-600);--patina:var(--patina-700);--leaf:#1C1E23;--line:var(--ink);--band:#fff;--band-fg:var(--ink);--band-muted:#4A463F;--band-rule:#D6CDBB;color-scheme:light}
-  body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.letter,.cv-ctl,canvas,.seam,.curtain{display:none!important}
+  body::after,header.site,.skip,.motion,.theme,.menu-btn,.progress,.letter,.cv-ctl,canvas,.seam,.vein,.curtain{display:none!important}
   html,body{background:#fff!important;color:var(--ink)!important}
   *,*::before,*::after{transition:none!important;animation:none!important}
   .js .tx-rise .w{overflow:visible}.js .tx-rise .w > i{transform:none!important}
