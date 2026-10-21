@@ -596,6 +596,31 @@ for (const path of ['/', '/es/', '/pt/']) {
   });
 }
 
+// Every market page, in every language, stands within the same sixteen screens on a phone held upright. There the sources,
+// a developer's rules past the first two and the launch's steps stand behind one ruled row each, and a footnote opens its row.
+const marketPages = ['', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f))
+  .filter((f) => readFileSync(f, 'utf8').includes('market.css?v='));
+for (const file of marketPages) {
+  test(`the phone market page stays within its length (${file})`, async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone only');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/' + file);
+    await page.waitForLoadState('load');
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(16 * 844);
+  });
+}
+test('a footnote opens the folded sources on a phone', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  await page.goto('/south-florida.html');
+  const fold = page.locator('#s1').locator('xpath=ancestor::details');
+  await expect(fold).not.toHaveAttribute('open', '');
+  await page.locator('sup a[href="#s1"]').first().click();
+  await expect(fold).toHaveAttribute('open', '');
+  await expect(page.locator('#s1')).toBeInViewport();
+  await page.goto('/es/sur-de-florida.html#s3');
+  await expect(page.locator('#s3')).toBeInViewport();
+});
+
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await page.goto('/');
