@@ -204,6 +204,9 @@
    cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the
    skyline, at a heavier pen, and leaves the ruler and the water's name to the wider screens. */
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+/* a skyline that pans on a phone says so in its caption, on a phone only */
+.mk-pan-cue{display:none}
+@media (max-width:600px){.mk-pan-cue{display:inline;color:var(--fg)}}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
 .mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
