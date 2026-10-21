@@ -54,6 +54,15 @@
   .hood > figure.photo{order:-1;margin:0 0 18px}
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
   .hood > p + p{margin-top:.6em}
+  /* the price follows the name on every card, so each card's figures sit at one height however long its description runs */
+  .hood > figure.photo{order:-3}
+  .hood > h3{order:-2}
+  .prose .hood > .mk-at{order:-1;margin:0 0 10px;font-size:12.5px;letter-spacing:.08em;line-height:1.6}
+}
+/* one neighbourhood photograph runs on into the margin, its caption under it, so seven places in a row keep a beat */
+@media (min-width:1320px) and (hover:hover) and (pointer:fine){
+  main.page:not(.wide) .prose .hood > figure.photo.span{width:calc(100% + 250px);max-width:none}
+  main.page:not(.wide) .prose .hood > figure.photo.span > .cap{position:static;width:auto;max-width:640px;margin-top:12px}
 }
 /* (a row whose photographs differ in shape gives every card the same picture, cut to fill, so no card ends in an empty band;
    each card holds its own hidden link text, which would otherwise widen the page) */
@@ -279,6 +288,7 @@
 .mk-key i{font-style:normal;color:var(--faint);opacity:.8;white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
+.mk-pan-hint{display:none}
 @media (max-width:600px){
   .mk-el-pan{margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));padding-inline:var(--gl) var(--gr);overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
   .mk-el-pan::-webkit-scrollbar{display:none}
@@ -286,6 +296,10 @@
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  /* where a line under the drawing says what lies past the edge (South Florida only), the drawing fades out at the right edge until the reader reaches its end; other pages keep the shared crop */
+  .mk-el-fig:has(.mk-pan-hint) .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
+  .mk-pan-hint{display:block;margin:10px 0 0;font:500 12px/1.4 var(--body);letter-spacing:.06em;color:var(--faint);transition:opacity .4s}
+  .mk-el-fig:has(.at-end) .mk-pan-hint{opacity:0}
 }
 /* The Hamptons lot in plan: an ocean lot from above, drawn in the elevation's weights. The setbacks are a dashed line,
    the house the one thing in bronze, the hedge a row of small arcs; the labels are the elevation's small capitals. */
