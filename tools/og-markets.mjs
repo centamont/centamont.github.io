@@ -17,7 +17,7 @@
 // (the two elevations side by side, at one scale in feet, read from their rulers) and the Texas buyer guide, whose
 // photograph panel is refilled from the page's current opening photograph (the ink half of that card is kept as it is).
 //
-// The Spanish and Portuguese South Florida, New York and Hamptons cards are drawn here too, from their own pages, so their rulers
+// The Spanish and Portuguese cards are drawn here too, from their own pages, so their rulers
 // and water names read in the page's language.
 //
 // It needs Playwright: from the repo's own node_modules (npm ci), or from a folder named in NODE_PATH. It serves the repo
@@ -51,6 +51,12 @@ const MARKETS = [
   { page: 'pt/nova-york.html', out: 'pt/og-nova-york.jpg', sub: 'Os novos condomínios de Manhattan', label: 'Nota de mercado' },
   { page: 'es/hamptons.html', out: 'es/og-hamptons.jpg', sub: 'Southampton, East Hampton y el South Fork', label: 'Nota de mercado' },
   { page: 'pt/hamptons.html', out: 'pt/og-hamptons.jpg', sub: 'Southampton, East Hampton e o South Fork', label: 'Nota de mercado' },
+  { page: 'es/los-angeles.html', out: 'es/og-los-angeles.jpg', sub: 'El Westside y Downtown', label: 'Nota de mercado' },
+  { page: 'pt/los-angeles.html', out: 'pt/og-los-angeles.jpg', sub: 'O Westside e Downtown', label: 'Nota de mercado' },
+  { page: 'es/san-francisco.html', out: 'es/og-san-francisco.jpg', sub: 'Rincon Hill, Mission Bay y Nob Hill', label: 'Nota de mercado' },
+  { page: 'pt/san-francisco.html', out: 'pt/og-san-francisco.jpg', sub: 'Rincon Hill, Mission Bay e Nob Hill', label: 'Nota de mercado' },
+  { page: 'es/orange-county.html', out: 'es/og-orange-county.jpg', sub: 'Newport Beach, Irvine y Laguna Beach', label: 'Nota de mercado' },
+  { page: 'pt/orange-county.html', out: 'pt/og-orange-county.jpg', sub: 'Newport Beach, Irvine e Laguna Beach', label: 'Nota de mercado' },
 ];
 
 // The journal note that sets the two launch cities side by side.
