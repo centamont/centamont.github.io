@@ -213,12 +213,12 @@ const hasRO = typeof ResizeObserver === 'function', hasIO = typeof IntersectionO
 const IDLE = 1000 / (matchMedia('(pointer: coarse)').matches ? 8 : 12);
 const CASCADE = 2400;
 const STILLS = {
-day: { x: 620, y: 75, w: 1120, h: 975, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
-morning: { x: 620, y: 75, w: 1120, h: 975, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
-gold: { x: 620, y: 75, w: 1120, h: 975, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
-night: { x: 620, y: 75, w: 1120, h: 975, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
+day: { x: 754, y: 143, w: 986, h: 907, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
+morning: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+gold: { x: 754, y: 127, w: 986, h: 923, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
+night: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
 };
-const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
+const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
 const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
 let GEN = 0;
 function hatchPlan(pw, hnx, hnz, D) {
