@@ -1,0 +1,21 @@
+name: Site scan
+on:
+  workflow_dispatch:
+  push:
+    paths: [ 'tools/scan.py', '.github/workflows/scan.yml' ]
+permissions:
+  contents: read
+  pages: read
+jobs:
+  scan:
+    # Reads the domain's public records and the site's public responses from outside and prints them; tools/scan.py says what.
+    # Everything it prints is public information anyone can look up. It runs on request, or when the scan itself changes.
+    name: Site scan
+    timeout-minutes: 25
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Scan
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 tools/scan.py
