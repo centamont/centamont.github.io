@@ -1315,3 +1315,21 @@ test('the films fit the screen and wait for a visitor saving data', async ({ pag
   await page.waitForTimeout(300);
   await expect(page.locator('video.loop source')).toHaveCount(0);
 });
+
+// Without scripts the Markets list never opens, but it still hangs hidden from the header: it must not reach past the
+// window on a wide screen, where the longer Spanish and Portuguese lists once made the page scroll sideways.
+test('without scripts no page scrolls sideways on a wide screen', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'desktop widths only');
+  test.setTimeout(120000);
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false, baseURL: info.project.use.baseURL });
+  const page = await ctx.newPage();
+  const pages = ['', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  for (const width of [1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of pages) {
+      await page.goto('/' + path);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${path} at ${width}`).toBeLessThanOrEqual(0);
+    }
+  }
+  await ctx.close();
+});
