@@ -17,7 +17,7 @@
 // (the two elevations side by side, at one scale in feet, read from their rulers) and the Texas buyer guide, whose
 // photograph panel is refilled from the page's current opening photograph (the ink half of that card is kept as it is).
 //
-// The Spanish and Portuguese South Florida and New York cards are drawn here too, from their own pages, so their rulers
+// The Spanish and Portuguese South Florida, New York and Hamptons cards are drawn here too, from their own pages, so their rulers
 // and water names read in the page's language.
 //
 // It needs Playwright: from the repo's own node_modules (npm ci), or from a folder named in NODE_PATH. It serves the repo
@@ -49,6 +49,8 @@ const MARKETS = [
   { page: 'pt/sul-da-florida.html', out: 'pt/og-sul-da-florida.jpg', sub: 'Miami, Fort Lauderdale e West Palm Beach', label: 'Nota de mercado' },
   { page: 'es/nueva-york.html', out: 'es/og-nueva-york.jpg', sub: 'Los condominios nuevos de Manhattan', label: 'Nota de mercado' },
   { page: 'pt/nova-york.html', out: 'pt/og-nova-york.jpg', sub: 'Os novos condomínios de Manhattan', label: 'Nota de mercado' },
+  { page: 'es/hamptons.html', out: 'es/og-hamptons.jpg', sub: 'Southampton, East Hampton y el South Fork', label: 'Nota de mercado' },
+  { page: 'pt/hamptons.html', out: 'pt/og-hamptons.jpg', sub: 'Southampton, East Hampton e o South Fork', label: 'Nota de mercado' },
 ];
 
 // The journal note that sets the two launch cities side by side.
