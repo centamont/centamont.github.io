@@ -719,10 +719,13 @@ html:not(.js) .step{min-height:auto}
   .pr h3 + p{display:none}
   .pr .sum{display:block;margin:8px 0 4px}
 }
-.begin-go{display:none}
 @media (max-width:520px){
-  .begin{display:none}
-  .begin-go{display:block;margin:32px 0 0}
+  .begin{margin-top:28px;padding-top:18px;gap:10px}
+  .begin ol > li{grid-template-columns:36px minmax(0,1fr);column-gap:8px;padding-block:7px;row-gap:0}
+  .begin ol > li > b{font-size:19px;line-height:1.2}
+  .begin ol .seq{font-size:22px}
+  .begin ol > li > span:not(.seq),.begin .spec,.begin .close > p{display:none}
+  .begin .close{margin-top:8px}
 }
 @media (max-width:520px){
   .chart .lv p,#markets .ask,#questions .ask,#contact .reach,#journal .jr-strip{display:none}
