@@ -1,4 +1,4 @@
-// Built from _src/home.js by tools/version.py: edit the source, not this file.
+// © Centamont. Not open source: centamont.com/terms.html. Built from _src/home.js by tools/version.py: edit the source, not this file.
 document.addEventListener('DOMContentLoaded',function(){
 const root=document.documentElement,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off';
 setTimeout(()=>{root.classList.remove('intro-on');try{startHero()}catch(e){const h=document.getElementById('top');if(h)h.classList.add('lit')}},4000);

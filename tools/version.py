@@ -39,7 +39,7 @@ def strip_css(src,name='site.css'):
         else:
             out.append(c);i+=1
     lines=[l.rstrip() for l in ''.join(out).split('\n')]
-    return '/* Built from _src/%s by tools/version.py: edit the source, not this file. */\n'%name+'\n'.join(l for l in lines if l.strip())+'\n'
+    return '/* © Centamont. Not open source: centamont.com/terms.html. Built from _src/%s by tools/version.py: edit the source, not this file. */\n'%name+'\n'.join(l for l in lines if l.strip())+'\n'
 
 # A slash starts a regular expression, not a division, after one of these (or at the start).
 REGEX_AFTER=set('( , = : [ ! & | ? { } ; + - * % < > ~ ^ => && || ?? == === != !== <= >= += -= *= /= return typeof case do else in instanceof new void delete throw yield await of'.split())
@@ -102,7 +102,7 @@ def strip_js(src,name,head=True):
         m=re.compile(r'[A-Za-z_$][\w$]*|\d[\w.]*|=>|===|!==|==|!=|<=|>=|&&|\|\||\?\?|[+\-*/]=|\.\.\.|.').match(src,i)
         cur.append(m.group(0));prev=m.group(0);i=m.end()
     end_line()
-    return ('// Built from _src/%s by tools/version.py: edit the source, not this file.\n'%name if head else '')+'\n'.join(lines)+'\n'
+    return ('// © Centamont. Not open source: centamont.com/terms.html. Built from _src/%s by tools/version.py: edit the source, not this file.\n'%name if head else '')+'\n'.join(lines)+'\n'
 
 built={}
 for f in CSS+JS:

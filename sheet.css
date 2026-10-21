@@ -1,4 +1,4 @@
-/* Built from _src/sheet.css by tools/version.py: edit the source, not this file. */
+/* © Centamont. Not open source: centamont.com/terms.html. Built from _src/sheet.css by tools/version.py: edit the source, not this file. */
 .rp-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:26px clamp(32px,6vw,96px);align-items:last baseline}
 .rp-top > *{min-width:0}
 .page.report .rp-top h1{font-size:clamp(40px,4.4vw,64px);line-height:1.04;max-width:none}
