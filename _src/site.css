@@ -918,7 +918,8 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .prose h2{font-size:var(--t-head);font-weight:400;max-width:none;margin:56px 0 16px}
 .prose h2:first-child{margin-top:0}
 .prose p,.prose li{font-family:var(--display);line-height:1.55;color:var(--read);font-variant-numeric:lining-nums}
-.prose p + p{margin-top:.9em}
+/* (a pull figure set between two paragraphs keeps their usual space) */
+.prose p + p,.prose p + .side + p{margin-top:.9em}
 .prose ul,.prose ol{margin:18px 0 0;padding-left:1.2em}
 /* under a heading a list starts as close as a paragraph does: the first item's 10px folds into the heading's 16px (also when a side note sits between them) */
 .prose h2 + :is(ul,ol),.prose h2 + .side + :is(ul,ol){margin-top:0}
