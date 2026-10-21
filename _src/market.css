@@ -58,7 +58,7 @@
   /* the price follows the name on every card, so each card's figures sit at one height however long its description runs */
   .hood > figure.photo{order:-3}
   .hood > h3{order:-2}
-  .prose .hood > .mk-at{order:-1;margin:0 0 10px;font-size:12.5px;letter-spacing:.08em;line-height:1.6}
+  .prose .hood > .mk-at{order:-1;margin:0 0 10px;font-size:13px;letter-spacing:.06em;line-height:1.6}
 }
 /* one neighbourhood photograph runs on into the margin, its caption under it, so seven places in a row keep a beat */
 @media (min-width:1320px) and (hover:hover) and (pointer:fine){
@@ -111,6 +111,25 @@
 }
 .prose .mk-src{font-size:15px}
 .prose .mk-src li{scroll-margin-top:96px}
+/* on a phone, where each row costs a scroll, the sources and the last of a developer's rules stand behind one ruled row
+   each, set as the curve's method is; a footnote or a link to one opens its row (site.js). From 521px the row steps aside
+   and the list stands open, as before, wherever the browser can open a closed row's content from the stylesheet */
+.mk-fold{margin-top:18px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.mk-fold[open]{border-bottom:0}
+.prose .mk-fold summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:44px;padding-block:10px;font-family:var(--body);font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .3s var(--ease)}
+.mk-fold summary::-webkit-details-marker{display:none}
+.mk-fold summary::after{content:"";flex:none;width:13px;height:13px;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .4s var(--ease)}
+.mk-fold[open] summary::after{transform:rotate(45deg)}
+.mk-fold summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+@media (hover:hover) and (pointer:fine){.prose .mk-fold summary:hover{color:var(--fg)}}
+.mk-fold > .ref{margin-top:0}
+@supports selector(::details-content){@media screen and (min-width:521px){
+  .mk-fold{margin-top:0;border:0}
+  .mk-fold > .mk-src{margin-top:18px}
+  .prose .mk-fold > summary{display:none}
+  details.mk-fold::details-content{content-visibility:visible;display:block;block-size:auto;overflow-y:visible}
+}}
+@media print{.prose .mk-fold > summary{display:none}.mk-fold{margin-top:0;border:0}.mk-fold > .mk-src{margin-top:18px}}
 .mk-fig{margin:clamp(40px,6vw,72px) 0 0;max-width:640px}
 .mk-fig .chart{margin:0;display:block;overflow:hidden;padding-block:8px}
 .mk-fig .sv{--u:.8;display:block;margin-inline:auto;width:min(100%,560px);height:auto;aspect-ratio:36/25;overflow:visible;clip-path:inset(0 -100vw)}
@@ -237,9 +256,6 @@
 .mk-tax .tv{fill:var(--fg);font:400 15px var(--display);letter-spacing:0;font-variant-numeric:lining-nums}
 .mk-tax .tj{fill:var(--muted);font-size:11.5px}
 @media (max-width:600px){.mk-tax text{font-size:14px}.mk-tax .tv{font-size:18px}.mk-tax .tj{font-size:14px}}
-/* a skyline that pans on a phone says so in its caption, on a phone only */
-.mk-pan-cue{display:none}
-@media (max-width:600px){.mk-pan-cue{display:inline;color:var(--fg)}}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
 .mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
@@ -289,10 +305,9 @@
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
 .mk-key b{display:inline-block;min-width:1.4em;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
-.mk-key i{font-style:normal;color:var(--faint);opacity:.8;white-space:nowrap}
+.mk-key i{font-style:normal;color:var(--faint);white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
-.mk-pan-hint{display:none}
 @media (max-width:600px){
   .mk-el-pan{margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));padding-inline:var(--gl) var(--gr);overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
   .mk-el-pan::-webkit-scrollbar{display:none}
@@ -303,12 +318,8 @@
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
-  /* where a line under the drawing says what lies past the edge (South Florida only), the drawing fades out at the right edge until the reader reaches its end; other pages keep the shared crop */
-  .mk-el-fig:has(.mk-pan-hint) .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
-  .mk-pan-hint{display:block;margin:10px 0 0;font:500 12px/1.4 var(--body);letter-spacing:.06em;color:var(--faint);transition:opacity .4s}
-  .mk-el-fig:has(.at-end) .mk-pan-hint{opacity:0}
 }
-/* A drawing that pans on a phone says so: a line in the caption's label voice ends in an arrow, and the frame fades
+/* A drawing that pans on a phone (every skyline that pans, the Manhattan and Hamptons maps) says so in one voice: a line in the caption's label voice ends in an arrow, and the frame fades
    at its right edge, so more is plainly there; both go once the reader reaches the end. The Manhattan district map pans the same way: on a phone it keeps the
    width and the lettering it has on a wide screen rather than shrinking its six names into one another. */
 .pan-hint{display:none}
