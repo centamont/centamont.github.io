@@ -1251,6 +1251,21 @@ test('share cards, descriptions and the first image stay within their limits', a
   }
 });
 
+// Every sheet of the set carries a share card of its own, drawn by tools/og-pages.mjs (or og-markets.mjs, og.mjs), in its
+// own language; the general card (og-site.png) is kept for the general sheets (privacy, terms) and the vacant lot.
+test('every sheet of the set has a share card of its own', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const general = ['privacy.html', 'terms.html', '404.html'];
+  for (const p of pages.filter((p) => !general.includes(p))) {
+    const html = readFileSync(p, 'utf8');
+    const img = (html.match(/<meta property="og:image" content="https:\/\/centamont\.com\/([^"?]*)/) || [])[1];
+    expect(img, `${p}: og:image`).toBeTruthy();
+    expect(img, `${p}: uses the general card`).not.toMatch(/og-site\.png$/);
+    if (/^(es|pt)\//.test(p)) expect(img.startsWith(p.slice(0, 3)), `${p}: ${img} is not in its language`).toBe(true);
+  }
+});
+
 // The developer notes read in sequence: from the newest, each one's Next note leads on until every note is read.
 test('every developer note is reached by following Next from the newest', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
