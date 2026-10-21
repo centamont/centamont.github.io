@@ -14,11 +14,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # each figure: (label, number, unit, note, footnote, (now, then, then as written) or None)
 SHEETS = {
     'south-florida.html': {
-        'asof': ('2026-07', 'July 2026'), 'next': ('2027-01', 'January 2027'),
+        'asof': ('2026-08', 'August 2026'), 'next': ('2027-01', 'January 2027'),
         'figures': [
-            ('New towers', '$1,983', 'a square foot', 'Average luxury asking price, against about $800 five years earlier', 1, (1983, 800, '$800')),
-            ('Projects', '26', 'or more in pre-construction', 'Branded and ultra-luxury projects across the three counties', 1, None),
-            ('Resale', '12', 'months of supply', 'Miami-Dade condominiums, at a median price of $400,000; new construction excluded', 2, None),
+            ('New towers', '$1,983', 'a square foot', 'Average luxury asking price in July, against about $800 five years earlier', 2, (1983, 800, '$800')),
+            ('Projects', '26', 'or more in pre-construction', 'Branded and ultra-luxury projects across the three counties, in July', 2, None),
+            ('Resale', '12.1', 'months of supply', 'Miami-Dade condominiums in August, at a median price of $408,000; new construction excluded', 1, None),
         ]},
     'new-york.html': {
         'asof': ('2026-09', 'the third quarter of 2026'), 'next': ('2027-01', 'January 2027'),
