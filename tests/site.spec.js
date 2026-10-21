@@ -751,11 +751,33 @@ test('the stylesheet is built from its source', async ({}, info) => {
   expect(out, 'a built stylesheet or script, or a ?v= token, is stale: run python3 tools/version.py').toBe('');
 });
 
+// Every page's footer, the drawing's title block, is written by tools/footer.py from one table, and its date and revision
+// from the page's own changes. A page changed without a new footer, a hand edit to one, or a page with no row in the table
+// fails here; and the date a reader sees is the date the page carries, never one still to come.
+test('every footer is drawn from the sheet table and dated by its revisions', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  let out = '';
+  try { execFileSync('python3', ['tools/footer.py', '--check'], { encoding: 'utf8' }); }
+  catch (e) { out = String(e.stdout || e.message); }
+  expect(out, 'a footer is stale: run python3 tools/footer.py').toBe('');
+  const today = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const pages = ['.', 'journal', 'es', 'pt'].flatMap((d) => readdirSync(d).filter((f) => f.endsWith('.html')).map((f) => (d === '.' ? f : d + '/' + f)));
+  let blocks = 0;
+  for (const p of pages) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/<div class="t-dr">[\s\S]*?<time datetime="([\d-]+)">([^<]+)<\/time>/g)) {
+      blocks++;
+      expect(m[2], `${p}: the date shown is the date it carries`).toBe(m[1].split('-').join(' · '));
+      expect(m[1] <= today, `${p}: drawn ${m[1]}, a date still to come`).toBe(true);
+    }
+  }
+  expect(blocks).toBeGreaterThanOrEqual(55);
+});
+
 // Stylesheet and scripts are linked with one shared ?v= token taken from their contents (tools/version.py), so a
 // returning visitor never pairs a new page with an old stylesheet. A change to any of them needs a new token.
 test('assets carry the current version', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'home.js', 'media/maps.svg'];
+  const assets = ['site.css', 'site.js', 'model.js', 'instrument.js', 'tower3d.js', 'planner.js', 'home.css', 'project-site.js', 'practice.css', 'market.css', 'reading.css', 'sheet.css', 'home.js', 'media/maps.svg', 'media/sig.svg'];
   const h = createHash('sha256');
   for (const a of assets) h.update(readFileSync(a));
   const token = h.digest('hex').slice(0, 8);
@@ -763,7 +785,7 @@ test('assets carry the current version', async ({}, info) => {
     'journal/buying-pre-construction-florida.html', 'journal/buying-new-construction-florida.html', 'journal/buying-pre-construction-new-york.html', 'journal/buying-new-construction-new-york.html', 'journal/launch-price-and-the-pre-sale-threshold.html', 'journal/what-a-weekly-sales-report-should-measure.html', 'journal/launching-in-miami-and-new-york.html', 'journal/buying-pre-construction-texas.html', 'journal/buying-new-construction-texas.html', 'journal/buying-pre-construction-california.html', 'journal/buying-new-construction-california.html', 'journal/deposit-escrow-for-new-condominiums.html', 'journal/reading-the-pace-of-sales.html', 'journal/working-with-outside-brokers.html', 'journal/releasing-inventory-in-a-new-building.html'];
   let refs = 0;
   for (const p of pages) {
-    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|home\.js|maps\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:href|src)="[^"]*?(site\.css|home\.css|practice\.css|market\.css|reading\.css|sheet\.css|site\.js|model\.js|instrument\.js|planner\.js|project-site\.js|home\.js|maps\.svg|sig\.svg)(\?v=[0-9a-f]*)?(#[\w-]+)?"/g)) {
       refs++;
       expect(m[2], `${p} links ${m[1]} without the current token: run python3 tools/version.py`).toBe('?v=' + token);
     }
