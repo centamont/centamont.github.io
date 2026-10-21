@@ -956,6 +956,8 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 /* the next note: one ruled row, the whole of it a link */
 .next{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:center;max-width:638px;min-height:96px;margin-top:clamp(44px,5vw,60px);padding:20px 0 22px;border-top:1px solid var(--fg);border-bottom:1px solid var(--rule);color:var(--fg);text-decoration:none}
 .next > span{grid-column:1}
+/* a second card straight after the first shares its rule, so two read as one short list */
+.next + .next{margin-top:0;border-top:0}
 .next-k{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .next-t{margin-top:4px;font-family:var(--display);font-size:30px;line-height:1.15;text-wrap:balance}
 .next-d{margin-top:10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;line-height:1.7;text-transform:uppercase;color:var(--faint)}
