@@ -4,10 +4,11 @@
 # load after it: home.css (the three home pages), practice.css (the home pages, developers, private clients and its
 # twins, advisors, the markets hub), market.css (the market pages), reading.css (the journal, the buyer guides, privacy,
 # the not-found page) and sheet.css (the report, the planner, the short list, the project site). The shared scripts
-# site.js, instrument.js and planner.js are written and commented there too (Jekyll never publishes an underscore
-# folder). This tool writes each published copy from its source with the comments and blank lines taken out, so what
-# the browser fetches carries no notes. Edit the sources, never the built files. model.js, tower3d.js,
-# project-site.js, media/maps.svg (the markets maps' coastlines) and media/sig.svg (the footer signature) are published as written.
+# site.js, instrument.js, planner.js, home.js, the tower model model.js and its WebGL renderer tower3d.js are written
+# and commented there too (Jekyll never publishes an underscore folder). This tool writes each published copy from its
+# source with the comments and blank lines taken out, so what the browser fetches carries no notes. Edit the sources,
+# never the built files. project-site.js, media/maps.svg (the markets maps' coastlines) and media/sig.svg (the footer
+# signature) are published as written.
 # The token is the first 8 hex digits of a sha256 over the published files, so it changes whenever any of them does.
 # Run from the repo root after editing any of them (or a source in _src/), then python3 tools/csp.py:
 #   python3 tools/version.py
@@ -17,7 +18,7 @@ import re,hashlib,glob,sys
 check='--check' in sys.argv[1:]
 stale=[]
 CSS=['site.css','home.css','practice.css','market.css','reading.css','sheet.css']
-JS=['site.js','instrument.js','planner.js','home.js']
+JS=['site.js','instrument.js','planner.js','home.js','model.js','tower3d.js']
 
 def strip_css(src,name='site.css'):
     # Drops /* comments */ outside strings and unquoted url(), then trailing spaces and blank lines.

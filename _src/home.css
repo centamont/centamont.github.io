@@ -740,7 +740,7 @@ html:not(.js) :is(.seam,.vein){display:none}
    curve of its own (an ellipse here drew a blob over the island's western palms at every width, and a band at 1440 x
    1100); the photograph fades in on its own edge inside the veil's last third, and the tower's lit lobby and its
    ground stand clear of it. */
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.97) 26%,rgba(var(--hero-rgb),.78) 38%,rgba(var(--hero-rgb),.38) 48%,rgba(var(--hero-rgb),.1) 56%,rgba(var(--hero-rgb),0) 64%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.97) 26%,rgba(var(--hero-rgb),.84) 38%,rgba(var(--hero-rgb),.46) 48%,rgba(var(--hero-rgb),.14) 56%,rgba(var(--hero-rgb),0) 64%)}
 /* While the photograph stands (the canvas carries data-still), the hero rises over the page's sheet (site.css: z-index 5),
    so the paper's grain lies on the copy's ink and never on the photograph: the hero lays its own grain, the same tile,
    over the veil's ink alone, thinning with it. A browser without :has() keeps the sheet over the whole hero. */
