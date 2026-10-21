@@ -242,6 +242,8 @@
 .mk-el.hd .md{stroke-width:calc(var(--lw-object) * var(--fu));opacity:.8}
 .mk-el.hd .fut .dt{opacity:.42}.mk-el.hd .fut .dt.q{opacity:.24}.mk-el.hd .fut .dt.md{opacity:.6}.mk-el.hd .fut .ob{opacity:.75}
 .mk-el.hd .bk{opacity:.42}
+.mk-el.mi .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.35)}
+.mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 .mk-el.hd .wn{stroke:none}
 .js .mk-el.hd .wn{opacity:0;transition:opacity .9s var(--ease-out) 1.1s}
