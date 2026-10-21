@@ -452,6 +452,20 @@ html.js .pc-nojs{display:none}
 .dv-get b{font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
 .dv-get span{color:var(--muted);max-width:34em}
 .dv-get .more{justify-self:start;margin-top:4px}
+.dv-shc{align-self:stretch;align-content:start}
+.dv-shs{display:grid;gap:14px;max-width:236px;margin-top:10px;position:sticky;top:96px}
+.dv-sheets{list-style:none;margin:0;padding:0;display:grid;gap:18px}
+.dv-sheets a{display:grid;gap:8px;text-decoration:none;color:var(--muted);font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;transition:color var(--t-ui)}
+.dv-sheets a:hover{color:var(--fg)}
+.dv-sheets img{display:block;width:100%;height:auto;border:1px solid var(--rule);transition:border-color var(--t-ui)}
+.dv-sheets a:hover img{border-color:var(--fg)}
+:root[data-theme="dark"] .dv-sheets img{filter:brightness(.86)}
+.dv-sheets-k{font-size:var(--t-label);color:var(--muted);margin:0}
+@media (max-width:820px){
+  .dv-shs{max-width:none;position:static}
+  .dv-sheets{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .dv-sheets a{font-size:13px;letter-spacing:.06em;text-transform:none}
+}
 .dv-qa{margin:0;border-top:1px solid var(--rule)}
 .dv-qa > div{padding:16px 0 18px;border-bottom:1px solid var(--rule)}
 .dv-qa dt{font-family:var(--display);font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
