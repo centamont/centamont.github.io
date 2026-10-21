@@ -14,48 +14,41 @@
 .facade :is(.w,.k){fill:currentColor;stroke:none}
 .facade .br{stroke:var(--sold-line)}
 .facade .hatch{stroke-width:calc(var(--lw-hatch) * var(--fu,1.1));opacity:.5}
-.facade .b{fill:var(--sold);stroke:none;opacity:.45;transition:opacity .5s var(--ease)}
+.facade .b{--b-rest:.45;fill:var(--sold);stroke:none;opacity:var(--b-rest);transition:opacity .5s var(--ease)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .facade .b{--b-rest:.68}}
+:root[data-theme="dark"] .facade .b{--b-rest:.68}
 .js .facade path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease-ink) calc(var(--i,0) * 60ms)}
 .js .facade.in path{stroke-dashoffset:0}
-.js .facade.in .b{animation:facade-b .9s var(--ease) .7s backwards}
+.js .facade:not(.in) :is(.w,.k,.b){opacity:0}
+.js .facade.in :is(.w,.k,.b){animation:facade-b .9s var(--ease) calc(var(--i,0) * 60ms + .6s) backwards}
 @keyframes facade-b{from{opacity:0}}
-.js .facade:not(.in) .b{opacity:0}
-.js .facade:not(.in) :is(.w,.k){opacity:0}
-.js .facade.in :is(.w,.k){animation:facade-b .9s var(--ease) .5s backwards}
-.practices:has(.pr:nth-of-type(1):focus-within) g:nth-of-type(1) .b,
-.practices:has(.pr:nth-of-type(2):focus-within) g:nth-of-type(2) .b,
-.practices:has(.pr:nth-of-type(3):focus-within) g:nth-of-type(3) .b{opacity:1}
-@media (hover:hover) and (pointer:fine){
-.practices:has(.pr:nth-of-type(1):hover) g:nth-of-type(1) .b,
-.practices:has(.pr:nth-of-type(2):hover) g:nth-of-type(2) .b,
-.practices:has(.pr:nth-of-type(3):hover) g:nth-of-type(3) .b{opacity:1}
-}
-@media (prefers-reduced-motion:reduce){.js .facade path{stroke-dashoffset:0;transition:none}.js .facade .b,.js .facade:not(.in) .b,.js .facade.in .b{opacity:.45;animation:none}.js .facade :is(.w,.k),.js .facade.in :is(.w,.k){opacity:1;animation:none}}
+@media (prefers-reduced-motion:reduce){.js .facade path{stroke-dashoffset:0;transition:none}.js .facade:not(.in) .b{opacity:var(--b-rest)}.js .facade:not(.in) :is(.w,.k){opacity:1}.js .facade.in :is(.w,.k,.b){animation:none}}
 :root[data-motion="off"] .facade path{stroke-dashoffset:0;transition:none}
-:root[data-motion="off"] .facade:not(.in) .b{opacity:.45}
-:root[data-motion="off"] .facade :is(.w,.k){opacity:1;animation:none}
+:root[data-motion="off"] .facade:not(.in) .b{opacity:var(--b-rest)}
+:root[data-motion="off"] .facade:not(.in) :is(.w,.k){opacity:1}
+:root[data-motion="off"] .facade.in :is(.w,.k,.b){animation:none}
+.practices:has(.pr:nth-of-type(1):focus-within) :is(.lt:nth-of-type(1),g:nth-of-type(1) .b),
+.practices:has(.pr:nth-of-type(2):focus-within) :is(.lt:nth-of-type(2),g:nth-of-type(2) .b),
+.practices:has(.pr:nth-of-type(3):focus-within) :is(.lt:nth-of-type(3),g:nth-of-type(3) .b){opacity:var(--lit,1)}
+@media (hover:hover) and (pointer:fine){
+  .practices:has(.pr:nth-of-type(1):hover) :is(.lt:nth-of-type(1),g:nth-of-type(1) .b),
+  .practices:has(.pr:nth-of-type(2):hover) :is(.lt:nth-of-type(2),g:nth-of-type(2) .b),
+  .practices:has(.pr:nth-of-type(3):hover) :is(.lt:nth-of-type(3),g:nth-of-type(3) .b){opacity:var(--lit,1)}
+}
 .pr > *{min-width:0;max-width:100%}
-.pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px)}
+.pr .num{font-family:var(--display);font-weight:300;font-size:clamp(44px,4.4vw,60px);line-height:.8;color:var(--accent);margin-bottom:clamp(18px,2vw,26px);transition:transform .6s var(--ease),font-style 0s}
 .pr h3{font-size:var(--t-head)}
-.pr p{color:var(--muted);margin-top:14px}
-.pr p{margin-bottom:12px}
+.pr p{color:var(--muted);margin:14px 0 12px}
 .pr .more{margin-top:auto;padding-top:6px}
+.pr .sum{display:none}
 @media (max-width:820px){
   .facade .pf{stroke-width:calc(var(--lw-object) * var(--fu,1.1))}
-  .bays span{position:absolute;top:0;transform:translateX(-50%);padding-left:.04em;transition:color var(--t-ui) var(--ease-out)}
-  .bays span:nth-child(1){left:17.29%}.bays span:nth-child(2){left:50%}.bays span:nth-child(3){left:82.71%}
-  .practices:has(.pr:nth-of-type(1):focus-within) .bays span:nth-child(1),
-  .practices:has(.pr:nth-of-type(2):focus-within) .bays span:nth-child(2),
-  .practices:has(.pr:nth-of-type(3):focus-within) .bays span:nth-child(3){color:var(--fg)}
-  .pr .num{font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted);margin-bottom:12px}
+  .facade :is(.dent,.hatch.alt){display:none}
+  .pr .num{font:400 20px/1 var(--display);letter-spacing:.04em;margin:0}
   .practices .pr:is(:focus-within,:hover) .num{font-style:normal}
+  .pr .more{justify-self:start}
 }
-@media (max-width:820px) and (hover:hover) and (pointer:fine){
-  .practices:has(.pr:nth-of-type(1):hover) .bays span:nth-child(1),
-  .practices:has(.pr:nth-of-type(2):hover) .bays span:nth-child(2),
-  .practices:has(.pr:nth-of-type(3):hover) .bays span:nth-child(3){color:var(--fg)}
-}
-@media (max-width:520px){.pr h3 + p{margin-top:12px}}
+@media (max-width:600px){.facade .fine{display:none}}
 @media screen and (min-width:1041px),screen and (min-width:821px) and (min-height:501px){
   html.js .rise .elev{grid-column:1/span 7}
 }
@@ -251,7 +244,6 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
   .head.quiet .intro{grid-column:8/-1}
 }
 .pr .more::after{content:"";position:absolute;inset:0}
-.pr .num{transition:transform .6s var(--ease),font-style 0s}
 .pr:focus-within .num{transform:translateX(6px);font-style:italic}
 @media (hover:hover) and (pointer:fine){.pr:hover .num{transform:translateX(6px);font-style:italic}}
 .chart .lv :is(h3,p,.when){transition:color .4s var(--ease)}
@@ -266,7 +258,7 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 }
 @media print{
   html.intro-on .hero :is(.lede,.row){transform:none!important}
-  .js .facade .b{opacity:.45!important}.js .facade :is(.w,.k){opacity:1!important}
+  .js .facade :is(.w,.k,.b){animation:none!important}.js .facade .b{opacity:var(--b-rest)!important}.js .facade :is(.w,.k){opacity:1!important}
   .js .spec .sp-plan g,.js .spec .sp-pace,.js .spec .sp-dot{opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}
   .rise .elev{display:none!important}
 }
@@ -292,25 +284,23 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 .head .intro::before{margin-bottom:18px}
 }
 .practices{margin-top:clamp(48px,6vw,80px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.plate{grid-column:1/-1;margin:0 0 clamp(14px,1.6vw,22px);font-size:15px;color:var(--faint)}
+.plate b{font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-right:14px;color:var(--muted)}
 .facade{grid-column:1/-1;display:block;width:100%;height:auto;color:var(--fg);overflow:visible}
-.facade .lt{fill:var(--sold);stroke:none;opacity:0;transition:opacity .6s var(--ease)}
-.practices:has(.pr:nth-of-type(1):focus-within) .lt:nth-of-type(1),
-.practices:has(.pr:nth-of-type(2):focus-within) .lt:nth-of-type(2),
-.practices:has(.pr:nth-of-type(3):focus-within) .lt:nth-of-type(3){opacity:.14}
-@media (hover:hover) and (pointer:fine){.practices:has(.pr:nth-of-type(1):hover) .lt:nth-of-type(1),
-.practices:has(.pr:nth-of-type(2):hover) .lt:nth-of-type(2),
-.practices:has(.pr:nth-of-type(3):hover) .lt:nth-of-type(3){opacity:.14}
-}
+.facade .lt{--lit:.14;fill:var(--sold);stroke:none;opacity:0;transition:opacity .6s var(--ease)}
 .pr{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:clamp(28px,3vw,40px) clamp(16px,2.4vw,36px) 0}
 .pr::after{content:"";position:absolute;left:0;right:0;top:calc(-11.5px / var(--fu,1.1));height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease)}
 .pr:focus-within::after{transform:none}
 @media (hover:hover) and (pointer:fine){.pr:hover::after{transform:none}}
-@media (min-width:821px){.pr{display:grid;grid-row:2/span 4;grid-template-rows:subgrid;justify-items:start;align-content:start}}
-.bays{display:none}
+@media (min-width:821px){.pr{display:grid;grid-row:3/span 4;grid-template-rows:subgrid;justify-items:start;align-content:start}
+.pr .more,.pr .go{margin-top:0}
+}
 @media (max-width:820px){.practices{grid-template-columns:minmax(0,1fr)}
-.pr{padding:28px 0;border-bottom:1px solid var(--rule)}
+.plate{display:none}
+.pr{display:grid;grid-template-columns:2.1em minmax(0,1fr);align-items:baseline;padding:28px 0;border-bottom:1px solid var(--rule)}
+.pr > *{grid-column:2}
+.pr > .num{grid-column:1;grid-row:1}
 .pr::after{top:auto;bottom:-1px}
-.bays{display:block;position:relative;height:20px;margin:8px 0 0;font:400 20px/1 var(--display);letter-spacing:.04em;color:var(--muted)}
 }
 .rise{--bleed:calc(max(0px,(100vw - var(--max)) / 2) + var(--gl));display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32px,5vw,96px);margin-top:clamp(48px,7vw,96px)}
 @media (min-width:1181px){.rise{grid-template-columns:minmax(0,7fr) minmax(0,4fr)}}
@@ -589,7 +579,7 @@ html:not(.js) .step{min-height:auto}
 }
 .name .cut{margin-left:-.045em}
 .pr:last-child{border-bottom:0}
-.pr .go{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:28px;margin:auto 0 0;color:inherit}
+.pr .go{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 28px;margin:auto 0 0;color:inherit}
 .pr .go .more{margin-top:0}
 .pr .go .more + .more{position:relative;z-index:1}
 .pr .go .more + .more::after{content:none}
@@ -718,6 +708,7 @@ html:not(.js) .step{min-height:auto}
   .chart .lv .when{grid-column:1;grid-row:2}
   .chart .lv p{grid-column:1;grid-row:3;margin-top:4px}
   .pr h3 + p{display:none}
+  .pr .sum{display:block;margin:8px 0 4px}
   .spec .sp-sheet,.sp-cap > span{display:none}
 }
 .begin-go{display:none}
