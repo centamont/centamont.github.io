@@ -1,4 +1,4 @@
-// Built from _src/site.js by tools/version.py: edit the source, not this file.
+// © Centamont. Not open source: centamont.com/terms.html. Built from _src/site.js by tools/version.py: edit the source, not this file.
 (function (init) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init(); })(function () {
 document.body.classList.remove('no-js');
 const root = document.documentElement;

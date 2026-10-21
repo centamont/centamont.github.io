@@ -83,7 +83,7 @@
 .ms-sc .now{top:5px;width:var(--now);height:3px;background:var(--fg)}
 .ms-sc .ref{left:var(--now);top:6px;width:calc(var(--then) - var(--now));height:1px;background:repeating-linear-gradient(90deg,var(--fg) 0 1px,transparent 1px 4px)}
 .ms-sc .then{left:var(--then);top:0;width:1px;height:13px;background:var(--fg)}
-.ms-sc b{position:absolute;top:17px;left:0;transform:translateX(-50%);font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--faint);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.ms-sc b{position:absolute;top:17px;left:0;transform:translateX(-50%);font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--muted);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
 .ms-sc[style*="--then:100.0%"] b{transform:translateX(-100%)}
 @media (forced-colors:active){.ms-sc{forced-color-adjust:none}.ms-sc :is(.now,.then),.ms-sc::after{background:CanvasText}.ms-sc .ref{background:repeating-linear-gradient(90deg,CanvasText 0 1px,transparent 1px 4px)}.ms-sc b{color:CanvasText}}
 .ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}

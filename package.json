@@ -1,7 +1,7 @@
 {
   "name": "centamont.github.io",
   "version": "1.0.0",
-  "description": "The Centamont.com website. A single static page (`index.html`) served by GitHub Pages.",
+  "description": "The Centamont.com website, served by GitHub Pages. Not open source: see terms.html.",
   "main": "index.js",
   "scripts": {},
   "repository": {
@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/centamont/centamont.github.io/issues"
   },
@@ -18,5 +18,6 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.4"
-  }
+  },
+  "private": true
 }

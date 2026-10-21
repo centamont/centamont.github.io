@@ -1,4 +1,4 @@
-/* Built from _src/reading.css by tools/version.py: edit the source, not this file. */
+/* © Centamont. Not open source: centamont.com/terms.html. Built from _src/reading.css by tools/version.py: edit the source, not this file. */
 .dbar .s{flex:0 0 calc(var(--w) * 1%);transform-origin:left;transition:transform 1s var(--ease) calc(var(--d) * .22s)}
 .js .deposit:not(.in) .dbar .s{transform:scaleX(0)}
 .dbar .s + .s{border-left:1px solid var(--fg)}

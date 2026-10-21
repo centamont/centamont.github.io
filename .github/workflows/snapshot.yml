@@ -1,0 +1,19 @@
+name: Site snapshot
+on:
+  schedule:
+    - cron: '41 12 * * 1'
+  workflow_dispatch:
+  push:
+    paths: [ 'tools/snapshot.py', '.github/workflows/snapshot.yml' ]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    # Asks the Internet Archive for a dated copy of the main pages, weekly; tools/snapshot.py lists them.
+    name: Site snapshot
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Snapshot
+      run: python3 tools/snapshot.py
