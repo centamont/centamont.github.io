@@ -7,7 +7,7 @@
 # site.js, instrument.js and planner.js are written and commented there too (Jekyll never publishes an underscore
 # folder). This tool writes each published copy from its source with the comments and blank lines taken out, so what
 # the browser fetches carries no notes. Edit the sources, never the built files. model.js, tower3d.js,
-# project-site.js and media/maps.svg (the markets maps' coastlines) are published as written.
+# project-site.js, media/maps.svg (the markets maps' coastlines) and media/sig.svg (the footer signature) are published as written.
 # The token is the first 8 hex digits of a sha256 over the published files, so it changes whenever any of them does.
 # Run from the repo root after editing any of them (or a source in _src/), then python3 tools/csp.py:
 #   python3 tools/version.py
@@ -112,7 +112,7 @@ for f in CSS+JS:
         if open(f).read()!=built[f]: stale.append(f); print(f,'stale: run python3 tools/version.py')
     else: open(f,'w').write(built[f])
 
-assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css','home.js','media/maps.svg']
+assets=['site.css','site.js','model.js','instrument.js','tower3d.js','planner.js','home.css','project-site.js','practice.css','market.css','reading.css','sheet.css','home.js','media/maps.svg','media/sig.svg']
 h=hashlib.sha256()
 for a in assets: h.update(built[a].encode() if a in built else open(a,'rb').read())
 token=h.hexdigest()[:8]
