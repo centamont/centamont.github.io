@@ -150,6 +150,10 @@
 .mk-fig .dm2 .rl{fill:var(--muted);font:500 calc(10.5px * var(--u,1)) var(--body);letter-spacing:.12em;stroke-width:calc(4px * var(--u,1))}
 .mk-fig .dm2 :is(.sbg,.nbg){fill:var(--sheet);opacity:.88}
 .mk-fig .dm2 .dl{font-weight:500}
+.mk-fig .dm2 .ct{fill:none;stroke:var(--fg);stroke-width:.6px;opacity:.2;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.mk-fig .dm2 .ct.ci{stroke-width:.85px;opacity:.28}
+.mk-fig .dm2 .cty{fill:none;stroke:var(--fg);stroke-width:1.3px;stroke-dasharray:6 3.5;stroke-linejoin:round;opacity:.72;vector-effect:non-scaling-stroke}
+.mk-fig .dmap text.lm.cl{fill:var(--fg);opacity:.8}
 @media (max-width:600px){.mk-fig .dm2 .mwc{stroke-width:calc(4px * var(--u,1))}.mk-fig .dm2 .mwf{stroke-width:calc(2.4px * var(--u,1))}.mk-fig .dm2 .po{display:none}}
 @media (forced-colors:active){.mk-fig .dm2 :is(.r2,.r3,.r4,.r5,.mwc){stroke:CanvasText}}
 @media (forced-colors:active){.mk-fig .dmap :is(.fb,.fw,.dz path,.dzl){stroke:CanvasText}.mk-fig .dmap rect.lm{fill:CanvasText}}
@@ -226,6 +230,7 @@
 .mk-el .far{opacity:.62}
 .mk-el .dt.far{opacity:.35}
 .film .frame{aspect-ratio:16/7}
+.photo.film:not(.bleed) .frame{aspect-ratio:2/1}
 .film .frame picture{position:absolute;inset:0}
 .film .frame img,.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .film video{opacity:0;transition:opacity 1.4s cubic-bezier(.3,0,.15,1)}
