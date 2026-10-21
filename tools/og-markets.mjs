@@ -39,7 +39,7 @@ const MARKETS = [
   { page: 'naples.html', out: 'og-naples.jpg', sub: 'Pelican Bay, Park Shore and the Old Town' },
   { page: 'tampa.html', out: 'og-tampa.jpg', sub: 'Water Street, Harbour Island and Bayshore' },
   { page: 'dallas.html', out: 'og-dallas.jpg', sub: 'Uptown, Turtle Creek and Downtown' },
-  { page: 'houston.html', out: 'og-houston.jpg', sub: 'Uptown, River Oaks and Downtown' },
+  { page: 'houston.html', out: 'og-houston.jpg', sub: 'Uptown, River Oaks and the Museum District' },
   { page: 'austin.html', out: 'og-austin.jpg', sub: 'Rainey Street, Second Street and Downtown' },
   { page: 'los-angeles.html', out: 'og-los-angeles.jpg', sub: 'The Westside and Downtown' },
   { page: 'orange-county.html', out: 'og-orange-county.jpg', sub: 'Newport Beach, Irvine and Laguna Beach' },
