@@ -256,9 +256,6 @@
 .mk-tax .tv{fill:var(--fg);font:400 15px var(--display);letter-spacing:0;font-variant-numeric:lining-nums}
 .mk-tax .tj{fill:var(--muted);font-size:11.5px}
 @media (max-width:600px){.mk-tax text{font-size:14px}.mk-tax .tv{font-size:18px}.mk-tax .tj{font-size:14px}}
-/* a skyline that pans on a phone says so in its caption, on a phone only */
-.mk-pan-cue{display:none}
-@media (max-width:600px){.mk-pan-cue{display:inline;color:var(--fg)}}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
 .mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
@@ -311,7 +308,6 @@
 .mk-key i{font-style:normal;color:var(--faint);white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
-.mk-pan-hint{display:none}
 @media (max-width:600px){
   .mk-el-pan{margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));padding-inline:var(--gl) var(--gr);overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
   .mk-el-pan::-webkit-scrollbar{display:none}
@@ -322,12 +318,8 @@
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
-  /* where a line under the drawing says what lies past the edge (South Florida only), the drawing fades out at the right edge until the reader reaches its end; other pages keep the shared crop */
-  .mk-el-fig:has(.mk-pan-hint) .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
-  .mk-pan-hint{display:block;margin:10px 0 0;font:500 12px/1.4 var(--body);letter-spacing:.06em;color:var(--faint);transition:opacity .4s}
-  .mk-el-fig:has(.at-end) .mk-pan-hint{opacity:0}
 }
-/* A drawing that pans on a phone says so: a line in the caption's label voice ends in an arrow, and the frame fades
+/* A drawing that pans on a phone (every skyline that pans, the Manhattan and Hamptons maps) says so in one voice: a line in the caption's label voice ends in an arrow, and the frame fades
    at its right edge, so more is plainly there; both go once the reader reaches the end. The Manhattan district map pans the same way: on a phone it keeps the
    width and the lettering it has on a wide screen rather than shrinking its six names into one another. */
 .pan-hint{display:none}
