@@ -417,7 +417,7 @@
   // The advisors' table: with motion off, the seats are shown taken.
   if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.add('in'));
 
-  // The footer signature is engraved as it arrives: outline first, then the fill.
+  // The footer signature is engraved as it arrives, left to right.
   const sig = document.querySelector('footer .sig');
   if (sig && !stillPage && 'IntersectionObserver' in window) {
     sig.classList.add('eng');
