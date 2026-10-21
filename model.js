@@ -595,20 +595,25 @@
     // The photograph, laid where the rendered tower is. Where it falls short of the canvas's right or bottom edge (a
     // window wider or shorter than the one it was made in), it fades out over its last 48 to 200px (twice the shortfall)
     // into the bay drawn under it rather than ending on a line (a copy faded once for each size, kept until it changes).
+    // Its left and top edges, which lie inside the canvas, are softened too (56px at the left, where the drawn sky hands
+    // its far city to the photograph's, and 16px at the top, just over the crown): the still's sky is never quite the drawn
+    // sky's tone, and while the photograph fades in (or out) a hard edge there shows as a dark box round the tower.
     still(g, a) {
       const p = this.ph, s = p.s, k = this.k, z = k.f / s.f;
-      const x = k.cx + (s.x - s.cx) * z, y = k.cy + (s.y - s.cy) * z, w = s.w * z, h = s.h * z, fr = x + w < this.w - 0.5, fb = y + h < this.h - 0.5;
+      const x = k.cx + (s.x - s.cx) * z, y = k.cy + (s.y - s.cy) * z, w = s.w * z, h = s.h * z, fr = x + w < this.w - 0.5, fb = y + h < this.h - 0.5, fl = x > 0.5, ft = y > 0.5;
       let src = p.img;
-      if (fr || fb) {
-        const d = this.dpr || 1, cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d)), key = cw + 'x' + ch + (fr ? 'r' : '') + (fb ? 'b' : '');
+      if (fr || fb || fl || ft) {
+        const d = this.dpr || 1, cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d)), key = cw + 'x' + ch + (fr ? 'r' : '') + (fb ? 'b' : '') + (fl ? 'l' : '') + (ft ? 't' : '');
         if (p.fk !== key) {
-          const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d;
+          const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d, el = Math.min(56 * z * d, cw / 4), et = Math.min(16 * z * d, ch / 8);
           c.width = cw; c.height = ch;
           const q = c.getContext('2d');
           q.drawImage(p.img, 0, 0, cw, ch); q.globalCompositeOperation = 'destination-out';
           const fade = (x0, y0, x1, y1) => { const lg = q.createLinearGradient(x0, y0, x1, y1); lg.addColorStop(0, 'rgba(0,0,0,0)'); lg.addColorStop(0.5, 'rgba(0,0,0,0.25)'); lg.addColorStop(1, 'rgba(0,0,0,1)'); q.fillStyle = lg; q.fillRect(0, 0, cw, ch); };
           if (fr) fade(cw - e, 0, cw, 0);
           if (fb) fade(0, ch - e, 0, ch);
+          if (fl) fade(el, 0, 0, 0);
+          if (ft) fade(0, et, 0, 0);
           p.fk = key;
         }
         src = p.fc;
@@ -785,10 +790,12 @@
       const fading = !!this.r3 && this.r3a < 1;
       if (fading) { this.r3a = reduce ? 1 : Math.min(1, this.r3a + dt / 600); this.dirty = true; }
       const casting = this.doneAt > 0 && t - this.doneAt < CASCADE / (this.o.cascadeK || 1) && this.dark && !this.o.sun && this.sunNow.night > 0.05;
-      // and the photograph over the tower, once it may (see photoOn; after dark, once its lights are on), in 0.8 s each way
+      // and the photograph over the tower, once it may (see photoOn; after dark, once its lights are on), in 0.8 s each way;
+      // over a tower that stood finished from its first frame (a return visit, a phone) it comes in whole, in one frame, as
+      // the page fades the canvas in round it (home.js), so no frames are spent crossfading a build nobody watched
       const saT = !casting && this.photoOn() ? 1 : 0, phading = this.sa !== saT;
       if (phading) {
-        this.sa = reduce ? saT : saT > this.sa ? Math.min(1, this.sa + dt / 800) : Math.max(0, this.sa - dt / 800); this.dirty = true;
+        this.sa = reduce || this.doneAt === -Infinity ? saT : saT > this.sa ? Math.min(1, this.sa + dt / 800) : Math.max(0, this.sa - dt / 800); this.dirty = true;
         if (this.sa > 0) this.c.dataset.still = this.ph.key; else delete this.c.dataset.still;
       }
       // the sun, let go, going back to now (eased in and out over 0.8 s)
