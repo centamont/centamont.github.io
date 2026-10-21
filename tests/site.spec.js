@@ -180,6 +180,11 @@ for (const [path, heading] of [
   ['/es/los-angeles.html', 'Los Angeles'],
   ['/pt/san-francisco.html', 'San Francisco'],
   ['/es/orange-county.html', 'Orange County'],
+  ['/pt/dallas.html', 'Dallas'],
+  ['/es/houston.html', 'Houston'],
+  ['/pt/austin.html', 'Austin'],
+  ['/es/tampa.html', 'Tampa'],
+  ['/pt/naples.html', 'Naples'],
   ['/privacy.html', 'Privacy'],
   ['/terms.html', 'Terms of use'],
   ['/404.html', 'This page was never built'],
@@ -480,7 +485,7 @@ test('only the home pages load the home styles', async ({}, info) => {
 // placed in one of these, and every stylesheet a page names has to exist.
 test('each page loads site.css and its own template sheet, and nothing else', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
-  const market = ['south-florida', 'new-york', 'hamptons', 'los-angeles', 'dallas', 'austin', 'houston', 'san-francisco', 'tampa', 'naples', 'orange-county', 'es/sur-de-florida', 'pt/sul-da-florida', 'es/nueva-york', 'pt/nova-york', 'es/hamptons', 'pt/hamptons', 'es/los-angeles', 'pt/los-angeles', 'es/san-francisco', 'pt/san-francisco', 'es/orange-county', 'pt/orange-county'].map((p) => p + '.html');
+  const market = ['south-florida', 'new-york', 'hamptons', 'los-angeles', 'dallas', 'austin', 'houston', 'san-francisco', 'tampa', 'naples', 'orange-county', 'es/sur-de-florida', 'pt/sul-da-florida', 'es/nueva-york', 'pt/nova-york', 'es/hamptons', 'pt/hamptons', 'es/los-angeles', 'pt/los-angeles', 'es/san-francisco', 'pt/san-francisco', 'es/orange-county', 'pt/orange-county', 'es/dallas', 'pt/dallas', 'es/austin', 'pt/austin', 'es/houston', 'pt/houston', 'es/tampa', 'pt/tampa', 'es/naples', 'pt/naples'].map((p) => p + '.html');
   const practice = ['developers', 'private-clients', 'es/clientes-privados', 'pt/clientes-privados', 'advisors', 'markets', 'es/desarrolladores', 'pt/incorporadoras', 'es/mercados', 'pt/mercados', 'es/asesores', 'pt/consultores'].map((p) => p + '.html');
   const homes = ['index.html', 'es/index.html', 'pt/index.html'];
   const sheets = ['report', 'planner', 'shortlist', 'project-site', 'es/informe-semanal', 'pt/relatorio-semanal', 'es/planificador', 'pt/planejador'].map((p) => p + '.html');
@@ -506,6 +511,11 @@ test('translated pages and their originals link to one another', async ({}, info
     ['los-angeles.html', 'es/los-angeles.html', 'pt/los-angeles.html'],
     ['san-francisco.html', 'es/san-francisco.html', 'pt/san-francisco.html'],
     ['orange-county.html', 'es/orange-county.html', 'pt/orange-county.html'],
+    ['dallas.html', 'es/dallas.html', 'pt/dallas.html'],
+    ['austin.html', 'es/austin.html', 'pt/austin.html'],
+    ['houston.html', 'es/houston.html', 'pt/houston.html'],
+    ['tampa.html', 'es/tampa.html', 'pt/tampa.html'],
+    ['naples.html', 'es/naples.html', 'pt/naples.html'],
     ['journal/buying-pre-construction-florida.html', 'es/comprar-preconstruccion-florida.html', 'pt/comprar-na-planta-florida.html'],
     ['journal/buying-new-construction-florida.html', 'es/comprar-obra-nueva-florida.html', 'pt/comprar-imovel-novo-florida.html'],
     ['developers.html', 'es/desarrolladores.html', 'pt/incorporadoras.html'],
@@ -598,7 +608,11 @@ for (const path of ['/', '/es/', '/pt/']) {
     // the questions after the fourth fold behind one more row, and every question is still on the page
     await expect(page.locator('.faq details:not(.fq-more)')).toHaveCount(6);
     await expect(page.locator('.faq .fq-more > summary')).toBeVisible();
-    await expect(page.locator('.begin-go a')).toBeVisible();
+    // the engagement keeps its three steps and its call to write on a phone
+    await expect(page.locator('.begin ol > li > b')).toHaveCount(3);
+    await expect(page.locator('.begin .close .btn')).toBeVisible();
+    // and the footer's set of sheets folds behind one row
+    await expect(page.locator('footer .ss-d > summary')).toBeVisible();
   });
 }
 
@@ -738,7 +752,7 @@ test('the buyer letter on private clients composes and copies', async ({ page, c
 test('every page runs under its security policy with nothing refused', async ({ page }) => {
   // some fifty pages, each loaded and scrolled, so the walk gets more than the default half minute
   test.setTimeout(120000);
-  const pages = ['/', '/privacy.html', '/terms.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/hamptons.html', '/pt/hamptons.html', '/es/los-angeles.html', '/pt/los-angeles.html', '/es/san-francisco.html', '/pt/san-francisco.html', '/es/orange-county.html', '/pt/orange-county.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html', '/es/asesores.html', '/pt/consultores.html', '/es/planificador.html', '/pt/planejador.html', '/es/informe-semanal.html', '/pt/relatorio-semanal.html',
+  const pages = ['/', '/privacy.html', '/terms.html', '/404.html', '/private-clients.html', '/planner.html', '/shortlist.html', '/report.html', '/south-florida.html', '/new-york.html', '/hamptons.html', '/los-angeles.html', '/dallas.html', '/austin.html', '/houston.html', '/san-francisco.html', '/tampa.html', '/naples.html', '/orange-county.html', '/developers.html', '/markets.html', '/project-site.html', '/es/', '/es/clientes-privados.html', '/es/sur-de-florida.html', '/pt/', '/pt/clientes-privados.html', '/pt/sul-da-florida.html', '/es/nueva-york.html', '/pt/nova-york.html', '/es/hamptons.html', '/pt/hamptons.html', '/es/los-angeles.html', '/pt/los-angeles.html', '/es/san-francisco.html', '/pt/san-francisco.html', '/es/orange-county.html', '/pt/orange-county.html', '/es/dallas.html', '/pt/dallas.html', '/es/austin.html', '/pt/austin.html', '/es/houston.html', '/pt/houston.html', '/es/tampa.html', '/pt/tampa.html', '/es/naples.html', '/pt/naples.html', '/es/comprar-preconstruccion-florida.html', '/es/comprar-obra-nueva-florida.html', '/pt/comprar-na-planta-florida.html', '/pt/comprar-imovel-novo-florida.html', '/es/desarrolladores.html', '/pt/incorporadoras.html', '/es/mercados.html', '/pt/mercados.html', '/es/asesores.html', '/pt/consultores.html', '/es/planificador.html', '/pt/planejador.html', '/es/informe-semanal.html', '/pt/relatorio-semanal.html',
     '/journal/', '/journal/buying-pre-construction-florida.html', '/journal/buying-new-construction-florida.html', '/journal/buying-pre-construction-new-york.html', '/journal/buying-new-construction-new-york.html',
     '/journal/launch-price-and-the-pre-sale-threshold.html', '/journal/what-a-weekly-sales-report-should-measure.html', '/journal/launching-in-miami-and-new-york.html',
     '/journal/buying-pre-construction-texas.html', '/journal/buying-new-construction-texas.html', '/journal/buying-pre-construction-california.html', '/journal/buying-new-construction-california.html', '/journal/deposit-escrow-for-new-condominiums.html', '/journal/reading-the-pace-of-sales.html', '/journal/working-with-outside-brokers.html', '/journal/releasing-inventory-in-a-new-building.html'];
@@ -1238,6 +1252,21 @@ test('share cards, descriptions and the first image stay within their limits', a
     const d = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1];
     if (d) expect(d.replace(/&[a-z#0-9]+;/g, '.').length, `${p}: description`).toBeLessThanOrEqual(160);
     for (const tag of html.matchAll(/<img\b[^>]*>/g)) expect(/fetchpriority="high"/.test(tag[0]) && /loading="lazy"/.test(tag[0]), `${p}: ${tag[0].slice(0, 80)}`).toBe(false);
+  }
+});
+
+// Every sheet of the set carries a share card of its own, drawn by tools/og-pages.mjs (or og-markets.mjs, og.mjs), in its
+// own language; the general card (og-site.png) is kept for the general sheets (privacy, terms) and the vacant lot.
+test('every sheet of the set has a share card of its own', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
+  const general = ['privacy.html', 'terms.html', '404.html'];
+  for (const p of pages.filter((p) => !general.includes(p))) {
+    const html = readFileSync(p, 'utf8');
+    const img = (html.match(/<meta property="og:image" content="https:\/\/centamont\.com\/([^"?]*)/) || [])[1];
+    expect(img, `${p}: og:image`).toBeTruthy();
+    expect(img, `${p}: uses the general card`).not.toMatch(/og-site\.png$/);
+    if (/^(es|pt)\//.test(p)) expect(img.startsWith(p.slice(0, 3)), `${p}: ${img} is not in its language`).toBe(true);
   }
 });
 

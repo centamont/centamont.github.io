@@ -1,4 +1,4 @@
-// Built from _src/planner.js by tools/version.py: edit the source, not this file.
+// © Centamont. Not open source: centamont.com/terms.html. Built from _src/planner.js by tools/version.py: edit the source, not this file.
 const plMonths = {
 es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
 pt: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],

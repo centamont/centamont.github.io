@@ -36,6 +36,8 @@
   --bg:#F4F0E8; --sheet:#FAF7F1; --fg:#14161A; --muted:#4A463F; --faint:#6E675D; --rule:#D6CDBB;
   /* a drawing's gridlines and tracks: the rule by day; at night a step lighter, so they keep the same faint presence on the dark sheet */
   --grid:#D6CDBB;
+  /* the mark (--seal) takes one colour on each ground, wherever it appears (the header, the icons, the share cards): ink on
+     a light ground, Centamont Bronze (bronze-500) on ink or on the night page */
   --accent:var(--bronze-700); --seal:#14161A; --sold:var(--bronze-500); --line:#14161A;
   /* bronze that must read as an edge, a line or a point on ivory (a field's rule, a data line, a marker, a meter, a hatch)
      takes a deeper bronze by day, 3:1 or more; the fill bronze stays for areas and bars. At night, and in the ink rooms by
@@ -77,11 +79,11 @@
 @media (max-width:520px){:root{--t-hero:clamp(44px,12.3vw,50px);--t-display:clamp(44px,12.3vw,50px);--t-spread:clamp(38px,10.8vw,44px);--t-chapter:clamp(34px,10vw,40px);--t-section:clamp(34px,10vw,40px);--t-head:clamp(26px,7.4vw,30px);--t-big:21px}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
-  --accent:var(--bronze-300); --seal:var(--bronze-300); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
+  --accent:var(--bronze-300); --seal:var(--bronze-500); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
-  --accent:var(--bronze-300); --seal:var(--bronze-300); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
+  --accent:var(--bronze-300); --seal:var(--bronze-500); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -189,6 +191,9 @@ nav.main a:focus-visible,nav.main a[aria-current="true"]{color:var(--fg)}
    before it is pressed: a small EN after its name, at the 13px label floor, in the link's own colour (screen readers hear
    "in English" instead) */
 .en-tag{display:inline-block;margin-left:.5em;font-family:var(--body);font-size:13px;font-weight:400;font-style:normal;line-height:1;letter-spacing:.1em;text-indent:0;text-transform:uppercase;vertical-align:.12em;white-space:nowrap}
+/* in the bar the sections stand just beside the language switch, where an "EN" after a section's name reads as part of
+   the switch ("Notas EN"); there the tag is left to the drawer and to screen readers, which hear "(en inglés)" */
+@media (min-width:1280px) and (min-width:80em){nav.main>a .en-tag{display:none}}
 /* wide enough for Close, with its tracking, so the label swap never shifts the day/night button */
 .menu-btn{display:none;min-width:86px;text-align:center;background:none;border:1px solid var(--rule);color:var(--fg);font:inherit;font-size:var(--t-label);letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:border-color var(--t-ui) var(--ease-out),background-color var(--t-ui) var(--ease-out)}
 @property --dp{syntax:'<number>';inherits:false;initial-value:0}
@@ -663,7 +668,7 @@ body.home header.site{position:fixed;left:0;right:0}
 .js header.site.over nav.main a{color:rgba(var(--ivory-rgb),.78)}
 .js header.site.over nav.main a:focus-visible{color:var(--ivory)}
 @media (hover:hover) and (pointer:fine){.js header.site.over nav.main a:hover{color:var(--ivory)}}
-.js header.site.over .mark .sym{color:var(--bronze-300)}
+.js header.site.over .mark .sym{color:var(--bronze-500)}
 .js header.site.over .menu-btn{border-color:rgba(var(--ivory-rgb),.28);color:var(--ivory)}
 .js header.site.over :is(.theme,.motion){color:rgba(var(--ivory-rgb),.78)}.js header.site.over :is(.theme,.motion):focus-visible{color:var(--ivory)}
 .js header.site.over .motion ~ .theme::before{background:rgba(var(--ivory-rgb),.28)}
@@ -1325,6 +1330,19 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* the set's two columns stand a little closer on a phone (1.2em rather than 2.2), so the longer Spanish and Portuguese
    names keep to one line where they can */
 @container (min-width:19.5em){@media (max-width:600px){.tb .ss{column-gap:1.2em}}}
+/* On a phone the set folds behind one row, its ten sheets a tap away, so a page keeps its length for what it says; wider
+   (and in print) the row goes and the set stands open. Where a browser cannot open a fold from its styles, the row stays at
+   every width, so the set is never out of reach. */
+.ss-d > summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:43px;color:var(--muted)}
+.ss-d > summary::-webkit-details-marker{display:none}
+.ss-d > summary::after{content:"";flex:none;width:13px;height:13px;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .3s var(--ease)}
+.ss-d[open] > summary::after{transform:rotate(45deg)}
+.ss-d > summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.ss-d > summary:hover{color:var(--fg)}}
+@supports selector(::details-content){
+  @media (min-width:601px){.ss-d > summary{display:none}.ss-d::details-content{content-visibility:visible;display:block;block-size:auto}}
+  @media print{.ss-d > summary{display:none}.ss-d::details-content{content-visibility:visible;display:block;block-size:auto}}
+}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so the labels and
    'Weekly report' each keep to one line in their cells */
 /* the office's address sits on one line in its half-width cell down to a 360px phone; below that it breaks after the @ */
