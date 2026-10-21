@@ -45,7 +45,7 @@
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
   .hood > p + p{margin-top:.6em}
 }
-@media (max-width:700px){.hoods.even .hood > figure.photo{max-width:none}.hoods.even .hood > figure.photo img{aspect-ratio:4/3;object-fit:cover;object-position:50% 35%}}
+@media (max-width:700px){.hoods.even .hood{position:relative}.hoods.even .hood > figure.photo{max-width:none}.hoods.even .hood > figure.photo img{aspect-ratio:4/3;object-fit:cover;object-position:50% 35%}}
 .prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .ms-h{display:flex;flex-wrap:wrap;gap:6px 1.15em;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ms-h span:first-child{color:var(--accent)}
@@ -166,6 +166,7 @@
 @media (max-width:600px){.mk-fig :is(.dmap,.nyd) [style*="--ph"]{transform:var(--ph)}.mk-fig :is(.dmap,.nyd) [style*="--pa"],.mk-fig :is(.dmap,.nyd) [style*="--pa"] tspan{text-anchor:var(--pa)}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+.mk-taxf{margin-bottom:clamp(32px,4vw,48px)}
 .mk-taxf .mk-tax{display:block;width:100%;height:auto;overflow:visible}
 .mk-tax path{fill:none;stroke:var(--fg);vector-effect:non-scaling-stroke}
 .mk-tax .st{stroke-width:var(--lw-profile);stroke-linejoin:miter}
