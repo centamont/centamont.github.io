@@ -273,8 +273,8 @@
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
-  /* until the reader reaches its end, the drawing fades out at the right edge, and a line under it says what lies there */
-  .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
+  /* where a line under the drawing says what lies past the edge (South Florida only), the drawing fades out at the right edge until the reader reaches its end; other pages keep the shared crop */
+  .mk-el-fig:has(.mk-pan-hint) .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
   .mk-pan-hint{display:block;margin:10px 0 0;font:500 12px/1.4 var(--body);letter-spacing:.06em;color:var(--faint);transition:opacity .4s}
   .mk-el-fig:has(.at-end) .mk-pan-hint{opacity:0}
 }
