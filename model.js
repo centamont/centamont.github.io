@@ -331,13 +331,13 @@
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 754, y: 143, w: 986, h: 907, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 754, y: 127, w: 986, h: 923, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 620, y: 140, w: 1120, h: 910, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    morning: { x: 620, y: 140, w: 1120, h: 910, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    gold: { x: 620, y: 140, w: 1120, h: 910, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    night: { x: 620, y: 140, w: 1120, h: 910, th: -0.096573, f: 1687.08, cx: 1021.968, cy: 668.736 },
   };
-  // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
-  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
+  // (and from x 575, fully from 825, in the same hero, the photograph has its own far city: the sky's skyline goes)
+  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
   // (an engine whose media queries take only the older addListener)
   const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
   let GEN = 0; // camera generations, shared by every model: the plan rings are shared too
@@ -537,7 +537,13 @@
       if (typeof WebGL2RenderingContext !== 'function') return;
       // (the renderer's script, tower3d.js, arrives on its own at low priority; it only defines what is used here)
       let tries = 0;
+      // A phone held upright shows the photograph, never the rendered tower (only held sideways does it keep the live
+      // drawing), and setting the renderer up cost it about a second of main thread for nothing: there the renderer
+      // waits until the phone is turned sideways, and the drawn sky stands under the photograph meanwhile.
+      const sideways = matchMedia('(orientation:landscape) and (max-height:500px)'), upright = () => !force && !!this.ph && matchMedia('(max-width:820px)').matches && !sideways.matches;
       const start = () => {
+        if (this.dead || this.r3) return;
+        if (upright()) { onMQ(sideways, function turn() { offMQ(sideways, turn); start(); }); return; }
         if (typeof window.CentamontTower3D !== 'function') { if (++tries < 40) setTimeout(start, 250); return; }
         let r = null;
         const phone = matchMedia('(max-width:820px)').matches;
@@ -2204,10 +2210,16 @@
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        // (over the photograph's bright haze, each name stands on a faint, wide ink halo, so the lowest still read without
-        // the names looking embossed on the sky)
-        const halo = this.sa > 0 && this.dark && !this.forced;
-        if (halo) { g.save(); g.shadowColor = `rgba(${(this.bg || [20, 22, 26]).join()},${(0.6 * this.sa).toFixed(3)})`; g.shadowBlur = 10; }
+        // (over the photograph's bright haze, each name stands on a halo of the hero's ink: a thin, rounded outline under the
+        // letters, as a map clears the ground round its names, then a faint, wide shadow, so the lowest names, over the
+        // lawn and the palms at 11 AM, keep at least three to one without looking embossed on the sky)
+        const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
+        if (halo) {
+          g.save(); g.strokeStyle = `rgba(${ink},${(0.7 * this.sa).toFixed(3)})`; g.lineWidth = 2.4; g.lineJoin = 'round'; g.lineCap = 'round';
+          for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
+          g.restore();
+          g.save(); g.shadowColor = `rgba(${ink},${(0.6 * this.sa).toFixed(3)})`; g.shadowBlur = 10;
+        }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
         g.globalAlpha = 1;
