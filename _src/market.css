@@ -64,6 +64,9 @@
   main.page:not(.wide) .prose .hood > figure.photo.span{width:calc(100% + 250px);max-width:none}
   main.page:not(.wide) .prose .hood > figure.photo.span > .cap{position:static;width:auto;max-width:640px;margin-top:12px}
 }
+/* (a row whose photographs differ in shape gives every card the same picture, cut to fill, so no card ends in an empty band;
+   each card holds its own hidden link text, which would otherwise widen the page) */
+@media (max-width:700px){.hoods.even .hood{position:relative}.hoods.even .hood > figure.photo{max-width:none}.hoods.even .hood > figure.photo img{aspect-ratio:4/3;object-fit:cover;object-position:50% 35%}}
 .prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .ms-h{display:flex;flex-wrap:wrap;gap:6px 1.15em;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ms-h span:first-child{color:var(--accent)}
@@ -219,6 +222,20 @@
    cities, with the tower going up in bronze. It draws in as the other drawings do. On phones it crops to the middle of the
    skyline, at a heavier pen, and leaves the ruler and the water's name to the wider screens. */
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+/* a tax drawn as steps (San Francisco): the rate in ink across each price band, the rate grid in hairline */
+.mk-taxf{margin-bottom:clamp(32px,4vw,48px)}
+.mk-taxf .mk-tax{display:block;width:100%;height:auto;overflow:visible}
+.mk-tax path{fill:none;stroke:var(--fg);vector-effect:non-scaling-stroke}
+.mk-tax .st{stroke-width:var(--lw-profile);stroke-linejoin:miter}
+.mk-tax .ax{stroke-width:var(--lw-object)}
+.mk-tax .g{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.mk-tax text{font:500 11px var(--body);letter-spacing:.06em;fill:var(--faint);font-variant-numeric:lining-nums tabular-nums}
+.mk-tax .tv{fill:var(--fg);font:400 15px var(--display);letter-spacing:0;font-variant-numeric:lining-nums}
+.mk-tax .tj{fill:var(--muted);font-size:11.5px}
+@media (max-width:600px){.mk-tax text{font-size:14px}.mk-tax .tv{font-size:18px}.mk-tax .tj{font-size:14px}}
+/* a skyline that pans on a phone says so in its caption, on a phone only */
+.mk-pan-cue{display:none}
+@media (max-width:600px){.mk-pan-cue{display:inline;color:var(--fg)}}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
 .mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
