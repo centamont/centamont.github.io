@@ -165,6 +165,9 @@
 .mk-fig .dm2 .r4{stroke-width:.6px;opacity:.32}
 .mk-fig .dm2 .r3{stroke-width:.8px;opacity:.42}
 .mk-fig .dm2 .r2{stroke-width:1.1px;opacity:.55}
+/* parks the copy names, in a faint tone, and a named trail as a fine dashed line (Dallas) */
+.mk-fig .dm2 .pk{fill:var(--fg);opacity:.06}
+.mk-fig .dm2 .tr{stroke-dasharray:3 2.5;opacity:.6}
 .mk-fig .dm2 :is(.mwc,.mwf){fill:none;stroke-linejoin:round;stroke-linecap:round}
 .mk-fig .dm2 .mwc{stroke:var(--fg);stroke-width:calc(5px * var(--u,1));opacity:.62}
 .mk-fig .dm2 .mwf{stroke:var(--sheet);stroke-width:calc(3.2px * var(--u,1))}
