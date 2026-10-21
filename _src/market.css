@@ -58,7 +58,7 @@
   /* the price follows the name on every card, so each card's figures sit at one height however long its description runs */
   .hood > figure.photo{order:-3}
   .hood > h3{order:-2}
-  .prose .hood > .mk-at{order:-1;margin:0 0 10px;font-size:12.5px;letter-spacing:.08em;line-height:1.6}
+  .prose .hood > .mk-at{order:-1;margin:0 0 10px;font-size:13px;letter-spacing:.06em;line-height:1.6}
 }
 /* one neighbourhood photograph runs on into the margin, its caption under it, so seven places in a row keep a beat */
 @media (min-width:1320px) and (hover:hover) and (pointer:fine){
@@ -308,7 +308,7 @@
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
 .mk-key b{display:inline-block;min-width:1.4em;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
-.mk-key i{font-style:normal;color:var(--faint);opacity:.8;white-space:nowrap}
+.mk-key i{font-style:normal;color:var(--faint);white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
 .mk-pan-hint{display:none}

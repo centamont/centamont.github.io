@@ -1085,7 +1085,7 @@ html:not(.js) .step{min-height:auto}
      close up a step */
   .head.seat{row-gap:16px}.head.seat .intro::before{display:none}
   .seat .table{margin:6px 0 4px}.head.seat .links{margin-top:0}
-  .seat .table .dm{font-size:10px;letter-spacing:.1em;gap:6px;transform:translate(-50%,calc(-100% - 2px))}
+  .seat .table .dm{font-size:13px;letter-spacing:.06em;gap:6px;transform:translate(-50%,calc(-100% - 2px))}
   .seat .table b{font-size:19px}
   /* at a quarter of their size the hidden seats and leaves would break into crumbs, so they stand a step darker */
   .seat .table .ch:not(.on){opacity:.75}.seat .table .leaf{opacity:.8}

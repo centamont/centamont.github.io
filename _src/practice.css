@@ -605,7 +605,7 @@ html.js .pc-nojs{display:none}
 @media (max-width:600px){.dv-rise{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:22px}}
 /* on a phone the two lines hold too, the size just under the width of the longest, Portuguese "desde o primeiro esboço." */
 @media (max-width:600px){.devs .dv-top h1{font-size:min(var(--t-chapter),9.6vw)}}
-@media (max-width:420px){.dv-rise .sl{font-size:12px;letter-spacing:.06em}.dv-rise .sn{font-size:18px}}
+@media (max-width:420px){.dv-rise .sl{font-size:13px;letter-spacing:.04em}.dv-rise .sn{font-size:18px}}
 /* what a developer receives: six ruled rows, each a deliverable, a line on it and the way to its specimen or note */
 .dv-get{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .dv-get li{display:grid;gap:4px;padding:16px 0 18px;border-bottom:1px solid var(--rule)}
