@@ -57,6 +57,16 @@ const MARKETS = [
   { page: 'pt/san-francisco.html', out: 'pt/og-san-francisco.jpg', sub: 'Rincon Hill, Mission Bay e Nob Hill', label: 'Nota de mercado' },
   { page: 'es/orange-county.html', out: 'es/og-orange-county.jpg', sub: 'Newport Beach, Irvine y Laguna Beach', label: 'Nota de mercado' },
   { page: 'pt/orange-county.html', out: 'pt/og-orange-county.jpg', sub: 'Newport Beach, Irvine e Laguna Beach', label: 'Nota de mercado' },
+  { page: 'es/dallas.html', out: 'es/og-dallas.jpg', sub: 'Uptown, Turtle Creek y Downtown', label: 'Nota de mercado' },
+  { page: 'pt/dallas.html', out: 'pt/og-dallas.jpg', sub: 'Uptown, Turtle Creek e Downtown', label: 'Nota de mercado' },
+  { page: 'es/austin.html', out: 'es/og-austin.jpg', sub: 'Rainey Street, Second Street y Downtown', label: 'Nota de mercado' },
+  { page: 'pt/austin.html', out: 'pt/og-austin.jpg', sub: 'Rainey Street, Second Street e Downtown', label: 'Nota de mercado' },
+  { page: 'es/houston.html', out: 'es/og-houston.jpg', sub: 'Uptown, River Oaks y el Museum District', label: 'Nota de mercado' },
+  { page: 'pt/houston.html', out: 'pt/og-houston.jpg', sub: 'Uptown, River Oaks e o Museum District', label: 'Nota de mercado' },
+  { page: 'es/tampa.html', out: 'es/og-tampa.jpg', sub: 'Water Street, Harbour Island y Bayshore', label: 'Nota de mercado' },
+  { page: 'pt/tampa.html', out: 'pt/og-tampa.jpg', sub: 'Water Street, Harbour Island e Bayshore', label: 'Nota de mercado' },
+  { page: 'es/naples.html', out: 'es/og-naples.jpg', sub: 'Pelican Bay, Park Shore y el casco antiguo', label: 'Nota de mercado' },
+  { page: 'pt/naples.html', out: 'pt/og-naples.jpg', sub: 'Pelican Bay, Park Shore e o centro histórico', label: 'Nota de mercado' },
 ];
 
 // The journal note that sets the two launch cities side by side.
