@@ -616,6 +616,11 @@
   if (rows.length) {
     const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
     let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
+    // a skyline or a map that pans knows when the reader has reached its right-hand end (its fade and its hint then go)
+    document.querySelectorAll('.mk-el-pan, .dm-pan').forEach((p) => {
+      const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
+      end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
+    });
   }
 
   // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so

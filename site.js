@@ -445,6 +445,10 @@ const rows = document.querySelectorAll('.hoods, .mk-el-pan, .dm-pan');
 if (rows.length) {
 const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
 let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
+document.querySelectorAll('.mk-el-pan, .dm-pan').forEach((p) => {
+const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
+end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
+});
 }
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
 document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
