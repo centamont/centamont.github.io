@@ -131,17 +131,17 @@ FOLLOW=[('https://www.instagram.com/centamont','Instagram'),('https://www.youtub
 
 W={
  'en':dict(pr='Practice',prd='New development and private client advisory in Miami and New York',of='Office',ofd='Miami, Florida',
-   dr='Drawn',rev='Rev.',lt='Letters',ltd='Write to us',sh='Sheet',set='of 10',gen='General',mk='Markets',ss='Sheets',fo='Follow',
+   dr='Drawn',rev='Rev.',lt='Letters',ltd='Write to us',sh='Sheet',set='of 10',gen='General',mk='Markets',ss='Sheets',ssall='All ten sheets',fo='Follow',
    note='07 to 09 are specimens, with invented figures.',tab=' (opens in a new tab)',en='',
    copy='© 2026 Centamont.',priv='Privacy &amp; accessibility',terms='Terms',eho='Equal Housing Opportunity',top='Back to top',
    home='/',name='English',hl='en'),
  'es':dict(pr='Especialidad',prd='Asesoría en nuevos desarrollos y a clientes privados en Miami y Nueva York',of='Oficina',ofd='Miami, Florida',
-   dr='Dibujado',rev='Rev.',lt='Cartas',ltd='Escríbanos',sh='Lámina',set='de 10',gen='General',mk='Mercados',ss='Láminas',fo='Síganos',
+   dr='Dibujado',rev='Rev.',lt='Cartas',ltd='Escríbanos',sh='Lámina',set='de 10',gen='General',mk='Mercados',ss='Láminas',ssall='Las diez láminas',fo='Síganos',
    note='07 a 09 son muestras, con cifras inventadas.',tab=' (se abre en una pestaña nueva)',en=' (en inglés)',
    copy='© 2026 Centamont.',priv='Privacidad y accesibilidad',terms='Términos',eho='Igualdad de Oportunidades en la Vivienda',top='Volver arriba',
    home='/es/',name='Español',hl='es'),
  'pt':dict(pr='Atuação',prd='Assessoria em lançamentos imobiliários e a clientes privados em Miami e Nova York',of='Escritório',ofd='Miami, Flórida',
-   dr='Desenhado',rev='Rev.',lt='Cartas',ltd='Escreva-nos',sh='Prancha',set='de 10',gen='Geral',mk='Mercados',ss='Pranchas',fo='Siga-nos',
+   dr='Desenhado',rev='Rev.',lt='Cartas',ltd='Escreva-nos',sh='Prancha',set='de 10',gen='Geral',mk='Mercados',ss='Pranchas',ssall='As dez pranchas',fo='Siga-nos',
    note='07 a 09 são modelos, com números fictícios.',tab=' (abre em nova aba)',en=' (em inglês)',
    copy='© 2026 Centamont.',priv='Privacidade e acessibilidade',terms='Termos',eho='Igualdade de Oportunidades na Habitação',top='Voltar ao topo',
    home='/pt/',name='Português',hl='pt-BR'),
@@ -203,9 +203,9 @@ def block(page,lang,key,part,title,revs,letter):
       <div class="t-lt"><dt>{w['lt']}</dt><dd><a href="{letter}">{w['ltd']}</a></dd></div>
       <div class="t-sh"><dt>{w['sh']}</dt><dd><span class="st">{title}</span>{rv}<span class="no"><span class="sn">{number(key,part)}</span><span class="of">{of}</span></span></dd></div>
       <div class="t-mk"><dt>{w['mk']}</dt><dd><ul>{mk}</ul></dd></div>
-      <div class="t-ss"><dt>{w['ss']}</dt><dd><ul class="ss">
+      <div class="t-ss"><dt>{w['ss']}</dt><dd><details class="ss-d"><summary>{w['ssall']}</summary><ul class="ss">
 {ss}
-      </ul><p class="ss-note">{w['note']}</p></dd></div>
+      </ul><p class="ss-note">{w['note']}</p></details></dd></div>
       <div class="t-fo"><dt>{w['fo']}</dt><dd><ul>
 {fo}
       </ul></dd></div>

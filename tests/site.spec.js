@@ -608,7 +608,11 @@ for (const path of ['/', '/es/', '/pt/']) {
     // the questions after the fourth fold behind one more row, and every question is still on the page
     await expect(page.locator('.faq details:not(.fq-more)')).toHaveCount(6);
     await expect(page.locator('.faq .fq-more > summary')).toBeVisible();
-    await expect(page.locator('.begin-go a')).toBeVisible();
+    // the engagement keeps its three steps and its call to write on a phone
+    await expect(page.locator('.begin ol > li > b')).toHaveCount(3);
+    await expect(page.locator('.begin .close .btn')).toBeVisible();
+    // and the footer's set of sheets folds behind one row
+    await expect(page.locator('footer .ss-d > summary')).toBeVisible();
   });
 }
 

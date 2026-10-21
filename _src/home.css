@@ -1097,12 +1097,15 @@ html:not(.js) .step{min-height:auto}
   .pr h3 + p{display:none}
   .pr .sum{display:block;margin:8px 0 4px}
 }
-/* on a phone the first steps of an engagement live on the developers page: the home keeps one line that leads there,
-   and the name band keeps its lead line, leaving the paragraph after it to wider screens */
-.begin-go{display:none}
+/* on a phone the engagement keeps its heading, the names of its three steps and the call to write, closed up; the words
+   under each step, the sheet and the notes are for wider screens and the developers page, where the steps are told in full */
 @media (max-width:520px){
-  .begin{display:none}
-  .begin-go{display:block;margin:32px 0 0}
+  .begin{margin-top:28px;padding-top:18px;gap:10px}
+  .begin ol > li{grid-template-columns:36px minmax(0,1fr);column-gap:8px;padding-block:7px;row-gap:0}
+  .begin ol > li > b{font-size:19px;line-height:1.2}
+  .begin ol .seq{font-size:22px}
+  .begin ol > li > span:not(.seq),.begin .spec,.begin .close > p{display:none}
+  .begin .close{margin-top:8px}
 }
 /* and what a phone reads elsewhere stays there: the markets' places on their own pages (and the close's line to the
    partners at the close itself), the deposit schedule in the guide it draws,

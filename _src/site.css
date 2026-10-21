@@ -1330,6 +1330,19 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* the set's two columns stand a little closer on a phone (1.2em rather than 2.2), so the longer Spanish and Portuguese
    names keep to one line where they can */
 @container (min-width:19.5em){@media (max-width:600px){.tb .ss{column-gap:1.2em}}}
+/* On a phone the set folds behind one row, its ten sheets a tap away, so a page keeps its length for what it says; wider
+   (and in print) the row goes and the set stands open. Where a browser cannot open a fold from its styles, the row stays at
+   every width, so the set is never out of reach. */
+.ss-d > summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:43px;color:var(--muted)}
+.ss-d > summary::-webkit-details-marker{display:none}
+.ss-d > summary::after{content:"";flex:none;width:13px;height:13px;background:linear-gradient(var(--accent),var(--accent)) center/13px 1px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1px 13px no-repeat;transition:transform .3s var(--ease)}
+.ss-d[open] > summary::after{transform:rotate(45deg)}
+.ss-d > summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.ss-d > summary:hover{color:var(--fg)}}
+@supports selector(::details-content){
+  @media (min-width:601px){.ss-d > summary{display:none}.ss-d::details-content{content-visibility:visible;display:block;block-size:auto}}
+  @media print{.ss-d > summary{display:none}.ss-d::details-content{content-visibility:visible;display:block;block-size:auto}}
+}
 /* the narrowest phones close the cells' sides up a little and the labels' tracking with them, so the labels and
    'Weekly report' each keep to one line in their cells */
 /* the office's address sits on one line in its half-width cell down to a 360px phone; below that it breaks after the @ */
