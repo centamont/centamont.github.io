@@ -621,6 +621,20 @@ test('a footnote opens the folded sources on a phone', async ({ page, isMobile }
   await expect(page.locator('#s3')).toBeInViewport();
 });
 
+// The markets hub's rows carry each market page's own date (tools/hub.py writes them): a page updated without rerunning
+// it would leave its row behind.
+test('the markets hub dates each market as its page does', () => {
+  for (const hub of ['markets.html', 'es/mercados.html', 'pt/mercados.html']) {
+    const html = readFileSync(hub, 'utf8');
+    const rows = [...html.matchAll(/<li><a href="([^"]+)"[^>]*><picture class="mk-v">.*?<time datetime="([^"]+)">/g)];
+    expect(rows.length).toBeGreaterThanOrEqual(11);
+    for (const [, href, date] of rows) {
+      const page = readFileSync(href.replace(/^\//, ''), 'utf8');
+      expect(page.match(/<div class="meta">.*?<time datetime="([^"]+)">/)[1], `${hub} → ${href}`).toBe(date);
+    }
+  }
+});
+
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await page.goto('/');
