@@ -3,6 +3,7 @@
 }
 .mk-lfig{margin:32px 0 8px}
 .lsq{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}
+.lsq.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
 .lsq > .w2{grid-column:span 2}
 .lsq svg{display:block;width:100%;height:auto;overflow:visible}
 .lsq p{margin:10px 14px 0 0;display:flex;flex-direction:column;gap:2px}
@@ -52,6 +53,7 @@
   main.page:not(.wide) .prose .hood > figure.photo.span{width:calc(100% + 250px);max-width:none}
   main.page:not(.wide) .prose .hood > figure.photo.span > .cap{position:static;width:auto;max-width:640px;margin-top:12px}
 }
+@media (max-width:700px){.hoods.even .hood{position:relative}.hoods.even .hood > figure.photo{max-width:none}.hoods.even .hood > figure.photo img{aspect-ratio:4/3;object-fit:cover;object-position:50% 35%}}
 .prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .ms-h{display:flex;flex-wrap:wrap;gap:6px 1.15em;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ms-h span:first-child{color:var(--accent)}
@@ -142,6 +144,8 @@
 .mk-fig .dm2 .r4{stroke-width:.6px;opacity:.32}
 .mk-fig .dm2 .r3{stroke-width:.8px;opacity:.42}
 .mk-fig .dm2 .r2{stroke-width:1.1px;opacity:.55}
+.mk-fig .dm2 .pk{fill:var(--fg);opacity:.06}
+.mk-fig .dm2 .tr{stroke-dasharray:3 2.5;opacity:.6}
 .mk-fig .dm2 :is(.mwc,.mwf){fill:none;stroke-linejoin:round;stroke-linecap:round}
 .mk-fig .dm2 .mwc{stroke:var(--fg);stroke-width:calc(5px * var(--u,1));opacity:.62}
 .mk-fig .dm2 .mwf{stroke:var(--sheet);stroke-width:calc(3.2px * var(--u,1))}
@@ -176,6 +180,18 @@
 @media (max-width:600px){.mk-fig :is(.dmap,.nyd) [style*="--ph"]{transform:var(--ph)}.mk-fig :is(.dmap,.nyd) [style*="--pa"],.mk-fig :is(.dmap,.nyd) [style*="--pa"] tspan{text-anchor:var(--pa)}}
 .mk-fig + .prose{margin-top:clamp(40px,6vw,72px)}
 .mk-el-fig{margin:clamp(28px,4vw,48px) 0 clamp(40px,6vw,72px)}
+.mk-taxf{margin-bottom:clamp(32px,4vw,48px)}
+.mk-taxf .mk-tax{display:block;width:100%;height:auto;overflow:visible}
+.mk-tax path{fill:none;stroke:var(--fg);vector-effect:non-scaling-stroke}
+.mk-tax .st{stroke-width:var(--lw-profile);stroke-linejoin:miter}
+.mk-tax .ax{stroke-width:var(--lw-object)}
+.mk-tax .g{stroke:var(--grid);stroke-width:var(--lw-hatch)}
+.mk-tax text{font:500 11px var(--body);letter-spacing:.06em;fill:var(--faint);font-variant-numeric:lining-nums tabular-nums}
+.mk-tax .tv{fill:var(--fg);font:400 15px var(--display);letter-spacing:0;font-variant-numeric:lining-nums}
+.mk-tax .tj{fill:var(--muted);font-size:11.5px}
+@media (max-width:600px){.mk-tax text{font-size:14px}.mk-tax .tv{font-size:18px}.mk-tax .tj{font-size:14px}}
+.mk-pan-cue{display:none}
+@media (max-width:600px){.mk-pan-cue{display:inline;color:var(--fg)}}
 .mk-el{--fu:1.1;display:block;width:100%;height:auto;aspect-ratio:3/1;color:var(--fg);overflow:hidden}
 .mk-el path{fill:none;stroke:currentColor;stroke-width:calc(var(--lw-object) * var(--fu));stroke-linejoin:round;stroke-linecap:round}
 .mk-el .pf{stroke-width:calc(var(--lw-profile) * var(--fu))}
@@ -223,6 +239,8 @@
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  .mk-el-pan[data-end]{direction:rtl}
+  .mk-el-pan[data-end] .mk-el{direction:ltr}
   .mk-el-fig:has(.mk-pan-hint) .mk-el-pan:not(.at-end){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
   .mk-pan-hint{display:block;margin:10px 0 0;font:500 12px/1.4 var(--body);letter-spacing:.06em;color:var(--faint);transition:opacity .4s}
   .mk-el-fig:has(.at-end) .mk-pan-hint{opacity:0}
