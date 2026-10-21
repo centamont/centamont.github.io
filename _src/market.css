@@ -270,6 +270,25 @@
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
 }
+/* The Hamptons lot in plan: an ocean lot from above, drawn in the elevation's weights. The setbacks are a dashed line,
+   the house the one thing in bronze, the hedge a row of small arcs; the labels are the elevation's small capitals. */
+.lotp{display:block;width:100%;height:auto;color:var(--fg)}
+.lotp path{fill:none;stroke:currentColor;stroke-width:var(--lw-object);stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.lotp .pf{stroke-width:var(--lw-profile)}
+.lotp :is(.dt,.ln,.hd){stroke-width:var(--lw-detail);opacity:.6}
+.lotp .hatch{stroke-width:var(--lw-hatch);opacity:.5}
+.lotp .sb{stroke-width:var(--lw-detail);stroke-dasharray:5 4;opacity:.7}
+.lotp .br{stroke:var(--sold-line)}
+.lotp .br.hz{fill:var(--sold-line);fill-opacity:.12}
+.lotp .br.dtl{stroke-width:var(--lw-detail);opacity:.65}
+.lotp text{font:500 11px var(--body);letter-spacing:.14em;fill:var(--faint);stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round;paint-order:stroke}
+@media (max-width:600px){.lotp text{font-size:15px}}
+.js .lotp path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--t-ink) var(--ease-ink) calc(var(--i,0) * 90ms)}
+.js .lotp .sb{stroke-dasharray:5 4;stroke-dashoffset:0;opacity:0;transition:opacity .8s var(--ease-out) .8s}
+.js .lotp.in path{stroke-dashoffset:0}.js .lotp.in .sb{opacity:.7}
+.js .lotp text{opacity:0;transition:opacity .6s var(--ease-out) 1s}.js .lotp.in text{opacity:1}
+@media (prefers-reduced-motion:reduce){.js .lotp path{stroke-dashoffset:0;transition:none}.js .lotp .sb{opacity:.7;transition:none}.js .lotp text{opacity:1;transition:none}}
+:root[data-motion="off"] .lotp path{stroke-dashoffset:0;transition:none}:root[data-motion="off"] .lotp .sb{opacity:.7}:root[data-motion="off"] .lotp text{opacity:1;transition:none}
 /* farther towers draw at a lighter weight than the waterfront, as a draughtsman would */
 .mk-el .far{opacity:.62}
 .mk-el .dt.far{opacity:.35}
