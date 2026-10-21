@@ -263,6 +263,9 @@
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
+  .mk-el-pan[data-end]{direction:rtl}
+  .mk-el-pan[data-end] .mk-el{direction:ltr}
 }
 /* farther towers draw at a lighter weight than the waterfront, as a draughtsman would */
 .mk-el .far{opacity:.62}
