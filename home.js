@@ -59,8 +59,8 @@ heroM.o.sunPath=!narrow||side();
 heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHeight)*9);heroM.touch()};
 const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
 if(Model){
-heroM=make('heroModel',{real3d:true,orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:22,slow:2,soldRate:40,cascadeK:2,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
-if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',!window.CentamontIntro);
+heroM=make('heroModel',{real3d:true,orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',true);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
 if(window.ResizeObserver){let hs='';new ResizeObserver(([e])=>{const r=e.contentRect,k=Math.round(r.width)+'x'+Math.round(r.height);if(k===hs)return;const was=hs;hs=k;if(was&&framed)requestAnimationFrame(()=>{try{frameHero()}catch(e){}})}).observe(hero.querySelector('h1'))}}
 }
@@ -92,7 +92,8 @@ if(m.sunT!==noteT){noteT=m.sunT;tick()}};
 }
 document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 const intro=window.CentamontIntro;let started=false;
-const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro)heroM.set(34,23,false,true);else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
+const unveil=()=>{if(!heroM||!photo||reduce)return;const c=heroM.c;c.classList.add('wait');let t=0;const go=()=>{clearTimeout(t);mo.disconnect();c.classList.remove('wait')},mo=new MutationObserver(()=>{if(c.dataset.still)go()});mo.observe(c,{attributes:true,attributeFilter:['data-still']});t=setTimeout(go,1200)};
+const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro){unveil();heroM.set(34,23,false,true)}else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
 if(!intro)root.classList.remove('intro-on');
 if(intro&&!intro.open&&root.classList.contains('intro-on')){if(heroM)heroM.hold(true);intro.go=startHero}else startHero();
 let covered=false;new MutationObserver(()=>{const o=root.classList.contains('menu-open');if(o===covered)return;covered=o;models.forEach(m=>m.hold(o||(m===heroM&&!started)))}).observe(root,{attributes:true,attributeFilter:['class']});

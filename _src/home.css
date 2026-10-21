@@ -1177,3 +1177,6 @@ html:not(.js) .step{min-height:auto}
    height-bound size, so the buttons stay above the fold with the longer lede */
 @media (min-width:821px) and (max-width:1180px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(calc(var(--t-hero) * .88),9.4vh)}}
 @media (min-width:821px) and (max-width:1180px) and (max-height:800px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(calc(var(--t-hero) * .88),8.6vh)}}
+/* the hero's canvas, standing finished, waits unseen for its photograph, then fades in whole (home.js, unveil) */
+#heroModel{transition:opacity .6s ease}
+#heroModel.wait{opacity:0;transition:none}

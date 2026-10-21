@@ -117,8 +117,8 @@ document.addEventListener('DOMContentLoaded',function(){
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
-    heroM=make('heroModel',{real3d:true,orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:22,slow:2,soldRate:40,cascadeK:2,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
-    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',!window.CentamontIntro);
+    heroM=make('heroModel',{real3d:true,orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',true);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
       if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
@@ -165,14 +165,17 @@ document.addEventListener('DOMContentLoaded',function(){
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.
   // The hero tower then sells as the curve below has it by completion (46 of its 62 residences, about three quarters),
   // its sold residences standing in the sketch before the frame rises into them: the pre-sale threshold is met as ground breaks.
-  // It goes up briskly (sales at 40 levels' worth a second, the frame at 22 levels a second, its rooms lit in about
-  // a second after dark), so the finished tower, and its photograph, stand about three seconds after it starts.
+  // It goes up briskly (sales at 60 levels' worth a second, the frame at 34 levels a second, its rooms lit in about
+  // half a second after dark), so the finished tower, and its photograph (fetched at once), stand about two seconds after it starts.
   // It starts as the halves part. Until then it is drawn once, under the curtain, and holds still; if they have already
   // parted (a slow connection), it starts now, behind the open page. Without the curtain's script there is no intro.
   // Without an intro (a return visit, a phone, motion off) the build has been seen or is not wanted: the tower stands
   // finished from the first frame, and its photograph, fetched at once, fades in as soon as it is decoded.
+  // Standing finished, the tower waits unseen for its photograph (or 1.2 s at most), then the canvas fades in whole on the
+  // compositor (home.css, #heroModel.wait): the drawn tower never shows for a moment before the photograph replaces it.
   const intro=window.CentamontIntro;let started=false;
-  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro)heroM.set(34,23,false,true);else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
+  const unveil=()=>{if(!heroM||!photo||reduce)return;const c=heroM.c;c.classList.add('wait');let t=0;const go=()=>{clearTimeout(t);mo.disconnect();c.classList.remove('wait')},mo=new MutationObserver(()=>{if(c.dataset.still)go()});mo.observe(c,{attributes:true,attributeFilter:['data-still']});t=setTimeout(go,1200)};
+  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro){unveil();heroM.set(34,23,false,true)}else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
   if(!intro)root.classList.remove('intro-on');
   if(intro&&!intro.open&&root.classList.contains('intro-on')){if(heroM)heroM.hold(true);intro.go=startHero}else startHero();
   // The open menu covers the page below the header, so its drawings run no frames until it closes (the hero only once
