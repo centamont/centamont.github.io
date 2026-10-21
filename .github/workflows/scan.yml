@@ -1,5 +1,7 @@
 name: Site scan
 on:
+  schedule:
+    - cron: '23 9 1 */3 *'
   workflow_dispatch:
   push:
     paths: [ 'tools/scan.py', '.github/workflows/scan.yml' ]
@@ -9,7 +11,7 @@ permissions:
 jobs:
   scan:
     # Reads the domain's public records and the site's public responses from outside and prints them; tools/scan.py says what.
-    # Everything it prints is public information anyone can look up. It runs on request, or when the scan itself changes.
+    # Everything it prints is public information anyone can look up. It runs quarterly, on request, or when the scan itself changes.
     name: Site scan
     timeout-minutes: 25
     runs-on: ubuntu-latest
