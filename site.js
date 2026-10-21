@@ -391,6 +391,7 @@ const a = e.target.closest && e.target.closest('a[href*="#"]');
 if (!a || a.classList.contains('skip') || a.target || a.hasAttribute('download') || a.origin !== location.origin || a.pathname !== location.pathname || a.search !== location.search) return;
 let t = null; try { t = a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1))); } catch (err) {}
 if (!t) return;
+const fold = t.closest('details:not([open])'); if (fold && t !== fold) fold.open = true;
 e.preventDefault();
 const h = t.matches('h1, h2, h3') ? t : t.querySelector('h1, h2, h3') || t;
 const land = () => {
@@ -469,11 +470,17 @@ v.play().catch(() => {});
 }), { rootMargin: '120px 0px' });
 films.forEach((v) => { v.muted = true; fo.observe(v); });
 }
+const unfold = () => {
+let t = null; try { t = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (err) {}
+const d = t && t.closest('details:not([open])');
+if (d && t !== d) { d.open = true; t.scrollIntoView({ block: 'start' }); }
+};
+unfold(); addEventListener('hashchange', unfold);
 let opened = [];
 addEventListener('beforeprint', () => {
 document.querySelectorAll('img[loading="lazy"]').forEach((i) => { i.loading = 'eager'; });
 document.querySelectorAll('.tx-rise, [data-draw], .cut, .doorway, main section').forEach((el) => el.classList.add('in'));
-opened = [...document.querySelectorAll('.faq details:not([open]), .cv-method:not([open])')];
+opened = [...document.querySelectorAll('.faq details:not([open]), .cv-method:not([open]), .mk-fold:not([open])')];
 opened.forEach((d) => { d.open = true; });
 });
 addEventListener('afterprint', () => { opened.forEach((d) => { d.open = false; }); opened = []; });
