@@ -1,3 +1,20 @@
+# Search engines and the crawlers that answer readers' questions are welcome.
 User-agent: *
 Allow: /
+
+# Crawlers that only gather material to train models may not take the site's words and drawings.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: cohere-ai
+User-agent: Diffbot
+User-agent: omgili
+User-agent: ImagesiftBot
+Disallow: /
+
 Sitemap: https://centamont.com/sitemap.xml

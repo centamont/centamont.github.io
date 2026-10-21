@@ -1,4 +1,4 @@
-/* Built from _src/practice.css by tools/version.py: edit the source, not this file. */
+/* © Centamont. Not open source: centamont.com/terms.html. Built from _src/practice.css by tools/version.py: edit the source, not this file. */
 .band .btn{--fill:var(--bronze);--on:var(--ink);border-color:var(--bronze);color:var(--band-fg)}
 .head.quiet h2,.door h2{font-size:var(--t-section)}
 .band .big,.people .col .big{font-size:var(--t-lede)}
