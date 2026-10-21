@@ -1,4 +1,4 @@
-// Built from _src/instrument.js by tools/version.py: edit the source, not this file.
+// © Centamont. Not open source: centamont.com/terms.html. Built from _src/instrument.js by tools/version.py: edit the source, not this file.
 const cmWords = ({
 es: {
 planner: 'https://centamont.com/es/planificador.html?',
