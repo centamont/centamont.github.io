@@ -256,7 +256,8 @@
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
-.mk-key b{display:inline-block;min-width:1.4em;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+.mk-key li{padding-left:1.7em;text-indent:-1.7em}
+.mk-key b{display:inline-block;min-width:1.4em;text-indent:0;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
 .mk-key i{font-style:normal;color:var(--faint);white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
