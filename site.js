@@ -441,7 +441,7 @@ if (el && !el.disabled) { held = el; el.classList.add('press'); }
 }, { capture: true, passive: true });
 ['pointerup', 'pointercancel', 'dragstart'].forEach((t) => document.addEventListener(t, letGo, { capture: true, passive: true }));
 addEventListener('pagehide', letGo); addEventListener('pageshow', letGo); addEventListener('blur', letGo);
-const rows = document.querySelectorAll('.hoods, .mk-el-pan');
+const rows = document.querySelectorAll('.hoods, .mk-el-pan, .dm-pan');
 if (rows.length) {
 const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
 let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
