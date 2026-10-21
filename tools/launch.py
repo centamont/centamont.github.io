@@ -1,6 +1,6 @@
-"""Draws "A launch, step by step" on the two open market pages and their Spanish and Portuguese twins, and writes it into
-each page's <figure class="mk-lfig">. Run it after changing a drawing or a word here (the drawing is markup, not script,
-so the page's security policy does not change).
+"""Draws "A launch, step by step" on the two open market pages and their Spanish and Portuguese twins, and on the Austin
+page, and writes it into each page's <figure class="mk-lfig">. Run it after changing a drawing or a word here (the
+drawing is markup, not script, so the page's security policy does not change).
 
 The figure is one site on one street, seen at the five steps of the list under it, numbered alike. The frames stand
 edge to edge, so the ground, the street behind and the time rule run on unbroken from the first to the last; the long
@@ -16,6 +16,8 @@ weekly reports, in the step the list gives them. On a phone the street runs side
                   still the sponsor's.
   South Florida   1 pricing set, refundable reservations (not bronze: not committed); 2 documents filed, contracts
                   signed; 3 the building rising under a crane; 4 finished, closings; 5 the owners take the association.
+  Texas (Austin)  1 documents prepared, prices set; 2 the information statement delivered, contracts signed; 3 the
+                  building rising under a crane, deposits in escrow; 4 finished, closings. Four steps, so five columns.
 """
 import random
 import re
@@ -188,6 +190,12 @@ STEPS = {
         dict(built=18, share=.9),
         dict(built=18, share=1, last=True),
     ],
+    'tx': [
+        dict(built=0, share=0),
+        dict(built=0, share=.2),
+        dict(built=11, shell=9, share=.65, crane=True, weeks=True, wide=True),
+        dict(built=18, share=.9, last=True),
+    ],
 }
 
 WORDS = {
@@ -204,6 +212,8 @@ WORDS = {
                    'Los propietarios reciben la asociación'],
     ('fl', 'pt'): ['Preços definidos, reservas', 'Documentos registrados, contratos assinados', 'Obra, relatórios semanais',
                    'Habite-se, fechamentos', 'Os proprietários assumem a associação'],
+    ('tx', 'en'): ['Documents prepared, prices set', 'Statement first, then contracts', 'Construction, weekly reports',
+                   'Closings, no transfer tax'],
 }
 
 LABEL = {
@@ -241,6 +251,11 @@ LABEL = {
                   'edifício sobe sob uma grua, com a maioria das unidades sob contrato, o passo mais longo. 4, o '
                   'edifício pronto, com os fechamentos em andamento. 5, todas as unidades vendidas e a associação nas '
                   'mãos dos proprietários. Um relatório semanal acompanha a obra.',
+    ('tx', 'en'): 'The launch on one site, in four steps along one street. 1, the documents prepared and prices set, '
+                  'nothing under contract. 2, each buyer given the information statement, then the first contracts '
+                  'signed. 3, the building rising under a crane, deposits in escrow and most residences under contract, '
+                  'the longest step. 4, the building finished and closings under way, with no transfer tax due. A '
+                  'weekly report runs through construction.',
 }
 
 KEY = {
@@ -258,6 +273,7 @@ SWATCH = ['<path class="hid" d="M0 5h22"/>', '<path class="pr" d="M0 5h22"/>',
 PAGES = {
     'new-york.html': ('ny', 'en'), 'es/nueva-york.html': ('ny', 'es'), 'pt/nova-york.html': ('ny', 'pt'),
     'south-florida.html': ('fl', 'en'), 'es/sur-de-florida.html': ('fl', 'es'), 'pt/sul-da-florida.html': ('fl', 'pt'),
+    'austin.html': ('tx', 'en'),
 }
 
 
@@ -272,7 +288,8 @@ def figure(m, lang):
         steps += f'<div{cls}>{frame(m, s, x0, width, blocks)}<p><span class="n">{i}</span><span class="f">{w}</span></p></div>'
         x0 += width
     key = ''.join(f'<span><svg viewBox="0 0 22 10">{sw}</svg>{k}</span>' for sw, k in zip(SWATCH, keys))
-    return (f'<figure class="mk-lfig"><div class="lsq" role="img" tabindex="0" aria-label="{LABEL[(m, lang)]}">{steps}</div>'
+    cols = ' c5' if len(STEPS[m]) == 4 else ''   # four steps, one of them double, fill five columns
+    return (f'<figure class="mk-lfig"><div class="lsq{cols}" role="img" tabindex="0" aria-label="{LABEL[(m, lang)]}">{steps}</div>'
             f'<figcaption class="cap"><span class="key" aria-hidden="true">{key}</span><span>{cap}</span></figcaption></figure>')
 
 
