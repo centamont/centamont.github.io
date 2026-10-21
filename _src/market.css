@@ -299,12 +299,23 @@
 /* the towers the key names carry the profile weight; an island in front (Brickell Key) hides the bases behind it */
 .mk-el .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
 .mk-el .isl{fill:var(--sheet);opacity:1}
+/* Miami is drawn larger than the other cities (.hd: about 2.5 ft to the unit, 2:1), so each tower it names shows its floors,
+   fins and crown. Lines come in three weights: the outline, slab edges and joints (.md), and floors (.dt, quietest .q). A tower
+   not yet standing keeps its whole facade, paler, inside its dashed outline; the towers behind are lighter still. The key in
+   the top corner (.lg) says what the dash means. */
+.mk-el.hd{aspect-ratio:2/1}
+.mk-el.hd .md{stroke-width:calc(var(--lw-object) * var(--fu));opacity:.8}
+.mk-el.hd .fut .dt{opacity:.42}.mk-el.hd .fut .dt.q{opacity:.24}.mk-el.hd .fut .dt.md{opacity:.6}.mk-el.hd .fut .ob{opacity:.75}
+.mk-el.hd .bk{opacity:.42}
+.mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 /* (and names its districts on the water under their towers, a step quieter than the water's own name) */
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
 /* its key: the numbers in ink, the names in the caption's voice, the towers still going up marked in words */
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .mk-key{display:grid;grid-template-columns:repeat(auto-fill,minmax(19em,1fr));gap:2px 24px;margin:6px 0 0;padding:0;list-style:none}
-.mk-key b{display:inline-block;min-width:1.4em;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+/* a name too long for its column wraps under itself, not under its number */
+.mk-key li{padding-left:1.7em;text-indent:-1.7em}
+.mk-key b{display:inline-block;min-width:1.4em;text-indent:0;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
 .mk-key i{font-style:normal;color:var(--faint);white-space:nowrap}
 .mk-key i::before{content:"\2014\2009"}
 .mk-note{font-size:13px}
@@ -313,6 +324,7 @@
   .mk-el-pan::-webkit-scrollbar{display:none}
   .mk-el-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
+  .mk-el-pan .mk-el.hd{width:1100px;aspect-ratio:2/1}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
