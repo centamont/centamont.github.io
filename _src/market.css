@@ -55,6 +55,8 @@
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
   .hood > p + p{margin-top:.6em}
 }
+/* (a row whose photographs differ in shape gives every card the same picture, cut to fill, so no card ends in an empty band) */
+@media (max-width:700px){.hoods.even .hood > figure.photo{max-width:none}.hoods.even .hood > figure.photo img{aspect-ratio:4/3;object-fit:cover;object-position:50% 35%}}
 .prose .mk-at{margin-top:8px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.7;color:var(--faint)}
 .ms-h{display:flex;flex-wrap:wrap;gap:6px 1.15em;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ms-h span:first-child{color:var(--accent)}
