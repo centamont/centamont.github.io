@@ -558,7 +558,7 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 /* an available residence is outlined in the text's own grey, one not yet released in a fainter dotted line */
 .sp-plan .rp-c.open,.spec .rp-key .k-open{stroke:var(--muted);border-color:var(--muted)}
 .sp-plan .rp-c.later{stroke-dasharray:1.5 1.5}
-.sp-pace{position:relative;aspect-ratio:300 / 176;margin:0 0 38px 24px;font:500 12px/1 var(--body);color:var(--faint);font-variant-numeric:lining-nums tabular-nums}
+.sp-pace{position:relative;aspect-ratio:300 / 176;margin:0 0 38px 24px;font:500 13px/1 var(--body);color:var(--faint);font-variant-numeric:lining-nums tabular-nums}
 .sp-pace svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .sp-pace path{fill:none;vector-effect:non-scaling-stroke}
 .sp-grid{stroke:var(--grid);stroke-dasharray:2 4}
@@ -571,8 +571,8 @@ html.js .step:last-child > .coda{position:sticky;bottom:var(--hold)}
 .sp-y{right:calc(100% + 6px);top:var(--y);transform:translateY(-50%)}
 .sp-x{top:calc(100% + 6px);left:var(--x);transform:translateX(-50%)}
 .sp-x.now{color:var(--fg)}
-.sp-xt{right:0;top:calc(100% + 24px);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.sp-thr-l{left:6px;bottom:calc(50% + 5px);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sp-xt{right:0;top:calc(100% + 24px);font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+.sp-thr-l{left:6px;bottom:calc(50% + 5px);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 /* the two lines are named where they end: the plan at the right edge, the contracts beside this week's point */
 .sp-plan-n{right:0;bottom:calc(75.76% + 6px);font:italic 400 15px/1 var(--display);color:var(--muted)}
 .sp-dot{left:60%;top:53.41%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--sold-line);box-shadow:0 0 0 2px var(--sheet)}
