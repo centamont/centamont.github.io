@@ -60,7 +60,7 @@ SHEETS = {
             },
             {'fn': 1, 'cmp': None,
              'en': ('Closed prices', '$2,070', 'a square foot', 'On average, roughly flat on a year earlier'),
-             'es': ('Precios de cierre', '$2,070', 'por pie cuadrado', 'En promedio, prácticamente sin cambios frente a un año&nbsp;antes'),
+             'es': ('Precios de cierre', '$2,070', 'por pie cuadrado', 'En promedio, casi sin cambios frente a un año&nbsp;antes'),
              'pt': ('Vendas concluídas', 'US$&nbsp;2.070', 'por pé quadrado', 'Em média, praticamente estável em relação a um ano&nbsp;antes'),
             },
         ]},
