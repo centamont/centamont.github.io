@@ -322,22 +322,22 @@
   // ms the lights-on cascade runs after the building is finished: the rooms over 1.6 s (the penthouses 0.4 s after),
   // the crown, then the aviation light last
   const CASCADE = 2400;
-  // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, each made from one
-  // camera of that hero at 1440 x 900 and lit by one sun (by day, in the early morning and at golden hour, after dark;
-  // the morning's is seen from the south-east, as the night's is, its east face lit by the low sun, and the evening's
-  // from the south, the low western sun on its face, so the two hours never look alike). Each
+  // The desktop hero's photographs (hero/): path-traced stills of the finished tower on its site, all four from one
+  // camera of that hero at 1440 x 900, standing 24 m up on the bay to the south-west (so the raked crown blade shows its
+  // top face), each lit by its own sun (the morning's low in the east behind the tower, the evening's low in the west on
+  // its face, the noon sun high in the south-east, the night by its own lights). Each
   // runs on past that hero's right and bottom edges, so a wider or taller window is still filled. For each: the crop's place
   // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
   const STILLS = {
-    day: { x: 754, y: 143, w: 986, h: 907, th: 0.735623, f: 1682.522, cx: 1021.497, cy: 668.112 },
-    morning: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
-    gold: { x: 754, y: 127, w: 986, h: 923, th: -0.096573, f: 1687.061, cx: 1021.987, cy: 668.701 },
-    night: { x: 750, y: 121, w: 990, h: 929, th: -0.5, f: 1690.153, cx: 1021.38, cy: 669.102 },
+    day: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    morning: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    gold: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    night: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
   };
-  // (and from x 730, fully from 805, in the same hero, the photograph has its own far city: the sky's skyline goes)
-  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [730, 805];
+  // (and from x 575, fully from 825, in the same hero, the photograph has its own far city: the sky's skyline goes)
+  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
   // (an engine whose media queries take only the older addListener)
   const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
   let GEN = 0; // camera generations, shared by every model: the plan rings are shared too
