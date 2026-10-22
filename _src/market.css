@@ -318,7 +318,7 @@
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
 /* its reflection in hairlines, the far plane of the city fainter than the near */
 .mk-el.ny .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
-.mk-el.ny .tn.r3{fill-opacity:.035}
+.mk-el.ny .tn.r3{fill-opacity:.05}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 /* (a detailed skyline's windows: each facade filled with its own window pattern, which washes in after the lines, as the
    tone does) */
