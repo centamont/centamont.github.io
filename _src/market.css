@@ -311,6 +311,8 @@
    their mullions and floor lines finer, so each tower reads first as a silhouette and only then as a facade */
 .mk-el.mi .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.35)}
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
+/* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
+.mk-el.mi .fut .wb{stroke-opacity:.5}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 /* (a detailed skyline's windows: each facade filled with its own window pattern, which washes in after the lines, as the
    tone does) */
