@@ -453,6 +453,60 @@ end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('r
 }
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
 document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
+const loupes = document.querySelectorAll('.mk-el.hd');
+if (loupes.length) {
+const Z = 2.5, lang = (document.documentElement.lang || 'en').slice(0, 2);
+const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+const words = {
+en: ['Hover to look closer', 'Hold to look closer'],
+es: ['Pasa el cursor para ver de cerca', 'Mantén pulsado para ver de cerca'],
+pt: ['Passe o cursor para ver de perto', 'Toque e segure para ver de perto'],
+}[lang] || ['Hover to look closer', 'Hold to look closer'];
+loupes.forEach((svg) => {
+const fig = svg.closest('figure'); if (!fig) return;
+const cap = fig.querySelector('figcaption');
+if (cap) { const h = document.createElement('span'); h.className = 'loupe-hint'; h.setAttribute('aria-hidden', 'true'); h.textContent = words[fine ? 0 : 1]; cap.prepend(h); }
+let lens = null, copy = null, on = false;
+const make = () => {
+if (lens) return;
+lens = document.createElement('div'); lens.className = 'loupe'; lens.setAttribute('aria-hidden', 'true');
+copy = svg.cloneNode(true);
+['data-draw', 'role', 'aria-label'].forEach((a) => copy.removeAttribute(a));
+copy.classList.add('in'); copy.setAttribute('focusable', 'false');
+const fu = parseFloat(getComputedStyle(svg).getPropertyValue('--fu')) || 1.1;
+copy.style.setProperty('--fu', String(fu / 1.6));
+lens.appendChild(copy); fig.appendChild(lens);
+};
+const show = (x, y, lift) => {
+make();
+const r = svg.getBoundingClientRect(), f = fig.getBoundingClientRect();
+const px = x - r.left, py = y - r.top;
+if (px < 0 || py < 0 || px > r.width || py > r.height) { hide(); return; }
+const d = lens.offsetWidth || 240, R = d / 2;
+copy.style.width = r.width * Z + 'px'; copy.style.height = r.height * Z + 'px';
+copy.style.transform = 'translate(' + (R - px * Z) + 'px,' + (R - py * Z) + 'px)';
+lens.style.transform = 'translate(' + (x - f.left - R) + 'px,' + (y - f.top - R - lift) + 'px)';
+if (!on) { on = true; lens.classList.add('on'); }
+};
+const hide = () => { if (on) { on = false; lens.classList.remove('on'); } };
+svg.addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') show(e.clientX, e.clientY, 0); });
+svg.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'touch') hide(); });
+let hold = 0, sx = 0, sy = 0, up = false;
+svg.addEventListener('touchstart', (e) => {
+if (e.touches.length !== 1) return;
+const t = e.touches[0]; sx = t.clientX; sy = t.clientY; clearTimeout(hold);
+hold = setTimeout(() => { up = true; show(sx, sy, 110); }, 350);
+}, { passive: true });
+svg.addEventListener('touchmove', (e) => {
+const t = e.touches[0];
+if (up) { e.preventDefault(); show(t.clientX, t.clientY, 110); }
+else if (Math.abs(t.clientX - sx) + Math.abs(t.clientY - sy) > 10) clearTimeout(hold);
+}, { passive: false });
+const end = () => { clearTimeout(hold); if (up) { up = false; hide(); } };
+svg.addEventListener('touchend', end); svg.addEventListener('touchcancel', end);
+svg.addEventListener('contextmenu', (e) => { if (up) e.preventDefault(); });
+});
+}
 const films = document.querySelectorAll('video.loop');
 const conn = navigator.connection, lean = !!conn && (conn.saveData || /(^|-)[23]g$/.test(conn.effectiveType || ''));
 const small = matchMedia('(max-width:820px)').matches;
