@@ -184,7 +184,8 @@ const units = [];
 for (let i = 0; i < n; i++) { const f = Math.floor(i / per); units.push({ f, c: i % per, w: 1 + 0.4 * (F > 1 ? f / (F - 1) - 0.5 : 0) }); }
 const mean = units.reduce((t, u) => t + u.w, 0) / n;
 units.forEach((u) => { u.v = o.price * 1e6 * (1 + o.par / 100) * u.w / mean; });
-const order = units.map((u, i) => [u.f + jitter(i), i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
+const lo = Math.floor(F * 0.25), hi = Math.max(lo + 1, Math.ceil(F * 0.55)), run = (f) => (F < 4 || (f >= lo && f < hi) ? 0 : f >= hi ? 1 : 2);
+const order = units.map((u, i) => [run(u.f) * 1e3 - u.f - jitter(i), i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i);
 const end = r.s.length - 1;
 let k = 1;
 order.forEach((i, rank) => { while (k <= end && Math.round(r.s[k] * n) <= rank) k++; units[i].m = k <= end ? k : -1; });
