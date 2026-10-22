@@ -113,6 +113,32 @@ SHEETS = {
              'pt': ('Vendas', '1.533', 'imóveis vendidos em setembro', 'Queda de 4,9&nbsp;por cento em relação a um ano&nbsp;antes', '1.612'),
             },
         ]},
+    'los-angeles.html': {
+        'twins': {'es': 'es/los-angeles.html', 'pt': 'pt/los-angeles.html'},
+        'asof': '2026-09', 'next': '2027-01',
+        'en': {'as': 'As of ', 'asof': 'September 2026', 'next': 'January 2027'},
+        'es': {'as': 'Datos a ', 'asof': 'septiembre de 2026', 'next': 'enero de 2027'},
+        'pt': {'as': 'Dados de ', 'asof': 'setembro de 2026', 'next': 'janeiro de 2027'},
+        'figures': [
+            {'fn': 7, 'cmp': (994670, 983230),
+             'en': ('Median price', '$995K', 'in September', 'Existing single-family homes in Los&nbsp;Angeles County: $994,670, against $983,230 a year earlier', '$983K'),
+             'es': ('Precio mediano', '$995K', 'en septiembre', 'Viviendas unifamiliares de reventa en el condado: $994,670, frente a $983,230 un año&nbsp;antes', '$983K'),
+             'pt': ('Preço mediano', 'US$&nbsp;995', 'mil, em setembro', 'Casas unifamiliares usadas no condado de Los&nbsp;Angeles: US$&nbsp;994.670, contra US$&nbsp;983.230 um ano&nbsp;antes', '983&nbsp;mil'),
+            },
+            {'fn': 7, 'cmp': None,
+             'trend': {'vals': (2.8, 3.5, 3.5, 4.0),
+                       'en': ('Dec 2025', 'Mar 2026', 'Jun 2026', 'Sep 2026'), 'es': ('dic. 2025', 'mar. 2026', 'jun. 2026', 'sep. 2026'),
+                       'pt': ('dez. 2025', 'mar. 2026', 'jun. 2026', 'set. 2026'), 'fmt': {'en': '{:.1f}', 'es': '{:.1f}', 'pt': '{:.1f}'}},
+             'en': ('Supply', '4.0', 'months of inventory', 'Up from 2.8 in December and 3.7 a year earlier'),
+             'es': ('Oferta', '4.0', 'meses de inventario', 'Frente a 2.8 en diciembre y 3.7 un año&nbsp;antes'),
+             'pt': ('Oferta', '4,0', 'meses de estoque', 'Contra 2,8 em dezembro e 3,7 um ano&nbsp;antes'),
+            },
+            {'fn': 7, 'cmp': None,
+             'en': ('Sales', '10.9%', 'fewer than a year earlier', 'Single-family homes sold in September, though 5.4 percent more than in August'),
+             'es': ('Ventas', '10.9%', 'menos que un año antes', 'Viviendas unifamiliares vendidas en septiembre, aunque un 5.4&nbsp;por ciento más que en&nbsp;agosto'),
+             'pt': ('Vendas', '10,9%', 'a menos que um ano antes', 'Casas unifamiliares vendidas em setembro, embora 5,4&nbsp;por cento a mais que em&nbsp;agosto'),
+            },
+        ]},
 }
 
 WORDS = {
