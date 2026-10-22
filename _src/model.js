@@ -250,23 +250,31 @@
   useSet(3);
   // A drawing's set for a level of u px: six chords from 12 px a level, three below, with a pixel's hysteresis.
   const pickSet = (cur, u) => (cur === 6 ? (u < 11.5 ? 3 : 6) : u >= 12.5 ? 6 : 3);
-  // The order the residences sell in, as a Miami launch sells: the penthouses and the upper floors first, anchoring the
-  // price ladder, and the bay side ahead of the city side, with a little of the scatter a real stacking plan shows.
-  // The city side runs three and a half to six floors behind, by a lag that changes from floor to floor, so the edge
-  // between sold and unsold reads as a record of sales rather than a rule. Each side keeps its own sale times but takes
-  // them from the top down, so neither side ever has an unsold home above a sold one.
-  const RANK = (() => {
-    const u = [];
-    for (let k = RES0; k < RES1; k++) for (let s = 0; s < 2; s++) u.push({ k, s, v: RES1 - 1 - k + (s ? 3.5 + 2.5 * hash(k, 1, 11) : 0) + (hash(k, s, 7) - 0.5) * 2.6 });
-    for (const s of [0, 1]) {
-      const q = u.filter((o) => o.s === s), vs = q.map((o) => o.v).sort((a, b) => a - b);
-      q.sort((a, b) => b.k - a.k).forEach((o, i) => { o.v = vs[i]; });
-    }
-    u.sort((a, b) => a.v - b.v);
+  // The order the residences sell in, as a stacking plan records it: the bay side ahead of the city side, with a little
+  // of the scatter a real one shows. The city side runs some floors behind the bay side, by a lag that changes from floor
+  // to floor, so the edge between sold and unsold reads as a record of sales rather than a rule. Within each run of levels
+  // that sell together, each side keeps its own sale times but takes them from the top down, so neither side ever has an
+  // unsold home above a sold one inside it. runs: [lowest level, highest level, the city side's least and greatest lag].
+  const order = (runs) => {
     const r = new Float32Array((FLOORS + 1) * 2).fill(1e9);
-    u.forEach((q, i) => { r[q.k * 2 + q.s] = i; });
+    let n = 0;
+    for (const [k0, k1, l0, l1] of runs) {
+      const u = [];
+      for (let k = k0; k <= k1; k++) for (let s = 0; s < 2; s++) u.push({ k, s, v: k1 - k + (s ? l0 + (l1 - l0) * hash(k, 1, 11) : 0) + (hash(k, s, 7) - 0.5) * 2.6 });
+      for (const s of [0, 1]) {
+        const q = u.filter((o) => o.s === s), vs = q.map((o) => o.v).sort((a, b) => a - b);
+        q.sort((a, b) => b.k - a.k).forEach((o, i) => { o.v = vs[i]; });
+      }
+      u.sort((a, b) => a.v - b.v).forEach((q) => { r[q.k * 2 + q.s] = n++; });
+    }
     return r;
-  })();
+  };
+  // The firm's order, as the release note and the weekly report plan a launch: the first release is the middle of the
+  // tower (levels 12 to 20, the eighteen residences the launch sells), priced to set the ladder, while the upper floors
+  // are held back for the second release, once the first has proved the price, and the lower floors come last.
+  const RANK = order([[11, 19, 1, 2.5], [19 + 1, RES1 - 1, 3.5, 6], [RES0, 10, 1, 2.5]]);
+  // The hero's order, which its photographed stills record: the penthouses and the upper floors first, from the top down.
+  const TOP = order([[RES0, RES1 - 1, 3.5, 6]]);
 
   // Sunlight is the real sun over Miami at this minute (a compact form of the NOAA solar position);
   // the tower's north is +z, east is +x. After dark the tower is lit from within.
@@ -465,6 +473,8 @@
       this.o = Object.assign({ orbit: 0, theta: -0.62, phi: 0.2, dist: 52, ty: 11.5, scale: 1.05, offsetX: 0, crane: true, grid: true, labels: false, labelSize: 13, envelope: true, rate: 9, slow: 3, soldRate: 6, presale: 0.5, rest: 45000, facadeLag: 3 }, opts);
       this.theta = this.o.theta;
       this.phi = this.o.phi;
+      // the order its residences sell in: the firm's (RANK), or the hero's from the top down (o.order 'top')
+      this.rank = this.o.order === 'top' ? TOP : RANK;
       this.L = 0; this.S = 0; this.C = 0; this.G = 0; // shown: levels framed, levels sold (in levels' worth of residences), levels glazed, crown
       this.B = 0; this.Sold = 0; // targets
       this.crane = 0; this.craneT = 0;
@@ -615,7 +625,8 @@
           c.width = cw; c.height = ch;
           const q = c.getContext('2d');
           q.drawImage(p.img, 0, 0, cw, ch); q.globalCompositeOperation = 'destination-out';
-          const fade = (x0, y0, x1, y1) => { const lg = q.createLinearGradient(x0, y0, x1, y1); lg.addColorStop(0, 'rgba(0,0,0,0)'); lg.addColorStop(0.5, 'rgba(0,0,0,0.25)'); lg.addColorStop(1, 'rgba(0,0,0,1)'); q.fillStyle = lg; q.fillRect(0, 0, cw, ch); };
+          // (each fade fills only its own band: beyond the band's inner end the gradient clears nothing)
+          const fade = (x0, y0, x1, y1) => { const lg = q.createLinearGradient(x0, y0, x1, y1); lg.addColorStop(0, 'rgba(0,0,0,0)'); lg.addColorStop(0.5, 'rgba(0,0,0,0.25)'); lg.addColorStop(1, 'rgba(0,0,0,1)'); q.fillStyle = lg; q.fillRect(Math.min(x0, x1), Math.min(y0, y1), x0 === x1 ? cw : Math.abs(x1 - x0), y0 === y1 ? ch : Math.abs(y1 - y0)); };
           if (fr) fade(cw - e, 0, cw, 0);
           if (fb) fade(0, ch - e, 0, ch);
           if (fl) fade(el, 0, 0, 0);
@@ -691,7 +702,7 @@
     // only as the crane leaves: a topped-off frame with its crane still up is a building site, not a finished tower.
     cladFor(L) { return L >= FLOORS - 0.001 && this.craneT === 0 && this.crane < 0.5 ? FLOORS : Math.max(0, L - this.o.facadeLag); }
     // The first release, marked beside the level ruler once the envelope is drawn: o.release is its size in levels' worth of
-    // residences (the first that sell, from the top down). The bracket stands until sales go past it or ground breaks.
+    // residences (the first that sell, in the drawing's order). The bracket stands until sales go past it or ground breaks.
     relFor() { return this.o.release > 0 && this.E > 0.999 && this.L < 0.01 && this.S <= this.o.release + 0.01 ? 1 : 0; }
     release(v, instant) { if (this.dead) return; this.o.release = v; if (instant || reduce) this.Rd = this.Ra = this.relFor(); this.touch(); }
     // in use only once it is finished: the crown set, the glass closed and the crane gone
@@ -699,7 +710,7 @@
 
     // How much of residence s (0 bay side, 1 city side) on level k is sold, 0 to 1. S counts levels' worth (two
     // residences to a level), so 2S is the number of residences under contract.
-    soldOf(k, s, S = this.S) { return clamp(S * 2 - RANK[k * 2 + s], 0, 1); }
+    soldOf(k, s, S = this.S) { return clamp(S * 2 - this.rank[k * 2 + s], 0, 1); }
 
     set(built, sold, crane, instant) {
       if (this.dead) return;
@@ -968,7 +979,7 @@
         for (const y of [SLAB, FLOORS + SLAB]) pads.push([lx, y, lz, sd > 0 ? tw : 0, sd > 0 ? 0 : tw, this.o.labelSize * 0.6]);
       }
       // the first release's name, where it is set over its bracket (see scene), at the bracket's top
-      const rel = !spec.plan && spec.release > 0 ? { k0: this.relLevel(spec.release), tw: this.relWidth(), nr: this.nearFace(c, s) } : null;
+      const rel = !spec.plan && spec.release > 0 ? { k: this.relBand(spec.release), tw: this.relWidth(), nr: this.nearFace(c, s) } : null;
       const box = () => {
         const K = this.camAt(theta, phi, ty, sc, ox);
         let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
@@ -976,10 +987,10 @@
         if (rel) {
           // (each level's tick sits where its slab edge is nearest the eye, as drawn)
           const lv = (k) => { let y = 0, zn = Infinity; for (const q of edgePlan(k)) { const Z = K.s * q.x + K.c * q.z + K.d; if (Z < zn) { zn = Z; y = K.cy - (K.f * (k + SLAB - K.ey)) / Z; } } return y; };
-          const yt = lv(FLOORS), [bx] = pr(-c * 9.15 * sd - s * rel.nr, 0, s * 9.15 * sd - c * rel.nr), z = this.o.labelSize;
-          if (!this.relAlong(w, K.f / K.d, Math.abs(lv(rel.k0) - yt), rel.tw)) {
+          const yt = lv(rel.k[1] + 1), [bx] = pr(-c * 9.15 * sd - s * rel.nr, 0, s * 9.15 * sd - c * rel.nr), z = this.o.labelSize;
+          if (!this.relAlong(w, K.f / K.d, Math.abs(lv(rel.k[0]) - yt), rel.tw)) {
             const r = sd > 0, lx0 = r ? bx - 1 : bx + 1 - rel.tw;
-            x0 = Math.min(x0, lx0); x1 = Math.max(x1, lx0 + rel.tw); y0 = Math.min(y0, yt - 0.5 * z - 8 - z);
+            x0 = Math.min(x0, lx0); x1 = Math.max(x1, lx0 + rel.tw); y0 = Math.min(y0, yt - 5 - z);
           }
         }
         for (const [x, y, z] of spec.crane && !spec.plan ? pts.concat(crane(K.f / K.d)) : pts) { const [u, v] = pr(x, y, z); x0 = Math.min(x0, u); x1 = Math.max(x1, u); y0 = Math.min(y0, v); y1 = Math.max(y1, v); }
@@ -2224,14 +2235,15 @@
         if (halo) g.restore();
         g.globalAlpha = 1;
       }
-      // The first release: a bracket on the façade side of the ruler over the levels that hold it (the bay side's
-      // reach, from the top floor down), drawn in from the top, in ink rather than bronze, since nothing in it has sold yet
+      // The first release: a bracket on the façade side of the ruler over the levels that hold it (the middle of the
+      // tower, the upper floors held back above it), drawn in from the top, in ink rather than bronze, since nothing in it has sold yet
       // when it is drawn. It is always named, at the drawing's 13px: along the bracket where the name fits beside it, and
-      // otherwise (a phone, or any drawing too small) over its top, level with the roof and reading toward the tower, in the
-      // room fit() keeps for it there. A bracket without its name says nothing.
+      // otherwise (a phone, or any drawing too small) just over its top, reading toward the tower, on a hairline of clear
+      // ground where it crosses the envelope (a halo, as a map clears the ground round its names). A bracket without its
+      // name says nothing.
       if (this.Ra > 0.005 && this.o.release > 0 && !inLens) (() => {
-        const k0 = this.relLevel(this.o.release);
-        const xb = sx(-9.15), xk = sx(-8.8), yt = ys[FLOORS], yb = ys[k0], e = smooth(this.Rd), ye = yt + (yb - yt) * e;
+        const [k0, k1] = this.relBand(this.o.release);
+        const xb = sx(-9.15), xk = sx(-8.8), yt = ys[k1 + 1], yb = ys[k0], e = smooth(this.Rd), ye = yt + (yb - yt) * e;
         const lab = WORDS.release, z = this.o.labelSize;
         g.save(); g.font = '500 ' + z + 'px Jost, sans-serif';
         if ('letterSpacing' in g) g.letterSpacing = '1.5px';
@@ -2248,11 +2260,11 @@
             g.textAlign = 'center'; g.textBaseline = 'middle';
             g.fillText(lab, 0, 0);
           } else {
-            // (from the bracket's spine toward the tower, kept inside the canvas, standing 8px clear above the roof's name
-            // and the crown, rather than across them)
-            const r = xk > xb;
+            // (from the bracket's spine toward the tower, kept inside the canvas)
+            const r = xk > xb, lx = r ? Math.min(xb - 1, w - 4 - tw) : Math.max(xb + 1, tw + 4), ly = Math.max(yt - 5, z + 2);
             g.textAlign = r ? 'left' : 'right'; g.textBaseline = 'alphabetic';
-            g.fillText(lab, r ? Math.min(xb - 1, w - 4 - tw) : Math.max(xb + 1, tw + 4), Math.max(yt - 0.5 * z - 8, z + 2));
+            if (!this.forced) { const [br, bg2, bb] = this.bg; g.save(); g.globalAlpha = la; g.lineWidth = 5; g.lineJoin = 'round'; g.strokeStyle = `rgb(${br},${bg2},${bb})`; g.strokeText(lab, lx, ly); g.restore(); }
+            g.fillText(lab, lx, ly);
           }
         }
         g.restore();
@@ -2276,10 +2288,11 @@
       return this._glow[gi];
     }
 
-    // The lowest level holding the first release of rel levels' worth of residences (they sell from the top down).
-    relLevel(rel) {
-      for (let k = RES0; k < RES1; k++) if (RANK[k * 2] < rel * 2 - 1e-6 || RANK[k * 2 + 1] < rel * 2 - 1e-6) return k;
-      return FLOORS - 1;
+    // The lowest and highest levels holding the first release of rel levels' worth of residences (the first that sell).
+    relBand(rel) {
+      let k0 = FLOORS - 1, k1 = RES0;
+      for (let k = RES0; k < RES1; k++) if (this.rank[k * 2] < rel * 2 - 1e-6 || this.rank[k * 2 + 1] < rel * 2 - 1e-6) { k0 = Math.min(k0, k); k1 = Math.max(k1, k); }
+      return [k0, k1];
     }
     // Whether the release's name (tw px long) can run along its bracket (span px long): on a drawing at least 480px wide
     // and 14 px a level, with the bracket long enough to hold it. Otherwise it is set over the bracket's top.

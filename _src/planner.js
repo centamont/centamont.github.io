@@ -215,8 +215,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // ---- the stacking plan: every residence on its floor, filled by when it sells. The higher floors sell first, give or
-  // take a few, as in the tower on the home page; a fixed scatter keeps the same plan for the same building.
+  // ---- the stacking plan: every residence on its floor, filled by when it sells, in the order the release note plans and
+  // the tower on the home page sells: the first release, a band of the lower and middle floors, then the upper floors held
+  // back for the second, from the top down, then the lowest floors; each from the top down within it, give or take a few.
+  // A building of fewer than four floors is one release. A fixed scatter keeps the same plan for the same building.
   const plan = $('plStack');
   const jitter = (i) => { const v = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return (v - Math.floor(v)) * 5 - 2.5; };
   function stack(o, r) {
@@ -225,7 +227,8 @@ document.addEventListener('DOMContentLoaded', function () {
     for (let i = 0; i < n; i++) { const f = Math.floor(i / per); units.push({ f, c: i % per, w: 1 + 0.4 * (F > 1 ? f / (F - 1) - 0.5 : 0) }); }
     const mean = units.reduce((t, u) => t + u.w, 0) / n;
     units.forEach((u) => { u.v = o.price * 1e6 * (1 + o.par / 100) * u.w / mean; });
-    const order = units.map((u, i) => [u.f + jitter(i), i]).sort((a, b) => b[0] - a[0]).map(([, i]) => i);
+    const lo = Math.floor(F * 0.25), hi = Math.max(lo + 1, Math.ceil(F * 0.55)), run = (f) => (F < 4 || (f >= lo && f < hi) ? 0 : f >= hi ? 1 : 2);
+    const order = units.map((u, i) => [run(u.f) * 1e3 - u.f - jitter(i), i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i);
     const end = r.s.length - 1;
     // the month each residence goes under contract, in the order they sell
     let k = 1;

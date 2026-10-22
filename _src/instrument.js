@@ -1,5 +1,5 @@
 // Two instruments on the home page: the sales curve for developers, and the letter to the partners (private-clients.html
-// carries the letter alone, in the buyer's voice). Each starts on its own, so a fault in one never stops the other.
+// carries the letter alone, in the buyer's voice, and advisors.html in the advisor's). Each starts on its own, so a fault in one never stops the other.
 // The curve shows only once this script is here to draw it (practice.css, .curve.ready): without it, an empty frame and
 // sliders that move nothing would be all there is.
 // Beside the sliders the figure stands over its readouts, which follow the price slider in the source (the order a phone
@@ -232,8 +232,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // model is, from a little above and to the southeast, lit from the southwest: the podium on its site plate, nineteen
     // residential levels turning a little as they rise, their terraces deepening and narrowing in a slow spiral, the two
     // penthouse levels set back behind deep terraces, and the lantern of the crown. Each level holds two residences, the
-    // bay side on the right and the city side on the left, and they sell in the hero's own order (penthouses and upper
-    // floors first, the bay side ahead), so the bronze edge reads as a record of sales. The podium and crown never sell.
+    // bay side on the right and the city side on the left, and they sell in the firm's order (the first release on the
+    // middle floors, then the upper floors held back for the second, then the lowest; the bay side ahead), so the bronze
+    // reads as a record of sales. The podium and crown never sell.
     const tw = document.getElementById('cvTower'), reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
     const G = window.CentamontModel && window.CentamontModel.geo;
     const RES = G ? (G.RES1 - G.RES0) * 2 : 38, homes = [];
@@ -391,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
       [['cvPhG', BREAK], ['cvPhT', TOP], ['cvPhC', DONE]].forEach(([id, m]) => { const e = out(id); if (e) e.textContent = m; });
       // and the same reading in one line just above a phone's plot
       out('cvNowM').textContent = hit > -1 ? cmSay('month', (m) => 'Month ' + m, hit) : cmSay('limNotMet', 'Threshold not met'); out('cvNowD').textContent = Math.round(done * 100) + '%';
-      // the same share of the building, its residences sold in the hero's order in the small elevation beside the figure
+      // the same share of the building, its residences sold in the firm's order in the small elevation beside the figure
       if (homes.length) { const n = Math.round(done * RES); for (const h of homes) { h.r.classList.toggle('on', h.rank < n); h.r.style.transitionDelay = (reduceM ? 0 : Math.abs(h.rank - lastN) * 14) + 'ms'; } lastN = n; }
       let say;
       const pct = Math.round(done * 100), unsold = Math.round((1 - done) * 100), unsoldPar = Math.round((1 - baseDone) * 100), late = BREAK - PLAN;
