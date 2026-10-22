@@ -69,6 +69,13 @@
 .ms-sc b{position:absolute;top:17px;left:0;transform:translateX(-50%);font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--muted);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
 .ms-sc[style*="--then:100.0%"] b{transform:translateX(-100%)}
 @media (forced-colors:active){.ms-sc{forced-color-adjust:none}.ms-sc :is(.now,.then),.ms-sc::after{background:CanvasText}.ms-sc .ref{background:repeating-linear-gradient(90deg,CanvasText 0 1px,transparent 1px 4px)}.ms-sc b{color:CanvasText}}
+.ms-tr{display:grid;gap:6px;max-width:260px;margin:14px 0 0;padding:0;list-style:none}
+.ms-tr li{display:grid;grid-template-columns:5.2em 1fr 2.8em;align-items:center;gap:10px;font:500 13px/1 var(--body);letter-spacing:.04em;color:var(--muted);font-variant-numeric:lining-nums tabular-nums}
+.ms-tr i{display:block;width:var(--w);height:1px;background:var(--muted)}
+.ms-tr li:last-child{color:var(--fg)}
+.ms-tr li:last-child i{height:3px;background:var(--fg)}
+.ms-tr b{font-weight:500;text-align:right}
+@media (forced-colors:active){.ms-tr{forced-color-adjust:none}.ms-tr li{color:CanvasText}.ms-tr i,.ms-tr li:last-child i{background:CanvasText}}
 .ms-note{display:block;margin-top:10px;font-size:15px;line-height:1.5;color:var(--read)}
 .ms .ms-note sup{font-size:max(13px,.62em);line-height:0}
 .ms .ms-note sup a{position:relative;color:var(--accent);text-decoration:none;padding-inline:2px}
@@ -80,7 +87,7 @@
   .ms dd{margin-top:4px}
   .ms-n{display:inline}
   .ms-u{display:inline;margin:0 0 0 .4em}
-  .ms-sc{margin-top:10px}
+  .ms-sc,.ms-tr{margin-top:10px}
   .ms-note{margin-top:6px}
   .mk-facts > .dup{display:none}
   .mk-facts > div{padding:10px 0 11px}

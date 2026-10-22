@@ -50,7 +50,10 @@ SHEETS = {
              'es': ('Inventario en Manhattan', '3,027', 'unidades de obra nueva', 'En el mercado, frente a un promedio de diez&nbsp;años de&nbsp;4,209', '4,209'),
              'pt': ('Oferta em Manhattan', '3.027', 'unidades novas', 'À venda, contra uma média de dez&nbsp;anos de&nbsp;4.209', '4.209'),
             },
-            {'fn': 1, 'cmp': (240, 331),
+            {'fn': 1, 'cmp': None,
+             'trend': {'vals': (331, 387, 311, 240),
+                       'en': ('Q3 2025', 'Q1 2026', 'Q2 2026', 'Q3 2026'), 'es': ('3T 2025', '1T 2026', '2T 2026', '3T 2026'),
+                       'pt': ('3T 2025', '1T 2026', '2T 2026', '3T 2026'), 'fmt': {'en': '{:,}', 'es': '{:,}', 'pt': '{:,}'}},
              'en': ('Contracts', '240', 'in the quarter', 'Down 27 percent from a year earlier', '331'),
              'es': ('Contratos', '240', 'en el trimestre', 'Un 27&nbsp;por ciento menos que un año&nbsp;antes', '331'),
              'pt': ('Contratos', '240', 'no trimestre', 'Queda de 27&nbsp;por cento em relação a um ano&nbsp;antes', '331'),
@@ -84,6 +87,32 @@ SHEETS = {
              'pt': ('Vendas', '4', 'trimestres em queda', 'Menos vendas que um ano antes, contidas pela falta de&nbsp;oferta'),
             },
         ]},
+    'dallas.html': {
+        'twins': {'es': 'es/dallas.html', 'pt': 'pt/dallas.html'},
+        'asof': '2026-09', 'next': '2027-01',
+        'en': {'as': 'As of ', 'asof': 'September 2026', 'next': 'January 2027'},
+        'es': {'as': 'Datos a ', 'asof': 'septiembre de 2026', 'next': 'enero de 2027'},
+        'pt': {'as': 'Dados de ', 'asof': 'setembro de 2026', 'next': 'janeiro de 2027'},
+        'figures': [
+            {'fn': 4, 'cmp': (359460, 357000),
+             'en': ('Median price', '$359K', 'in September', 'Every home sold in Dallas County: $359,460, against $357,000 a year earlier', '$357K'),
+             'es': ('Precio mediano', '$359K', 'en septiembre', 'Todas las viviendas vendidas en el condado de Dallas: $359,460, frente a $357,000 un año&nbsp;antes', '$357K'),
+             'pt': ('Preço mediano', 'US$&nbsp;359', 'mil, em setembro', 'Todos os imóveis vendidos no condado de Dallas: US$&nbsp;359.460, contra US$&nbsp;357.000 um ano&nbsp;antes', '357&nbsp;mil'),
+            },
+            {'fn': 4, 'cmp': None,
+             'trend': {'vals': (3.53, 4.15, 4.54, 4.65),
+                       'en': ('Dec 2025', 'Mar 2026', 'Jun 2026', 'Sep 2026'), 'es': ('dic. 2025', 'mar. 2026', 'jun. 2026', 'sep. 2026'),
+                       'pt': ('dez. 2025', 'mar. 2026', 'jun. 2026', 'set. 2026'), 'fmt': {'en': '{:.1f}', 'es': '{:.1f}', 'pt': '{:.1f}'}},
+             'en': ('Supply', '4.7', 'months of inventory', 'Up from 3.5 in December, with 7,594 homes for sale'),
+             'es': ('Oferta', '4.7', 'meses de inventario', 'Frente a 3.5 en diciembre, con 7,594 viviendas en&nbsp;venta'),
+             'pt': ('Oferta', '4,7', 'meses de estoque', 'Contra 3,5 em dezembro, com 7.594 imóveis à&nbsp;venda'),
+            },
+            {'fn': 4, 'cmp': (1533, 1612),
+             'en': ('Sales', '1,533', 'homes sold in September', 'Down 4.9 percent from a year earlier', '1,612'),
+             'es': ('Ventas', '1,533', 'viviendas vendidas en septiembre', 'Un 4.9&nbsp;por ciento menos que un año&nbsp;antes', '1,612'),
+             'pt': ('Vendas', '1.533', 'imóveis vendidos em setembro', 'Queda de 4,9&nbsp;por cento em relação a um ano&nbsp;antes', '1.612'),
+            },
+        ]},
 }
 
 WORDS = {
@@ -108,6 +137,18 @@ def bars(now, then, said):
             + ('<i class="ref"></i>' if then > now else '')
             + f'<i class="now"></i><i class="then"><b>{said}</b></i></span>')
 
+TREND = {'en': ' Where lines are stacked, each is an earlier reading, drawn from zero, and the heavier line is the&nbsp;latest.',
+         'es': ' Donde hay varias líneas, cada una es una lectura anterior, trazada desde cero, y la más gruesa es la más&nbsp;reciente.',
+         'pt': ' Onde há várias linhas, cada uma é uma leitura anterior, traçada a partir do zero, e a mais grossa é a mais&nbsp;recente.'}
+
+def trend(t, lang):
+    # the quarters as a short list, each line drawn to scale from zero; the latest is drawn heavier
+    top = max(t['vals'])
+    num = lambda v: t['fmt'][lang].format(v).replace(',', '.') if lang == 'pt' and isinstance(v, int) else (
+        t['fmt'][lang].format(v).replace('.', ',') if lang == 'pt' else t['fmt'][lang].format(v))
+    return ('<ol class="ms-tr">' + ''.join(f'<li><span>{q}</span><i style="--w:{100 * v / top:.1f}%"></i><b>{num(v)}</b></li>'
+                                          for q, v in zip(t[lang], t['vals'])) + '</ol>')
+
 def sheet(s, lang):
     t, d = WORDS[lang], s[lang]
     out = ['<aside class="ms" aria-labelledby="msT">',
@@ -117,9 +158,10 @@ def sheet(s, lang):
     for f in s['figures']:
         label, num, unit, note, *said = f[lang]
         out.append(f'<div><dt>{label}</dt><dd><span class="ms-n">{num}</span> <span class="ms-u">{unit}</span>'
-                   + (bars(*f['cmp'], said[0]) if f['cmp'] else '')
+                   + (bars(*f['cmp'], said[0]) if f['cmp'] else '') + (trend(f['trend'], lang) if 'trend' in f else '')
                    + f'<span class="ms-note">{nb(note)}<sup><a href="#s{f["fn"]}">{f["fn"]}</a></sup></span></dd></div>')
-    out += ['</dl>', f'<p class="ms-k">{t["key"]}</p>', '</aside>']
+    key = t['key'] + (TREND[lang] if any('trend' in f for f in s['figures']) else '')
+    out += ['</dl>', f'<p class="ms-k">{key}</p>', '</aside>']
     return '\n'.join(out)
 
 for name, s in SHEETS.items():
