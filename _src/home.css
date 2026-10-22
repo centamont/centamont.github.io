@@ -736,10 +736,17 @@ html:not(.js) :is(.seam,.vein){display:none}
 .hero{position:relative;background:rgb(var(--hero-rgb));color:var(--ivory);overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:var(--ivory);--sold:var(--bronze-500);--sold-line:var(--bronze-500);isolation:isolate}
 .hero.loupe{cursor:none}
 
-/* The veil under the copy: one long ellipse of the hero's ink, anchored on the copy's side and falling away evenly in
-   every direction, so it never draws a line of its own across the water or the site (the photograph fades in on its
-   own edge), and the tower's lit lobby and its ground stand clear of it. */
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(64% 120% at 0 58%,rgba(var(--hero-rgb),.97) 0%,rgba(var(--hero-rgb),.9) 42%,rgba(var(--hero-rgb),.55) 70%,rgba(var(--hero-rgb),0) 100%),linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.5) 24%,rgba(var(--hero-rgb),0) 44%)}
+/* The veil under the copy: the hero's ink, full behind the headline and thinning evenly across the width, with no
+   curve of its own (an ellipse here drew a blob over the island's western palms at every width, and a band at 1440 x
+   1100); the photograph fades in on its own edge inside the veil's last third, and the tower's lit lobby and its
+   ground stand clear of it. */
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.97) 26%,rgba(var(--hero-rgb),.84) 38%,rgba(var(--hero-rgb),.46) 48%,rgba(var(--hero-rgb),.14) 56%,rgba(var(--hero-rgb),0) 64%)}
+/* While the photograph stands (the canvas carries data-still), the hero rises over the page's sheet (site.css: z-index 5),
+   so the paper's grain lies on the copy's ink and never on the photograph: the hero lays its own grain, the same tile,
+   over the veil's ink alone, thinning with it. A browser without :has() keeps the sheet over the whole hero. */
+.hero:has(#heroModel[data-still]){z-index:6}
+.hero:has(#heroModel[data-still])::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55;-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%);mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%)}
+@media (max-width:820px){.hero:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px));mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}}
 .hero .lede{font-size:var(--t-intro);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
 
@@ -917,7 +924,8 @@ html:not(.js) .step{min-height:auto}
    hero's last strip, and the section's top meets the screen's top either way; its own opening space keeps its heading
    clear below the bar, which comes back for the jump */
 #services{scroll-margin-top:calc(var(--hdr) * -1)}
-@media (max-width:820px){.hero .coords{display:flex;top:80px;font-size:13px;letter-spacing:.14em}
+/* (the line ends inside the right gutter, as every other line of the page: the caption wraps rather than running out of it) */
+@media (max-width:820px){.hero .coords{display:flex;top:80px;right:var(--gutter);font-size:13px;letter-spacing:.14em}
 
 /* the place and the caption, and under them on a line of their own, the hour and the sun the drawing is lit by, as on a
      desktop (the drawing is framed under both lines, so they never meet the crown) */

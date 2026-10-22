@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // tower above, the copy under it (home.css, .hero.stack). At the set size this never applies.
   let stack=false;
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
-  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.3:2.1,offsetX:wide?.25:mid?.28:.22}};
+  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
   // Once built, the finished tower is a photograph: a path-traced still made from the desktop hero's own camera, lit by
   // the sun of the hour it suits (by day, early in the morning, at golden hour, after dark; model.js, STILLS). The camera
