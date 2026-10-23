@@ -646,7 +646,29 @@
         }
         src = p.fc;
       }
-      g.globalAlpha = a; g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
+      g.globalAlpha = a;
+      // On a phone the still's left edge falls well inside the screen, and the drawn sky and bay showed through its soft
+      // edge as a pale band over a navy wedge. There the still carries itself on to the screen's edge in its own tones:
+      // each band of its height averaged across the open view right of the tower (sky, city, bay, lawn), drawn out to the
+      // left under the still's soft edge, as clear as the still is there and fading at its top and foot (once for each still).
+      if (fl && this.w <= 820) {
+        let ec = p.ec;
+        if (!ec) {
+          const sw = 256, sh = 64, t = document.createElement('canvas'); t.width = sw; t.height = sh;
+          const tq = t.getContext('2d'); tq.imageSmoothingQuality = 'high'; tq.drawImage(p.img, 0, 0, sw, sh);
+          const d = tq.getImageData(0, 0, sw, sh).data, x0 = Math.round(0.42 * sw), x1 = Math.round(0.98 * sw);
+          ec = p.ec = document.createElement('canvas'); ec.width = 1; ec.height = sh;
+          const eq = ec.getContext('2d'), e = eq.createImageData(1, sh);
+          for (let j = 0; j < sh; j++) {
+            let r = 0, gr = 0, b = 0, n = 0;
+            for (let i = x0; i < x1; i++) { const o = (j * sw + i) * 4, al = d[o + 3]; r += d[o] * al; gr += d[o + 1] * al; b += d[o + 2] * al; n += al; }
+            const k = n / (x1 - x0); n = n || 1; e.data.set([r / n, gr / n, b / n, j && j < sh - 1 ? k : 0], j * 4);
+          }
+          eq.putImageData(e, 0, 0);
+        }
+        g.drawImage(ec, 0, y, x + 0.3 * w, h);
+      }
+      g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
     }
 
     // back to the drawing: the rendered tower and its sky (a CSS background on the canvas, set by tower3d.js) go
@@ -2243,19 +2265,17 @@
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        // (over the photograph's bright haze, each name stands in a soft, wide shadow of the hero's ink, laid twice so the
-        // lowest names, over the lawn and the palms at 11 AM, keep at least three to one against it; no outline round the
-        // letters, which read as a sticker's edge)
+        // (over the photograph's bright haze, each name stands on a small plate of the hero's ink, square and unblurred, dark
+        // enough that the lowest names, over the lawn and the palms at 11 AM, and a name over white cumulus keep at least three
+        // to one against it; a soft shadow round the letters read as a dark smudge, and an outline as a sticker's edge)
         const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
         if (halo) {
-          g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 14;
-          for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
-          // (and a closer, denser shadow, twice, so a name over white cumulus still holds three to one)
-          g.shadowBlur = 5;
-          for (let k = 0; k < 2; k++) for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
+          const z = this.o.labelSize, px = 0.42 * z, py = 0.62 * z;
+          g.fillStyle = `rgba(${ink},${(0.72 * this.sa).toFixed(3)})`;
+          for (const [t, x, y, a] of labs) { const tw = g.measureText(t).width, x0 = sd < 0 ? x - px : x - tw - px; g.globalAlpha = a; g.fillRect(Math.round(x0), Math.round(y - py), Math.round(tw + 2 * px), Math.round(2 * py)); }
+          g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`;
         }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
-        if (halo) g.restore();
         g.globalAlpha = 1;
       }
       // The first release: a bracket on the façade side of the ruler over the levels that hold it (the middle of the
