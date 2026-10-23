@@ -322,11 +322,13 @@
 /* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
 .mk-el.mi .fut .wb{stroke-opacity:.5}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
-   (glass dark toward the street, stone a breath darker at its foot) and by its reflection in the river */
+   (glass dark toward the street, stone a breath darker at its foot) and by its reflection in the river; the city behind in
+   hairline and in three planes of tone, palest furthest off, so the towers stand clear of it */
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
-/* its reflection in hairlines, the far plane of the city fainter than the near */
+.mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}
+.mk-el.ny .tn.r1{fill-opacity:.085}.mk-el.ny .tn.r2{fill-opacity:.055}.mk-el.ny .tn.r3{fill-opacity:.035}
+/* its reflection in hairlines */
 .mk-el.ny .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
-.mk-el.ny .tn.r3{fill-opacity:.05}
 /* the other cities (.cy) are drawn the same way as New York, each from the viewpoint of its page's photograph, and set their
    ground (woods, beach, hills) as one quiet tone under the towers */
 .mk-el.cy .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
