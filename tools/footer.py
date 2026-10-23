@@ -169,17 +169,17 @@ W={
  'en':dict(pr='Practice',prd='New development and private client advisory in Miami and New York',of='Office',ofd='Miami, Florida',
    dr='Drawn',rev='Rev.',lt='Letters',ltd='Write to us',sh='Sheet',set='of 10',gen='General',mk='Markets',ss='Sheets',ssall='All ten sheets',fo='Follow',
    note='07 to 09 are specimens, with invented figures.',tab=' (opens in a new tab)',en='',
-   copy='© 2026 Centamont.',priv='Privacy &amp; accessibility',terms='Terms',eho='Equal Housing Opportunity',top='Back to top',
+   copy='© 2026 Centamont.',priv='Privacy &amp; accessibility',terms='Terms',cred='Map data © OpenStreetMap contributors',credid='credits',eho='Equal Housing Opportunity',top='Back to top',
    home='/',name='English',hl='en'),
  'es':dict(pr='Especialidad',prd='Asesoría en nuevos desarrollos y a clientes privados en Miami y Nueva York',of='Oficina',ofd='Miami, Florida',
    dr='Dibujado',rev='Rev.',lt='Cartas',ltd='Escríbanos',sh='Lámina',set='de 10',gen='General',mk='Mercados',ss='Láminas',ssall='Las diez láminas',fo='Síganos',
    note='07 a 09 son muestras, con cifras inventadas.',tab=' (se abre en una pestaña nueva)',en=' (en inglés)',
-   copy='© 2026 Centamont.',priv='Privacidad y accesibilidad',terms='Términos',eho='Igualdad de Oportunidades en la Vivienda',top='Volver arriba',
+   copy='© 2026 Centamont.',priv='Privacidad y accesibilidad',terms='Términos',cred='Datos del mapa © colaboradores de OpenStreetMap',credid='creditos',eho='Igualdad de Oportunidades en la Vivienda',top='Volver arriba',
    home='/es/',name='Español',hl='es'),
  'pt':dict(pr='Atuação',prd='Assessoria em lançamentos imobiliários e a clientes privados em Miami e Nova York',of='Escritório',ofd='Miami, Flórida',
    dr='Desenhado',rev='Rev.',lt='Cartas',ltd='Escreva-nos',sh='Prancha',set='de 10',gen='Geral',mk='Mercados',ss='Pranchas',ssall='As dez pranchas',fo='Siga-nos',
    note='07 a 09 são modelos, com números fictícios.',tab=' (abre em nova aba)',en=' (em inglês)',
-   copy='© 2026 Centamont.',priv='Privacidade e acessibilidade',terms='Termos',eho='Igualdade de Oportunidades na Habitação',top='Voltar ao topo',
+   copy='© 2026 Centamont.',priv='Privacidade e acessibilidade',terms='Termos',cred='Dados do mapa © colaboradores do OpenStreetMap',credid='creditos',eho='Igualdade de Oportunidades na Habitação',top='Voltar ao topo',
    home='/pt/',name='Português',hl='pt-BR'),
 }
 EHO='<svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M16 2 31 13.5h-4V30H5V13.5H1ZM10 16.5h12v3H10Zm0 6h12v3H10Z"/></svg>'
@@ -246,7 +246,7 @@ def block(page,lang,key,part,title,revs,letter):
 {fo}
       </ul></dd></div>
     </dl>
-    <div class="legal"><span>{w['copy']}</span><span><span class="nw">{link('/privacy.html',lang,w['priv'])}<i class="sep"> ·</i></span> <span class="nw">{link('/terms.html',lang,w['terms'])}<i class="sep"> ·</i></span> <span class="nw eho">{EHO}{w['eho']}</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">{w['top']}</a></span>{langs}</span></div>
+    <div class="legal"><span>{w['copy']} <a class="cred" href="{twin('/terms.html',lang)}#{w['credid']}">{w['cred']}</a></span><span><span class="nw">{link('/privacy.html',lang,w['priv'])}<i class="sep"> ·</i></span> <span class="nw">{link('/terms.html',lang,w['terms'])}<i class="sep"> ·</i></span> <span class="nw eho">{EHO}{w['eho']}</span><span class="nw"><i class="sep"> · </i><a href="#top" class="totop">{w['top']}</a></span>{langs}</span></div>
   </div>
 '''
 

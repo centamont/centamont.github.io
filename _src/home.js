@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded',function(){
     let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
     const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
     o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
-  const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
+  // (on a wide screen the ruler's names grow with it, from 13px up to 16px at 2560)
+  const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
     // on a phone the crown stays below the survey note and the tower stands clear of the headline
     const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offsetParent)t+=e.offsetTop;return t};
     if(narrow){const up=!side(),note=document.querySelector('.hero .coords'),c=heroM.c.getBoundingClientRect(),nb=note&&note.offsetParent?note.getBoundingClientRect().bottom-c.top:64;
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
-    heroM=make('heroModel',{real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
     if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',true);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
