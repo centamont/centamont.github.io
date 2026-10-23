@@ -338,11 +338,13 @@
   // and size in that hero (x, y, w, h, CSS px) and its camera's bearing (th), lens (f) and centre (cx, cy), all from the
   // hero's eye height (EY) and pitch (PHI). From the same bearing, height and pitch, any other size or framing of the
   // hero is the same picture scaled about the centre (see camAt), so the still is placed by the lens and centre alone.
+  // (sky, where the far city is a photographed skyline: how far its towers rise above the horizon behind the level
+  // ruler, in the still's pixels, so the ruler's names stay clear of them)
   const STILLS = {
-    day: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-    morning: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-    gold: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-    night: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
+    day: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160 },
+    morning: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160 },
+    gold: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160 },
+    night: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160 },
   };
   // (and from x 575, fully from 825, in the same hero, the photograph has its own far city: the sky's skyline goes)
   const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
@@ -2156,8 +2158,11 @@
       // the levels' names: [name, x, y, strength]
       // (over the photograph, the line itself stops at the lowest numbered level above the horizon, rather than running on
       // down through its palms: yb is where it ends, and no tick is drawn below it)
+      // (and where the photograph has a real skyline behind the ruler, a name never sits on its towers: hy is the line the
+      // names stay above, the skyline's top under the ruler, from the still's own sky, in its pixels above the horizon)
+      const ps_ = this.ph && this.ph.s, hy = this.k.cy - (ps_ && ps_.sky ? ps_.sky * this.k.f / ps_.f : 0);
       let iLo = 0;
-      if (this.sa > 0) { iLo = FLOORS; for (let i = 0; i <= FLOORS; i++) if (named(i) && ys[i] <= this.k.cy - 6) { iLo = i; break; } }
+      if (this.sa > 0) { iLo = FLOORS; for (let i = 0; i <= FLOORS; i++) if (named(i) && ys[i] <= hy - 6) { iLo = i; break; } }
       const yb = ys[0] + (ys[iLo] - ys[0]) * this.sa, on = (i) => ys[i] <= yb + 0.5;
       const labs = [];
       if (this.o.labels && w > 280) {
@@ -2173,7 +2178,7 @@
         for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
           if (!named(i)) continue;
           // (over the photograph, a name below the horizon would sit on its palms: it gives way as the photograph comes in)
-          const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
+          const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - hy + 6) / 14, 0, 1)));
           if (a <= 0.01) continue;
           const t = WORDS.lv + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
         }
@@ -2208,10 +2213,11 @@
         const cy = this.k.cy, z = this.o.labelSize;
         g.save(); g.globalCompositeOperation = 'destination-out'; g.lineWidth = 5; g.lineJoin = 'round'; g.strokeStyle = '#000';
         g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a; g.strokeText(t, x, y); }
+        // (not over the photograph, which has its own skyline: clearing it would cut a dark hole in its towers)
+        for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a * (1 - this.sa); g.strokeText(t, x, y); }
         g.restore();
       }
-      g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
+      g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8 + 0.3 * this.sa; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
       for (let i = 0; i <= FLOORS; i++) if (named(i) && on(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
       g.stroke();
       // a short tick at every level between the numbered ones
@@ -2226,10 +2232,10 @@
         // lawn and the palms at 11 AM, keep at least three to one against their own halo without reading as stickers)
         const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
         if (halo) {
-          g.save(); g.strokeStyle = `rgba(${ink},${(0.62 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
+          g.save(); g.strokeStyle = `rgba(${ink},${(0.78 * this.sa).toFixed(3)})`; g.lineWidth = 2.6; g.lineJoin = 'round'; g.lineCap = 'round';
           for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
           g.restore();
-          g.save(); g.shadowColor = `rgba(${ink},${(0.75 * this.sa).toFixed(3)})`; g.shadowBlur = 8;
+          g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 10;
         }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
