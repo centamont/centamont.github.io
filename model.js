@@ -443,7 +443,25 @@ p.fk = key;
 }
 src = p.fc;
 }
-g.globalAlpha = a; g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
+g.globalAlpha = a;
+if (fl && this.w <= 820) {
+let ec = p.ec;
+if (!ec) {
+const sw = 256, sh = 64, t = document.createElement('canvas'); t.width = sw; t.height = sh;
+const tq = t.getContext('2d'); tq.imageSmoothingQuality = 'high'; tq.drawImage(p.img, 0, 0, sw, sh);
+const d = tq.getImageData(0, 0, sw, sh).data, x0 = Math.round(0.42 * sw), x1 = Math.round(0.98 * sw);
+ec = p.ec = document.createElement('canvas'); ec.width = 1; ec.height = sh;
+const eq = ec.getContext('2d'), e = eq.createImageData(1, sh);
+for (let j = 0; j < sh; j++) {
+let r = 0, gr = 0, b = 0, n = 0;
+for (let i = x0; i < x1; i++) { const o = (j * sw + i) * 4, al = d[o + 3]; r += d[o] * al; gr += d[o + 1] * al; b += d[o + 2] * al; n += al; }
+const k = n / (x1 - x0); n = n || 1; e.data.set([r / n, gr / n, b / n, j && j < sh - 1 ? k : 0], j * 4);
+}
+eq.putImageData(e, 0, 0);
+}
+g.drawImage(ec, 0, y, x + 0.3 * w, h);
+}
+g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
 }
 drop3d() {
 this.r3 = null; this.r3a = 0; this.r3f = null; delete this.c.dataset.render;
@@ -1612,13 +1630,12 @@ if (labs.length) {
 g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
 const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
 if (halo) {
-g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 14;
-for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
-g.shadowBlur = 5;
-for (let k = 0; k < 2; k++) for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
+const z = this.o.labelSize, px = 0.42 * z, py = 0.62 * z;
+g.fillStyle = `rgba(${ink},${(0.72 * this.sa).toFixed(3)})`;
+for (const [t, x, y, a] of labs) { const tw = g.measureText(t).width, x0 = sd < 0 ? x - px : x - tw - px; g.globalAlpha = a; g.fillRect(Math.round(x0), Math.round(y - py), Math.round(tw + 2 * px), Math.round(2 * py)); }
+g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`;
 }
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
-if (halo) g.restore();
 g.globalAlpha = 1;
 }
 if (this.Ra > 0.005 && this.o.release > 0 && !inLens) (() => {
