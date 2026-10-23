@@ -451,7 +451,11 @@ const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p
 end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
 });
 }
-const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+let sy = scrollY, sT = 0, sv = 0;
+addEventListener('scroll', () => { const t = performance.now(), dt = t - sT; if (dt > 0 && dt < 250) sv = 0.5 * sv + 0.5 * Math.abs(scrollY - sy) / dt; else sv = 0; sy = scrollY; sT = t; }, { passive: true });
+const hurried = window.cmHurried = (r) => (performance.now() - sT < 160 && sv > 2.4) || (scrollY > 40 && r.top < innerHeight * 0.45);
+const at = (el) => { el.classList.add('at-once', 'in'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('at-once'))); };
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (hurried(e.boundingClientRect)) at(e.target); else e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
 document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
 const loupes = document.querySelectorAll('.mk-el.hd');
 if (loupes.length) {
