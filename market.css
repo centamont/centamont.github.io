@@ -253,8 +253,9 @@
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.mi .fut .wb{stroke-opacity:.5}
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
+.mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}
+.mk-el.ny .tn.r1{fill-opacity:.085}.mk-el.ny .tn.r2{fill-opacity:.055}.mk-el.ny .tn.r3{fill-opacity:.035}
 .mk-el.ny .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
-.mk-el.ny .tn.r3{fill-opacity:.05}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 .mk-el.hd .wn{stroke:none}
 .js .mk-el.hd .wn{opacity:0;transition:opacity .9s var(--ease-out) 1.1s}
