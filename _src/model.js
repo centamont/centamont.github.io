@@ -2236,15 +2236,13 @@
       if (labs.length) {
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-        // (over the photograph's bright haze, each name stands on a halo of the hero's ink: a thin, rounded outline under the
-        // letters, as a map clears the ground round its names, then a soft, wide shadow, so the lowest names, over the
-        // lawn and the palms at 11 AM, keep at least three to one against their own halo without reading as stickers)
+        // (over the photograph's bright haze, each name stands in a soft, wide shadow of the hero's ink, laid twice so the
+        // lowest names, over the lawn and the palms at 11 AM, keep at least three to one against it; no outline round the
+        // letters, which read as a sticker's edge)
         const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
         if (halo) {
-          g.save(); g.strokeStyle = `rgba(${ink},${(0.55 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
-          for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
-          g.restore();
-          g.save(); g.shadowColor = `rgba(${ink},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 12;
+          g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 14;
+          for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();

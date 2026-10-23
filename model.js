@@ -1607,10 +1607,8 @@ if (labs.length) {
 g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
 const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
 if (halo) {
-g.save(); g.strokeStyle = `rgba(${ink},${(0.55 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
-for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
-g.restore();
-g.save(); g.shadowColor = `rgba(${ink},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 12;
+g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 14;
+for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
 }
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
 if (halo) g.restore();
