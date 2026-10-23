@@ -430,7 +430,7 @@ let src = p.img;
 if (fr || fb || fl || ft) {
 const d = this.dpr || 1, cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d)), key = cw + 'x' + ch + (fr ? 'r' : '') + (fb ? 'b' : '') + (fl ? 'l' : '') + (ft ? 't' : '');
 if (p.fk !== key) {
-const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d, el = Math.min(56 * z * d, cw / 4), et = Math.min(16 * z * d, ch / 8);
+const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d, el = Math.min(Math.max(56 * z, 48) * d, cw / 4), et = Math.min(16 * z * d, ch / 8);
 c.width = cw; c.height = ch;
 const q = c.getContext('2d');
 q.drawImage(p.img, 0, 0, cw, ch); q.globalCompositeOperation = 'destination-out';
@@ -1027,6 +1027,11 @@ g.stroke(); g.setLineDash([]);
 }
 const E = this.E, Ek = smooth(E) * (FLOORS + 1.001);
 if (this.o.footprint && E < 1 && L < 0.01) {
+const fp = this._fp || (this._fp = PLANS[0].slab.map((p) => [p.x, p.z]));
+g.save(); g.beginPath();
+for (const pl of [fp, PLANS[PODIUM].glass.map((p) => [p.x, p.z])]) pl.forEach(([x, z], i) => { const q = this.P(x, 0.01, z); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); });
+g.clip('evenodd'); g.fillStyle = ink((dark ? 0.08 : 0.05) * (1 - E)); g.fillRect(0, 0, w, h);
+hatchOn(fp, 0.01, (q) => ink((dark ? 0.3 : 0.26) * (1 - E) * q)); g.restore();
 g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink((dark ? 0.6 : 0.62) * (1 - E));
 for (const pl of [PLANS[0].slab, PLANS[PODIUM].glass]) { poly(pl.map((p) => this.P(p.x, 0.01, p.z))); g.stroke(); }
 g.setLineDash([]);
@@ -1562,7 +1567,7 @@ if (this.o.labels && w > 280) {
 g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif';
 const fx = (x, t) => sd < 0 ? Math.min(x, w - g.measureText(t).width - 4) : Math.max(x, g.measureText(t).width + 4), z = this.o.labelSize;
 const lastN = Math.floor(FLOORS / 5) * 5 - 1, give = smooth(clamp((Math.abs(ys[FLOORS] - ys[lastN]) - z) / (0.5 * z), 0, 1));
-const thin = smooth(clamp((24 - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
+const thin = smooth(clamp((24 + 6 * this.sa - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
 for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
 if (!named(i)) continue;
 const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - hy + 6) / 14, 0, 1)));
@@ -1607,10 +1612,10 @@ if (labs.length) {
 g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
 const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
 if (halo) {
-g.save(); g.strokeStyle = `rgba(${ink},${(0.55 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
+g.save(); g.strokeStyle = `rgba(${ink},${(0.45 * this.sa).toFixed(3)})`; g.lineWidth = 1.6; g.lineJoin = 'round'; g.lineCap = 'round';
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
 g.restore();
-g.save(); g.shadowColor = `rgba(${ink},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 12;
+g.save(); g.shadowColor = `rgba(${ink},${(0.7 * this.sa).toFixed(3)})`; g.shadowBlur = 7;
 }
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
 if (halo) g.restore();

@@ -694,7 +694,7 @@ void main() {
     // own CSS background, which costs the page nothing as the drawing redraws; while it fades in they are drawn here.
     const ys = (e) => cy - e * f, G = Math.max(40, 0.32 * h);
     // (below the horizon, the bay: see water)
-    const D = Math.max(1, h - cy), wc = waterStops(S);
+    const D = Math.max(1, h - cy), wc = waterStops(S, softBay(m));
     const st = [[ys(0.9), mixc(zen, ink, 0.25)], [ys(0.45), zen], [ys(0.16), mid], [ys(0.05), mixc(mid, hor, 0.7)], [cy, hor], ...wc.map(([t, c]) => [cy + t * D, c])];
     if (alpha < 1 || !m.c || fill) {
       const y0 = st[0][0], y1 = st[st.length - 1][0], gr = g.createLinearGradient(0, y0, 0, y1);
@@ -806,16 +806,20 @@ void main() {
     }
     return (ripMask = c);
   }
-  // the water's own colour from the horizon down (t, a share of the height below it): the sky it mirrors
-  const waterStops = (S) => {
-    const { zen, hor, ink } = S;
-    return [[0, mixc(hor, ink, 0.06)], [0.035, mixc(mixc(hor, zen, 0.45), ink, 0.18)], [0.16, mixc(zen, ink, 0.35)], [0.5, mixc(zen, ink, 0.62)], [1, mixc(zen, ink, 0.85)]];
+  // the water's own colour from the horizon down (t, a share of the height below it): the sky it mirrors. Beside the
+  // hero's photograph on a narrow screen (soft, 0 to 1 as it comes in), the bright band where the water is seen at a
+  // graze runs longer and the deepening comes later, as the photograph's own bay does, so the drawn bay either side of
+  // it meets the horizon in the photograph's light rather than as a dark line across the screen
+  const waterStops = (S, soft = 0) => {
+    const { zen, hor, ink } = S, l = (a, b) => a + (b - a) * soft;
+    return [[0, mixc(hor, ink, l(0.06, 0.04))], [l(0.035, 0.09), mixc(mixc(hor, zen, l(0.45, 0.35)), ink, l(0.18, 0.12))], [l(0.16, 0.28), mixc(zen, ink, l(0.35, 0.4))], [0.5, mixc(zen, ink, 0.62)], [1, mixc(zen, ink, 0.85)]];
   };
+  const softBay = (m) => (m.ph && m.ph.img && m.w <= 820 ? clamp(m.sa || 0, 0, 1) : 0);
   function water(g, m, S, w, h, fill) {
     const k = m.k, f = k.f, cy = k.cy, { hor, ink } = S, alpha = g.globalAlpha, D = Math.max(1, h - cy);
     if (alpha < 1 || !m.c || fill) {
       const gr = g.createLinearGradient(0, cy, 0, h);
-      for (const [t, c] of waterStops(S)) gr.addColorStop(t, css(c));
+      for (const [t, c] of waterStops(S, softBay(m))) gr.addColorStop(t, css(c));
       g.fillStyle = gr; g.fillRect(0, cy, w, D);
     }
     g.save();
