@@ -88,9 +88,10 @@ document.addEventListener('DOMContentLoaded',function(){
       // shows it whole, the copy closes up under the drawing; if not, the copy steps down so the button starts under the fold
       hero.style.removeProperty('--rise');
       const btn=up&&wrap.querySelector('.row .btn');if(btn){const t=hero.offsetTop+at(btn),need=Math.ceil(t+btn.offsetHeight-(innerHeight-14));if(t<innerHeight&&need>0)hero.style.setProperty('--rise',(need<=24?need:-Math.ceil(innerHeight-t))+'px')}
-      // and the drawing's ground stays 28px above the headline, so the podium and its hatch never touch the type; the crown
-      // stands 14px under the caption, or 10px under the sun line where that closes the note (its line has no descenders)
-      const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-28)):c.height*.22;
+      // and the drawing's ground stays 28px above the headline, so the podium and its hatch never touch the type (with the
+      // photograph, 18px: below its quay there is only water, fading into the bay); the crown stands 14px under the
+      // caption, or 10px under the sun line where that closes the note (its line has no descenders)
+      const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-(photo?18:28))):c.height*.22;
       const top=nb+(sunline&&sunline.offsetParent?10:14);
       // (with the photograph the camera's height is the still's, so only the size is fitted: the largest that keeps the
       // crown under the note and the ground over the headline)
@@ -113,13 +114,17 @@ document.addEventListener('DOMContentLoaded',function(){
     heroM.o.groundLabel=narrow||side();
     // stacked, the group stands on the centre line and the ruler's labels take the corner the sun's path would use
     heroM.o.sunPath=!narrow||side();
-    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHeight)*9);heroM.touch()};
+    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHeight)*9);
+    // the photograph is sent for once the drawing is first framed, so its size is chosen for the size it is shown at (a
+    // phone's tower is drawn small enough for the lighter file, which is a quarter of the pixels to decode and lay down)
+    if(photo&&!heroM.ph)heroM.photo(photo,'/hero/',true);
+    heroM.touch()};
   // A drawing that cannot start (no canvas, an old engine) costs only itself: the rest of the page carries on without it.
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
     heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
-    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);if(photo)heroM.photo(photo,'/hero/',true);
+    if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
       if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
@@ -319,19 +324,20 @@ document.addEventListener('DOMContentLoaded',function(){
     const o=mk.appendChild(document.createElementNS(NS,'rect'));['x','y','width','height','transform'].forEach(n=>{if(loc.hasAttribute(n))o.setAttribute(n,loc.getAttribute(n))});
     d.style.setProperty('--len',Math.ceil(p.getTotalLength())+'px');groups[order.indexOf(p.dataset.m)].draw.push(d)})};
   const wide=matchMedia('(min-width:1200px)'),held={},hold=(k,v)=>{v=v.toFixed(4);if(held[k]!==v){held[k]=v;chart.style.setProperty(k,v)}};
-  let mraf=0,near=false,tS=0,tR=0;
+  // (a reader who arrives in a hurry finds the plate already drawn: its clock is started as if it had run its course)
+  let mraf=0,near=false,tS=0,tR=0;const done=(now,T)=>window.cmHurried&&cmHurried(fig.getBoundingClientRect())?now-T-1:now;
   const paint=()=>{mraf=0;if(!armed)arm();const h=innerHeight,now=performance.now(),lb=loc.getBoundingClientRect().bottom,fb=fig.getBoundingClientRect().bottom;let ms=MS,mr=MR,run=false;
     if(!reduce){
       if(wide.matches){
         // side by side, the plate starts as soon as the locator is in view, and then plays through on its own (never while
         // the whole plate is above the screen, as a jump past it leaves it: it keeps its arrival for the way back)
-        if(!tS&&lb<h&&fb>64)tS=now;ms=tS?now-tS:0;mr=ms-Q0;run=!!tS&&ms<MT}
+        if(!tS&&lb<h&&fb>64)tS=done(now,MT);ms=tS?now-tS:0;mr=ms-Q0;run=!!tS&&ms<MT}
       else{
         // stacked, the survey comes first and plays as soon as its reach is in view; the routes leave as soon as the
         // locator on the overview below it is in view, but never before the survey's three points have landed (and here
         // too, never while the whole plate is above the screen)
-        const rb=reach.getBoundingClientRect().bottom;if(!tS&&rb<h&&fb>64)tS=now;ms=tS?now-tS:0;
-        if(tS&&!tR&&lb<h&&fb>64)tR=Math.max(now,tS+Q0);mr=tR?now-tR:-1;run=(!!tS&&ms<MS)||(!!tR&&mr<MR)}}
+        const rb=reach.getBoundingClientRect().bottom;if(!tS&&rb<h&&fb>64)tS=done(now,MS);ms=tS?now-tS:0;
+        if(tS&&!tR&&lb<h&&fb>64)tR=done(now,MR)<now?now-MR-1:Math.max(now,tS+Q0);mr=tR?now-tR:-1;run=(!!tS&&ms<MS)||(!!tR&&mr<MR)}}
     hold('--c',ease(cl(ms/T1)));hold('--t',ease(cl((ms-K0)/T2)));hold('--r',ease(cl((ms-R0)/T3)));
     groups.forEach((g,i)=>{const a=i>1?ease(cl((mr-(i-2)*GAP)/TR)):(ms>=MS?1:0);if(a!==g.a){g.a=a;g.draw.forEach(d=>d.style.setProperty('--a',a.toFixed(4)))}
       const on=a>=1;if(on!==g.on){g.on=on;g.els.forEach(e=>e.classList.toggle('landed',on))}});

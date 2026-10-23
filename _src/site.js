@@ -417,11 +417,12 @@
   // The advisors' table: with motion off, the seats are shown taken.
   if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.add('in'));
 
-  // The footer signature is engraved as it arrives, left to right.
+  // The footer signature is engraved as it arrives, left to right: begun as soon as its line is a little way into the
+  // window, and quick (1.2 s), so a reader who scrolls straight down finds it signed rather than half written.
   const sig = document.querySelector('footer .sig');
   if (sig && !stillPage && 'IntersectionObserver' in window) {
     sig.classList.add('eng');
-    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -30% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -8% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
   }
 
   // The short bronze rule over each section's intro draws itself as the intro comes 15% into the screen (site.css keys
@@ -627,7 +628,15 @@
 
   // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so
   // by the time it stands in the middle of the screen it is finished, and a reader scrolling past never meets one half drawn.
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+  // A reader in a hurry is never kept waiting for one: where it arrives during a fast scroll (over about 2.4px a
+  // millisecond, a flick rather than reading) or by a jump that lands it already half way up the screen (a link, a key,
+  // a restored place), it is simply there, drawn, its transitions held for that one change (window.cmHurried tells the
+  // page's own drawings the same).
+  let sy = scrollY, sT = 0, sv = 0;
+  addEventListener('scroll', () => { const t = performance.now(), dt = t - sT; if (dt > 0 && dt < 250) sv = 0.5 * sv + 0.5 * Math.abs(scrollY - sy) / dt; else sv = 0; sy = scrollY; sT = t; }, { passive: true });
+  const hurried = window.cmHurried = (r) => (performance.now() - sT < 160 && sv > 2.4) || (scrollY > 40 && r.top < innerHeight * 0.45);
+  const at = (el) => { el.classList.add('at-once', 'in'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('at-once'))); };
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (hurried(e.boundingClientRect)) at(e.target); else e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
 
   // The two skylines drawn tower by tower (Miami, New York) carry more than a page width can show: every floor, fin and

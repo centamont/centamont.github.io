@@ -424,7 +424,7 @@ h2{font-size:clamp(38px,4.6vw,64px);font-weight:300;max-width:16ch;letter-spacin
 .elev canvas{width:100%;flex:1;min-height:0;display:block}
 
 @keyframes lim{30%{transform:scaleY(2.2)}}
-.elev figcaption{font-size:15px;color:var(--faint);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin-left:var(--bleed);border-top:1px solid var(--rule);padding-top:10px}
+.elev figcaption{font-size:15px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;margin-left:var(--bleed);border-top:1px solid var(--rule);padding-top:10px}
 .elev figcaption b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:.14em;text-transform:uppercase;font-size:13px;white-space:nowrap}
 /* on the narrowest phones the caption keeps the same lines at every step, so the tower never changes size between them:
    one line down to 350px, and below that the step's name always on a second line under the disclosure */
@@ -658,6 +658,8 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
    touches, and a list of them, even at 0s, is weighed on every element at every restyle) */
 :root[data-motion="off"]{scroll-behavior:auto}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
+/* a drawing that arrives while the reader hurries is set down whole, for that one change (site.js, cmHurried) */
+.at-once,.at-once *,.at-once *::before,.at-once *::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important}
 /* the icon shows where the switch takes you */
 .theme .sun{display:none}
 :root[data-theme="dark"] .theme .moon{display:none}
@@ -776,7 +778,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 .chart mask path{fill:none;stroke:#fff;stroke-width:14;stroke-dasharray:var(--len);stroke-dashoffset:calc(var(--len) * (1 - var(--a,1)))}
 .chart .pt{fill:var(--sheet);stroke:var(--fg);stroke-width:calc(1.25px * var(--u,1));transition:stroke .6s var(--ease)}
 .js .chart .pt:not(.landed){stroke:var(--rule)}
-.js .chart .sky.landed{stroke-dashoffset:0;fill-opacity:.62}
+.js .chart .sky.landed{stroke-dashoffset:0;fill-opacity:.12}
 /* what opens now is the only continuous line: the reach along the coast, three points, the locator around them */
 .chart .rch{fill:none;stroke:var(--patina);stroke-width:calc(3px * var(--u,1));stroke-linecap:round;stroke-dasharray:1 2;stroke-dashoffset:calc(1 - var(--r,1));opacity:clamp(0,calc(var(--r,1) * 40),1)}
 
@@ -828,7 +830,7 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 /* (narrower still, the survey's title no longer fits beside the coast; the overview below names South Florida) */
 @media (max-width:340px){.chart .sv .ttl{display:none}}
 /* A drawing's caption strip: what the drawing is, on the left; its key, on the right */
-.cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;color:var(--faint);text-align:left}
+.cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:baseline;border-top:1px solid var(--rule);padding-top:10px;font-size:15px;color:var(--muted);text-align:left}
 /* (a figure caption with no key keeps the strip's whole width, with no gap held open for one; the hero's coordinates line, also a .cap, keeps its spacing) */
 figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
 .cap .k-later{stroke-width:var(--lw-object);stroke-dasharray:var(--lt-dot);stroke-linecap:round;stroke-opacity:.62}
@@ -941,7 +943,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .prose .mk-src li{color:var(--muted)}
 .prose .mk-src strong{font-style:normal;font-weight:500}
 .prose a{color:var(--accent)}
-.prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--faint)}
+.prose .note{margin-top:48px;padding:22px 0;border-block:1px solid var(--rule);font-size:16px;color:var(--muted)}
 /* (its rules run the column's width; its 16px words keep to about 75 characters a line, in lines of even length) */
 .prose .note{padding-right:max(0px,calc(100% - 32em));text-wrap:balance}
 /* a side figure: a number the paragraph beside it gives, set large under a bronze rule with what it counts (the notes
@@ -949,7 +951,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
    so the paragraph beside it keeps its full measure */
 .prose .side{float:right;width:min(210px,40%);margin:6px 0 16px 28px;padding-top:12px;border-top:1px solid var(--accent);display:grid;gap:6px}
 .prose .side b{font-family:var(--display);font-weight:300;font-size:72px;line-height:.85;color:var(--fg);font-variant-numeric:lining-nums}
-.prose .side span{font-family:var(--body);font-size:15px;line-height:1.5;color:var(--faint)}
+.prose .side span{font-family:var(--body);font-size:15px;line-height:1.5;color:var(--muted)}
 @media (max-width:560px){.prose .side{float:none;width:auto;margin:28px 0;grid-template-columns:auto minmax(0,1fr);align-items:end;gap:16px}}
 @media (min-width:1140px){.prose .side{margin-right:-258px}}
 .page .row{margin-top:48px}
@@ -1001,7 +1003,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 .cp-dot{fill:var(--sold-line);stroke:var(--bg);stroke-width:2}
 .cp-vd{fill:var(--bg);stroke:var(--fg)}
 .cp-t .cp-up,.cp-lt{text-transform:uppercase;letter-spacing:.12em;paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round}
-.cp figcaption,.wk figcaption{margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--faint)}
+.cp figcaption,.wk figcaption{margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:15px;line-height:1.5;color:var(--muted)}
 .cp figcaption{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 28px;align-items:baseline}
 .cp figcaption .more{white-space:nowrap}
 /* a figure too narrow to name the threshold in the drawing names it in the key */
@@ -1563,7 +1565,7 @@ p,li{text-wrap:pretty}
 /* the title block keeps one row of four cells only where its narrow cells can hold their labels on one line */
 /* The signature is engraved left to right, so a half-cut state still reads as an inscription */
 .sig.eng{-webkit-mask:linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat;mask:linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat}
-.sig.eng.in{-webkit-mask-position:0 0;mask-position:0 0;transition:mask-position 1.6s var(--ease-ink),-webkit-mask-position 1.6s var(--ease-ink)}
+.sig.eng.in{-webkit-mask-position:0 0;mask-position:0 0;transition:mask-position 1.2s var(--ease-ink),-webkit-mask-position 1.2s var(--ease-ink)}
 
 .legal .sep{font-style:normal}
 /* the fair-housing mark: the house and equals sign drawn in the line's own ink at cap height, its words beside it */
