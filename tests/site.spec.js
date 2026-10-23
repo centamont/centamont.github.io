@@ -446,7 +446,7 @@ test('the launch planner answers its inputs, keeps them in its link and says it 
 
 // Each open market's sheet says when its figures hold and when they are next checked, and every figure points to a source on the page.
 test('the market sheets are dated and every figure cites a source on its page', async ({ page }) => {
-  for (const url of ['/south-florida.html', '/new-york.html', '/hamptons.html', '/es/hamptons.html', '/pt/hamptons.html']) {
+  for (const url of ['/south-florida.html', '/new-york.html', '/hamptons.html', '/es/hamptons.html', '/pt/hamptons.html', '/dallas.html', '/es/dallas.html', '/pt/dallas.html', '/los-angeles.html', '/es/los-angeles.html', '/pt/los-angeles.html']) {
     await page.goto(url);
     const sheet = page.locator('aside.ms');
     await expect(sheet.locator('time')).toHaveCount(2);
