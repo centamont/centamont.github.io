@@ -622,8 +622,8 @@
     // The photograph, laid where the rendered tower is. Where it falls short of the canvas's right or bottom edge (a
     // window wider or shorter than the one it was made in), it fades out over its last 48 to 200px (twice the shortfall)
     // into the bay drawn under it rather than ending on a line (a copy faded once for each size, kept until it changes).
-    // Its left and top edges, which lie inside the canvas, are softened too (56px at the left, where the drawn sky hands
-    // its far city to the photograph's, and 16px at the top, just over the crown): the still's sky is never quite the drawn
+    // Its left and top edges, which lie inside the canvas, are softened too (56px at the left, never under 48 on a phone, where
+    // the drawn sky hands its far city to the photograph's, and 16px at the top, just over the crown): the still's sky is never quite the drawn
     // sky's tone, and while the photograph fades in (or out) a hard edge there shows as a dark box round the tower.
     still(g, a) {
       const p = this.ph, s = p.s, k = this.k, z = k.f / s.f;
@@ -632,7 +632,7 @@
       if (fr || fb || fl || ft) {
         const d = this.dpr || 1, cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d)), key = cw + 'x' + ch + (fr ? 'r' : '') + (fb ? 'b' : '') + (fl ? 'l' : '') + (ft ? 't' : '');
         if (p.fk !== key) {
-          const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d, el = Math.min(56 * z * d, cw / 4), et = Math.min(16 * z * d, ch / 8);
+          const c = p.fc || (p.fc = document.createElement('canvas')), e = clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) * d, el = Math.min(Math.max(56 * z, 48) * d, cw / 4), et = Math.min(16 * z * d, ch / 8);
           c.width = cw; c.height = ch;
           const q = c.getContext('2d');
           q.drawImage(p.img, 0, 0, cw, ch); q.globalCompositeOperation = 'destination-out';
@@ -1457,9 +1457,16 @@
         for (const i of DATUM) { g.moveTo(xt, ys[i]); g.lineTo(xg, ys[i]); }
         g.stroke(); g.setLineDash([]);
       }
-      // Before the envelope exists, only the footprint: podium and tower drawn on the ground
+      // Before the envelope exists, only the footprint: podium and tower drawn on the ground, the podium toned and hatched
+      // as a site plan marks the building it places (the shadows' hatch, so the sheet keeps one hand), the tower's plate
+      // left clear inside it for its name
       const E = this.E, Ek = smooth(E) * (FLOORS + 1.001);
       if (this.o.footprint && E < 1 && L < 0.01) {
+        const fp = this._fp || (this._fp = PLANS[0].slab.map((p) => [p.x, p.z]));
+        g.save(); g.beginPath();
+        for (const pl of [fp, PLANS[PODIUM].glass.map((p) => [p.x, p.z])]) pl.forEach(([x, z], i) => { const q = this.P(x, 0.01, z); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); });
+        g.clip('evenodd'); g.fillStyle = ink((dark ? 0.08 : 0.05) * (1 - E)); g.fillRect(0, 0, w, h);
+        hatchOn(fp, 0.01, (q) => ink((dark ? 0.3 : 0.26) * (1 - E) * q)); g.restore();
         g.setLineDash([3, 4]); g.lineWidth = 1; g.strokeStyle = ink((dark ? 0.6 : 0.62) * (1 - E));
         for (const pl of [PLANS[0].slab, PLANS[PODIUM].glass]) { poly(pl.map((p) => this.P(p.x, 0.01, p.z))); g.stroke(); }
         g.setLineDash([]);
@@ -2180,9 +2187,9 @@
         // the roof is always named; on a small drawing, where the last numbered level would crowd it, that level gives way,
         // fading rather than blinking
         const lastN = Math.floor(FLOORS / 5) * 5 - 1, give = smooth(clamp((Math.abs(ys[FLOORS] - ys[lastN]) - z) / (0.5 * z), 0, 1));
-        // where the names would stand closer than 24px, only every tenth level keeps its name (L10, L20, L30), the others
-        // fading as the drawing shrinks
-        const thin = smooth(clamp((24 - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
+        // where the names would stand closer than 24px (30px over the photograph, whose own detail they sit on), only every
+        // tenth level keeps its name (L10, L20, L30), the others fading as the drawing shrinks
+        const thin = smooth(clamp((24 + 6 * this.sa - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
         // (a drawing whose ground sinks into a veil the page lays over it leaves the ground level's tick unnamed, o.groundLabel false)
         for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
           if (!named(i)) continue;
@@ -2237,14 +2244,15 @@
         // (in high contrast, the system's text colour, as every other line of the drawing)
         g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
         // (over the photograph's bright haze, each name stands on a halo of the hero's ink: a thin, rounded outline under the
-        // letters, as a map clears the ground round its names, then a soft, wide shadow, so the lowest names, over the
-        // lawn and the palms at 11 AM, keep at least three to one against their own halo without reading as stickers)
+        // letters, as a map clears the ground round its names, then a soft shadow, so the lowest names, over the sky's haze,
+        // keep at least three to one against their own halo; kept close and light, so a name never weighs what the
+        // building does)
         const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
         if (halo) {
-          g.save(); g.strokeStyle = `rgba(${ink},${(0.55 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
+          g.save(); g.strokeStyle = `rgba(${ink},${(0.45 * this.sa).toFixed(3)})`; g.lineWidth = 1.6; g.lineJoin = 'round'; g.lineCap = 'round';
           for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
           g.restore();
-          g.save(); g.shadowColor = `rgba(${ink},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 12;
+          g.save(); g.shadowColor = `rgba(${ink},${(0.7 * this.sa).toFixed(3)})`; g.shadowBlur = 7;
         }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();

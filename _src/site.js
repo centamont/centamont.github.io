@@ -417,11 +417,12 @@
   // The advisors' table: with motion off, the seats are shown taken.
   if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.add('in'));
 
-  // The footer signature is engraved as it arrives, left to right.
+  // The footer signature is engraved as it arrives, left to right: begun as soon as its line is a little way into the
+  // window, and quick (1.2 s), so a reader who scrolls straight down finds it signed rather than half written.
   const sig = document.querySelector('footer .sig');
   if (sig && !stillPage && 'IntersectionObserver' in window) {
     sig.classList.add('eng');
-    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -30% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -8% 0px' }).observe(sig.parentNode); // the clipped signature has no visible area of its own to observe
   }
 
   // The short bronze rule over each section's intro draws itself as the intro comes 15% into the screen (site.css keys
