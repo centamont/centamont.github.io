@@ -308,7 +308,7 @@ if (stillPage) document.querySelectorAll('.table').forEach((t) => t.classList.ad
 const sig = document.querySelector('footer .sig');
 if (sig && !stillPage && 'IntersectionObserver' in window) {
 sig.classList.add('eng');
-new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -30% 0px' }).observe(sig.parentNode);
+new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { o.disconnect(); requestAnimationFrame(() => requestAnimationFrame(() => sig.classList.add('in'))); } }), { rootMargin: '0px 0px -8% 0px' }).observe(sig.parentNode);
 }
 const painted = performance.getEntriesByType && performance.getEntriesByType('paint').some((e) => e.name === 'first-contentful-paint');
 const seen = (el) => { if (!painted) return false; const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
