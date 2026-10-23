@@ -628,7 +628,15 @@
 
   // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so
   // by the time it stands in the middle of the screen it is finished, and a reader scrolling past never meets one half drawn.
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+  // A reader in a hurry is never kept waiting for one: where it arrives during a fast scroll (over about 2.4px a
+  // millisecond, a flick rather than reading) or by a jump that lands it already half way up the screen (a link, a key,
+  // a restored place), it is simply there, drawn, its transitions held for that one change (window.cmHurried tells the
+  // page's own drawings the same).
+  let sy = scrollY, sT = 0, sv = 0;
+  addEventListener('scroll', () => { const t = performance.now(), dt = t - sT; if (dt > 0 && dt < 250) sv = 0.5 * sv + 0.5 * Math.abs(scrollY - sy) / dt; else sv = 0; sy = scrollY; sT = t; }, { passive: true });
+  const hurried = window.cmHurried = (r) => (performance.now() - sT < 160 && sv > 2.4) || (scrollY > 40 && r.top < innerHeight * 0.45);
+  const at = (el) => { el.classList.add('at-once', 'in'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('at-once'))); };
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { if (hurried(e.boundingClientRect)) at(e.target); else e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
   document.querySelectorAll('[data-draw]').forEach((el) => io.observe(el));
 
   // The two skylines drawn tower by tower (Miami, New York) carry more than a page width can show: every floor, fin and

@@ -324,19 +324,20 @@ document.addEventListener('DOMContentLoaded',function(){
     const o=mk.appendChild(document.createElementNS(NS,'rect'));['x','y','width','height','transform'].forEach(n=>{if(loc.hasAttribute(n))o.setAttribute(n,loc.getAttribute(n))});
     d.style.setProperty('--len',Math.ceil(p.getTotalLength())+'px');groups[order.indexOf(p.dataset.m)].draw.push(d)})};
   const wide=matchMedia('(min-width:1200px)'),held={},hold=(k,v)=>{v=v.toFixed(4);if(held[k]!==v){held[k]=v;chart.style.setProperty(k,v)}};
-  let mraf=0,near=false,tS=0,tR=0;
+  // (a reader who arrives in a hurry finds the plate already drawn: its clock is started as if it had run its course)
+  let mraf=0,near=false,tS=0,tR=0;const done=(now,T)=>window.cmHurried&&cmHurried(fig.getBoundingClientRect())?now-T-1:now;
   const paint=()=>{mraf=0;if(!armed)arm();const h=innerHeight,now=performance.now(),lb=loc.getBoundingClientRect().bottom,fb=fig.getBoundingClientRect().bottom;let ms=MS,mr=MR,run=false;
     if(!reduce){
       if(wide.matches){
         // side by side, the plate starts as soon as the locator is in view, and then plays through on its own (never while
         // the whole plate is above the screen, as a jump past it leaves it: it keeps its arrival for the way back)
-        if(!tS&&lb<h&&fb>64)tS=now;ms=tS?now-tS:0;mr=ms-Q0;run=!!tS&&ms<MT}
+        if(!tS&&lb<h&&fb>64)tS=done(now,MT);ms=tS?now-tS:0;mr=ms-Q0;run=!!tS&&ms<MT}
       else{
         // stacked, the survey comes first and plays as soon as its reach is in view; the routes leave as soon as the
         // locator on the overview below it is in view, but never before the survey's three points have landed (and here
         // too, never while the whole plate is above the screen)
-        const rb=reach.getBoundingClientRect().bottom;if(!tS&&rb<h&&fb>64)tS=now;ms=tS?now-tS:0;
-        if(tS&&!tR&&lb<h&&fb>64)tR=Math.max(now,tS+Q0);mr=tR?now-tR:-1;run=(!!tS&&ms<MS)||(!!tR&&mr<MR)}}
+        const rb=reach.getBoundingClientRect().bottom;if(!tS&&rb<h&&fb>64)tS=done(now,MS);ms=tS?now-tS:0;
+        if(tS&&!tR&&lb<h&&fb>64)tR=done(now,MR)<now?now-MR-1:Math.max(now,tS+Q0);mr=tR?now-tR:-1;run=(!!tS&&ms<MS)||(!!tR&&mr<MR)}}
     hold('--c',ease(cl(ms/T1)));hold('--t',ease(cl((ms-K0)/T2)));hold('--r',ease(cl((ms-R0)/T3)));
     groups.forEach((g,i)=>{const a=i>1?ease(cl((mr-(i-2)*GAP)/TR)):(ms>=MS?1:0);if(a!==g.a){g.a=a;g.draw.forEach(d=>d.style.setProperty('--a',a.toFixed(4)))}
       const on=a>=1;if(on!==g.on){g.on=on;g.els.forEach(e=>e.classList.toggle('landed',on))}});

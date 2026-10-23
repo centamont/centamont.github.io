@@ -658,6 +658,8 @@ body > footer > .wrap::before{content:"";display:block;height:9px;background:var
    touches, and a list of them, even at 0s, is weighed on every element at every restyle) */
 :root[data-motion="off"]{scroll-behavior:auto}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
+/* a drawing that arrives while the reader hurries is set down whole, for that one change (site.js, cmHurried) */
+.at-once,.at-once *,.at-once *::before,.at-once *::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important}
 /* the icon shows where the switch takes you */
 .theme .sun{display:none}
 :root[data-theme="dark"] .theme .moon{display:none}
