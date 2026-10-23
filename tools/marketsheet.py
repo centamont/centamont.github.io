@@ -17,10 +17,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SHEETS = {
     'south-florida.html': {
         'twins': {'es': 'es/sur-de-florida.html', 'pt': 'pt/sul-da-florida.html'},
-        'asof': '2026-08', 'next': '2027-01',
-        'en': {'as': 'As of ', 'asof': 'August 2026', 'next': 'January 2027'},
-        'es': {'as': 'Datos a ', 'asof': 'agosto de 2026', 'next': 'enero de 2027'},
-        'pt': {'as': 'Dados de ', 'asof': 'agosto de 2026', 'next': 'janeiro de 2027'},
+        'asof': '2026-09', 'next': '2027-01',
+        'en': {'as': 'As of ', 'asof': 'September 2026', 'next': 'January 2027'},
+        'es': {'as': 'Datos a ', 'asof': 'septiembre de 2026', 'next': 'enero de 2027'},
+        'pt': {'as': 'Dados de ', 'asof': 'setembro de 2026', 'next': 'janeiro de 2027'},
         'figures': [
             {'fn': 2, 'cmp': (1983, 800),
              'en': ('New towers', '$1,983', 'a square foot', 'Average luxury asking price in July, against about $800 five years earlier', '$800'),
@@ -33,9 +33,12 @@ SHEETS = {
              'pt': ('Projetos', '26', 'ou mais na planta', 'Projetos de marca e de ultraluxo nos três condados, em&nbsp;julho'),
             },
             {'fn': 1, 'cmp': None,
-             'en': ('Resale', '12.1', 'months of supply', 'Miami-Dade condominiums in August, at a median price of $408,000; new construction excluded'),
-             'es': ('Reventa', '12.1', 'meses de inventario', 'Condominios de Miami-Dade en agosto, con un precio mediano de $408,000; se excluye la obra&nbsp;nueva'),
-             'pt': ('Revenda', '12,1', 'meses de estoque', 'Apartamentos em condomínio em Miami-Dade em agosto, com preço mediano de US$ 408.000; exclui imóveis&nbsp;novos'),
+             'trend': {'vals': (14.0, 13.0, 12.3, 12.3),
+                       'en': ('Sep 2025', 'Mar 2026', 'Jun 2026', 'Sep 2026'), 'es': ('sep. 2025', 'mar. 2026', 'jun. 2026', 'sep. 2026'),
+                       'pt': ('set. 2025', 'mar. 2026', 'jun. 2026', 'set. 2026'), 'fmt': {'en': '{:.1f}', 'es': '{:.1f}', 'pt': '{:.1f}'}},
+             'en': ('Resale', '12.3', 'months of supply', 'Miami-Dade condominiums in September, with 11,706 for sale, against 14.0 months a year earlier; new construction excluded'),
+             'es': ('Reventa', '12.3', 'meses de inventario', 'Condominios de Miami-Dade en septiembre, con 11,706 en venta, frente a 14.0 meses un año antes; se excluye la obra&nbsp;nueva'),
+             'pt': ('Revenda', '12,3', 'meses de estoque', 'Apartamentos em condomínio em Miami-Dade em setembro, com 11.706 à venda, contra 14,0 meses um ano antes; exclui imóveis&nbsp;novos'),
             },
         ]},
     'new-york.html': {
