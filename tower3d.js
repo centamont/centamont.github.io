@@ -671,7 +671,7 @@ const r = hash(i), tall = r > 0.94 ? 1 : 0, cl = 0.5 + 0.5 * Math.sin(i * 0.37 +
 const hgt = town * (tall ? 0.02 + 0.016 * hash(i + 3) : 0.003 + 0.009 * cl * cl + 0.004 * r * r) + 0.001 * hash(i + 9);
 const a1 = ((i + (tall ? 0.5 : hash(i + 5) > 0.85 ? 0.7 : 1.02)) / N) * TAU, p0 = scr(Math.sin(a0), 0, Math.cos(a0)), p1 = scr(Math.sin(a1), 0, Math.cos(a1));
 if (!p0 || !p1 || p1[0] < -2 || p0[0] > w + 2) { open = false; continue; }
-const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) * (cut ? 1 - cut[2] * smooth(clamp((p0[0] - cut[0]) / (cut[1] - cut[0]), 0, 1)) : 1) / p0[2];
+const yh = cy - f * hgt * (w > 820 ? smooth(clamp((p0[0] - 0.42 * w) / (0.2 * w), 0, 1)) : 1) * (cut ? 1 - cut[2] * (w <= 820 ? 1 : smooth(clamp((p0[0] - cut[0]) / (cut[1] - cut[0]), 0, 1))) : 1) / p0[2];
 if (!open) { g.moveTo(p0[0], cy + 1); open = true; }
 g.lineTo(p0[0], cy + 1); g.lineTo(p0[0], yh); g.lineTo(p1[0], yh); g.lineTo(p1[0], cy + 1);
 if (cy - yh > 0.5) skyl.push(p0[0], p1[0], cy - yh);

@@ -2250,6 +2250,9 @@
         if (halo) {
           g.save(); g.shadowColor = `rgba(${ink},${(0.9 * this.sa).toFixed(3)})`; g.shadowBlur = 14;
           for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
+          // (and a closer, denser shadow, twice, so a name over white cumulus still holds three to one)
+          g.shadowBlur = 5;
+          for (let k = 0; k < 2; k++) for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         }
         for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
         if (halo) g.restore();
