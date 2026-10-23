@@ -195,6 +195,11 @@ const { el, az } = solar(date), E = el * RAD, A = az * RAD;
 return { v: [Math.cos(E) * Math.sin(A), Math.sin(E), Math.cos(E) * Math.cos(A)], night: smooth(clamp((6 - el) / 12, 0, 1)), el, az };
 }
 window.CentamontSun = miamiSun;
+function turnSun(s, turn) {
+if (!turn) return s;
+const r = turn * RAD, c = Math.cos(r), n = Math.sin(r), [x, y, z] = s.v;
+return Object.assign({}, s, { v: [x * c - z * n, y, z * c + x * n] });
+}
 function miamiDay(t) {
 try {
 const f = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
@@ -217,10 +222,10 @@ const hasRO = typeof ResizeObserver === 'function', hasIO = typeof IntersectionO
 const IDLE = 1000 / (matchMedia('(pointer: coarse)').matches ? 8 : 12);
 const CASCADE = 2400;
 const STILLS = {
-day: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-morning: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-gold: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
-night: { x: 620, y: 75, w: 1120, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736 },
+day: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
+morning: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
+gold: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
+night: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
 };
 const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
 const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
@@ -346,9 +351,9 @@ this.r3 = null; this.r3a = 0; this.r3f = null;
 this.ph = null; this.sa = 0;
 try { this.ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null; } catch (e) { this.ctx = null; }
 if (!this.ctx) { this.dead = true; this.w = this.h = 0; return; }
-this.sunNow = miamiSun();
+this.sunNow = turnSun(miamiSun(), this.o.turn);
 this.sunT = null; this.sunBack = null; this.spG = null;
-setInterval(() => { if (this.sunT == null) { this.sunNow = miamiSun(); this.dirty = true; this.kick(); } }, 300000);
+setInterval(() => { if (this.sunT == null) { this.sunNow = turnSun(miamiSun(), this.o.turn); this.dirty = true; this.kick(); } }, 300000);
 this.colors();
 if (this.o.real3d) this.load3d();
 if (!hasRO) this.size();
@@ -508,7 +513,7 @@ this.touch();
 pointer(x, y) { this.mx = x; this.my = y; this.wake(); }
 scrub(t) {
 if (reduce || this.dead) return;
-if (t != null) { if (t === this.sunT && !this.sunBack) return; this.sunT = t; this.sunBack = null; this.sunNow = miamiSun(new Date(t)); }
+if (t != null) { if (t === this.sunT && !this.sunBack) return; this.sunT = t; this.sunBack = null; this.sunNow = turnSun(miamiSun(new Date(t)), this.o.turn); }
 else if (this.sunT != null && !this.sunBack) this.sunBack = { from: this.sunT, at: performance.now() };
 this.touch();
 }
@@ -555,8 +560,8 @@ if (this.sa > 0) this.c.dataset.still = this.ph.key; else delete this.c.dataset.
 const back = this.sunBack;
 if (back) {
 const p = clamp((t - back.at) / 800, 0, 1), e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-if (p >= 1) { this.sunT = null; this.sunBack = null; this.sunNow = miamiSun(); }
-else { this.sunT = back.from + (Date.now() - back.from) * e; this.sunNow = miamiSun(new Date(this.sunT)); }
+if (p >= 1) { this.sunT = null; this.sunBack = null; this.sunNow = turnSun(miamiSun(), this.o.turn); }
+else { this.sunT = back.from + (Date.now() - back.from) * e; this.sunNow = turnSun(miamiSun(new Date(this.sunT)), this.o.turn); }
 this.dirty = true;
 }
 const relT = this.relFor();
@@ -1548,8 +1553,9 @@ const tw = this.o.labels ? this.o.labelSize * 3 : 0;
 this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
 if (!ruler) return;
 const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
+const ps_ = this.ph && this.ph.s, hy = this.k.cy - (ps_ && ps_.sky ? ps_.sky * this.k.f / ps_.f : 0);
 let iLo = 0;
-if (this.sa > 0) { iLo = FLOORS; for (let i = 0; i <= FLOORS; i++) if (named(i) && ys[i] <= this.k.cy - 6) { iLo = i; break; } }
+if (this.sa > 0) { iLo = FLOORS; for (let i = 0; i <= FLOORS; i++) if (named(i) && ys[i] <= hy - 6) { iLo = i; break; } }
 const yb = ys[0] + (ys[iLo] - ys[0]) * this.sa, on = (i) => ys[i] <= yb + 0.5;
 const labs = [];
 if (this.o.labels && w > 280) {
@@ -1559,7 +1565,7 @@ const lastN = Math.floor(FLOORS / 5) * 5 - 1, give = smooth(clamp((Math.abs(ys[F
 const thin = smooth(clamp((24 - Math.abs(ys[9] - ys[4])) / 6, 0, 1));
 for (let i = this.o.groundLabel === false ? 1 : 0; i < FLOORS; i++) {
 if (!named(i)) continue;
-const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - this.k.cy + 6) / 14, 0, 1)));
+const a = ra * (i === lastN ? give : 1) * ((i + 1) % 10 ? 1 - thin : 1) * (1 - this.sa * smooth(clamp((ys[i] - hy + 6) / 14, 0, 1)));
 if (a <= 0.01) continue;
 const t = WORDS.lv + String(i + 1).padStart(2, '0'); labs.push([t, fx(xl, t), ys[i], a]);
 }
@@ -1588,10 +1594,10 @@ if (labs.length && this.skyCss && !inLens) {
 const cy = this.k.cy, z = this.o.labelSize;
 g.save(); g.globalCompositeOperation = 'destination-out'; g.lineWidth = 5; g.lineJoin = 'round'; g.strokeStyle = '#000';
 g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
-for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a; g.strokeText(t, x, y); }
+for (const [t, x, y, a] of labs) if (y > cy - 3 * z && y < cy + 2 * z) { g.globalAlpha = a * (1 - this.sa); g.strokeText(t, x, y); }
 g.restore();
 }
-g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
+g.strokeStyle = bronze(0.7 * ra); g.lineWidth = 0.8 + 0.3 * this.sa; g.beginPath(); g.moveTo(xa, yb); g.lineTo(xa, ys[FLOORS]);
 for (let i = 0; i <= FLOORS; i++) if (named(i) && on(i)) { g.moveTo(xa, ys[i]); g.lineTo(xt, ys[i]); }
 g.stroke();
 g.strokeStyle = bronze(0.4 * ra); g.lineWidth = 0.6; g.beginPath();
@@ -1601,10 +1607,10 @@ if (labs.length) {
 g.fillStyle = this.forced ? `rgb(${this.line.join()})` : `rgb(${(this.dark ? this.b300 : this.b700).join()})`; g.textAlign = sd < 0 ? 'left' : 'right'; g.textBaseline = 'middle';
 const halo = this.sa > 0 && this.dark && !this.forced, ink = (this.bg || [20, 22, 26]).join();
 if (halo) {
-g.save(); g.strokeStyle = `rgba(${ink},${(0.62 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
+g.save(); g.strokeStyle = `rgba(${ink},${(0.55 * this.sa).toFixed(3)})`; g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.strokeText(t, x, y); }
 g.restore();
-g.save(); g.shadowColor = `rgba(${ink},${(0.75 * this.sa).toFixed(3)})`; g.shadowBlur = 8;
+g.save(); g.shadowColor = `rgba(${ink},${(0.95 * this.sa).toFixed(3)})`; g.shadowBlur = 12;
 }
 for (const [t, x, y, a] of labs) { g.globalAlpha = a; g.fillText(t, x, y); }
 if (halo) g.restore();
