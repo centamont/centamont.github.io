@@ -703,7 +703,7 @@ html:not(.js) .step{min-height:auto}
 .jr-strip .w{display:block;font:500 13px/1.35 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .jr-strip b{display:block;margin-top:6px;font:400 clamp(19px,1.5vw,22px)/1.2 var(--display);font-variant-numeric:lining-nums;color:var(--fg)}
 .jr-strip li.m b{color:var(--accent)}
-.jr-strip figcaption{margin-top:16px;font-size:13px;line-height:1.5;color:var(--faint)}
+.jr-strip figcaption{margin-top:16px;font-size:14px;line-height:1.5;color:var(--faint)}
 @media (max-width:820px){.jr-strip ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:821px){.jr-strip .w{min-height:2.7em}}
 @media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}}
