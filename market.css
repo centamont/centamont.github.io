@@ -265,6 +265,7 @@
 .mk-el.cy .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
 .mk-el.cy .tn.r2{fill-opacity:.065}.mk-el.cy .tn.r3{fill-opacity:.035}
 .mk-el.cy .isl{stroke:none}
+.mk-el.hd.cy[data-crop]{aspect-ratio:var(--pd,var(--pa))}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 @media (max-width:600px){.mk-el-pan .mk-el.hd .lg text{font-size:13.5px;letter-spacing:.1em}}
 .mk-el.hd .wn{stroke:none}
