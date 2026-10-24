@@ -7,6 +7,11 @@
 @font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300;font-display:swap;src:url(fonts/cormorant-garamond-latin-300-italic.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Jost';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jost-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Jost';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/jost-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Bodoni Moda (OFL, from the foundry that drew Jost) is not Centamont's: it is the face of The Halvard, the imaginary
+   building on the specimen project site, so a developer sees their building wear its own brand inside our sheet. Only that
+   page sets it, so only that page fetches it. */
+@font-face{font-family:'Bodoni Moda';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/bodoni-moda-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Bodoni Moda';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/bodoni-moda-latin-400-italic.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 /* Until they arrive, text is set in a system face scaled to the same width and height (Times New Roman for Cormorant,
    Arial for Jost, or their metric twins), so lines break in the same places and nothing moves when the type swaps in.
    (Arial's widths differ from Jost's letter by letter, so a few paragraphs still gain or lose a line; 95.6% for the light
@@ -1771,9 +1776,9 @@ nav.main a.press{color:var(--fg);transition:none}
 .photos-pair .cap{grid-template-columns:minmax(0,1fr)}
 /* One art direction for every photograph: the same quiet grade over each (a little less colour, a breath of warmth, the
    shadows held), so a Pexels evening and an Unsplash morning read as one set of plates on the vellum; a touch darker at night. */
-.photo :is(img,video),.trio img{filter:saturate(.84) sepia(.06) contrast(1.03)}
-:root[data-theme="dark"] .photo :is(img,video),:root[data-theme="dark"] .trio img{filter:saturate(.8) sepia(.06) contrast(1.03) brightness(.92)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .photo :is(img,video),:root:not([data-theme="light"]) .trio img{filter:saturate(.8) sepia(.06) contrast(1.03) brightness(.92)}}
+.photo :is(img,video){filter:saturate(.84) sepia(.06) contrast(1.03)}
+:root[data-theme="dark"] .photo :is(img,video){filter:saturate(.8) sepia(.06) contrast(1.03) brightness(.92)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .photo :is(img,video){filter:saturate(.8) sepia(.06) contrast(1.03) brightness(.92)}}
 /* A full-bleed view: the photograph runs to the edges of the window while its caption keeps the column. (main clips the
    overhang a classic scrollbar would add.) */
 main{overflow-x:clip}
