@@ -459,21 +459,12 @@ html.js .rise .steps{grid-column:8/-1}
 @media (min-width:821px) and (max-width:1180px){.gauge{align-items:end}}
 /* the hero's key to its bronze, over the level ruler (home.js places it): the gauge's own reading, the bronze swatch and
    "Under contract" in the ruler's 13px caps over the count in display numerals */
-.key-sold{position:absolute;z-index:2;display:none;flex-direction:column;gap:2px;margin:0;color:var(--muted);white-space:nowrap;pointer-events:none}
+.key-sold{position:absolute;z-index:2;display:none;flex-direction:column;align-items:flex-end;gap:2px;margin:0;color:var(--hero-lede);white-space:nowrap;pointer-events:none}
 .key-sold .k{display:inline-flex;align-items:center;gap:8px;font:500 13px/1.3 var(--body);letter-spacing:.12em;text-transform:uppercase}
 .key-sold i{flex:none;width:14px;height:10px;background:rgba(var(--bronze-rgb),.45);border-bottom:1px solid var(--accent)}
-.key-sold .n{padding-left:22px;font:400 15px/1 var(--body);letter-spacing:.06em;color:var(--faint)}
+.key-sold .n{font:400 15px/1 var(--body);letter-spacing:.06em;color:var(--hero-lede)}
 .key-sold b{font:300 30px/1 var(--display);font-variant-numeric:lining-nums tabular-nums;letter-spacing:0;color:var(--accent)}
 .js .key-sold.on{display:flex}
-/* The last closing shows the finished building as it will look: the plate of this hour's photograph (home.js), standing
-   over the drawing, the height of its canvas (home.js sets its top and height), and the drawing steps back under it;
-   reading back up, the drawing returns. */
-.rise .elev .bplate{position:absolute;left:50%;top:0;z-index:1;width:auto;height:100%;max-width:92%;object-fit:cover;translate:-50% 0;border:1px solid var(--rule);opacity:0;transition:opacity .9s var(--ease);pointer-events:none}
-.rise .elev.built .bplate{opacity:1}
-.rise .elev canvas{transition:opacity .9s var(--ease)}
-.rise .elev.built canvas{opacity:.14}
-@media (prefers-reduced-motion:reduce){.rise .elev .bplate,.rise .elev canvas{transition:none}}
-:root[data-motion="off"] :is(.rise .elev .bplate,.rise .elev canvas){transition:none}
 .steps{list-style:none;margin:0;padding:0;counter-reset:st}
 .step{min-height:64svh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding-block:40px;counter-increment:st}
 .step:first-child{min-height:58svh;justify-content:flex-start;padding-top:6svh}
@@ -847,7 +838,7 @@ html:not(.js) .step{min-height:auto}
 .hero::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.9) 45%,rgba(var(--hero-rgb),0) 75%)}
 .hero .lede{max-width:20.4em;font-size:16px}
 }
-@media (min-width:821px) and (max-width:1040px) and (min-height:348px) and (max-height:500px) and (orientation:landscape){.hero .lede{max-width:44ch;margin-top:12px}}
+@media (min-width:821px) and (max-width:1040px) and (min-height:348px) and (max-height:500px) and (orientation:landscape){.hero .lede{max-width:44ch;margin-top:8px}}
 @media (max-width:1180px) and (min-width:821px) and (min-height:501px),(min-width:1041px) and (max-width:1180px){.hero .lede{max-width:21.6em}}
 .faq summary{text-wrap:balance}
 @media (max-width:520px) and (max-height:700px) and (orientation:portrait){.hero .lede{line-height:1.45;margin-top:14px}}
@@ -1083,7 +1074,7 @@ html:not(.js) .step{min-height:auto}
 .jr-strip .w{display:block;font:500 13px/1.35 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .jr-strip b{display:block;margin-top:6px;font:400 clamp(19px,1.5vw,22px)/1.2 var(--display);font-variant-numeric:lining-nums;color:var(--fg)}
 .jr-strip li.m b{color:var(--accent)}
-.jr-strip figcaption{margin-top:16px;font-size:13px;line-height:1.5;color:var(--faint)}
+.jr-strip figcaption{margin-top:16px;font-size:14px;line-height:1.5;color:var(--faint)}
 @media (max-width:820px){.jr-strip ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* (six to a row, a step's label may take two lines at 13px, so every label keeps two, and the steps stand on one line) */
 @media (min-width:821px){.jr-strip .w{min-height:2.7em}}

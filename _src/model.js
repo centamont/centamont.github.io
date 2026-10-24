@@ -669,6 +669,9 @@
         g.drawImage(ec, 0, y, x + 0.3 * w, h);
       }
       g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
+      // (where the photograph is whole, inside its soft edges, for a page that shows it as a plate: CSS px in the canvas)
+      const sl = fl ? Math.min(Math.max(56 * z, 48), w / 4) : 0, st = ft ? Math.min(16 * z, h / 8) : 0, sr = fr ? clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) : 0;
+      this.phR = { x0: Math.max(0, x + sl), y0: Math.max(0, y + st), x1: Math.min(this.w, x + w - sr), y1: Math.min(this.h, y + h - (fb ? sr : 0)) };
     }
 
     // back to the drawing: the rendered tower and its sky (a CSS background on the canvas, set by tower3d.js) go
@@ -2188,8 +2191,8 @@
       const tw = this.o.labels ? this.o.labelSize * 3 : 0;
       this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
 
-      // Dimension line with level ticks; it comes in with the sketch
-      if (!ruler) return;
+      // Dimension line with level ticks; it comes in with the sketch (and goes where an unnamed photograph has replaced it)
+      if (!ruler || (sa >= 1 && !this.o.labels)) return;
       // Levels are numbered as American drawings and the weekly report number them: the ground floor is L01, the top
       // floor L34, and the roof above it is named. Every fifth level is numbered, with a longer tick.
       const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
