@@ -1101,8 +1101,8 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 /* where the closed-up hero fits, its buttons stand whole above the fold (and clear of the home indicator), never cut through;
    shorter screens keep the open hero above, with the buttons wholly below the fold. Up to 820px wide see the rule after the caption's. */
 @media (min-width:821px) and (max-width:1040px) and (min-height:348px) and (max-height:500px) and (orientation:landscape){
-  .hero .wrap{padding-top:76px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-  .hero h1{font-size:36px}
+  .hero .wrap{padding-top:98px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .hero h1{font-size:32px}
   
   .hero .row{margin-top:12px}
   .hero .btn{padding-block:14px}

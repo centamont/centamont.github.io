@@ -311,11 +311,10 @@ test('first visit plays the intro, then reveals the page', async ({ page }, info
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
-// The hero is drawn. Its tower can still be rendered in WebGL2 (tower3d.js) under one of its photographed stills, which is
-// how tools/plates.mjs makes the plates that close the developer story; the test browser's GPU is emulated in software,
-// which the renderer declines, so the test asks for it outright. It takes over from the drawing without an error, and
-// the drawing alone stands where it is not asked for. (In a window narrower than the desktop hero, so the render stays
-// in view.)
+// The hero's tower is rendered in WebGL2 (tower3d.js) under one of its photographed stills where a real GPU can afford it
+// (tools/plates.mjs asks for one still by name); the test browser's GPU is emulated in software, which the renderer
+// declines, so the test asks for it outright. It takes over from the drawing without an error, and the drawing alone
+// stands where it is not asked for. (In a window narrower than the desktop hero, so the render stays in view.)
 test('hero tower renders in 3D under a still when asked, and is drawn otherwise', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop', 'one engine is enough');
   const errors = [];
@@ -338,24 +337,22 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
   await plain.close();
 });
 
-// The hero stays the drawing on a phone as on a desktop, and fetches no photograph; the developer story closes on one,
-// the plate of this hour's still (hero/plate-*.webp), laid over its drawing at the last closing and fetched only there.
-test('the hero is drawn, and the story closes on the photograph of the hour', async ({ page }) => {
+// Once built, the finished tower is a photograph (hero/), one of four picked by the hour's sun and fetched once the page
+// has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the screen. The developer
+// story below stays drawn to its last closing, with no second photograph.
+test('the hero shows a photograph of the tower, on a phone as on a desktop', async ({ page }) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
-  await page.waitForTimeout(2500);
-  await expect(hero).not.toHaveAttribute('data-still', /./);
-  expect(asked.filter((u) => !/plate-/.test(u))).toEqual([]);
+  await expect(hero).toHaveAttribute('data-still', /^(day|morning|gold|night)$/, { timeout: 20000 });
+  await expect(page.locator('.key-sold')).toBeHidden();
   await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
-  await expect(page.locator('.rise .elev')).toHaveClass(/\bbuilt\b/);
-  const plate = page.locator('.rise .elev .bplate');
-  await expect(plate).toHaveAttribute('data-still', /^(day|morning|gold|night)$/);
-  await expect.poll(() => plate.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
-  expect(asked.length).toBe(1);
+  await page.waitForTimeout(1500);
+  await expect(page.locator('.rise .elev img')).toHaveCount(0);
+  expect(asked).toHaveLength(1);
 });
 
 test('day and night toggle remembers the choice', async ({ page }) => {
