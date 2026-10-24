@@ -38,7 +38,7 @@
   --leaf:#1C1E23;
   /* the fixed colors as channels, for the hairlines and veils that set them at a fraction */
   --ink-rgb:20,22,26; --ivory-rgb:244,240,232; --bronze-rgb:184,151,106; --bronze-300-rgb:213,179,130;
-  --bg:#F4F0E8; --sheet:#FAF7F1; --fg:#14161A; --muted:#4A463F; --faint:#6E675D; --rule:#D6CDBB;
+  --bg:#F4F0E8; --sheet:#FAF7F1; --fg:#14161A; --muted:#4A463F; --faint:#5F594F; --rule:#D6CDBB;
   /* a drawing's gridlines and tracks: the rule by day; at night a step lighter, so they keep the same faint presence on the dark sheet */
   --grid:#D6CDBB;
   /* the mark (--seal) takes one colour on each ground, wherever it appears (the header, the icons, the share cards): ink on
@@ -83,11 +83,11 @@
 @media (min-width:521px) and (max-width:820px){:root{--t-chapter:clamp(40px,7.2vw,56px);--t-spread:clamp(44px,7.6vw,60px)}}
 @media (max-width:520px){:root{--t-hero:clamp(44px,12.3vw,50px);--t-display:clamp(44px,12.3vw,50px);--t-spread:clamp(38px,10.8vw,44px);--t-chapter:clamp(34px,10vw,40px);--t-section:clamp(34px,10vw,40px);--t-head:clamp(26px,7.4vw,30px);--t-big:21px}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
+  --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#ABA498; --rule:#2F3236; --grid:#45494F;
   --accent:var(--bronze-300); --seal:var(--bronze-500); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#9A9388; --rule:#2F3236; --grid:#45494F;
+  --bg:#1B1E23; --sheet:#21252A; --fg:#EDE7DC; --muted:#C2BBAF; --faint:#ABA498; --rule:#2F3236; --grid:#45494F;
   --accent:var(--bronze-300); --seal:var(--bronze-500); --sold:var(--bronze-500); --line:#EDE7DC; --sold-line:var(--bronze-600); --patina:var(--patina-300); --leaf:#17191D; --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M.5.5 5 5 9.5.5' fill='none' stroke='%23D5B382'/%3E%3C/svg%3E");
   --band:#090A0C; --band-rule:#2A2D31; color-scheme:dark}
 
@@ -1101,8 +1101,8 @@ html:not(.js) .step h3::before{opacity:1;transform:none}
 /* where the closed-up hero fits, its buttons stand whole above the fold (and clear of the home indicator), never cut through;
    shorter screens keep the open hero above, with the buttons wholly below the fold. Up to 820px wide see the rule after the caption's. */
 @media (min-width:821px) and (max-width:1040px) and (min-height:348px) and (max-height:500px) and (orientation:landscape){
-  .hero .wrap{padding-top:76px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-  .hero h1{font-size:36px}
+  .hero .wrap{padding-top:98px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .hero h1{font-size:32px}
   
   .hero .row{margin-top:12px}
   .hero .btn{padding-block:14px}
@@ -1303,7 +1303,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* where the cell is too narrow for a revision and its date on one line, each takes two, so the rows stay alike */
 @container (max-width:140px){.rv li{flex-direction:column;align-items:flex-start}}
 /* under the set, the line that names its specimens */
-.ss-note{margin:12px 0 0;font-size:13px;line-height:1.4;color:var(--faint);text-wrap:pretty}
+.ss-note{margin:12px 0 0;font-size:14px;line-height:1.4;color:var(--faint);text-wrap:pretty}
 .no{margin-top:auto;padding-top:12px;border-top:1px solid var(--grid);display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.6em}
 .sn{font-family:var(--display);font-weight:300;font-size:72px;line-height:.9;letter-spacing:-.02em;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}
 .sn small{font-size:40px;letter-spacing:0}
@@ -1338,6 +1338,17 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    cells close up around them, so the whole footer stands about one screen tall. */
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of dr" "lt sh" "ss ss" "mk fo"}.sn{font-size:40px}.sn small{font-size:24px}.t-sh dd{gap:8px}.no{padding-top:8px}.tb > div{min-height:0;padding:8px 14px 9px;gap:2px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:8px}
   footer .sig{margin-top:18px}.tb{margin-top:10px}.ss{--n:1.9em}}
+/* Off the home the title block is drawn closer: the name keeps the full width of the sheet, a little nearer the ground
+   line, and the cells and lists close up, so a page ends on what it says. The home keeps the full sheet. */
+@media (min-width:821px){
+  body:not(.home) > footer .sig{margin-top:clamp(28px,3.4vw,44px)}
+  body:not(.home) .tb{margin-top:18px}
+  body:not(.home) .tb > div{padding:14px 16px 16px}
+  body:not(.home) .tb ul{gap:0}
+  body:not(.home) .sn{font-size:56px}
+  body:not(.home) .sn small{font-size:32px}
+}
+@media (min-width:821px) and (pointer:fine){body:not(.home) .tb a{padding-block:2px}}
 /* the set's two columns stand a little closer on a phone (1.2em rather than 2.2), so the longer Spanish and Portuguese
    names keep to one line where they can */
 @container (min-width:19.5em){@media (max-width:600px){.tb .ss{column-gap:1.2em}}}
@@ -1765,7 +1776,7 @@ nav.main a.press{color:var(--fg);transition:none}
 .photo .cap{margin-top:12px}
 /* the credit is a quiet note after the caption, never a label: sentence case at 13px, in the faint tone, so it never
    outweighs the caption it follows or the section labels */
-.cap .credit{font-size:13px;font-weight:400;letter-spacing:.01em;line-height:1.5;text-transform:none;color:var(--faint);white-space:nowrap}
+.cap .credit{font-size:14px;font-weight:400;letter-spacing:.01em;line-height:1.5;text-transform:none;color:var(--faint);white-space:nowrap}
 /* the drawing, then the view: on a market page the photograph follows the elevation of the same city */
 .mk-el-fig + .after-el{margin-top:calc(-1 * clamp(8px,2vw,24px))}
 .reel{padding-bottom:clamp(8px,2vw,24px)}

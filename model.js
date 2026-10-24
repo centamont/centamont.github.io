@@ -462,6 +462,8 @@ eq.putImageData(e, 0, 0);
 g.drawImage(ec, 0, y, x + 0.3 * w, h);
 }
 g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
+const sl = fl ? Math.min(Math.max(56 * z, 48), w / 4) : 0, st = ft ? Math.min(16 * z, h / 8) : 0, sr = fr ? clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) : 0;
+this.phR = { x0: Math.max(0, x + sl), y0: Math.max(0, y + st), x1: Math.min(this.w, x + w - sr), y1: Math.min(this.h, y + h - (fb ? sr : 0)) };
 }
 drop3d() {
 this.r3 = null; this.r3a = 0; this.r3f = null; delete this.c.dataset.render;
@@ -1574,7 +1576,7 @@ palmsFront.forEach((p) => this.drawPalm(p));
 g.globalAlpha = this.occ * (1 - sa); figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
 const tw = this.o.labels ? this.o.labelSize * 3 : 0;
 this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
-if (!ruler) return;
+if (!ruler || (sa >= 1 && !this.o.labels)) return;
 const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
 const ps_ = this.ph && this.ph.s, hy = this.k.cy - (ps_ && ps_.sky ? ps_.sky * this.k.f / ps_.f : 0);
 let iLo = 0;

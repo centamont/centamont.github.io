@@ -311,11 +311,10 @@ test('first visit plays the intro, then reveals the page', async ({ page }, info
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
-// The hero is drawn. Its tower can still be rendered in WebGL2 (tower3d.js) under one of its photographed stills, which is
-// how tools/plates.mjs makes the plates that close the developer story; the test browser's GPU is emulated in software,
-// which the renderer declines, so the test asks for it outright. It takes over from the drawing without an error, and
-// the drawing alone stands where it is not asked for. (In a window narrower than the desktop hero, so the render stays
-// in view.)
+// The hero's tower is rendered in WebGL2 (tower3d.js) under one of its photographed stills where a real GPU can afford it
+// (tools/plates.mjs asks for one still by name); the test browser's GPU is emulated in software, which the renderer
+// declines, so the test asks for it outright. It takes over from the drawing without an error, and the drawing alone
+// stands where it is not asked for. (In a window narrower than the desktop hero, so the render stays in view.)
 test('hero tower renders in 3D under a still when asked, and is drawn otherwise', async ({ page }, info) => {
   test.skip(info.project.name !== 'desktop', 'one engine is enough');
   const errors = [];
@@ -338,24 +337,35 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
   await plain.close();
 });
 
-// The hero stays the drawing on a phone as on a desktop, and fetches no photograph; the developer story closes on one,
-// the plate of this hour's still (hero/plate-*.webp), laid over its drawing at the last closing and fetched only there.
-test('the hero is drawn, and the story closes on the photograph of the hour', async ({ page }) => {
+// Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
+// fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
+// screen. The developer story below stays drawn, with no photograph.
+test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install({ time: new Date('2026-10-24T05:41:00Z') });
   await page.goto('/');
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
-  await page.waitForTimeout(2500);
-  await expect(hero).not.toHaveAttribute('data-still', /./);
-  expect(asked.filter((u) => !/plate-/.test(u))).toEqual([]);
+  await expect(hero).toHaveAttribute('data-still', 'night', { timeout: 20000 });
+  await expect(page.locator('.key-sold')).toBeHidden();
   await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
-  await expect(page.locator('.rise .elev')).toHaveClass(/\bbuilt\b/);
-  const plate = page.locator('.rise .elev .bplate');
-  await expect(plate).toHaveAttribute('data-still', /^(day|morning|gold|night)$/);
-  await expect.poll(() => plate.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
-  expect(asked.length).toBe(1);
+  await page.waitForTimeout(1500);
+  await expect(page.locator('.rise .elev img')).toHaveCount(0);
+  expect(asked).toHaveLength(1);
+  const day = await page.context().newPage();
+  const dayAsked = [];
+  day.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && dayAsked.push(r.url()));
+  await day.emulateMedia({ reducedMotion: 'reduce' });
+  await day.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
+  await day.goto('/');
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+  await expect(day.locator('.key-sold')).toBeHidden();
+  expect(dayAsked).toHaveLength(1);
+  expect(dayAsked[0]).toMatch(/\/hero\/day-[12]x\.webp$/);
+  await day.close();
 });
 
 test('day and night toggle remembers the choice', async ({ page }) => {
