@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded',function(){
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
   const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
-  // Once built, the finished tower is a photograph: a path-traced still made from the desktop hero's own camera, lit by
-  // the sun of the hour it suits (by day, early in the morning, at golden hour, after dark; model.js, STILLS), on a phone
-  // as on a desktop. The camera then stands where the still was made from (its bearing, height and distance; only the
-  // size and the framing follow the screen): no orbit, no tilt after the pointer, no ride up the façade. A phone held on
-  // its side keeps the drawing, which also tells the developer story further down. (A test asks for one still by name.)
-  const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()?Model.still():null;
+  // After dark, once built, the finished tower is a photograph: the path-traced night still, made from the desktop hero's
+  // own camera (model.js, STILLS), on a phone as on a desktop. By day the hero is the drawing, its residences under
+  // contract in bronze: blind panels preferred the drawing by day and the lit photograph at night. With the photograph the
+  // camera stands where the still was made from (its bearing, height and distance; only the size and the framing follow
+  // the screen): no orbit, no tilt after the pointer, no ride up the façade. A phone held on its side keeps the drawing.
+  // (A test asks for one still by name.)
+  const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()&&Model.still()==='night'?'night':null;
   // The hero is lit by this hour's sun, so it is seen from where the sun models it: by day the camera starts 35 degrees off
   // the sun's bearing and turns away from it as it builds and orbits, coming to rest up to 80 degrees off, so a lit face
   // and a shade side both show and the shadow falls in the open. The sun stands on the viewer's left (the shadow falls to
@@ -167,13 +168,13 @@ document.addEventListener('DOMContentLoaded',function(){
         if(m.sunT!==noteT){noteT=m.sunT;tick()}};
     }
   }
-  // Where the hero stays the drawing (a phone held on its side), its bronze is named over its level ruler, in the names'
-  // column above the roof: the residences under contract, as the hero stands once built, read as the story's gauge reads
-  // them (home.css, .key-sold). It follows the ruler wherever the drawing puts it and keeps inside the window; it goes
-  // where it would meet the header or where the tower stands above the copy, either of which leaves it no room. The
-  // photograph has no bronze to name.
+  // Where the hero is the drawing (by day, or on a phone held on its side), its bronze is named over its level ruler, in
+  // the names' column above the roof: the residences under contract, as the hero stands once built, read as the story's
+  // gauge reads them (home.css, .key-sold). It heads the ruler, its right edge on the names' own, inside the window;
+  // it goes where it would meet the header or where the tower stands above the copy, either of which leaves it no room.
+  // The photograph has no bronze to name.
   const keyEl=hero.querySelector('.key-sold');
-  if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){const x=c.offsetLeft+r.x1-3*m.o.labelSize-6;keyEl.style.left=Math.round(Math.min(x,innerWidth-keyEl.offsetWidth-16))+'px';keyEl.style.top=y+'px'}}}
+  if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){keyEl.style.left=Math.round(Math.min(c.offsetLeft+r.x1-6,innerWidth-16)-keyEl.offsetWidth)+'px';keyEl.style.top=y+'px'}}}
   // The photograph stands as a plate: cut square inside its soft edges, where it is whole, on the hero's ink, so no drawn
   // sky or blended edge shows beside it (home.css, #heroModel[data-still]). While the drawing shows, nothing is cut.
   // Beside the copy (a wide screen) the plate starts a column's gutter clear of the headline's longest line, so no word

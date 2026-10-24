@@ -337,22 +337,37 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
   await plain.close();
 });
 
-// Once built, the finished tower is a photograph (hero/), one of four picked by the hour's sun and fetched once the page
-// has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the screen. The developer
-// story below stays drawn to its last closing, with no second photograph.
-test('the hero shows a photograph of the tower, on a phone as on a desktop', async ({ page }) => {
+// After dark, once built, the finished tower is a photograph (hero/night-*.webp), fetched once the page has loaded (at
+// once where there is no intro), on a phone as on a desktop: one file, whichever the screen. By day the hero is the
+// drawing, its bronze named, and fetches no photograph. The developer story below stays drawn, with no photograph.
+test('the hero shows the night photograph after dark and the drawing by day', async ({ page }, info) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.install({ time: new Date('2026-10-24T05:41:00Z') });
   await page.goto('/');
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
-  await expect(hero).toHaveAttribute('data-still', /^(day|morning|gold|night)$/, { timeout: 20000 });
+  await expect(hero).toHaveAttribute('data-still', 'night', { timeout: 20000 });
   await expect(page.locator('.key-sold')).toBeHidden();
   await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
   await page.waitForTimeout(1500);
   await expect(page.locator('.rise .elev img')).toHaveCount(0);
   expect(asked).toHaveLength(1);
+  const day = await page.context().newPage();
+  const dayAsked = [];
+  day.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && dayAsked.push(r.url()));
+  await day.emulateMedia({ reducedMotion: 'reduce' });
+  // (the key above the ruler needs a window tall enough to clear the header)
+  if (info.project.name === 'desktop') await day.setViewportSize({ width: 1440, height: 900 });
+  await day.clock.install({ time: new Date('2026-10-24T15:00:00Z') });
+  await day.goto('/');
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
+  await day.waitForTimeout(2500);
+  await expect(day.locator('#heroModel')).not.toHaveAttribute('data-still', /./);
+  if (info.project.name === 'desktop') await expect(day.locator('.key-sold')).toBeVisible();
+  expect(dayAsked).toEqual([]);
+  await day.close();
 });
 
 test('day and night toggle remembers the choice', async ({ page }) => {

@@ -31,7 +31,7 @@ let stack=false;
 const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
 const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
 let heroTy=0,framed=false;
-const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()?Model.still():null;
+const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()&&Model.still()==='night'?'night':null;
 const heroCam=(()=>{const o={th:-0.5,orbit:0.0009,idle:0.0003},s=window.CentamontSun&&CentamontSun();if(photo){const th=Model.stills[photo].th;return{th,orbit:0,idle:null,hatch:th*180/Math.PI+180}}if(!s||!(s.night<0.6))return o;
 const A=s.az,lo=124,hi=236,left=A-lo>=50,off=Math.min(79.5,left?A-lo:hi-A),idle=Math.max(0.55,Math.min(2,(off-35-17)/14.3))/1e4,S=17+14.3e4*idle;
 let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
@@ -93,7 +93,7 @@ if(m.sunT!==noteT){noteT=m.sunT;tick()}};
 }
 }
 const keyEl=hero.querySelector('.key-sold');
-if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){const x=c.offsetLeft+r.x1-3*m.o.labelSize-6;keyEl.style.left=Math.round(Math.min(x,innerWidth-keyEl.offsetWidth-16))+'px';keyEl.style.top=y+'px'}}}
+if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){keyEl.style.left=Math.round(Math.min(c.offsetLeft+r.x1-6,innerWidth-16)-keyEl.offsetWidth)+'px';keyEl.style.top=y+'px'}}}
 if(heroM&&photo){const was=heroM.o.onFrame;let pk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.c.dataset.still&&m.phR;let x0=r?r.x0:0;const y0=r?Math.max(r.y0,(header?header.offsetHeight:64)-m.c.offsetTop+2):0;
 if(r&&!stacked()){const cl=m.c.getBoundingClientRect().left;hero.querySelectorAll('h1 .ln > span,.lede,.row > *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width)x0=Math.max(x0,b.right-cl+56)})}
 const k=r?[x0,y0,r.x1,r.y1].map(Math.round).join():'';if(k===pk)return;pk=k;m.c.style.clipPath=r?'inset('+Math.round(y0)+'px '+Math.round(m.w-r.x1)+'px '+Math.round(m.h-r.y1)+'px '+Math.round(x0)+'px)':''}}
