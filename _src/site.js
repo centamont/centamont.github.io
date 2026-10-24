@@ -624,6 +624,10 @@
   // end (its fade and its hint then go)
   document.querySelectorAll('.mk-el-pan, .dm-pan, .lsq, .hoods').forEach((p) => {
     const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
+    // a skyline that opens on its landmark (data-start: the landmark's place across the drawing, out of 1200) starts
+    // with it in the middle of the screen, the city to either side for the swipe
+    const sv_ = p.dataset.start && p.querySelector('svg');
+    if (sv_ && p.scrollWidth > p.clientWidth + 1) p.scrollLeft = sv_.getBoundingClientRect().width * p.dataset.start / 1200 - p.clientWidth / 2;
     end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
   });
 
