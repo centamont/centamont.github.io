@@ -337,10 +337,10 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
   await plain.close();
 });
 
-// After dark, once built, the finished tower is a photograph (hero/night-*.webp), fetched once the page has loaded (at
-// once where there is no intro), on a phone as on a desktop: one file, whichever the screen. By day the hero is the
-// drawing, its bronze named, and fetches no photograph. The developer story below stays drawn, with no photograph.
-test('the hero shows the night photograph after dark and the drawing by day', async ({ page }, info) => {
+// Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
+// fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
+// screen. The developer story below stays drawn, with no photograph.
+test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }) => {
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -358,15 +358,13 @@ test('the hero shows the night photograph after dark and the drawing by day', as
   const dayAsked = [];
   day.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && dayAsked.push(r.url()));
   await day.emulateMedia({ reducedMotion: 'reduce' });
-  // (the key above the ruler needs a window tall enough to clear the header)
-  if (info.project.name === 'desktop') await day.setViewportSize({ width: 1440, height: 900 });
-  await day.clock.install({ time: new Date('2026-10-24T15:00:00Z') });
+  await day.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
   await day.goto('/');
   await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
-  await day.waitForTimeout(2500);
-  await expect(day.locator('#heroModel')).not.toHaveAttribute('data-still', /./);
-  if (info.project.name === 'desktop') await expect(day.locator('.key-sold')).toBeVisible();
-  expect(dayAsked).toEqual([]);
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+  await expect(day.locator('.key-sold')).toBeHidden();
+  expect(dayAsked).toHaveLength(1);
+  expect(dayAsked[0]).toMatch(/\/hero\/day-[12]x\.webp$/);
   await day.close();
 });
 

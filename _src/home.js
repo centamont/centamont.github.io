@@ -57,13 +57,13 @@ document.addEventListener('DOMContentLoaded',function(){
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
   const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
-  // After dark, once built, the finished tower is a photograph: the path-traced night still, made from the desktop hero's
-  // own camera (model.js, STILLS), on a phone as on a desktop. By day the hero is the drawing, its residences under
-  // contract in bronze: blind panels preferred the drawing by day and the lit photograph at night. With the photograph the
+  // Once built, the finished tower is a photograph: the path-traced still for this hour of the Miami sun (morning, day,
+  // gold or night), made from the desktop hero's own camera (model.js, STILLS), on a phone as on a desktop. The drawing
+  // (labels, ruler, the residences under contract in bronze) stands only while it builds. With the photograph the
   // camera stands where the still was made from (its bearing, height and distance; only the size and the framing follow
   // the screen): no orbit, no tilt after the pointer, no ride up the façade. A phone held on its side keeps the drawing.
   // (A test asks for one still by name.)
-  const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()&&Model.still()==='night'?'night':null;
+  const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()?Model.still():null;
   // The hero is lit by this hour's sun, so it is seen from where the sun models it: by day the camera starts 35 degrees off
   // the sun's bearing and turns away from it as it builds and orbits, coming to rest up to 80 degrees off, so a lit face
   // and a shade side both show and the shadow falls in the open. The sun stands on the viewer's left (the shadow falls to
@@ -177,10 +177,10 @@ document.addEventListener('DOMContentLoaded',function(){
   if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){keyEl.style.left=Math.round(Math.min(c.offsetLeft+r.x1-6,innerWidth-16)-keyEl.offsetWidth)+'px';keyEl.style.top=y+'px'}}}
   // The photograph stands as a plate: cut square inside its soft edges, where it is whole, on the hero's ink, so no drawn
   // sky or blended edge shows beside it (home.css, #heroModel[data-still]). While the drawing shows, nothing is cut.
-  // Beside the copy (a wide screen) the plate starts a column's gutter clear of the headline's longest line, so no word
-  // stands on it.
+  // Beside the copy (a wide screen) the plate starts a column's gutter clear of the headline's longest line, and a
+  // narrower one clear of the caption line above it, so no word stands on it.
   if(heroM&&photo){const was=heroM.o.onFrame;let pk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.c.dataset.still&&m.phR;let x0=r?r.x0:0;const y0=r?Math.max(r.y0,(header?header.offsetHeight:64)-m.c.offsetTop+2):0;
-    if(r&&!stacked()){const cl=m.c.getBoundingClientRect().left;hero.querySelectorAll('h1 .ln > span,.lede,.row > *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width)x0=Math.max(x0,b.right-cl+56)})}
+    if(r&&!stacked()){const cl=m.c.getBoundingClientRect().left;hero.querySelectorAll('h1 .ln > span,.lede,.row > *,.coords > *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width)x0=Math.max(x0,b.right-cl+(e.parentNode.classList.contains('coords')?32:56))})}
     const k=r?[x0,y0,r.x1,r.y1].map(Math.round).join():'';if(k===pk)return;pk=k;m.c.style.clipPath=r?'inset('+Math.round(y0)+'px '+Math.round(m.w-r.x1)+'px '+Math.round(m.h-r.y1)+'px '+Math.round(x0)+'px)':''}}
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
