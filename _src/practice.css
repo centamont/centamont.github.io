@@ -763,6 +763,8 @@ html:not(.js) .dv-st-f{display:none}
   .dv-story{display:block}
   .dv-story > h2{margin-bottom:12px}
   .dv-st-f{z-index:2;top:var(--hdr);max-width:none;margin:0 calc(var(--gl) * -1);padding:8px var(--gl) 12px;background:var(--bg);border-bottom:1px solid var(--rule);transition:top 300ms var(--ease-out)}
+  /* (the lines passing under the band fade into it, so none is seen sliced through at its edge) */
+  .dv-st-f::after{content:"";position:absolute;left:0;right:0;top:100%;height:20px;background:linear-gradient(var(--bg),transparent);pointer-events:none}
   .dv-st-fr > li{display:flex;align-items:center;gap:18px}
   .dv-st-fr svg{width:auto;height:92px;flex:none}
   .dv-st-fr .lb{flex-direction:column;align-items:flex-start;gap:4px;margin:0}
