@@ -800,14 +800,16 @@ html.intro-on .curtain{animation:curtain-failsafe 0s 4s forwards}
 /* a row answers in ink: it holds its ink while the other markets stand back on the map and in the list (below) */
 .lv{transition:color .3s}
 
-/* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. */
+/* The schedule beneath reads as a ruled table, one row per market; a row takes a bronze rule when its route lands. Its
+   number stands on the row's first line, beside the status and the name (not as the title block's .no, which shares the
+   class name and sits at the foot of its cell). */
 .chart .levels{margin:0;padding:0;list-style:none}
 .chart .lv{position:relative}
 .chart .lv .no{display:none}
 .chart .lv::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
 .chart .lv.landed::before{transform:none}
 @media (min-width:700px){.chart .lv{grid-template-columns:56px 132px minmax(0,1fr);gap:6px 24px;padding-block:22px}
-.chart .lv .no{display:block;grid-column:1;grid-row:1;font-size:13px;font-weight:500;letter-spacing:.14em;color:var(--faint);font-variant-numeric:lining-nums tabular-nums}
+.chart .lv .no{display:block;grid-column:1;grid-row:1;margin:0;padding:0;border:0;font-size:13px;font-weight:500;letter-spacing:.14em;color:var(--faint);font-variant-numeric:lining-nums tabular-nums}
 .chart .lv .when{grid-column:2}
 }
 @media (min-width:1000px){.chart .lv{grid-template-columns:56px 132px minmax(0,6fr) minmax(0,4fr);row-gap:0}}
@@ -848,11 +850,6 @@ html:not(.js) .step{min-height:auto}
 /* dashed like its legend swatch, so it never reads as the dotted construction line */
 .cv-par{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:4 3;stroke-linecap:butt;opacity:.6}
 @media (max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:501px),(max-width:479px){.cv-now{display:block;margin:0;font-family:var(--display);font-size:21px;line-height:1.3;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}}
-.letter .send .direct{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 0 0 12px;padding-block:12px 3px}
-
-/* (until the letter is ready its plain link already goes there, so the line waits) */
-.letter:not(.ready) .send .direct{display:none}
-@media (max-width:520px){.letter .send .direct{justify-self:start;margin:0}}
 
 /* the little tower stands on the numeral's baseline; where its cell is wide enough to keep it clear of the label, it rises
    taller, up beside the label (a phone on its side, its label beside the numeral, keeps it at the smaller size) */
@@ -1073,24 +1070,6 @@ html:not(.js) .step{min-height:auto}
 @media (max-width:820px){.jr-strip ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* (six to a row, a step's label may take two lines at 13px, so every label keeps two, and the steps stand on one line) */
 @media (min-width:821px){.jr-strip .w{min-height:2.7em}}
-/* the advisors' table under the seat line, the same plan the Advisors page opens with (its drawing and strings are styled in
-   practice.css): the full measure of the page, so its leaves end on the margins, and the two strings say what the seats mean */
-.seat .table{grid-area:auto;grid-column:1/-1;width:auto;justify-self:stretch;margin:clamp(36px,4vw,56px) 0 0}
-/* a phone keeps the plan along the screen, its strings' labels set smaller to stand on them */
-/* and there it comes straight under the seat line, before the copy, whose first sentence it says, so that sentence
-   stays with the wider screens and the phone reads the plan, then who sits at it */
-@media (max-width:520px){
-  .head.seat > h2{order:0}.seat .table{order:1}.head.seat > .intro{order:2}.head.seat > .links{order:3}
-  .head.seat .pn{display:none}
-  /* the plan's own strings rule the copy off from the heading, so the seat line's bronze rule stands down, and the four
-     close up a step */
-  .head.seat{row-gap:16px}.head.seat .intro::before{display:none}
-  .seat .table{margin:6px 0 4px}.head.seat .links{margin-top:0}
-  .seat .table .dm{font-size:13px;letter-spacing:.06em;gap:6px;transform:translate(-50%,calc(-100% - 2px))}
-  .seat .table b{font-size:19px}
-  /* at a quarter of their size the hidden seats and leaves would break into crumbs, so they stand a step darker */
-  .seat .table .ch:not(.on){opacity:.75}.seat .table .leaf{opacity:.8}
-}
 @media (forced-colors:active){.jr-strip li::before,.jr-strip li.m::after{background:CanvasText}}
 
 /* The home page on a phone held upright, kept close to sixteen screens by saying each thing once. The markets list reads

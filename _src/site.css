@@ -159,7 +159,7 @@ header.site{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:
 @property --hdr{syntax:'<length>';inherits:false;initial-value:64px}
 @media (max-width:820px){
   html.js header.site{transition:translate 300ms var(--ease-out)}
-  html.hdr-off :is(.elev,.cv-fig,.cv-txt h3,.progress,#services){--hdr:0px}
+  html.hdr-off :is(.elev,.cv-fig,.cv-txt h3,.progress,#services,.dv-st-f){--hdr:0px}
   html.hdr-off header.site{translate:0 -100%}
   /* (a journal note's reading line, which hangs from the header's foot, rises with it) */
   html .progress{top:var(--hdr);transition:top 300ms var(--ease-out),opacity .4s var(--ease)}
@@ -918,7 +918,7 @@ nav.main .mk-st a:is([href$="south-florida.html"],[href$="sur-de-florida.html"],
 /* A two-line initial: its cap height spans line 1's cap line to line 2's baseline (34.1px + Cormorant's 13.75px caps = its
    .625 cap at 3.48em), and the line height drops that baseline onto line 2's; a margin figure set between the first
    heading and its paragraph keeps the initial */
-.prose.lead h2:first-child + p::first-letter,.prose.lead h2:first-child + .side + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .12em 0 0;color:var(--accent)}
+.prose.lead h2:first-child + p::first-letter,.prose.lead h2:first-child + .side + p::first-letter{float:left;font-family:var(--display);font-weight:300;font-size:3.48em;line-height:.882;padding:0 .05em 0 0;color:var(--accent)}
 .progress{position:fixed;top:64px;left:0;right:0;height:1px;z-index:25;pointer-events:none;transition:opacity .4s var(--ease)}
 .progress.end{opacity:0}
 .progress i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
@@ -1329,9 +1329,10 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 /* narrower, three rows of two-column cells: the sheet keeps its full figure */
 @media (max-width:1023px){.tb{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"pr pr pr of of of" "dr dr lt lt sh sh" "ss ss ss ss ss ss" "mk mk mk fo fo fo"}}
 /* phones: practice across the sheet, then two columns: the office beside the date, the letter beside the sheet, the set
-   across, five and five, and the markets beside the channels. Every link keeps a 43px target, set edge to edge. */
-@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of dr" "lt sh" "ss ss" "mk fo"}.sn{font-size:40px}.sn small{font-size:24px}.t-sh dd{gap:8px}.no{padding-top:8px}.tb > div{min-height:0;padding:10px 14px 12px;gap:4px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:9px}
-  footer .sig{margin-top:24px}.tb{margin-top:14px}.ss{--n:1.9em}}
+   across, five and five, and the markets beside the channels. Every link keeps a 41px target, set edge to edge, and the
+   cells close up around them, so the whole footer stands about one screen tall. */
+@media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of dr" "lt sh" "ss ss" "mk fo"}.sn{font-size:40px}.sn small{font-size:24px}.t-sh dd{gap:8px}.no{padding-top:8px}.tb > div{min-height:0;padding:8px 14px 9px;gap:2px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:8px}
+  footer .sig{margin-top:18px}.tb{margin-top:10px}.ss{--n:1.9em}}
 /* the set's two columns stand a little closer on a phone (1.2em rather than 2.2), so the longer Spanish and Portuguese
    names keep to one line where they can */
 @container (min-width:19.5em){@media (max-width:600px){.tb .ss{column-gap:1.2em}}}

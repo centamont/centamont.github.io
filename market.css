@@ -28,7 +28,9 @@
 @media (max-width:600px){
   .lsq{display:flex;margin:0 calc(-1 * var(--gl)) 16px;padding:0 var(--gl) 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .lsq::-webkit-scrollbar{display:none}
-  .lsq{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent 98%);mask-image:linear-gradient(90deg,#000 82%,transparent 98%)}
+  .lsq{-webkit-mask-image:linear-gradient(90deg,#000 72%,transparent 94%);mask-image:linear-gradient(90deg,#000 72%,transparent 94%)}
+  .lsq.at-end{-webkit-mask-image:none;mask-image:none}
+  .mk-lfig:has(.lsq.at-end) .pan-hint{opacity:0;transition:opacity .4s}
   .lsq > div{flex:0 0 78%;scroll-snap-align:start}
   .lsq > .w2{flex-basis:156%}
   .lsq > .w2 p{max-width:50%}
@@ -41,6 +43,8 @@
 @media (max-width:700px){
   .hoods{display:flex;gap:16px;margin:28px calc(-1 * var(--gl)) 0;padding:0 var(--gl) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .hoods::-webkit-scrollbar{display:none}
+  .hoods{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
+  .hoods.at-end{-webkit-mask-image:none;mask-image:none}
   .hood{flex:0 0 84%;display:flex;flex-direction:column;scroll-snap-align:start}
   .hood > figure.photo{order:-1;margin:0 0 18px}
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
@@ -263,6 +267,7 @@
 .mk-el.cy .isl{stroke:none}
 .mk-el.hd.cy[data-crop]{aspect-ratio:var(--pd,var(--pa))}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
+@media (max-width:600px){.mk-el-pan .mk-el.hd .lg text{font-size:13.5px;letter-spacing:.1em}}
 .mk-el.hd .wn{stroke:none}
 .js .mk-el.hd .wn{opacity:0;transition:opacity .9s var(--ease-out) 1.1s}
 .js .mk-el.hd.in .wn{opacity:1}

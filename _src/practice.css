@@ -341,6 +341,12 @@ html:not(.js) .curve + .cv-method,.js .curve:not(.ready) + .cv-method{display:no
 /* until the letter's script is ready (or if it never runs) its button is a plain link to the same message */
 .letter:not(.ready) .send button,.letter.ready .send .alt{display:none}
 .letter .send .alt{line-height:normal}
+/* the line to Instagram beside the button, its arrow a step clear of the words (on every page that carries the letter) */
+.letter .send .direct{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 0 0 12px;padding-block:12px 3px}
+
+/* (until the letter is ready its plain link already goes there, so the line waits) */
+.letter:not(.ready) .send .direct{display:none}
+@media (max-width:520px){.letter .send .direct{justify-self:start;margin:0}}
 
 .letter .send .direct svg{width:18px;height:8px;flex:none;transition:transform .3s var(--ease)}
 .letter .send .direct:focus-visible svg{transform:translateX(4px)}
@@ -705,30 +711,62 @@ html.js .pc-nojs{display:none}
 .dv-get b{font-family:var(--display);font-weight:400;font-size:clamp(23px,2vw,28px);line-height:1.25;color:var(--fg)}
 .dv-get span{color:var(--muted);max-width:34em}
 .dv-get .more{justify-self:start;margin-top:4px}
-/* beside them, three of the deliverables as they look: the specimen price list, project site and weekly report, laid
-   out as plates the width of the heading's column, each a page of paper that opens its specimen and large enough to be
-   read where it hangs; on a phone they stand three abreast under the heading. (The pictures are of the light sheets, so
-   by night they are dimmed a little.) */
-.dv-shc{align-self:stretch;align-content:start}
-.dv-shs{display:grid;gap:14px;margin-top:clamp(18px,2.2vw,32px)}
-.dv-sheets{list-style:none;margin:0;padding:0;display:grid;gap:clamp(22px,2.4vw,34px)}
+/* What a developer receives opens on three of the deliverables as they look, set across the page at reading size: the
+   specimen price list as the large plate, the project site and the weekly report stacked beside it, each a page of paper
+   that opens its specimen; the six things received follow under them in three columns. On a phone the plates stand one
+   above the other, the width of the column. (The pictures are of the light sheets, so by night they are dimmed a little.) */
+.dv-recv{margin-top:clamp(64px,8vw,120px);padding-top:clamp(24px,3vw,36px);border-top:1px solid var(--fg)}
+.dv-recv-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 32px}
+.dv-recv h2{font-size:clamp(30px,3vw,44px);max-width:none}
+.dv-sheets{list-style:none;margin:0;padding:0}
 .dv-sheets a{display:grid;gap:10px;text-decoration:none;color:var(--muted);font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;transition:color var(--t-ui)}
 .dv-sheets a:hover{color:var(--fg)}
-.dv-sheets img{display:block;width:100%;height:auto;border:1px solid var(--rule);transition:border-color var(--t-ui)}
+.dv-sheets img{display:block;width:100%;height:auto;border:1px solid var(--rule);background:var(--sheet);box-shadow:0 1px 0 var(--rule),0 18px 40px -28px rgba(20,22,26,.35);transition:border-color var(--t-ui)}
 .dv-sheets a:hover img{border-color:var(--fg)}
 :root[data-theme="dark"] .dv-sheets img{filter:brightness(.86)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-sheets img{filter:brightness(.86)}}
 .dv-sheets-k{font-size:var(--t-label);color:var(--muted);margin:0}
+.dv-plates{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(22px,2.4vw,34px) clamp(24px,3vw,44px);margin-top:clamp(24px,3vw,40px);align-items:start}
+.dv-plates li:first-child{grid-row:span 2}
+.dv-recv .dv-get{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(24px,3vw,44px);margin-top:clamp(40px,5vw,64px);border-top:0}
+.dv-recv .dv-get li{border-top:1px solid var(--rule);border-bottom:0;align-content:start}
+@media (max-width:1000px){.dv-recv .dv-get{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){
-  .dv-shs{margin-top:10px}
-  .dv-sheets{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  .dv-sheets a{font-size:13px;letter-spacing:.06em;text-transform:none}
+  .dv-plates{grid-template-columns:minmax(0,1fr)}
+  .dv-plates li:first-child{grid-row:auto}
+  .dv-recv .dv-get{grid-template-columns:minmax(0,1fr);border-bottom:1px solid var(--rule)}
 }
-/* (on a phone the three sheets are a row to swipe, each wide enough to read, with the next showing at the edge) */
-@media (max-width:560px){
-  .dv-sheets{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:72%;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
-  .dv-sheets::-webkit-scrollbar{display:none}
-  .dv-sheets li{scroll-snap-align:start}
-  .dv-sheets a{font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase}
+/* The report leads the page, at the full width of its column, its figures set a little smaller in the drawing's own
+   units so they read at the size they do on the report itself. */
+.dv-wk{margin-top:clamp(48px,6vw,88px);border-top-color:var(--fg)}
+.dv-wk > div{max-width:none}
+.dv-wk .dv-report{max-width:none;margin-top:10px}
+@media (min-width:901px){.dv-wk .dv-report .rp-pace{--rp:12.5px}}
+/* The six steps are told beside one drawing that keeps pace with the reader: the tower of the step being read, its
+   residences under contract filling in bronze as it comes (site.js, [data-story]). On a wide screen it stands under the
+   heading and stays in view down the steps; on a phone it is a short band under the header, which rises with it. Without
+   script the six stages already stand together in the page's first drawing, so this one is left out. */
+.dv-story{grid-template-areas:"h o" "f o";grid-template-rows:auto 1fr}
+.dv-story > h2{grid-area:h}
+.dv-story > ol{grid-area:o}
+.dv-st-f{grid-area:f;position:sticky;top:calc(var(--hdr) + 32px);align-self:start;margin:8px 0 0;max-width:340px}
+html:not(.js) .dv-st-f{display:none}
+.dv-st-fr.dv-rise{grid-template-columns:minmax(0,1fr);row-gap:0}
+.dv-st-fr > li{grid-area:1/1;grid-template-columns:minmax(0,1fr);padding:0;border:0;transition:opacity .5s var(--ease)}
+.dv-st-fr > li:not(.on){opacity:0}
+.dv-st-fr .lb{display:flex;align-items:baseline;justify-content:center;gap:10px;margin:10px 0 0;color:var(--muted)}
+.dv-st-fr :is(.sold,.soldf){transform-box:view-box;transform-origin:50% 176px;transform:scaleY(0);transition:transform .9s var(--ease-ink) .15s}
+.dv-st-fr li.on :is(.sold,.soldf){transform:none}
+@media (prefers-reduced-motion:reduce){.dv-st-fr > li,.dv-st-fr :is(.sold,.soldf){transition:none}}
+:root[data-motion="off"] :is(.dv-st-fr > li,.dv-st-fr .sold,.dv-st-fr .soldf){transition:none}
+@media (max-width:820px){
+  .dv-story{display:block}
+  .dv-story > h2{margin-bottom:12px}
+  .dv-st-f{z-index:2;top:var(--hdr);max-width:none;margin:0 calc(var(--gl) * -1);padding:8px var(--gl) 12px;background:var(--bg);border-bottom:1px solid var(--rule);transition:top 300ms var(--ease-out)}
+  .dv-st-fr > li{display:flex;align-items:center;gap:18px}
+  .dv-st-fr svg{width:auto;height:92px;flex:none}
+  .dv-st-fr .lb{flex-direction:column;align-items:flex-start;gap:4px;margin:0}
+  .dv-story > ol{margin-top:22px}
 }
 /* the questions a developer asks first, each answered in full where it can be read without opening anything */
 .dv-qa{margin:0;border-top:1px solid var(--rule)}
