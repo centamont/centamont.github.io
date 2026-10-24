@@ -163,7 +163,9 @@
 .ps-stack{margin-top:2px}
 /* the plan beside its room schedule */
 .ps-planwrap{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:32px clamp(28px,4vw,56px);align-items:start}
-.ps-plan-d{display:block;width:100%;height:auto}
+/* (the overall dimension stands on the line above the walls, and on a phone its larger figures rise past the top of the
+   drawing, so the drawing lets them show) */
+.ps-plan-d{display:block;width:100%;height:auto;overflow:visible}
 .ps-np circle{fill:none;stroke:var(--faint);stroke-width:.8}.ps-np path{fill:var(--faint);stroke:var(--faint);stroke-width:.8}
 /* the plan is drawn 600 units wide and shown at about the screen less 80px on a phone, alone across the sheet to 900px and
    beside its room schedule above that, so its labels are sized in drawing units (--pf) by each layout's width to read at

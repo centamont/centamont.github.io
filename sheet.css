@@ -131,7 +131,7 @@
 .ps-table td:last-child{font-family:var(--display);font-size:22px;color:var(--fg)}
 .ps-stack{margin-top:2px}
 .ps-planwrap{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:32px clamp(28px,4vw,56px);align-items:start}
-.ps-plan-d{display:block;width:100%;height:auto}
+.ps-plan-d{display:block;width:100%;height:auto;overflow:visible}
 .ps-np circle{fill:none;stroke:var(--faint);stroke-width:.8}.ps-np path{fill:var(--faint);stroke:var(--faint);stroke-width:.8}
 .ps-plan-d{--pf:max(12.7px,calc(27.4px - 1.19vw))}
 @media (max-width:900px){.ps-plan-d{--pf:calc(26.6px - 1.77vw)}}
