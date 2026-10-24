@@ -1338,10 +1338,10 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
    cells close up around them, so the whole footer stands about one screen tall. */
 @media (max-width:600px){.tb{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"pr pr" "of dr" "lt sh" "ss ss" "mk fo"}.sn{font-size:40px}.sn small{font-size:24px}.t-sh dd{gap:8px}.no{padding-top:8px}.tb > div{min-height:0;padding:8px 14px 9px;gap:2px}.tb dt{line-height:1.4}.tb ul{gap:0}.tb a{padding-block:8px}
   footer .sig{margin-top:18px}.tb{margin-top:10px}.ss{--n:1.9em}}
-/* Off the home the title block is drawn smaller: the name at half its width, the cells and lists closed up, so the
-   footer stands about half a desktop screen and a page ends on what it says. The home keeps the full sheet. */
+/* Off the home the title block is drawn closer: the name keeps the full width of the sheet, a little nearer the ground
+   line, and the cells and lists close up, so a page ends on what it says. The home keeps the full sheet. */
 @media (min-width:821px){
-  body:not(.home) > footer .sig{width:min(100%,540px);margin-top:clamp(28px,3.4vw,44px)}
+  body:not(.home) > footer .sig{margin-top:clamp(28px,3.4vw,44px)}
   body:not(.home) .tb{margin-top:18px}
   body:not(.home) .tb > div{padding:14px 16px 16px}
   body:not(.home) .tb ul{gap:0}

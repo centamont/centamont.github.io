@@ -453,10 +453,6 @@ const sv_ = p.dataset.start && p.querySelector('svg');
 if (sv_ && p.scrollWidth > p.clientWidth + 1) p.scrollLeft = sv_.getBoundingClientRect().width * p.dataset.start / 1200 - p.clientWidth / 2;
 end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
 });
-if (window.IntersectionObserver) document.querySelectorAll('.hoods, .lsq').forEach((r) => {
-const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('part', getComputedStyle(r).overflowX !== 'visible' && e.intersectionRect.width < Math.min(e.boundingClientRect.width, e.rootBounds.width) * 0.9)), { root: r, threshold: Array.from({ length: 21 }, (_, i) => i / 20) });
-[...r.children].forEach((h) => io.observe(h));
-});
 document.querySelectorAll('[data-story]').forEach((fig) => {
 const frames = fig.querySelectorAll('.dv-st-fr > li'), steps = document.querySelectorAll(fig.dataset.story);
 if (!('IntersectionObserver' in window) || frames.length !== steps.length) return;

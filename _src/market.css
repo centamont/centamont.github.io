@@ -45,8 +45,6 @@
   .lsq > .w2{flex-basis:156%}
   .lsq > .w2 p{max-width:50%;position:sticky;left:0}
   .lsq .f{font-size:15px}
-  .lsq > div p{transition:opacity .35s var(--ease)}
-  .lsq > .part p{opacity:0}
   .lsq:focus-visible{outline:2px solid var(--accent);outline-offset:8px}
 }
 @media (forced-colors:active){:is(.lsq,.mk-lfig .key) path:not(.ko){stroke:CanvasText}.lsq .ko{fill:Canvas;stroke:Canvas}.lsq .thr{fill:CanvasText}:is(.lsq,.mk-lfig .key) .sold{fill:CanvasText;stroke:none}}
@@ -62,9 +60,6 @@
   .hoods{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
   .hoods.at-end{-webkit-mask-image:none;mask-image:none}
   .hood{flex:0 0 84%;display:flex;flex-direction:column;scroll-snap-align:start}
-  /* (a card partly in view shows only its photograph at the edge; its words come in with it: site.js) */
-  .hood > :not(figure),.hood > figure figcaption{transition:opacity .35s var(--ease)}
-  .hood.part > :not(figure),.hood.part > figure figcaption{opacity:0}
   .hood > figure.photo{order:-1;margin:0 0 18px}
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
   .hood > p + p{margin-top:.6em}

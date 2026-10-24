@@ -61,7 +61,7 @@ if(photo&&!heroM.ph)heroM.photo(photo,'/hero/',true);
 heroM.touch()};
 const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
 if(Model){
-heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:!photo,dimSide:1,palms:false,guides:!photo,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
 if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
 if(window.ResizeObserver){let hs='';new ResizeObserver(([e])=>{const r=e.contentRect,k=Math.round(r.width)+'x'+Math.round(r.height);if(k===hs)return;const was=hs;hs=k;if(was&&framed)requestAnimationFrame(()=>{try{frameHero()}catch(e){}})}).observe(hero.querySelector('h1'))}}
@@ -94,6 +94,9 @@ if(m.sunT!==noteT){noteT=m.sunT;tick()}};
 }
 const keyEl=hero.querySelector('.key-sold');
 if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){const x=c.offsetLeft+r.x1-3*m.o.labelSize-6;keyEl.style.left=Math.round(Math.min(x,innerWidth-keyEl.offsetWidth-16))+'px';keyEl.style.top=y+'px'}}}
+if(heroM&&photo){const was=heroM.o.onFrame;let pk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.c.dataset.still&&m.phR;let x0=r?r.x0:0;const y0=r?Math.max(r.y0,(header?header.offsetHeight:64)-m.c.offsetTop+2):0;
+if(r&&!stacked()){const cl=m.c.getBoundingClientRect().left;hero.querySelectorAll('h1 .ln > span,.lede,.row > *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width)x0=Math.max(x0,b.right-cl+56)})}
+const k=r?[x0,y0,r.x1,r.y1].map(Math.round).join():'';if(k===pk)return;pk=k;m.c.style.clipPath=r?'inset('+Math.round(y0)+'px '+Math.round(m.w-r.x1)+'px '+Math.round(m.h-r.y1)+'px '+Math.round(x0)+'px)':''}}
 document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 const intro=window.CentamontIntro;let started=false;
 const unveil=()=>{if(!heroM||!photo||reduce)return;const c=heroM.c;c.classList.add('wait');let t=0;const go=()=>{clearTimeout(t);mo.disconnect();c.classList.remove('wait')},mo=new MutationObserver(()=>{if(c.dataset.still)go()});mo.observe(c,{attributes:true,attributeFilter:['data-still']});t=setTimeout(go,1200)};

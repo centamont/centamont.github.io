@@ -631,15 +631,6 @@
     end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
   });
 
-  // In a row of neighborhoods or a launch strip that scrolls, a card only partly in view shows its picture alone at the
-  // edge, its words held back until the card comes in, so no name, price or step is ever seen cut through (market.css,
-  // .part)
-  if (window.IntersectionObserver) document.querySelectorAll('.hoods, .lsq').forEach((r) => {
-    // (a card wider than the row counts as in once it fills nine tenths of the row)
-    const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('part', getComputedStyle(r).overflowX !== 'visible' && e.intersectionRect.width < Math.min(e.boundingClientRect.width, e.rootBounds.width) * 0.9)), { root: r, threshold: Array.from({ length: 21 }, (_, i) => i / 20) });
-    [...r.children].forEach((h) => io.observe(h));
-  });
-
   // A drawn story (developers.html, the six steps): one figure keeps a frame for each step, and shows the frame of the
   // step being read, the one crossing the middle of the screen (practice.css, .dv-story). Its steps are named by the
   // figure's data-story selector, in the same order as its frames.

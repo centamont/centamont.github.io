@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
-    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:!photo,dimSide:1,palms:false,guides:!photo,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
     if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
@@ -174,6 +174,13 @@ document.addEventListener('DOMContentLoaded',function(){
   // photograph has no bronze to name.
   const keyEl=hero.querySelector('.key-sold');
   if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){const x=c.offsetLeft+r.x1-3*m.o.labelSize-6;keyEl.style.left=Math.round(Math.min(x,innerWidth-keyEl.offsetWidth-16))+'px';keyEl.style.top=y+'px'}}}
+  // The photograph stands as a plate: cut square inside its soft edges, where it is whole, on the hero's ink, so no drawn
+  // sky or blended edge shows beside it (home.css, #heroModel[data-still]). While the drawing shows, nothing is cut.
+  // Beside the copy (a wide screen) the plate starts a column's gutter clear of the headline's longest line, so no word
+  // stands on it.
+  if(heroM&&photo){const was=heroM.o.onFrame;let pk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.c.dataset.still&&m.phR;let x0=r?r.x0:0;const y0=r?Math.max(r.y0,(header?header.offsetHeight:64)-m.c.offsetTop+2):0;
+    if(r&&!stacked()){const cl=m.c.getBoundingClientRect().left;hero.querySelectorAll('h1 .ln > span,.lede,.row > *').forEach(e=>{const b=e.getBoundingClientRect();if(b.width)x0=Math.max(x0,b.right-cl+56)})}
+    const k=r?[x0,y0,r.x1,r.y1].map(Math.round).join():'';if(k===pk)return;pk=k;m.c.style.clipPath=r?'inset('+Math.round(y0)+'px '+Math.round(m.w-r.x1)+'px '+Math.round(m.h-r.y1)+'px '+Math.round(x0)+'px)':''}}
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.
