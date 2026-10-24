@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import AxeBuilder from '@axe-core/playwright';
 
 // Every section of the one-page centamont.com and a phrase from its heading.
 const sections = [
@@ -16,6 +17,38 @@ const sections = [
   ['house', 'Centum, a hundred'],
   ['contact', 'Write to the partners'],
 ];
+
+// Text that a box with its overflow hidden cuts part of the way through: a label clipped at a drawing's edge, a word cut
+// off at the side of a frame. Text wholly outside its box is a crop made on purpose (a map label beyond the part of the
+// map shown) and passes; a cut of two pixels across, or a quarter of the line's height, does not.
+const clippedText = (page) => page.evaluate(() => {
+  const cut = [];
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.textContent.trim() ? 1 : 2) });
+  const range = document.createRange();
+  for (let n; (n = walk.nextNode());) {
+    const el = n.parentElement;
+    if (el.closest('script, style, noscript, template, [hidden], [aria-hidden="true"]')) continue;
+    if (getComputedStyle(el).visibility !== 'visible') continue;
+    range.selectNodeContents(n);
+    const rects = [...range.getClientRects()].filter((q) => q.width > 0.5);
+    for (let a = el; rects.length && a && a !== document.body; a = a.parentElement) {
+      const s = getComputedStyle(a);
+      const hx = /hidden|clip/.test(s.overflowX), hy = /hidden|clip/.test(s.overflowY);
+      if (!hx && !hy) { if (/auto|scroll/.test(s.overflowX + s.overflowY)) break; continue; }
+      const b = a.getBoundingClientRect();
+      if (b.width < 3 || b.height < 3) break; // a label hidden for screen readers only
+      const L = b.left + parseFloat(s.borderLeftWidth), R = b.right - parseFloat(s.borderRightWidth);
+      const T = b.top + parseFloat(s.borderTopWidth), B = b.bottom - parseFloat(s.borderBottomWidth);
+      for (const q of rects) {
+        if (q.right <= L || q.left >= R || q.bottom <= T || q.top >= B) continue;
+        const x = hx ? Math.max(L - q.left, q.right - R, 0) : 0, y = hy ? Math.max(T - q.top, q.bottom - B, 0) : 0;
+        if (x >= 2 || y >= q.height / 4) { cut.push(`"${n.textContent.trim().slice(0, 40)}" in ${a.tagName.toLowerCase()}.${a.getAttribute('class')}`); break; }
+      }
+      break;
+    }
+  }
+  return cut;
+});
 
 // Skip the one-time intro so every test starts on the page itself.
 test.beforeEach(async ({ page }) => {
@@ -1110,6 +1143,34 @@ test.describe('every page in the sitemap', () => {
       await page.mouse.wheel(0, 4000);
       await page.waitForTimeout(300);
       expect(errors).toEqual([]);
+    });
+  }
+
+  // Every page is read whole, no text cut off by the box that holds it, and checked against the accessibility guidelines
+  // (WCAG 2.2 AA) by axe: on a computer by day and by night, on a phone by day. Motion is reduced so the drawings stand
+  // at rest, not caught mid-fade.
+  for (const path of pages) {
+    test(`${path} reads whole and passes the accessibility check`, async ({ page, isMobile }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
+      await page.goto(path);
+      await page.waitForTimeout(300);
+      expect(await clippedText(page)).toEqual([]);
+      const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+      const check = async (when) => {
+        const { violations } = await new AxeBuilder({ page }).withTags(tags).analyze();
+        expect(violations.map((v) => `${when} ${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+      };
+      await check('day');
+      // and on the smallest phones in use, 320 wide, where drawings sized for legibility leave their labels least room
+      if (isMobile) {
+        await page.setViewportSize({ width: 320, height: 640 });
+        await page.waitForTimeout(300);
+        expect(await clippedText(page)).toEqual([]);
+        return;
+      }
+      await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'dark' });
+      await page.waitForTimeout(500);
+      await check('night');
     });
   }
 

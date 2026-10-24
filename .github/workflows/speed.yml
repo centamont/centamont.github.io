@@ -1,0 +1,27 @@
+name: Phone speed
+on:
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '29 13 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  speed:
+    # Times the main pages as a phone loads them and holds each to its budget; tools/speed.mjs says what and why.
+    # It is not a required check: a page over budget shows on the pull request without blocking the merge.
+    name: Phone speed
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: lts/*
+    - name: Serve the site
+      run: |
+        python3 -m http.server 4173 --bind 127.0.0.1 &
+        for i in $(seq 30); do curl -sf http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+    - name: Time the pages
+      run: node tools/speed.mjs
