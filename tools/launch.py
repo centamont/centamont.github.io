@@ -270,6 +270,9 @@ KEY = {
 SWATCH = ['<path class="hid" d="M0 5h22"/>', '<path class="pr" d="M0 5h22"/>',
           '<path class="sold" d="M3 1h7v8H3ZM12 1h7v8h-7Z"/>', '<path class="dt" d="M1 2v5M6 2v5M11 2v5M16 2v5M21 2v5"/>']
 
+# on a phone the strip pans a frame at a time, and says so in the voice every drawing that pans uses
+HINT = {'en': 'Swipe for every step', 'es': 'Desliza para ver cada paso', 'pt': 'Deslize para ver cada etapa'}
+
 PAGES = {
     'new-york.html': ('ny', 'en'), 'es/nueva-york.html': ('ny', 'es'), 'pt/nova-york.html': ('ny', 'pt'),
     'south-florida.html': ('fl', 'en'), 'es/sur-de-florida.html': ('fl', 'es'), 'pt/sul-da-florida.html': ('fl', 'pt'),
@@ -290,7 +293,7 @@ def figure(m, lang):
     key = ''.join(f'<span><svg viewBox="0 0 22 10">{sw}</svg>{k}</span>' for sw, k in zip(SWATCH, keys))
     cols = ' c5' if len(STEPS[m]) == 4 else ''   # four steps, one of them double, fill five columns
     return (f'<figure class="mk-lfig"><div class="lsq{cols}" role="img" tabindex="0" aria-label="{LABEL[(m, lang)]}">{steps}</div>'
-            f'<figcaption class="cap"><span class="key" aria-hidden="true">{key}</span><span>{cap}</span></figcaption></figure>')
+            f'<figcaption class="cap"><span class="pan-hint" aria-hidden="true">{HINT[lang]}</span><span class="key" aria-hidden="true">{key}</span><span>{cap}</span></figcaption></figure>')
 
 
 def main():
