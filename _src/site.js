@@ -619,16 +619,28 @@
   if (rows.length) {
     const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
     let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
-    // a skyline or a map that pans knows when the reader has reached its right-hand end (its fade and its hint then go)
-    document.querySelectorAll('.mk-el-pan, .dm-pan').forEach((p) => {
-      const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
-      // a skyline that opens on its landmark (data-start: the landmark's place across the drawing, out of 1200) starts
-      // with it in the middle of the screen, the city to either side for the swipe
-      const sv_ = p.dataset.start && p.querySelector('svg');
-      if (sv_ && p.scrollWidth > p.clientWidth + 1) p.scrollLeft = sv_.getBoundingClientRect().width * p.dataset.start / 1200 - p.clientWidth / 2;
-      end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
-    });
   }
+  // a skyline, a map, a launch strip or a row of neighborhoods that pans knows when the reader has reached its right-hand
+  // end (its fade and its hint then go)
+  document.querySelectorAll('.mk-el-pan, .dm-pan, .lsq, .hoods').forEach((p) => {
+    const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
+    // a skyline that opens on its landmark (data-start: the landmark's place across the drawing, out of 1200) starts
+    // with it in the middle of the screen, the city to either side for the swipe
+    const sv_ = p.dataset.start && p.querySelector('svg');
+    if (sv_ && p.scrollWidth > p.clientWidth + 1) p.scrollLeft = sv_.getBoundingClientRect().width * p.dataset.start / 1200 - p.clientWidth / 2;
+    end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
+  });
+
+  // A drawn story (developers.html, the six steps): one figure keeps a frame for each step, and shows the frame of the
+  // step being read, the one crossing the middle of the screen (practice.css, .dv-story). Its steps are named by the
+  // figure's data-story selector, in the same order as its frames.
+  document.querySelectorAll('[data-story]').forEach((fig) => {
+    const frames = fig.querySelectorAll('.dv-st-fr > li'), steps = document.querySelectorAll(fig.dataset.story);
+    if (!('IntersectionObserver' in window) || frames.length !== steps.length) return;
+    const show = (k) => frames.forEach((f, i) => f.classList.toggle('on', i === k));
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) show([...steps].indexOf(e.target)); }), { rootMargin: '-45% 0px -50% 0px' });
+    steps.forEach((s) => io.observe(s));
+  });
 
   // Drawings that draw themselves once they arrive: each starts as its top clears the lowest tenth of the screen, so
   // by the time it stands in the middle of the screen it is finished, and a reader scrolling past never meets one half drawn.

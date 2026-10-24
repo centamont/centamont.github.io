@@ -407,6 +407,19 @@ test('the drawings arrive and say what they show', async ({ page }) => {
   await expect(page.locator('.deposit figcaption')).toContainText(/illustrative/i);
 });
 
+// The developer pages tell their six steps beside one drawing, which shows the stage of the step being read.
+for (const path of ['/developers.html', '/es/desarrolladores.html', '/pt/incorporadoras.html']) {
+  test(`the six steps keep their drawing in step (${path})`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator('.dv-st-fr > li')).toHaveCount(6);
+    await expect(page.locator('#dvSix ~ ol > li')).toHaveCount(6);
+    await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; const s = document.getElementById('step-4'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.47); });
+    await expect(page.locator('.dv-st-fr > li').nth(3)).toHaveClass(/\bon\b/);
+    await expect(page.locator('.dv-st-fr > li.on')).toHaveCount(1);
+    await expect(page.locator('.dv-st-f')).toBeVisible();
+  });
+}
+
 // A link can name a building and a neighborhood, but only in plain words: never a web address or a run of digits.
 test('the planner takes only plain names from its link', async ({ page }) => {
   await page.goto('/planner.html?n=The%20Bayfront&w=Coconut%20Grove');

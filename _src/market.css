@@ -36,7 +36,11 @@
 @media (max-width:600px){
   .lsq{display:flex;margin:0 calc(-1 * var(--gl)) 16px;padding:0 var(--gl) 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .lsq::-webkit-scrollbar{display:none}
-  .lsq{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent 98%);mask-image:linear-gradient(90deg,#000 82%,transparent 98%)}
+  /* the next frame shows as a fade at the edge, never as a word cut through, and the fade (with the caption's swipe line)
+     goes once the reader reaches the last frame */
+  .lsq{-webkit-mask-image:linear-gradient(90deg,#000 72%,transparent 94%);mask-image:linear-gradient(90deg,#000 72%,transparent 94%)}
+  .lsq.at-end{-webkit-mask-image:none;mask-image:none}
+  .mk-lfig:has(.lsq.at-end) .pan-hint{opacity:0;transition:opacity .4s}
   .lsq > div{flex:0 0 78%;scroll-snap-align:start}
   .lsq > .w2{flex-basis:156%}
   .lsq > .w2 p{max-width:50%}
@@ -51,6 +55,10 @@
 @media (max-width:700px){
   .hoods{display:flex;gap:16px;margin:28px calc(-1 * var(--gl)) 0;padding:0 var(--gl) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);overscroll-behavior-x:contain;scrollbar-width:none}
   .hoods::-webkit-scrollbar{display:none}
+  /* (the next card shows as a fade at the edge, so a name or a price is never seen cut through; at the last card the fade
+     goes) */
+  .hoods{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 56px),transparent)}
+  .hoods.at-end{-webkit-mask-image:none;mask-image:none}
   .hood{flex:0 0 84%;display:flex;flex-direction:column;scroll-snap-align:start}
   .hood > figure.photo{order:-1;margin:0 0 18px}
   .hood > h3:first-child,.hood:first-child > h3:first-child{margin-top:0}
@@ -340,6 +348,8 @@
 /* (a city drawing built with data-crop gives up the empty sky above its highest mark on a desktop too, as it does on a phone) */
 .mk-el.hd.cy[data-crop]{aspect-ratio:var(--pd,var(--pa))}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
+/* (on a phone, where the drawing pans, its key keeps to the first screen's width, clear of the fade at the frame's edge) */
+@media (max-width:600px){.mk-el-pan .mk-el.hd .lg text{font-size:13.5px;letter-spacing:.1em}}
 /* (a detailed skyline's windows: each facade filled with its own window pattern, which washes in after the lines, as the
    tone does) */
 .mk-el.hd .wn{stroke:none}

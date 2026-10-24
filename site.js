@@ -446,13 +446,20 @@ const rows = document.querySelectorAll('.hoods, .mk-el-pan, .dm-pan');
 if (rows.length) {
 const stop = () => rows.forEach((r) => { if (getComputedStyle(r).overflowX !== 'visible' && r.scrollWidth > r.clientWidth + 1) r.tabIndex = 0; else r.removeAttribute('tabindex'); });
 let st = 0; stop(); addEventListener('resize', () => { cancelAnimationFrame(st); st = requestAnimationFrame(stop); }); addEventListener('load', stop, { once: true });
-document.querySelectorAll('.mk-el-pan, .dm-pan').forEach((p) => {
+}
+document.querySelectorAll('.mk-el-pan, .dm-pan, .lsq, .hoods').forEach((p) => {
 const end = () => p.classList.toggle('at-end', p.scrollLeft + p.clientWidth >= p.scrollWidth - 2);
 const sv_ = p.dataset.start && p.querySelector('svg');
 if (sv_ && p.scrollWidth > p.clientWidth + 1) p.scrollLeft = sv_.getBoundingClientRect().width * p.dataset.start / 1200 - p.clientWidth / 2;
 end(); p.addEventListener('scroll', end, { passive: true }); addEventListener('resize', end);
 });
-}
+document.querySelectorAll('[data-story]').forEach((fig) => {
+const frames = fig.querySelectorAll('.dv-st-fr > li'), steps = document.querySelectorAll(fig.dataset.story);
+if (!('IntersectionObserver' in window) || frames.length !== steps.length) return;
+const show = (k) => frames.forEach((f, i) => f.classList.toggle('on', i === k));
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) show([...steps].indexOf(e.target)); }), { rootMargin: '-45% 0px -50% 0px' });
+steps.forEach((s) => io.observe(s));
+});
 let sy = scrollY, sT = 0, sv = 0;
 addEventListener('scroll', () => { const t = performance.now(), dt = t - sT; if (dt > 0 && dt < 250) sv = 0.5 * sv + 0.5 * Math.abs(scrollY - sy) / dt; else sv = 0; sy = scrollY; sT = t; }, { passive: true });
 const hurried = window.cmHurried = (r) => (performance.now() - sT < 160 && sv > 2.4) || (scrollY > 40 && r.top < innerHeight * 0.45);
