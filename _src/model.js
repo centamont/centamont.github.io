@@ -356,7 +356,7 @@
     night: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
   };
   // (and from x 575, fully from 825, in the same hero, the photograph has its own far city: the sky's skyline goes)
-  const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
+  const STILL_EY = 6.7366, STILL_CUT = [575, 825];
   // (an engine whose media queries take only the older addListener)
   const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
   let GEN = 0; // camera generations, shared by every model: the plan rings are shared too
@@ -617,7 +617,7 @@
       if (!p || !p.img || !this.dark || this.forced || this.sunT != null || this.sunBack || !((this.r3 && !this.r3.lost) || window.CentamontSky)) return false;
       if (this.L < FLOORS || this.G < 1 || this.occ < 1 || this.S !== this.Sold) return false;
       const ph = this.phi + (this.tyy || 0), d = Math.abs((((this.theta + (this.tx || 0) - p.s.th) % TAU) + TAU + Math.PI) % TAU - Math.PI);
-      return d < 1e-4 && Math.abs(ph - STILL_PHI) < 1e-4 && Math.abs(Math.max(0.8, this.o.ty - this.o.dist * Math.sin(ph)) - STILL_EY) < 1e-3;
+      return d < 1e-4 && Math.abs(Math.max(0.8, this.o.ty - this.o.dist * Math.sin(ph)) - STILL_EY) < 1e-3;
     }
     // The photograph, laid where the rendered tower is. Where it falls short of the canvas's right or bottom edge (a
     // window wider or shorter than the one it was made in), it fades out over its last 48 to 200px (twice the shortfall)
@@ -669,9 +669,6 @@
         g.drawImage(ec, 0, y, x + 0.3 * w, h);
       }
       g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
-      // (where the photograph is whole, inside its soft edges, for a page that shows it as a plate: CSS px in the canvas)
-      const sl = fl ? Math.min(Math.max(56 * z, 48), w / 4) : 0, st = ft ? Math.min(16 * z, h / 8) : 0, sr = fr ? clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) : 0;
-      this.phR = { x0: Math.max(0, x + sl), y0: Math.max(0, y + st), x1: Math.min(this.w, x + w - sr), y1: Math.min(this.h, y + h - (fb ? sr : 0)) };
     }
 
     // back to the drawing: the rendered tower and its sky (a CSS background on the canvas, set by tower3d.js) go

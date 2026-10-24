@@ -755,6 +755,20 @@ html:not(.js) :is(.seam,.vein){display:none}
 .hero:has(#heroModel[data-still]){z-index:6}
 .hero:has(#heroModel[data-still])::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55;-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%);mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%)}
 @media (max-width:820px){.hero:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px));mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}}
+/* The photograph full bleed (home.js, framePhoto): beside the copy the veil is solid ink to the still's left edge (--va)
+   and thins to nothing across its soft edge (--vb), well short of the shaft, so the photograph comes out of the ink
+   with no seam and no wash on the tower, and the grain thins with it. The canvas fades in under the header, which so
+   stands on ink and never on the sky (--m0 to --m1), and, stacked, into the copy's ink below the podium (--m2 to --m3).
+   It carries one house grade at every hour: the sky's blue taken down, a little warmth, deeper shadows, so morning,
+   noon, the gold hour and the night read as one sheet with the ink, the ivory and the bronze. */
+.hero.plated::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0,rgb(var(--hero-rgb)) var(--va,40%),rgba(var(--hero-rgb),.72) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .3),rgba(var(--hero-rgb),.3) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .62),rgba(var(--hero-rgb),0) var(--vb,60%))}
+.hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%));mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%))}
+.hero.plated canvas{-webkit-mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%));mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%))}
+.hero.plated #heroModel[data-still]{filter:saturate(.62) sepia(.18) contrast(1.06) brightness(.94)}
+@media (max-width:820px){
+  .hero.plated::after{background:none}
+  .hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(180deg,transparent calc(var(--plate-foot,50svh) - 48px),#000 var(--plate-foot,50svh));mask-image:linear-gradient(180deg,transparent calc(var(--plate-foot,50svh) - 48px),#000 var(--plate-foot,50svh))}
+}
 .hero .lede{font-size:var(--t-intro);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
 

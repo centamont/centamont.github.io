@@ -227,7 +227,7 @@ morning: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.96
 gold: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
 night: { x: 681, y: 75, w: 1059, h: 975, th: 0.523599, f: 1687.08, cx: 1021.968, cy: 668.736, sky: 160, turn: 215 },
 };
-const STILL_EY = 6.7366, STILL_PHI = 0.13, STILL_CUT = [575, 825];
+const STILL_EY = 6.7366, STILL_CUT = [575, 825];
 const onMQ = (m, f) => (m.addEventListener ? m.addEventListener('change', f) : m.addListener(f)), offMQ = (m, f) => (m.removeEventListener ? m.removeEventListener('change', f) : m.removeListener(f));
 let GEN = 0;
 function hatchPlan(pw, hnx, hnz, D) {
@@ -421,7 +421,7 @@ const p = this.ph;
 if (!p || !p.img || !this.dark || this.forced || this.sunT != null || this.sunBack || !((this.r3 && !this.r3.lost) || window.CentamontSky)) return false;
 if (this.L < FLOORS || this.G < 1 || this.occ < 1 || this.S !== this.Sold) return false;
 const ph = this.phi + (this.tyy || 0), d = Math.abs((((this.theta + (this.tx || 0) - p.s.th) % TAU) + TAU + Math.PI) % TAU - Math.PI);
-return d < 1e-4 && Math.abs(ph - STILL_PHI) < 1e-4 && Math.abs(Math.max(0.8, this.o.ty - this.o.dist * Math.sin(ph)) - STILL_EY) < 1e-3;
+return d < 1e-4 && Math.abs(Math.max(0.8, this.o.ty - this.o.dist * Math.sin(ph)) - STILL_EY) < 1e-3;
 }
 still(g, a) {
 const p = this.ph, s = p.s, k = this.k, z = k.f / s.f;
@@ -462,8 +462,6 @@ eq.putImageData(e, 0, 0);
 g.drawImage(ec, 0, y, x + 0.3 * w, h);
 }
 g.drawImage(src, x, y, w, h); g.globalAlpha = 1;
-const sl = fl ? Math.min(Math.max(56 * z, 48), w / 4) : 0, st = ft ? Math.min(16 * z, h / 8) : 0, sr = fr ? clamp(2 * Math.max(this.w - x - w, this.h - y - h) + 24, 48, 200) : 0;
-this.phR = { x0: Math.max(0, x + sl), y0: Math.max(0, y + st), x1: Math.min(this.w, x + w - sr), y1: Math.min(this.h, y + h - (fb ? sr : 0)) };
 }
 drop3d() {
 this.r3 = null; this.r3a = 0; this.r3f = null; delete this.c.dataset.render;

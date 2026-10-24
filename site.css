@@ -455,6 +455,8 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
 @media (max-width:820px){
   .hero canvas{height:63svh;bottom:auto}
   .hero .wrap{padding-top:calc(clamp(46svh,100svh - 432px,56svh) - var(--rise,0px))}
+  .hero.plated canvas{height:max(63svh,calc(var(--plate-foot,0px) + 72px))}
+  .hero.plated .wrap{padding-top:calc(max(clamp(46svh,100svh - 432px,56svh),var(--plate-foot,0px)) - var(--rise,0px))}
   .hero h1{max-width:none}
 }
 @media (max-width:520px){.hero h1{line-height:.97}.hero .row{margin-top:20px;gap:10px}.hero .btn{padding-block:14px}}

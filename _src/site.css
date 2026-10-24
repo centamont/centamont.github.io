@@ -734,6 +734,9 @@ header.site.swap :is(.mark,.mark *,.menu-btn,.theme,.motion){transition:none!imp
   
   /* the copy starts as low as the taller drawing wants (56svh), but never so low that the second button leaves the first screen; 432px is the copy's height from the headline to the second button */
   .hero .wrap{padding-top:calc(clamp(46svh,100svh - 432px,56svh) - var(--rise,0px))}
+  /* (with the photograph the copy starts under its podium, home.js framePhoto) */
+  .hero.plated canvas{height:max(63svh,calc(var(--plate-foot,0px) + 72px))}
+  .hero.plated .wrap{padding-top:calc(max(clamp(46svh,100svh - 432px,56svh),var(--plate-foot,0px)) - var(--rise,0px))}
   .hero h1{max-width:none}
   
 }

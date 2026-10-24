@@ -368,6 +368,37 @@ test('the hero shows this hour\'s photograph of the tower, by night and by day',
   await day.close();
 });
 
+// The photograph stands full bleed: on a phone it runs the screen's width under the caption line, the crown below the
+// caption and the copy under the podium (the plate's old square cut once came out empty there), and on a desktop no
+// loupe opens over it (it has no structure behind its glass to show).
+test('the hero photograph fills the phone\'s width and takes no loupe', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'each window size is opened here');
+  for (const [width, height] of [[390, 844], [390, 664], [768, 1024], [1363, 628]]) {
+    const phone = width <= 820;
+    const ctx = await browser.newContext({ viewport: { width, height }, isMobile: phone, hasTouch: phone, reducedMotion: 'reduce', baseURL: info.project.use.baseURL });
+    const page = await ctx.newPage();
+    await page.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
+    await page.goto('/');
+    const hero = page.locator('#heroModel');
+    await expect(hero).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+    const m = await page.evaluate(() => {
+      const c = document.getElementById('heroModel'), v = (k) => parseFloat(c.style.getPropertyValue(k)), h = document.getElementById('top');
+      return { plated: h.classList.contains('plated'), clip: c.style.clipPath, m1: v('--m1'), m2: v('--m2'), w: c.clientWidth, foot: parseFloat(h.style.getPropertyValue('--plate-foot')), note: document.querySelector('.hero .coords').getBoundingClientRect().bottom, h1: document.querySelector('.hero h1').getBoundingClientRect().top };
+    });
+    expect(m.plated, `${width}x${height}`).toBe(true);
+    expect(m.clip, `${width}x${height}`).toBe('');
+    expect(m.m2 - m.m1, `${width}x${height}: the photograph's open band`).toBeGreaterThan(phone ? 180 : 300);
+    if (phone) {
+      expect(m.foot, `${width}x${height}: the podium under the caption`).toBeGreaterThan(m.note + 150);
+      expect(m.h1, `${width}x${height}: the headline under the podium`).toBeGreaterThanOrEqual(m.foot - 25);
+    } else {
+      await page.mouse.move(width * 0.75, height * 0.3);
+      await expect(page.locator('.hero')).not.toHaveClass(/loupe/);
+    }
+    await ctx.close();
+  }
+});
+
 test('day and night toggle remembers the choice', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
