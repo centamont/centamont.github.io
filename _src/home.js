@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded',function(){
     o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
   // (on a wide screen the ruler's names grow with it, from 13px up to 16px at 2560)
   // The photograph is framed by its own features, in the still's pixels: the crown's top, the podium, the quay and the
-  // shaft's axis (66, 660, 784 and 345 down and across the 1x file) and the soft edge on its left (60). The camera stands
+  // shaft's axis (66, 660, 784 and 345 down and across the 1x file), the soft edge on its left (60) and the crown's left end (286). The camera stands
   // where the still was made from, at its bearing and its eye's height; only the size and the shift of the lens follow
   // the screen (the lens's rise sets where the still stands up and down: phi follows, so the eye stays at the still's).
   // Beside the copy the crown stands a margin under the header and the quay above the foot of the screen, the shaft a
@@ -92,19 +92,75 @@ document.addEventListener('DOMContentLoaded',function(){
   // photograph comes out of the ink with no seam, no drawn sky beside it and no wash on the tower.
   // Stacked (a phone, a tablet held upright), the still runs the full width, its soft edge off the screen and the shaft
   // at a third of it, the crown under the caption line; the copy starts under the podium, the lawn fading into its ink.
-  const ST={crown:66,podium:660,quay:784,axis:345,soft:60};
-  const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0;
-    if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
+  const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+  const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
+    if(narrow){const kp=hero.querySelector('.key-sold');if(kp)kp.classList.remove('on');z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
     else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
       z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown)));Y=hb+tm-ST.crown*z;
       const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
-      X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
+      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot');
+      // the bronze's count, which the drawing names over its ruler, stands with the photograph too: by the crown, on its
+      // left, in the still's own sky (or nowhere, if the copy leaves it no room)
+      const kp=hero.querySelector('.key-sold');if(kp){kp.classList.add('ph','on');const kw=kp.offsetWidth,kr=Math.round(X+ST.crown2*z-24),ky=Math.round(Y+ST.crown*z+8),on=kr-kw>textR+32&&ky>hb+12;kp.classList.toggle('on',on);if(on){kp.style.left=c.offsetLeft+kr-kw+'px';kp.style.top=c.offsetTop+ky+'px';const nb=lb.find(b=>b[0]<0);if(nb){nb[1]=Math.max(nb[1],ky+kp.offsetHeight);nb[2]=Math.max(nb[2],kr)}}}}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
     Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
     // the canvas fades in under the header (so the header stands on the hero's ink, never on the sky) and, stacked,
     // into the copy's ink between the podium and the quay
     const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
-    ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px')};
+    ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
+    airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
+  // The air beside the photograph (wide screens). The still ends a little left of its shaft, so beside the copy there
+  // is no picture, and black there made the photograph a print pasted on a dark slide, noon beside midnight. So the
+  // still's own light runs on under the copy: its sky, the haze on its horizon and, under that, its bay, read row by
+  // row from the scene right of the shaft (the brightest third of each row, so the shaft and the shadows don't darken it)
+  // and laid across. Next to the still the rows keep their detail; toward the window's edge they melt into one soft fall
+  // of light. Nothing is made up: no cloud, tower or wave, only the still's own colours, in its own grade. The air
+  // covers the still's soft left edge and gives way to the photograph over the next 130 of its pixels, short of the
+  // shaft, and the hero's ink deepens over it toward the copy, so every line of it reads as it did on ink (4.5:1 at
+  // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
+  // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
+  // A phone shows the photograph whole above the copy and needs none.
+  const AIR={from:440,to:600,horizon:612,bay:800,keep:120,give:250,ink:[.42,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.56,.46,160]};
+  let air=null,airAt=null,airRows=null,airKey='';
+  // (the house grade, as the stylesheet's filter has it on the photograph: home.css, saturate(.62) sepia(.18)
+  // contrast(1.06) brightness(.94), the first two as one matrix)
+  const GM=(()=>{const s=.62,q=1-.18,S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
+    P=[.393+.607*q,.769-.769*q,.189-.189*q,.349-.349*q,.686+.314*q,.168-.168*q,.272-.272*q,.534-.534*q,.131+.869*q],M=[];
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++)M.push(P[i*3]*S[j]+P[i*3+1]*S[3+j]+P[i*3+2]*S[6+j]);return M})();
+  const grade=(r,g,b)=>[0,1,2].map(i=>{const v=Math.min(255,GM[i*3]*r+GM[i*3+1]*g+GM[i*3+2]*b);return Math.max(0,Math.min(255,((v/255-.5)*1.06+.5)*255))*.94});
+  // the light right of the shaft, row by row, read off the hero's canvas once the photograph stands whole there (so over
+  // the drawn sky its soft top fades into), at a quarter of the screen's size: the sky and the haze, then, from just
+  // above the horizon, the bay's own tone; each row softened a little (near) and a lot (far)
+  const airRead=a=>{const c=heroM.c,k=c.width/a.W,x0=a.X+AIR.from*a.z,x1=Math.min(a.W,a.X+AIR.to*a.z),w=Math.round((x1-x0)/4),h=Math.ceil(a.H/4);if(w<4)return null;
+    const t=document.createElement('canvas');t.width=w;t.height=h;const q=t.getContext('2d',{willReadFrequently:true});q.drawImage(c,x0*k,0,(x1-x0)*k,a.H*k,0,0,w,h);
+    const d=q.getImageData(0,0,w,h).data,row=new Float32Array(h*3),lum=new Float32Array(w),idx=[...Array(w).keys()],keep=Math.max(1,Math.round(w*.3));
+    for(let y=0;y<h;y++){for(let i=0;i<w;i++){const o=(y*w+i)*4;lum[i]=.2126*d[o]+.7152*d[o+1]+.0722*d[o+2]}
+      idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
+      row.set(grade(r/keep,gg/keep,b/keep),y*3)}
+    const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)});
+    for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
+    const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
+      for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
+    return{h,near:blur(2.5*a.z),far:blur(11*a.z)}};
+  // laid across, at the same quarter size: the near rows by the still, the far ones toward the window's edge, the ink
+  // deepening toward the copy (from AIR.ink's first at the window's edge to its second at the copy's right edge, and
+  // to none just past the still's soft edge); opaque over that soft edge, then giving way to the photograph
+  const airPaint=()=>{const a=airAt;
+    if(!a){if(air)air.hidden=true;return}if(!airRows)return;
+    if(!air){air=document.createElement('canvas');air.className='hero-air';air.setAttribute('aria-hidden','true');heroM.c.after(air)}
+    air.hidden=false;air.style.setProperty('--m0',a.m0+'px');air.style.setProperty('--m1',a.m1+'px');
+    const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
+    const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
+      x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
+    // (the ink at x: from l at the window's edge to r at the copy's right edge R, then to none 60px past it, or by the
+    // still's soft edge; over the lede and the buttons, and over the survey note, it runs deeper, to their own right edges)
+    const ramp=(x,l,r,R)=>{const U=Math.max(R+60,x0);return x<R?l+(r-l)*x/R:r*Math.min(1,Math.max(0,(U-x)/(U-R)))};
+    for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
+      for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),Math.max(vt,R),bl,br])}
+      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),o=(j*w+i)*4;let t=ramp(x,tl,tr,vt);
+        for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
+        for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
+    g.putImageData(im,0,0)};
   const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
     // on a phone the crown stays below the survey note and the tower stands clear of the headline
     const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offsetParent)t+=e.offsetTop;return t};
@@ -200,6 +256,8 @@ document.addEventListener('DOMContentLoaded',function(){
   // The photograph stands full bleed on the hero's ink (home.css, .hero.plated): the veil and the canvas's own fades,
   // which framePhoto() places, take its soft edges, so nothing is cut square.
   if(heroM&&photo)hero.classList.add('plated');
+  // and once it stands whole, the air beside it (see airPaint) comes in as the veil it replaces goes (home.css, .aired)
+  if(heroM&&photo){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);const on=m.sa>=1&&!!airAt;if(on&&!airRows){try{airRows=airRead(airAt)}catch(e){airAt=null}airPaint()}hero.classList.toggle('aired',on&&!!airRows)}}
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.

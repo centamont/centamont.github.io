@@ -1574,7 +1574,7 @@ palmsFront.forEach((p) => this.drawPalm(p));
 g.globalAlpha = this.occ * (1 - sa); figsFront.forEach((f) => this.drawFigure(f)); g.globalAlpha = 1;
 const tw = this.o.labels ? this.o.labelSize * 3 : 0;
 this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
-if (!ruler || (sa >= 1 && !this.o.labels)) return;
+if (!ruler || (!this.o.labels && (sa > 0 || this.ph))) return;
 const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
 const ps_ = this.ph && this.ph.s, hy = this.k.cy - (ps_ && ps_.sky ? ps_.sky * this.k.f / ps_.f : 0);
 let iLo = 0;
