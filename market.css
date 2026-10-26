@@ -283,6 +283,7 @@
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig:has(.mk-el.hd) > .cap{margin-left:var(--rail)}
 }
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
+.mk-el .pn{display:none;text-anchor:end;letter-spacing:.1em}
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .cap > .mk-fold{margin-top:0}
 .cap > .mk-fold > span{display:block}
@@ -301,6 +302,7 @@
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  .mk-el-pan .mk-el .pn{font-size:15px}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
