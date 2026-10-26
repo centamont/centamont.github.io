@@ -2193,7 +2193,10 @@
       if (!ruler || (!this.o.labels && (sa > 0 || this.ph))) return;
       // Levels are numbered as American drawings and the weekly report number them: the ground floor is L01, the top
       // floor L34, and the roof above it is named. Every fifth level is numbered, with a longer tick.
-      const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
+      // (where a photograph stands in for the finished tower, the ruler is the drawing's own: it goes out as the
+      // photograph comes in, so the building is left to stand on its own)
+      const ra = (L > 0.01 ? 1 : E0) * (this.ph ? 1 - this.sa : 1), named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
+      if (ra <= 0.004) return;
       // the levels' names: [name, x, y, strength]
       // (over the photograph, the line itself stops at the lowest numbered level above the horizon, rather than running on
       // down through its palms: yb is where it ends, and no tick is drawn below it)

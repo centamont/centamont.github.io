@@ -12,8 +12,6 @@ const sections = [
   ['developers', 'Your building, sold as if it were the only one we have'],
   ['clients', 'Residences chosen for one buyer, some before they reach the market'],
   ['markets', 'South Florida and New York first'],
-  ['journal', 'Notes on new development'],
-  ['people', 'A seat here is earned'],
   ['house', 'Centum, a hundred'],
   ['contact', 'Write to the partners'],
 ];
@@ -246,9 +244,12 @@ for (const [path, heading] of [
   });
 }
 
-test('journal links to the guide', async ({ page }) => {
-  await page.goto('/#journal');
-  await page.getByRole('link', { name: 'Read the guide' }).click();
+// The home carries one line to the journal, under the markets it names; the notes themselves are read on their own page.
+test('the home leads to the journal', async ({ page }) => {
+  await page.goto('/#markets');
+  await page.getByRole('link', { name: 'Notes on new development' }).click();
+  await expect(page.locator('h1')).toContainText(/Notes on new development/);
+  await page.getByRole('link', { name: /Buying pre-construction in Florida/ }).first().click();
   await expect(page.locator('h1')).toContainText(/Buying pre.construction in Florida/);
 });
 
@@ -743,12 +744,11 @@ for (const path of ['/', '/es/', '/pt/']) {
     await page.waitForLoadState('load');
     const height = await page.evaluate(() => document.documentElement.scrollHeight);
     expect(height).toBeLessThanOrEqual(cap);
-    // the questions after the fourth fold behind one more row, and every question is still on the page
+    // the questions stand with the letter, behind one row, and every question is still on the page
+    await expect(page.locator('.qa > summary')).toBeVisible();
     await expect(page.locator('.faq details:not(.fq-more)')).toHaveCount(6);
+    await page.locator('.qa > summary').click();
     await expect(page.locator('.faq .fq-more > summary')).toBeVisible();
-    // the engagement keeps its three steps and its call to write on a phone
-    await expect(page.locator('.begin ol > li > b')).toHaveCount(3);
-    await expect(page.locator('.begin .close .btn')).toBeVisible();
     // and the footer's set of sheets folds behind one row
     await expect(page.locator('footer .ss-d > summary')).toBeVisible();
   });
