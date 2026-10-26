@@ -373,8 +373,6 @@
 }
 /* (and names its districts on the water under their towers, a step quieter than the water's own name) */
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
-/* (the Hamptons sets the name it opens on to the left of its number) */
-.mk-el.hp .pn{text-anchor:end}
 /* its key: the numbers in ink, the names in the caption's voice, the towers still going up marked in words */
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 /* in a skyline's caption the fold holds what the drawing shows, its scale and its key; open, it reads as the caption always did */

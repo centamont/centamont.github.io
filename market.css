@@ -283,7 +283,6 @@
   main.page:not(.wide):not(.lot) > .wrap > .mk-el-fig:has(.mk-el.hd) > .cap{margin-left:var(--rail)}
 }
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
-.mk-el.hp .pn{text-anchor:end}
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 .cap > .mk-fold{margin-top:0}
 .cap > .mk-fold > span{display:block}
