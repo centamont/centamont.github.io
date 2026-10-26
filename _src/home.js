@@ -30,16 +30,18 @@ document.addEventListener('DOMContentLoaded',function(){
   // (One script serves the English, Spanish and Portuguese home pages: each reads its words and its way of writing the
   // time from the page's language.)
   const clock=document.getElementById('clock'),lang=document.documentElement.lang;
-  const [locale,pts,sunUp,sunAt,sunDown]=lang==='es'?['es-US',['N','NE','E','SE','S','SO','O','NO'],'Sol a ','° de altura, ','Sol bajo el horizonte']
-    :lang==='pt-BR'?['pt-BR',['N','NE','L','SE','S','SO','O','NO'],'Sol a ','° de altura, ','Sol abaixo do horizonte']
-    :['en-US',['N','NE','E','SE','S','SW','W','NW'],'Sun ','° up, ','Sun below the horizon'];
+  // The sun is stated in plain words rather than in a sun study's figures ("Sun high, south-west", not "Sun 52° up, S"):
+  // how high it stands (high from 45°, halfway up from 20°, low under that) and the quarter of the sky it stands in.
+  const [locale,pts,sunUp,sunLv,sunDown]=lang==='es'?['es-US',['al norte','al noreste','al este','al sureste','al sur','al suroeste','al oeste','al noroeste'],'Sol ',['bajo','a media altura','alto'],'Sol bajo el horizonte']
+    :lang==='pt-BR'?['pt-BR',['ao norte','a nordeste','a leste','a sudeste','ao sul','a sudoeste','a oeste','a noroeste'],'Sol ',['baixo','a meia altura','alto'],'Sol abaixo do horizonte']
+    :['en-US',['north','north-east','east','south-east','south','south-west','west','north-west'],'Sun ',['low','halfway up','high'],'Sun below the horizon'];
   const sunline=document.getElementById('sunline');
-  // The sun the drawing is lit by, stated the way a sun study states it. A phone shows it too, beside the caption,
+  // The sun the drawing is lit by, in the words above. A phone shows it too, beside the caption,
   // so it is set before the drawing is framed under the note (and kept up to date with or without the clock).
   // (While a visitor holds the sun at another hour, the note states that hour and its sun.)
-  const sunNote=d=>{if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+Math.round(s.el)+sunAt+pts[Math.round(s.az/45)%8]:sunDown}};
+  const sunNote=d=>{if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+sunLv[s.el>=45?2:s.el>=20?1:0]+', '+pts[Math.round(s.az/45)%8]:sunDown}};
   sunNote();
-  const tick=()=>{const d=heroM&&heroM.sunT!=null?new Date(heroM.sunT):new Date();sunNote(d);if(!clock||!clock.offsetParent)return;try{clock.textContent=new Intl.DateTimeFormat(locale,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(d)}catch(e){}};
+  const tick=()=>{const d=heroM&&heroM.sunT!=null?new Date(heroM.sunT):new Date();sunNote(d);if(!clock||!clock.parentNode.offsetParent)return;try{clock.textContent=new Intl.DateTimeFormat(locale,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(d)}catch(e){}};
   setInterval(tick,30000);
 
   // Models
@@ -93,6 +95,15 @@ document.addEventListener('DOMContentLoaded',function(){
   // Stacked (a phone, a tablet held upright), the still runs the full width, its soft edge off the screen and the shaft
   // at a third of it, the crown under the caption line; the copy starts under the podium, the lawn fading into its ink.
   const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+  // The hero opens on the drawing. While the tower draws itself, the sheet stands a little left of the photograph's
+  // framing and a little smaller (SET), so the level ruler and the levels' names have the page's margin to stand in
+  // rather than the window's edge; once the building is up the camera settles onto the still's own framing over 0.7 s
+  // as the photograph fades in, and the ruler goes with it. The photograph is laid where the tower stands, whatever the
+  // size and the shift of the lens, so it comes in during the move. (Motion off, or a phone, or a visitor who has seen
+  // the drawing before: the camera stands at the photograph's framing from the first frame.)
+  const SET={x:.072,s:.93,ms:700};
+  let settle=1,settleAt=0,phTgt=null;
+  const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
   const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
     if(narrow){const kp=hero.querySelector('.key-sold');if(kp)kp.classList.remove('on');z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
     else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
@@ -104,6 +115,8 @@ document.addEventListener('DOMContentLoaded',function(){
       const kp=hero.querySelector('.key-sold');if(kp){kp.classList.add('ph','on');const kw=kp.offsetWidth,kr=Math.round(X+ST.crown2*z-24),ky=Math.round(Y+ST.crown*z+8),on=kr-kw>textR+32&&ky>hb+12;kp.classList.toggle('on',on);if(on){kp.style.left=c.offsetLeft+kr-kw+'px';kp.style.top=c.offsetTop+ky+'px';const nb=lb.find(b=>b[0]<0);if(nb){nb[1]=Math.max(nb[1],ky+kp.offsetHeight);nb[2]=Math.max(nb[2],kr)}}}}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
     Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
+    // beside the copy, the drawing stands where the settle has it until the building is up (see SET)
+    phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();
     // the canvas fades in under the header (so the header stands on the hero's ink, never on the sky) and, stacked,
     // into the copy's ink between the podium and the quay
     const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
@@ -114,13 +127,15 @@ document.addEventListener('DOMContentLoaded',function(){
   // still's own light runs on under the copy: its sky, the haze on its horizon and, under that, its bay, read row by
   // row from the scene right of the shaft (the brightest third of each row, so the shaft and the shadows don't darken it)
   // and laid across. Next to the still the rows keep their detail; toward the window's edge they melt into one soft fall
-  // of light. Nothing is made up: no cloud, tower or wave, only the still's own colours, in its own grade. The air
+  // of light. Under the horizon the bay is laid in at a little over half its light (bayK), since beside the copy the
+  // photograph has its lawn and its quay there, not open water: the hero's foot is one deep ink rather than a bright
+  // band with the picture dark beside it. Nothing is made up: no cloud, tower or wave, only the still's own colours, in its own grade. The air
   // covers the still's soft left edge and gives way to the photograph over the next 130 of its pixels, short of the
   // shaft, and the hero's ink deepens over it toward the copy, so every line of it reads as it did on ink (4.5:1 at
   // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
   // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
   // A phone shows the photograph whole above the copy and needs none.
-  const AIR={from:440,to:600,horizon:612,bay:800,keep:120,give:250,ink:[.42,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:250,ink:[.56,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
   let air=null,airAt=null,airRows=null,airKey='';
   // (the house grade, as the stylesheet's filter has it on the photograph at this hour, read off the canvas: home.css,
   // saturate sepia contrast brightness, the first two as one matrix)
@@ -138,7 +153,7 @@ document.addEventListener('DOMContentLoaded',function(){
     for(let y=0;y<h;y++){for(let i=0;i<w;i++){const o=(y*w+i)*4;lum[i]=.2126*d[o]+.7152*d[o+1]+.0722*d[o+2]}
       idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
       row.set(grade(r/keep,gg/keep,b/keep),y*3)}
-    const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)});
+    const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
     for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
     const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
       for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
@@ -162,7 +177,10 @@ document.addEventListener('DOMContentLoaded',function(){
         for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
         for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
     g.putImageData(im,0,0)};
-  const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
+  const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
+    // the drawing is named while it builds, beside the copy; under the photograph on a phone, where it runs the full
+    // width, there is no margin for a ruler, so the tower there draws unnamed as it always has
+    heroM.o.labels=heroM.o.guides=!(photo&&narrow);Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
     // on a phone the crown stays below the survey note and the tower stands clear of the headline
     const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offsetParent)t+=e.offsetTop;return t};
     if(narrow){const up=!side(),note=document.querySelector('.hero .coords'),c=heroM.c.getBoundingClientRect(),nb=note&&note.offsetParent?note.getBoundingClientRect().bottom-c.top:64;
@@ -201,9 +219,11 @@ document.addEventListener('DOMContentLoaded',function(){
     heroM.touch()};
   // A drawing that cannot start (no canvas, an old engine) costs only itself: the rest of the page carries on without it.
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
+  // the drawing is seen building only where the curtain parts on it: a first visit, on a wide screen, with motion on
+  if(photo&&!reduce&&window.CentamontIntro&&!matchMedia('(max-width:820px)').matches)settle=0;
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
-    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:!photo,dimSide:1,palms:false,guides:!photo,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
     if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
@@ -257,6 +277,13 @@ document.addEventListener('DOMContentLoaded',function(){
   // The photograph stands full bleed on the hero's ink (home.css, .hero.plated): the veil and the canvas's own fades,
   // which framePhoto() places, take its soft edges, so nothing is cut square.
   if(heroM&&photo)hero.classList.add('plated');
+  // the camera settles onto the photograph's framing once the building stands (see SET), and the drawing's names go out
+  // with the ruler as the photograph comes in
+  if(heroM&&photo&&settle<1){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);
+    if(settle>=1||!phTgt)return;
+    if(!(m.L>=34-1e-6&&m.G>=1&&m.occ>=1))return;
+    const now=performance.now();if(!settleAt)settleAt=now;
+    settle=Math.min(1,(now-settleAt)/SET.ms);settleTo();m.touch()}}
   // and once it stands whole, the air beside it (see airPaint) comes in as the veil it replaces goes (home.css, .aired)
   if(heroM&&photo){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);const on=m.sa>=1&&!!airAt;if(on&&!airRows){try{airRows=airRead(airAt)}catch(e){airAt=null}airPaint()}hero.classList.toggle('aired',on&&!!airRows)}}
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
