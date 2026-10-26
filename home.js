@@ -15,13 +15,13 @@ const atTop=()=>header.classList.toggle('top',scrollY<8);addEventListener('scrol
 const later=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:1000}):setTimeout(f,1);
 const onMQ=(m,f)=>m.addEventListener?m.addEventListener('change',f):m.addListener(f);
 const clock=document.getElementById('clock'),lang=document.documentElement.lang;
-const [locale,pts,sunUp,sunAt,sunDown]=lang==='es'?['es-US',['N','NE','E','SE','S','SO','O','NO'],'Sol a ','° de altura, ','Sol bajo el horizonte']
-:lang==='pt-BR'?['pt-BR',['N','NE','L','SE','S','SO','O','NO'],'Sol a ','° de altura, ','Sol abaixo do horizonte']
-:['en-US',['N','NE','E','SE','S','SW','W','NW'],'Sun ','° up, ','Sun below the horizon'];
+const [locale,pts,sunUp,sunLv,sunDown]=lang==='es'?['es-US',['al norte','al noreste','al este','al sureste','al sur','al suroeste','al oeste','al noroeste'],'Sol ',['bajo','a media altura','alto'],'Sol bajo el horizonte']
+:lang==='pt-BR'?['pt-BR',['ao norte','a nordeste','a leste','a sudeste','ao sul','a sudoeste','a oeste','a noroeste'],'Sol ',['baixo','a meia altura','alto'],'Sol abaixo do horizonte']
+:['en-US',['north','north-east','east','south-east','south','south-west','west','north-west'],'Sun ',['low','halfway up','high'],'Sun below the horizon'];
 const sunline=document.getElementById('sunline');
-const sunNote=d=>{if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+Math.round(s.el)+sunAt+pts[Math.round(s.az/45)%8]:sunDown}};
+const sunNote=d=>{if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+sunLv[s.el>=45?2:s.el>=20?1:0]+', '+pts[Math.round(s.az/45)%8]:sunDown}};
 sunNote();
-const tick=()=>{const d=heroM&&heroM.sunT!=null?new Date(heroM.sunT):new Date();sunNote(d);if(!clock||!clock.offsetParent)return;try{clock.textContent=new Intl.DateTimeFormat(locale,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(d)}catch(e){}};
+const tick=()=>{const d=heroM&&heroM.sunT!=null?new Date(heroM.sunT):new Date();sunNote(d);if(!clock||!clock.parentNode.offsetParent)return;try{clock.textContent=new Intl.DateTimeFormat(locale,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(d)}catch(e){}};
 setInterval(tick,30000);
 const Model=window.CentamontModel,models=[];
 let heroM=null,towerM=null;
@@ -38,6 +38,9 @@ let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
 const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
 o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
 const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+const SET={x:.072,s:.93,ms:700};
+let settle=1,settleAt=0,phTgt=null;
+const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
 const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
 if(narrow){const kp=hero.querySelector('.key-sold');if(kp)kp.classList.remove('on');z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
 else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
@@ -47,10 +50,11 @@ tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelect
 const kp=hero.querySelector('.key-sold');if(kp){kp.classList.add('ph','on');const kw=kp.offsetWidth,kr=Math.round(X+ST.crown2*z-24),ky=Math.round(Y+ST.crown*z+8),on=kr-kw>textR+32&&ky>hb+12;kp.classList.toggle('on',on);if(on){kp.style.left=c.offsetLeft+kr-kw+'px';kp.style.top=c.offsetTop+ky+'px';const nb=lb.find(b=>b[0]<0);if(nb){nb[1]=Math.max(nb[1],ky+kp.offsetHeight);nb[2]=Math.max(nb[2],kr)}}}}
 const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
 Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
+phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();
 const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
 ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
 airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
-const AIR={from:440,to:600,horizon:612,bay:800,keep:120,give:250,ink:[.42,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
+const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:250,ink:[.56,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
 let air=null,airAt=null,airRows=null,airKey='';
 const gradeOf=c=>{const f=getComputedStyle(c).filter||'',n=(k,d)=>{const m=f.match(new RegExp(k+'\\(([\\d.]+)'));return m?+m[1]:d},s=n('saturate',1),q=1-n('sepia',0),ct=n('contrast',1),br=n('brightness',1),
 S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
@@ -63,7 +67,7 @@ const grade=gradeOf(c),d=q.getImageData(0,0,w,h).data,row=new Float32Array(h*3),
 for(let y=0;y<h;y++){for(let i=0;i<w;i++){const o=(y*w+i)*4;lum[i]=.2126*d[o]+.7152*d[o+1]+.0722*d[o+2]}
 idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
 row.set(grade(r/keep,gg/keep,b/keep),y*3)}
-const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)});
+const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
 for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
 const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
 for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
@@ -82,7 +86,8 @@ for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),
 for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
 for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
 g.putImageData(im,0,0)};
-const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
+const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
+heroM.o.labels=heroM.o.guides=!(photo&&narrow);Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
 const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offsetParent)t+=e.offsetTop;return t};
 if(narrow){const up=!side(),note=document.querySelector('.hero .coords'),c=heroM.c.getBoundingClientRect(),nb=note&&note.offsetParent?note.getBoundingClientRect().bottom-c.top:64;
 hero.style.removeProperty('--rise');if(photo)framePhoto(v,true,nb);
@@ -105,8 +110,9 @@ heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHei
 if(photo&&!heroM.ph)heroM.photo(photo,'/hero/',true);
 heroM.touch()};
 const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
+if(photo&&!reduce&&window.CentamontIntro&&!matchMedia('(max-width:820px)').matches)settle=0;
 if(Model){
-heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:!photo,dimSide:1,palms:false,guides:!photo,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
 if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(framed)try{frameHero()}catch(e){}});
 if(window.ResizeObserver){let hs='';new ResizeObserver(([e])=>{const r=e.contentRect,k=Math.round(r.width)+'x'+Math.round(r.height);if(k===hs)return;const was=hs;hs=k;if(was&&framed)requestAnimationFrame(()=>{try{frameHero()}catch(e){}})}).observe(hero.querySelector('h1'))}}
@@ -140,6 +146,11 @@ if(m.sunT!==noteT){noteT=m.sunT;tick()}};
 const keyEl=hero.querySelector('.key-sold');
 if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){keyEl.style.left=Math.round(Math.min(c.offsetLeft+r.x1-6,innerWidth-16)-keyEl.offsetWidth)+'px';keyEl.style.top=y+'px'}}}
 if(heroM&&photo)hero.classList.add('plated');
+if(heroM&&photo&&settle<1){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);
+if(settle>=1||!phTgt)return;
+if(!(m.L>=34-1e-6&&m.G>=1&&m.occ>=1))return;
+const now=performance.now();if(!settleAt)settleAt=now;
+settle=Math.min(1,(now-settleAt)/SET.ms);settleTo();m.touch()}}
 if(heroM&&photo){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);const on=m.sa>=1&&!!airAt;if(on&&!airRows){try{airRows=airRead(airAt)}catch(e){airAt=null}airPaint()}hero.classList.toggle('aired',on&&!!airRows)}}
 document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 const intro=window.CentamontIntro;let started=false;
