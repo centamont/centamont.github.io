@@ -301,6 +301,7 @@
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  .mk-el-pan .mk-el .dsk text{display:none}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
