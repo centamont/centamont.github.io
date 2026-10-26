@@ -427,6 +427,11 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 /* Side by side, the three practices share their rows, so a heading that wraps moves its neighbours' lines with it, and
    their links stand on one line at the head of the last row (a second link, where it does not fit, goes under the first) */
 @media (min-width:821px){.pr{display:grid;grid-row:3/span 4;grid-template-rows:subgrid;justify-items:start;align-content:start}
+/* and each heading keeps to one line: where the column is too narrow for the longest at the house size, all three set a
+   little smaller together (the three columns are a third of the set each, so a share of its width sizes them alike).
+   The Portuguese "Assessoria ao empreendimento" would need a size well below its neighbours', so it takes two lines. */
+.practices{container-type:inline-size}
+.pr h3{font-size:min(var(--t-head),3.1cqi)}
 .pr .more,.pr .go{margin-top:0}
 }
 @media (max-width:820px){.practices{grid-template-columns:minmax(0,1fr)}
@@ -1214,3 +1219,6 @@ html:not(.js) .step{min-height:auto}
 /* the hero's canvas, standing finished, waits unseen for its photograph, then fades in whole (home.js, unveil) */
 #heroModel{transition:opacity .6s ease}
 #heroModel.wait{opacity:0;transition:none}
+
+/* The record band (tools/firm.py), when it is given, rides over the opening as the practices do */
+.firm-record{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}

@@ -1,0 +1,17 @@
+{
+  "contact": {
+    "form": "",
+    "form_service": "",
+    "form_privacy": "",
+    "booking": "",
+    "phone": "",
+    "phone_display": "",
+    "whatsapp": false,
+    "reply": {"en": "", "es": "", "pt": ""}
+  },
+  "partners": [],
+  "byline": [],
+  "record": {"figures": [], "note": {"en": "", "es": "", "pt": ""}},
+  "press": [],
+  "case": null
+}

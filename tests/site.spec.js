@@ -830,6 +830,46 @@ test('the letter opens as an email to the office and is copied, without a clipbo
   }
 });
 
+// Where tools/firm.json names a form service, tools/firm.py writes its address on the letter (data-send) and an email
+// blank under the signature, and the letter is sent from the page; if the service fails, the writer gets the letter to
+// open in their own email and to copy. Here the page is given the same two things, and a stand-in service.
+test('the letter sends through a form service where one is named, and falls back to email', async ({ page }) => {
+  for (const status of [200, 500]) {
+    let sent = null;
+    await page.route('**/__send', async (r) => { sent = r.request().postDataJSON(); await r.fulfill({ status, contentType: 'application/json', body: '{}' }); });
+    await page.goto('/');
+    await page.evaluate(() => {
+      const f = document.getElementById('letter'); f.dataset.send = '/__send';
+      const s = document.createElement('span'); s.className = 'blank'; s.dataset.l = 'Email';
+      const i = document.createElement('input'); i.type = 'email'; i.name = 'email'; i.setAttribute('aria-label', 'Your email'); i.placeholder = 'your email';
+      s.appendChild(i); f.querySelector('.sign').append(document.createElement('br'), s);
+    });
+    await page.locator('#letter').scrollIntoViewIfNeeded();
+    await page.locator('#letter input[name="where"]').fill('Edgewater');
+    await page.locator('#letter input[name="units"]').fill('60');
+    await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
+    await page.locator('#letter input[name="company"]').fill('Ruiz Development');
+    await page.locator('#letter button[type="submit"]').click();
+    await expect(page.locator('#letterNote')).toContainText('Fill in your email first');
+    await page.locator('#letter input[name="email"]').fill('ana@ruiz');
+    await page.locator('#letter button[type="submit"]').click();
+    await expect(page.locator('#letterNote')).toContainText('Check your email address');
+    await page.locator('#letter input[name="email"]').fill('ana@ruiz.example');
+    await page.locator('#letter button[type="submit"]').click();
+    if (status === 200) await expect(page.locator('#letterNote')).toContainText('Your letter is with the partners');
+    else {
+      await expect(page.locator('#letterNote')).toContainText('could not be sent from here');
+      expect((await page.locator('#letterNote a').getAttribute('href')).startsWith('mailto:office@centamont.com?subject=')).toBe(true);
+      await expect(page.locator('#letterCopy')).toBeVisible();
+    }
+    expect(sent.email).toBe('ana@ruiz.example');
+    expect(sent._subject).toBe('Developer: Ana Ruiz of Ruiz Development · Edgewater, 60 residences');
+    expect(sent.message.startsWith('Dear partners,')).toBe(true);
+    await expect(page).toHaveURL(/127\.0\.0\.1:4173\/$/);
+    await page.unroute('**/__send');
+  }
+});
+
 // The Spanish and Portuguese developer pages write the developer's letter in their own language, reminder included.
 test('the developer letter composes in Spanish and Portuguese', async ({ page, context, browserName }) => {
   for (const [path, ask, copied, letter, subject] of [
@@ -939,6 +979,16 @@ test('the stylesheet is built from its source', async ({}, info) => {
   try { execFileSync('python3', ['tools/version.py', '--check'], { encoding: 'utf8' }); }
   catch (e) { out = String(e.stdout || e.message); }
   expect(out, 'a built stylesheet or script, or a ?v= token, is stale: run python3 tools/version.py').toBe('');
+});
+
+// The firm's own facts (the letter's form, booking, telephone, reply time, partners, record, press, a developer's words,
+// the journal's byline) are written into the pages by tools/firm.py from tools/firm.json, and only from there.
+test('the firm\'s facts are written from one file', async ({}, info) => {
+  test.skip(info.project.name !== 'desktop', 'file check, once');
+  let out = '';
+  try { execFileSync('python3', ['tools/firm.py', '--check'], { encoding: 'utf8' }); }
+  catch (e) { out = String(e.stdout || e.message); }
+  expect(out, 'a page is stale: run python3 tools/firm.py').toBe('');
 });
 
 // Every page's footer, the drawing's title block, is written by tools/footer.py from one table, and its date and revision

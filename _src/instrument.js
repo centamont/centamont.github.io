@@ -26,7 +26,7 @@ const cmWords = ({
     figure: (say, marks) => 'Curva de ventas ilustrativa. ' + say + ' Bajo contrato: ' + marks + '.',
     heard: (m, n) => 'Mes ' + m + ', ' + n + ' por ciento bajo contrato.',
     salute: 'Estimados socios:', sign: 'Saludos cordiales,',
-    asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa' },
+    asks: { where: 'el barrio', units: 'el número de residencias', area: 'la zona', mkt: 'su mercado', niche: 'su especialidad', name: 'su nombre', company: 'el nombre de su empresa', email: 'su correo electrónico' },
     of: ', de ', plan: 'Mi plan: ',
     ask: (l) => 'Complete primero ' + l + ', para que los socios sepan quién les escribe y por qué.',
     subject: { dev: 'Desarrollador', buy: 'Cliente privado', adv: 'Asesor' },
@@ -34,6 +34,9 @@ const cmWords = ({
     copied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, también está copiada: péguela en un mensaje nuevo a esa dirección. Un socio le responderá personalmente para concertar una primera conversación.'],
     launchIn: (m, y) => 'en ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][m - 1] + ' de ' + y,
     notCopied: ['Su carta está abierta en su correo, dirigida a ', '. Si no se abrió nada, copie la carta de abajo y envíela a esa dirección.'],
+    badEmail: 'Revise su correo electrónico, para que un socio pueda responderle.', sending: 'Enviando su carta…',
+    sent: 'Su carta ya está con los socios. Un socio le responderá personalmente para concertar una primera conversación.',
+    notSent: ['No se pudo enviar la carta desde aquí. ', 'Ábrala en su correo', ', dirigida a office@centamont.com, o cópiela de abajo.'],
   },
   pt: {
     planner: 'https://centamont.com/pt/planejador.html?',
@@ -52,7 +55,7 @@ const cmWords = ({
     figure: (say, marks) => 'Curva de vendas ilustrativa. ' + say + ' Sob contrato: ' + marks + '.',
     heard: (m, n) => 'Mês ' + m + ', ' + n + ' por cento sob contrato.',
     salute: 'Prezados sócios,', sign: 'Atenciosamente,',
-    asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa' },
+    asks: { where: 'o bairro', units: 'o número de residências', area: 'a região', mkt: 'o seu mercado', niche: 'o seu foco', name: 'o seu nome', company: 'o nome da sua empresa', email: 'o seu e-mail' },
     of: ', ', plan: 'Meu plano: ',
     ask: (l) => 'Preencha primeiro ' + l + ', para que os sócios saibam quem está escrevendo e por quê.',
     subject: { dev: 'Incorporadora', buy: 'Cliente privado', adv: 'Consultor' },
@@ -60,6 +63,9 @@ const cmWords = ({
     copied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, ela também foi copiada: cole-a em uma nova mensagem para esse endereço. Um sócio responderá pessoalmente para marcar uma primeira conversa.'],
     launchIn: (m, y) => 'em ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][m - 1] + ' de ' + y,
     notCopied: ['Sua carta está aberta no seu e-mail, endereçada a ', '. Se nada abriu, copie a carta abaixo e envie-a para esse endereço.'],
+    badEmail: 'Confira o seu e-mail, para que um sócio possa responder.', sending: 'Enviando sua carta…',
+    sent: 'Sua carta já está com os sócios. Um sócio responderá pessoalmente para marcar uma primeira conversa.',
+    notSent: ['Não foi possível enviar a carta daqui. ', 'Abra-a no seu e-mail', ', endereçada a office@centamont.com, ou copie-a abaixo.'],
   },
 })[(document.documentElement.lang || 'en').slice(0, 2)] || {};
 // a word in the page's language, or the English given: either may be a function, called with the figures that follow
@@ -558,6 +564,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // ---- The letter: composed here, opened in the writer's own email, addressed to the office, and sent by the writer.
   // It is copied too, for a browser with no email app to open. Until this script has set it up (or if it never runs),
   // the letter's button is a plain link to the same address (practice.css, .letter.ready).
+  // Where the page names a form service to send it through (data-send on the form, written by tools/firm.py from
+  // tools/firm.json), the letter is sent from here instead, with the writer's email under the signature to reply to;
+  // if that fails, the writer is offered the letter in their own email, and a copy, as before.
   const form = document.getElementById('letter');
   if (form) {
     const note = document.getElementById('letterNote');
@@ -702,7 +711,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // It is emptied first and filled on the next frame, so a screen reader announces a repeated message again.
     const say = (...parts) => { note.textContent = ''; requestAnimationFrame(() => { note.replaceChildren(...parts); }); };
     // what each blank asks for, so a reminder can name the ones left empty
-    const asks = cmWords.asks || { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', name: 'your name', company: 'your company' };
+    const asks = cmWords.asks || { where: 'the neighborhood', units: 'the number of residences', area: 'the area', mkt: 'your market', niche: 'your focus', name: 'your name', company: 'your company', email: 'your email' };
     const list = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' ' + cmSay('and', 'and') + ' ' + a[a.length - 1]);
     const ask = (empty) => cmSay('ask', (l) => 'Fill in ' + l + ' first, so the partners know who is writing and why.', list(empty.map((i) => asks[i.name] || i.getAttribute('aria-label').toLowerCase())));
     // As each named blank is filled, the reminder names only the ones still empty, and goes once none is.
@@ -740,10 +749,34 @@ document.addEventListener('DOMContentLoaded', function () {
         requestAnimationFrame(() => { const lo = note.getBoundingClientRect().bottom + 16 - innerHeight, hi = empty[0].getBoundingClientRect().top - 76, d = Math.min(Math.max(0, lo), hi); if (d) scrollBy(0, d); });
         return;
       }
+      // the address to reply to, where there is one, has to be one
+      const mail = signed().find((i) => i.name === 'email');
+      if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail.value.trim())) {
+        mail.classList.add('miss'); mail.setAttribute('aria-invalid', 'true'); mail.setAttribute('aria-describedby', 'letterNote');
+        mail.focus(); reminding = cmSay('badEmail', 'Check your email address, so a partner can write back.'); say(reminding);
+        return;
+      }
       reminding = '';
       if (window.cmCount) window.cmCount('letter' + location.pathname);
       const to = 'office@centamont.com', t = text();
       const url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject()) + '&body=' + encodeURIComponent(t);
+      // the note, once filled, brought into view if it stands below the fold
+      const seen = () => requestAnimationFrame(() => { const d = note.getBoundingClientRect().bottom + 24 - innerHeight; if (d > 0) scrollBy({ top: d, behavior: calm() ? 'auto' : 'smooth' }); });
+      if (form.dataset.send && mail && window.fetch) {
+        busy = true; box.hidden = true; say(cmSay('sending', 'Sending your letter…'));
+        const field = (k) => { const i = signed().find((x) => x.name === k); return i ? i.value.trim() : ''; };
+        fetch(form.dataset.send, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ email: mail.value.trim(), name: field('name'), company: field('company'), _subject: subject(), message: t, page: location.pathname }), signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined })
+          .then((r) => { if (!r.ok) throw new Error(r.status); })
+          .then(() => { say(cmSay('sent', 'Your letter is with the partners. A partner will reply personally to arrange a first conversation.')); seen(); setTimeout(() => { busy = false; }, 4000); },
+            () => {
+              // not sent: the letter in the writer's own email, a link they press themselves, and a copy to send it by
+              busy = false; area.value = t; box.hidden = false;
+              const [a, l, b] = cmSay('notSent', ['The letter could not be sent from here. ', 'Open it in your email', ', addressed to office@centamont.com, or copy it below.']);
+              const link = document.createElement('a'); link.className = 'ul'; link.href = url; link.textContent = l;
+              say(a, link, b); seen();
+            });
+        return;
+      }
       // Copy first, while the click still counts as the writer's own and this tab still has the focus. Handing the
       // letter to an email app first can take the focus before an asynchronous copy lands, so the synchronous copy
       // goes first and the clipboard API is only the second try.
@@ -762,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const [a, b] = copied ? cmSay('copied', ['Your letter is open in your email, addressed to ', '. If nothing opened, it is copied too: paste it into a new message to that address. A partner will reply personally to arrange a first conversation.']) : cmSay('notCopied', ['Your letter is open in your email, addressed to ', '. If nothing opened, copy the letter below and send it to that address.']);
         say(a, link(), b);
         // the note is filled on the next frame (say); then, if it stands below the fold, the page brings it into view
-        if (copied) requestAnimationFrame(() => { const d = note.getBoundingClientRect().bottom + 24 - innerHeight; if (d > 0) scrollBy({ top: d, behavior: calm() ? 'auto' : 'smooth' }); });
+        if (copied) seen();
       };
       copying.then(() => go(true), () => go(false));
     });

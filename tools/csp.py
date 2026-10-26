@@ -5,7 +5,11 @@
 # trusted-types 'none': and no script may make a Trusted Types policy (none does), so nothing can open that door again.
 # centamont.goatcounter.com: the cookie-free visit count (site.js), sent as a beacon or, failing that, as an image.
 # style-src-elem 'self': style attributes may stay where a page needs them, but a <style> element only ever comes from the stylesheet.
-import re,hashlib,base64,glob,sys
+# The letter's form service, once tools/firm.json names one (tools/firm.py), is the one other host a page may send to.
+import re,hashlib,base64,glob,sys,json
+from urllib.parse import urlparse
+form=json.load(open('tools/firm.json'))['contact'].get('form')
+SEND=' https://'+urlparse(form).netloc if form and urlparse(form).scheme=='https' else ''
 check='--check' in sys.argv[1:]
 stale=[]
 pages=['index.html','privacy.html','terms.html','404.html','private-clients.html','advisors.html','planner.html','shortlist.html','report.html','south-florida.html','new-york.html','hamptons.html','los-angeles.html','dallas.html','austin.html','houston.html','san-francisco.html','tampa.html','naples.html','orange-county.html','developers.html','markets.html','project-site.html']+sorted(glob.glob('journal/*.html'))+sorted(glob.glob('es/*.html'))+sorted(glob.glob('pt/*.html'))
@@ -15,7 +19,7 @@ for f in pages:
     for attrs,body in re.findall(r'<script([^>]*)>(.*?)</script>',t,re.S):
         if 'src=' in attrs or 'ld+json' in attrs: continue
         hs.append("'sha256-"+base64.b64encode(hashlib.sha256(body.encode()).digest()).decode()+"'")
-    csp=("default-src 'self'; script-src 'self' "+' '.join(dict.fromkeys(hs))+"; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; "
+    csp=("default-src 'self'; script-src 'self' "+' '.join(dict.fromkeys(hs))+"; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com"+SEND+"; "
          "frame-src 'none'; worker-src 'self'; manifest-src 'self'; "
          "object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests")
     tag=f'<meta http-equiv="Content-Security-Policy" content="{csp}">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n'

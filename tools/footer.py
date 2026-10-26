@@ -34,6 +34,9 @@ SET=[
   (10,'advisors',{'en':'Advisors','es':'Asesores','pt':'Consultores'},'/advisors.html',False),
 ]
 NUM={k:n for n,k,*_ in SET}
+# The office's telephone, under its address, once tools/firm.json gives one (tools/firm.py writes the rest of the firm's facts)
+_C=json.load(open('tools/firm.json'))['contact']
+TEL=f'<br><a href="tel:{_C["phone"]}">{_C.get("phone_display") or _C["phone"]}</a>' if _C.get('phone') else ''
 # Sheets outside the set: the general notes (privacy, terms) and the vacant lot (the not-found page).
 GENERAL={'privacy':'G.1','terms':'G.2','vacant':'00'}
 
@@ -234,7 +237,7 @@ def block(page,lang,key,part,title,revs,letter):
     <svg class="sig" viewBox="0 0 1000 130" aria-hidden="true"><use href="/media/sig.svg#sig"/></svg>
     <dl class="tb">
       <div class="t-pr"><dt>{w['pr']}</dt><dd>{w['prd']}</dd></div>
-      <div class="t-of"><dt>{w['of']}</dt><dd>{w['ofd']}<br><a href="mailto:office@centamont.com">office@<wbr>centamont.com</a></dd></div>
+      <div class="t-of"><dt>{w['of']}</dt><dd>{w['ofd']}<br><a href="mailto:office@centamont.com">office@<wbr>centamont.com</a>{TEL}</dd></div>
       <div class="t-dr"><dt>{w['dr']}</dt><dd class="num"><time datetime="{last}">{dot(last)}</time><small>{w['rev']} {len(revs)}</small></dd></div>
       <div class="t-lt"><dt>{w['lt']}</dt><dd><a href="{letter}">{w['ltd']}</a></dd></div>
       <div class="t-sh"><dt>{w['sh']}</dt><dd><span class="st">{title}</span>{rv}<span class="no"><span class="sn">{number(key,part)}</span><span class="of">{of}</span></span></dd></div>
