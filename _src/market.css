@@ -396,6 +396,8 @@
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  /* (a village name set in the ground, too small to read at a phone's width, gives way to the key) */
+  .mk-el-pan .mk-el .dsk text{display:none}
   /* (a skyline whose key folds under its caption names the towers it opens on beside their numbers, here only) */
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
