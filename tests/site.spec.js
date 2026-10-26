@@ -339,8 +339,10 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
 
 // Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
 // fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
-// screen. The developer story below stays drawn, with no photograph.
-test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }) => {
+// screen. The developer story below stays drawn, with no photograph. Beside it on a desktop the still's own light runs
+// under the copy (the air), and the count under contract stands by the crown, clear of the copy; a phone has neither.
+test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }, info) => {
+  const wide = info.project.name === 'desktop';
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -349,7 +351,17 @@ test('the hero shows this hour\'s photograph of the tower, by night and by day',
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
   await expect(hero).toHaveAttribute('data-still', 'night', { timeout: 20000 });
-  await expect(page.locator('.key-sold')).toBeHidden();
+  if (wide) {
+    await expect(page.locator('#top')).toHaveClass(/\baired\b/);
+    await expect(page.locator('.hero-air')).toBeVisible();
+    await expect(page.locator('.key-sold')).toBeVisible();
+    const [key, copy] = await page.evaluate(() => [document.querySelector('.key-sold'), document.querySelector('#top .wrap h1')].map((e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; }));
+    expect(key.l > copy.r || key.b < copy.t).toBe(true);
+  } else {
+    // a phone shows the photograph whole above the copy: no air, and no count over it
+    await expect(page.locator('#top')).not.toHaveClass(/\baired\b/);
+    await expect(page.locator('.key-sold')).toBeHidden();
+  }
   await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
   await page.waitForTimeout(1500);
   await expect(page.locator('.rise .elev img')).toHaveCount(0);
@@ -362,7 +374,7 @@ test('the hero shows this hour\'s photograph of the tower, by night and by day',
   await day.goto('/');
   await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
   await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'day', { timeout: 20000 });
-  await expect(day.locator('.key-sold')).toBeHidden();
+  if (wide) await expect(day.locator('#top')).toHaveClass(/\baired\b/);
   expect(dayAsked).toHaveLength(1);
   expect(dayAsked[0]).toMatch(/\/hero\/day-[12]x\.webp$/);
   await day.close();

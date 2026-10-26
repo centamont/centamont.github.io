@@ -2188,8 +2188,9 @@
       const tw = this.o.labels ? this.o.labelSize * 3 : 0;
       this.rb = ruler ? { x0: Math.min(xa, xl - (sd > 0 ? tw : 0)) - 6, x1: Math.max(xa, xl + (sd < 0 ? tw : 0)) + 6, y0: ys[FLOORS] - this.o.labelSize, y1: ys[0] } : null;
 
-      // Dimension line with level ticks; it comes in with the sketch (and goes where an unnamed photograph has replaced it)
-      if (!ruler || (sa >= 1 && !this.o.labels)) return;
+      // Dimension line with level ticks; it comes in with the sketch (and an unnamed drawing that a photograph will replace,
+      // the home's hero, never draws it: the build there runs up to the photograph without a ruler that would then vanish)
+      if (!ruler || (!this.o.labels && (sa > 0 || this.ph))) return;
       // Levels are numbered as American drawings and the weekly report number them: the ground floor is L01, the top
       // floor L34, and the roof above it is named. Every fifth level is numbered, with a longer tick.
       const ra = L > 0.01 ? 1 : E0, named = (i) => i === 0 || i === FLOORS || (i + 1) % 5 === 0;
