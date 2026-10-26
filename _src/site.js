@@ -336,9 +336,13 @@
       for (const h of heads) if (h.getBoundingClientRect().top < innerHeight / 3) at = h;
       links.forEach((a, h) => { if (h === at) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
     };
+    // At the page's end the list steps aside as the footer comes up beneath it, rather than ride up with the last section
+    // and stand alone over the footer (site.css, .toc.end); a link in it that takes the focus brings it back.
+    const close = () => toc.classList.toggle('end', !!foot && foot.getBoundingClientRect().top < box.getBoundingClientRect().bottom + 96);
     let queued = false;
-    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); }); } }, { passive: true });
-    mark();
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); close(); }); } }, { passive: true });
+    addEventListener('resize', close);
+    mark(); close();
     // A page that closes on the date it was last updated (privacy, terms) carries that date in the right margin too, with
     // where to ask about it, held in view beside the text as the list of sections is on the left (reading.css, .rail);
     // it is set in the text's own column, just before that closing line, and hung out into the margin.
@@ -670,10 +674,14 @@
       es: ['Pasa el cursor para ver de cerca', 'Mantén pulsado para ver de cerca'],
       pt: ['Passe o cursor para ver de perto', 'Toque e segure para ver de perto'],
     }[lang] || ['Hover to look closer', 'Hold to look closer'];
+    // (a screen that takes both a mouse and a finger learns from the hand in use: a touch turns the line to "hold", a mouse
+    // back to "hover")
+    const hints = [];
+    addEventListener('pointerdown', (e) => { const t = words[e.pointerType === 'mouse' ? 0 : 1]; hints.forEach((h) => { h.textContent = t; }); }, { passive: true });
     loupes.forEach((svg) => {
       const fig = svg.closest('figure'); if (!fig) return;
       const cap = fig.querySelector('figcaption');
-      if (cap) { const h = document.createElement('span'); h.className = 'loupe-hint'; h.setAttribute('aria-hidden', 'true'); h.textContent = words[fine ? 0 : 1]; cap.prepend(h); }
+      if (cap) { const h = document.createElement('span'); h.className = 'loupe-hint'; h.setAttribute('aria-hidden', 'true'); h.textContent = words[fine ? 0 : 1]; cap.prepend(h); hints.push(h); }
       let lens = null, copy = null, on = false;
       const make = () => {
         if (lens) return;

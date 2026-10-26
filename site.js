@@ -243,9 +243,11 @@ let at = heads[0];
 for (const h of heads) if (h.getBoundingClientRect().top < innerHeight / 3) at = h;
 links.forEach((a, h) => { if (h === at) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
 };
+const close = () => toc.classList.toggle('end', !!foot && foot.getBoundingClientRect().top < box.getBoundingClientRect().bottom + 96);
 let queued = false;
-addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); }); } }, { passive: true });
-mark();
+addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; mark(); close(); }); } }, { passive: true });
+addEventListener('resize', close);
+mark(); close();
 const upd = page.querySelector('.prose > p.note:last-child'), on = upd && /^Last updated (.+?)\.?$/.exec(upd.textContent.trim());
 if (on) {
 const rail = document.createElement('aside'), box = document.createElement('div');
@@ -475,10 +477,12 @@ en: ['Hover to look closer', 'Hold to look closer'],
 es: ['Pasa el cursor para ver de cerca', 'Mantén pulsado para ver de cerca'],
 pt: ['Passe o cursor para ver de perto', 'Toque e segure para ver de perto'],
 }[lang] || ['Hover to look closer', 'Hold to look closer'];
+const hints = [];
+addEventListener('pointerdown', (e) => { const t = words[e.pointerType === 'mouse' ? 0 : 1]; hints.forEach((h) => { h.textContent = t; }); }, { passive: true });
 loupes.forEach((svg) => {
 const fig = svg.closest('figure'); if (!fig) return;
 const cap = fig.querySelector('figcaption');
-if (cap) { const h = document.createElement('span'); h.className = 'loupe-hint'; h.setAttribute('aria-hidden', 'true'); h.textContent = words[fine ? 0 : 1]; cap.prepend(h); }
+if (cap) { const h = document.createElement('span'); h.className = 'loupe-hint'; h.setAttribute('aria-hidden', 'true'); h.textContent = words[fine ? 0 : 1]; cap.prepend(h); hints.push(h); }
 let lens = null, copy = null, on = false;
 const make = () => {
 if (lens) return;

@@ -544,13 +544,14 @@ figcaption.cap:not(:has(.key)){grid-template-columns:minmax(0,1fr)}
 @media (min-width:1320px) and (hover:hover) and (pointer:fine){
   main.page:not(.wide) > .wrap{position:relative}
   .toc{display:block;position:absolute;top:var(--toc-top,0px);bottom:0;left:var(--gl);width:min(232px,var(--rail,208px) - 40px)}
-  .toc > div{position:sticky;top:calc(var(--hdr,64px) + 40px);max-height:calc(100svh - var(--hdr,64px) - 80px);overflow-y:auto;padding-top:14px;border-top:1px solid var(--rule)}
+  .toc > div{position:sticky;top:calc(var(--hdr,64px) + 40px);max-height:calc(100svh - var(--hdr,64px) - 80px);overflow-y:auto;padding-top:14px;border-top:1px solid var(--rule);transition:opacity var(--t-ui)}
   .toc-k{margin:0 0 10px;font-size:var(--t-label);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .toc ol{list-style:none;margin:0;padding:0}
   .toc a{position:relative;display:block;padding:6px 0 6px 16px;font-size:15px;line-height:1.35;color:var(--muted);text-decoration:none;transition:color var(--t-ui)}
   .toc a::before{content:"";position:absolute;left:0;top:calc(6px + .675em);width:8px;height:1px;background:var(--rule);transition:background-color var(--t-ui),width var(--t-ui) var(--ease-out)}
   .toc a[aria-current]{color:var(--fg)}
   .toc a[aria-current]::before{background:var(--accent);width:11px}
+  .toc.end > div:not(:focus-within){opacity:0;pointer-events:none}
   .toc a:hover,.toc a:focus-visible{color:var(--fg)}
   main.page:not(.wide) .prose figure.photo{position:relative}
   main.page:not(.wide) .prose figure.photo > .cap{position:absolute;top:0;left:calc(100% + 40px);width:210px;margin:0;display:block;font-size:14px;line-height:1.5}
@@ -819,7 +820,7 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
 .no{margin-top:auto;padding-top:12px;border-top:1px solid var(--grid);display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.6em}
 .sn{font-family:var(--display);font-weight:300;font-size:72px;line-height:.9;letter-spacing:-.02em;color:var(--fg);font-variant-numeric:lining-nums tabular-nums}
 .sn small{font-size:40px;letter-spacing:0}
-.of{font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.no .of{font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
 .t-sh{container-type:inline-size}
 .t-dr small{display:block;margin-top:8px;font-family:var(--body);font-size:13px;font-weight:500;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ss{--n:2.2em}
@@ -860,9 +861,9 @@ header.site nav.main.jump,header.site nav.main.jump.open{transition:clip-path 32
   @media print{.ss-d > summary{display:none}.ss-d::details-content{content-visibility:visible;display:block;block-size:auto}}
 }
 @media (max-width:600px){.t-of a{font-size:.9em}}
-@media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.of{letter-spacing:.1em}.ss{--n:1.7em}}
+@media (max-width:359px){.tb > div{padding-inline:12px}.tb dt,.no .of{letter-spacing:.1em}.ss{--n:1.7em}}
 @media (max-width:339px){.tb > div{padding-inline:10px}.tb dt{letter-spacing:.08em}}
-@media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.of{letter-spacing:.1em}}
+@media (min-width:1024px) and (max-width:1149px){.tb > div{padding-inline:12px}.tb dt,.no .of{letter-spacing:.1em}}
 @media (min-width:1024px) and (max-width:1199px){.tb{grid-template-areas:"pr pr pr of of of dr dr lt lt sh sh" "ss ss ss ss ss ss mk mk fo fo sh sh"}}
 @media (min-width:1920px){footer,.legal{font-size:16px}.tb .num,.tb .t-lt a{font-size:22px}.sn{font-size:80px}}
 .page.wide .wrap{max-width:var(--max)}

@@ -1,0 +1,17 @@
+{
+  "contact": {
+    "form": "https://formspree.io/f/xgaaaoaj",
+    "form_service": "Formspree",
+    "form_privacy": "https://formspree.io/legal/privacy-policy/",
+    "booking": "",
+    "phone": "",
+    "phone_display": "",
+    "whatsapp": false,
+    "reply": {"en": "", "es": "", "pt": ""}
+  },
+  "partners": [],
+  "byline": [],
+  "record": {"figures": [], "note": {"en": "", "es": "", "pt": ""}},
+  "press": [],
+  "case": null
+}
