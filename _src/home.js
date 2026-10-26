@@ -120,20 +120,21 @@ document.addEventListener('DOMContentLoaded',function(){
   // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
   // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
   // A phone shows the photograph whole above the copy and needs none.
-  const AIR={from:440,to:600,horizon:612,bay:800,keep:120,give:250,ink:[.42,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.56,.46,160]};
+  const AIR={from:440,to:600,horizon:612,bay:800,keep:120,give:250,ink:[.42,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
   let air=null,airAt=null,airRows=null,airKey='';
-  // (the house grade, as the stylesheet's filter has it on the photograph: home.css, saturate(.62) sepia(.18)
-  // contrast(1.06) brightness(.94), the first two as one matrix)
-  const GM=(()=>{const s=.62,q=1-.18,S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
+  // (the house grade, as the stylesheet's filter has it on the photograph at this hour, read off the canvas: home.css,
+  // saturate sepia contrast brightness, the first two as one matrix)
+  const gradeOf=c=>{const f=getComputedStyle(c).filter||'',n=(k,d)=>{const m=f.match(new RegExp(k+'\\(([\\d.]+)'));return m?+m[1]:d},s=n('saturate',1),q=1-n('sepia',0),ct=n('contrast',1),br=n('brightness',1),
+    S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
     P=[.393+.607*q,.769-.769*q,.189-.189*q,.349-.349*q,.686+.314*q,.168-.168*q,.272-.272*q,.534-.534*q,.131+.869*q],M=[];
-    for(let i=0;i<3;i++)for(let j=0;j<3;j++)M.push(P[i*3]*S[j]+P[i*3+1]*S[3+j]+P[i*3+2]*S[6+j]);return M})();
-  const grade=(r,g,b)=>[0,1,2].map(i=>{const v=Math.min(255,GM[i*3]*r+GM[i*3+1]*g+GM[i*3+2]*b);return Math.max(0,Math.min(255,((v/255-.5)*1.06+.5)*255))*.94});
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++)M.push(P[i*3]*S[j]+P[i*3+1]*S[3+j]+P[i*3+2]*S[6+j]);
+    return(r,g,b)=>[0,1,2].map(i=>{const v=Math.min(255,M[i*3]*r+M[i*3+1]*g+M[i*3+2]*b);return Math.min(255,Math.max(0,Math.min(255,((v/255-.5)*ct+.5)*255))*br)})};
   // the light right of the shaft, row by row, read off the hero's canvas once the photograph stands whole there (so over
   // the drawn sky its soft top fades into), at a quarter of the screen's size: the sky and the haze, then, from just
   // above the horizon, the bay's own tone; each row softened a little (near) and a lot (far)
   const airRead=a=>{const c=heroM.c,k=c.width/a.W,x0=a.X+AIR.from*a.z,x1=Math.min(a.W,a.X+AIR.to*a.z),w=Math.round((x1-x0)/4),h=Math.ceil(a.H/4);if(w<4)return null;
     const t=document.createElement('canvas');t.width=w;t.height=h;const q=t.getContext('2d',{willReadFrequently:true});q.drawImage(c,x0*k,0,(x1-x0)*k,a.H*k,0,0,w,h);
-    const d=q.getImageData(0,0,w,h).data,row=new Float32Array(h*3),lum=new Float32Array(w),idx=[...Array(w).keys()],keep=Math.max(1,Math.round(w*.3));
+    const grade=gradeOf(c),d=q.getImageData(0,0,w,h).data,row=new Float32Array(h*3),lum=new Float32Array(w),idx=[...Array(w).keys()],keep=Math.max(1,Math.round(w*.3));
     for(let y=0;y<h;y++){for(let i=0;i<w;i++){const o=(y*w+i)*4;lum[i]=.2126*d[o]+.7152*d[o+1]+.0722*d[o+2]}
       idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
       row.set(grade(r/keep,gg/keep,b/keep),y*3)}
