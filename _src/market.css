@@ -423,6 +423,14 @@
   .mk-fig .dm-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-fig .dm-pan .dmap{--u:.9;--k:.5;width:720px;max-width:none}
 }
+/* (a skyline whose key would sit folded on a phone names the towers its first view shows in one line under the frame, in
+   the key's own voice: the numbers in ink, the names in the caption's; from 521px the key stands open and the line steps aside) */
+.mk-pkey{display:none}
+@media (max-width:520px){
+  .mk-pkey{display:flex;flex-wrap:wrap;column-gap:.9em;margin-top:6px;font-size:14px;line-height:1.5;color:var(--muted)}
+  .mk-pkey b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+  .mk-pkey span{white-space:nowrap}
+}
 /* The Hamptons lot in plan: an ocean lot from above, drawn in the elevation's weights. The setbacks are a dashed line,
    the house the one thing in bronze, the hedge a row of small arcs; the labels are the elevation's small capitals. */
 .lotp{display:block;width:100%;height:auto;color:var(--fg)}

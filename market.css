@@ -323,6 +323,12 @@
   .mk-fig .dm-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-fig .dm-pan .dmap{--u:.9;--k:.5;width:720px;max-width:none}
 }
+.mk-pkey{display:none}
+@media (max-width:520px){
+  .mk-pkey{display:flex;flex-wrap:wrap;column-gap:.9em;margin-top:6px;font-size:14px;line-height:1.5;color:var(--muted)}
+  .mk-pkey b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+  .mk-pkey span{white-space:nowrap}
+}
 .lotp{display:block;width:100%;height:auto;color:var(--fg)}
 .lotp path{fill:none;stroke:currentColor;stroke-width:var(--lw-object);stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .lotp .pf{stroke-width:var(--lw-profile)}
