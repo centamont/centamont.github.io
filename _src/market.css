@@ -312,6 +312,9 @@
    dashed outline at their planned height (the dashes are drawn as geometry, so they still draw in). On a phone it is not
    cropped: it keeps its full width and pans sideways in its frame, with its labels, so every tower can be reached. */
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
+.mk-el .pn{display:none}
+/* (Houston's numbers stand over a dense cluster, so each keeps a margin of paper) */
+.mk-el.hx .nk text{stroke:var(--sheet);stroke-width:6px;stroke-linejoin:round;paint-order:stroke}
 /* (the towers it does not name keep their outline but quieten their floor lines, so the named ones lead) */
 .mk-el .dt.q{opacity:.3}.mk-el .dt.q.far{opacity:.2}
 /* the towers the key names carry the profile weight; an island in front (Brickell Key) hides the bases behind it */
@@ -389,6 +392,8 @@
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  /* (a skyline whose key folds under its caption names the towers it opens on beside their numbers, here only) */
+  .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
