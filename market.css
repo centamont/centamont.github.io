@@ -227,7 +227,7 @@
 .mk-el :is(.tn,.sh){stroke:none}
 .mk-el .tn{fill:var(--fg);fill-opacity:0}
 .mk-el .tn.r2{fill-opacity:.05}.mk-el .tn.r3{fill-opacity:.09}
-.mk-el .sh{fill:var(--fg);fill-opacity:.075}
+.mk-el .sh{fill:var(--fg);fill-opacity:.12}
 .js .mk-el :is(.tn,.sh){opacity:0;transition:opacity .9s var(--ease-out) .9s}
 .js .mk-el.in :is(.tn,.sh){opacity:1}
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
@@ -265,6 +265,8 @@
 .mk-el.cy .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
 .mk-el.cy .tn.r2{fill-opacity:.065}.mk-el.cy .tn.r3{fill-opacity:.035}
 .mk-el.cy .isl{stroke:none}
+:root[data-theme="dark"] .mk-el.np .tn.sand{fill-opacity:.12}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mk-el.np .tn.sand{fill-opacity:.12}}
 .mk-el.hd.cy[data-crop]{aspect-ratio:var(--pd,var(--pa))}
 .mk-el.hd .lg text{font-size:15px;letter-spacing:.18em}
 @media (max-width:600px){.mk-el-pan .mk-el.hd .lg text{font-size:13.5px;letter-spacing:.1em}}
