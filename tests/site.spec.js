@@ -50,9 +50,20 @@ const clippedText = (page) => page.evaluate(() => {
   return cut;
 });
 
-// Skip the one-time intro so every test starts on the page itself.
+// Skip the one-time intro so every test starts on the page itself. And no test ever sends a real letter: the letter's
+// form service (tools/firm.json) is refused here unless a test answers for it itself.
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('cm-intro', '1'));
+  await page.route('https://formspree.io/**', (r) => r.abort('blockedbyclient'));
+});
+
+// The letter as it is where no form service is named (tools/firm.json, contact.form): no reply address under the
+// signature, and the letter opens in the writer's own email.
+const noForm = (page) => page.evaluate(() => {
+  const f = document.getElementById('letter'); delete f.dataset.send;
+  const e = f.querySelector('input[name="email"]');
+  if (e) { const b = e.closest('.blank'); if (b.previousElementSibling && b.previousElementSibling.tagName === 'BR') b.previousElementSibling.remove(); b.remove(); }
+  f.querySelector('button[type="submit"]').dataset.to = 'mail';
 });
 
 test('home renders cleanly', async ({ page }, info) => {
@@ -785,6 +796,7 @@ test('the markets hub dates each market as its page does', () => {
 test('the letter turns the fields into a message to copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await page.goto('/');
+  await noForm(page);
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await page.locator('#letter label', { hasText: 'A buyer' }).click();
   await expect(page.locator('#letter p[data-for="buy"]')).toBeVisible();
@@ -807,6 +819,7 @@ test('the letter turns the fields into a message to copy', async ({ page, contex
 // the click still counts as the visitor's own, so the copy must start before the email app takes the letter.
 test('the letter opens as an email to the office and is copied, without a clipboard permission', async ({ page, context, browserName }) => {
   await page.goto('/');
+  await noForm(page);
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await page.locator('#letter input[name="where"]').fill('Edgewater');
   await page.locator('#letter input[name="units"]').fill('60');
@@ -831,31 +844,27 @@ test('the letter opens as an email to the office and is copied, without a clipbo
 });
 
 // Where tools/firm.json names a form service, tools/firm.py writes its address on the letter (data-send) and an email
-// blank under the signature, and the letter is sent from the page; if the service fails, the writer gets the letter to
-// open in their own email and to copy. Here the page is given the same two things, and a stand-in service.
-test('the letter sends through a form service where one is named, and falls back to email', async ({ page }) => {
-  for (const status of [200, 500]) {
+// blank under the signature, and the letter is sent from the page; if the service fails or can't be reached, the writer
+// gets the letter to open in their own email and to copy. A stand-in answers for the service here.
+test('the letter sends through its form service, and falls back to email', async ({ page }) => {
+  for (const status of [200, 500, 0]) {
     let sent = null;
-    await page.route('**/__send', async (r) => { sent = r.request().postDataJSON(); await r.fulfill({ status, contentType: 'application/json', body: '{}' }); });
     await page.goto('/');
-    await page.evaluate(() => {
-      const f = document.getElementById('letter'); f.dataset.send = '/__send';
-      const s = document.createElement('span'); s.className = 'blank'; s.dataset.l = 'Email';
-      const i = document.createElement('input'); i.type = 'email'; i.name = 'email'; i.setAttribute('aria-label', 'Your email'); i.placeholder = 'your email';
-      s.appendChild(i); f.querySelector('.sign').append(document.createElement('br'), s);
-    });
+    const to = await page.locator('#letter').getAttribute('data-send');
+    expect(to, 'the letter names its form service').toMatch(/^https:\/\//);
+    await page.route(to, async (r) => { sent = r.request().postDataJSON(); if (status) await r.fulfill({ status, contentType: 'application/json', body: '{}' }); else await r.abort('failed'); });
     await page.locator('#letter').scrollIntoViewIfNeeded();
     await page.locator('#letter input[name="where"]').fill('Edgewater');
     await page.locator('#letter input[name="units"]').fill('60');
     await page.locator('#letter input[name="name"]').fill('Ana Ruiz');
     await page.locator('#letter input[name="company"]').fill('Ruiz Development');
-    await page.locator('#letter button[type="submit"]').click();
+    await page.locator('#letter button[data-to="send"]').click();
     await expect(page.locator('#letterNote')).toContainText('Fill in your email first');
     await page.locator('#letter input[name="email"]').fill('ana@ruiz');
-    await page.locator('#letter button[type="submit"]').click();
+    await page.locator('#letter button[data-to="send"]').click();
     await expect(page.locator('#letterNote')).toContainText('Check your email address');
     await page.locator('#letter input[name="email"]').fill('ana@ruiz.example');
-    await page.locator('#letter button[type="submit"]').click();
+    await page.locator('#letter button[data-to="send"]').click();
     if (status === 200) await expect(page.locator('#letterNote')).toContainText('Your letter is with the partners');
     else {
       await expect(page.locator('#letterNote')).toContainText('could not be sent from here');
@@ -866,7 +875,7 @@ test('the letter sends through a form service where one is named, and falls back
     expect(sent._subject).toBe('Developer: Ana Ruiz of Ruiz Development · Edgewater, 60 residences');
     expect(sent.message.startsWith('Dear partners,')).toBe(true);
     await expect(page).toHaveURL(/127\.0\.0\.1:4173\/$/);
-    await page.unroute('**/__send');
+    await page.unroute(to);
   }
 });
 
@@ -876,6 +885,7 @@ test('the developer letter composes in Spanish and Portuguese', async ({ page, c
     ['/es/desarrolladores.html', 'Complete primero su nombre', 'también está copiada', 'Estimados socios:\n\nEstamos desarrollando un edificio en Edgewater con unas 60 residencias. El proyecto está en diseño esquemático, y esperamos lanzar las ventas el próximo año. Nos gustaría hablar de su lanzamiento.\n\nSaludos cordiales,\nAna Ruiz, de Ruiz Development', 'Desarrollador: Ana Ruiz, de Ruiz Development · Edgewater, 60 residencias'],
     ['/pt/incorporadoras.html', 'Preencha primeiro o seu nome', 'ela também foi copiada', 'Prezados sócios,\n\nEstamos incorporando um edifício em Edgewater com cerca de 60 residências. O projeto está em anteprojeto, e esperamos lançar as vendas no ano que vem. Gostaríamos de conversar sobre o lançamento.\n\nAtenciosamente,\nAna Ruiz, Ruiz Development', 'Incorporadora: Ana Ruiz, Ruiz Development · Edgewater, 60 residências']]) {
     await page.goto(path);
+    await noForm(page);
     await page.locator('#letter').scrollIntoViewIfNeeded();
     await expect(page.locator('#letter fieldset.as')).toBeHidden();
     await page.locator('#letter input[name="where"]').fill('Edgewater');
@@ -898,6 +908,7 @@ test('the developer letter composes in Spanish and Portuguese', async ({ page, c
 // The private-clients page writes its own letter, already set to a buyer, without the sales curve beside it.
 test('the buyer letter on private clients composes and copies', async ({ page, context, browserName }) => {
   await page.goto('/private-clients.html');
+  await noForm(page);
   await page.locator('#letter').scrollIntoViewIfNeeded();
   await expect(page.locator('#letter fieldset.as')).toBeHidden();
   await expect(page.locator('#letter [data-for="buy"]')).toBeVisible();

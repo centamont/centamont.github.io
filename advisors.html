@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sG/DM+BlA4vDMivUiEPSIc8MYP3ahwafP9CxFFll4ME=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com https://formspree.io; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -139,7 +139,7 @@
   <div class="row pc-nojs"><a class="btn solid" href="mailto:office@centamont.com">Write by email<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a></div>
   <!-- firm:reach --><!-- /firm:reach -->
   <!-- firm:partners --><!-- /firm:partners -->
-  <form class="letter" id="letter" novalidate>
+  <form class="letter" id="letter" data-send="https://formspree.io/f/xgaaaoaj" novalidate>
     <fieldset class="as" hidden>
       <legend>Writing as</legend>
       <label><input type="radio" name="as" value="adv" checked><span>An advisor</span></label>
@@ -147,16 +147,16 @@
     <div class="sheet">
       <p class="salute">Dear partners,</p>
       <p class="body" data-for="adv">I am an advisor in <span class="blank" data-l="Market"><input name="mkt" aria-label="Your market" aria-required="true" placeholder="e.g. Fort Lauderdale" size="13"></span> and focus on <span class="nw"><span class="blank" data-l="Focus"><input name="niche" aria-label="What you focus on" aria-required="true" placeholder="e.g. new development" size="14"></span></span><span class="opt" data-opt>, and I&nbsp;was referred by <span class="nw"><span class="blank" data-l="Referred by"><input name="ref" aria-label="Referred by (optional)" placeholder="name, optional" size="13"></span>.</span></span><span data-req> I would like to be considered for a&nbsp;seat.</span></p>
-      <p class="sign">With regards,<br><span class="blank" data-l="Name"><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18" required></span><!-- firm:replyto --><!-- /firm:replyto --></p>
+      <p class="sign">With regards,<br><span class="blank" data-l="Name"><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18" required></span><!-- firm:replyto --><br><span class="blank" data-l="Email"><input type="email" name="email" aria-label="Your email" aria-required="true" placeholder="your email" autocomplete="email" size="20"></span><!-- /firm:replyto --></p>
     </div>
     <div class="send">
-      <button type="submit" class="btn solid" data-to="mail">Open in your email<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
+      <button type="submit" class="btn solid" data-to="send">Send the letter<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
       <a class="btn solid alt" href="mailto:office@centamont.com">Write by email<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
       <!-- firm:book --><!-- /firm:book -->
     </div>
     <p class="note" id="letterNote" role="status" aria-live="polite"></p>
     <div class="fallback" id="letterCopy" hidden><label for="letterText">Your letter, ready to copy</label><textarea id="letterText" readonly rows="7"></textarea></div>
-    <p class="fine">Nothing is sent from this page. The letter opens in your own email, and you send it yourself.</p>
+    <p class="fine">The letter goes straight to the partners. If it cannot be sent from here, it opens in your own email instead.</p>
   </form>
 </div>
 </div>

@@ -1,8 +1,8 @@
 {
   "contact": {
-    "form": "",
-    "form_service": "",
-    "form_privacy": "",
+    "form": "https://formspree.io/f/xgaaaoaj",
+    "form_service": "Formspree",
+    "form_privacy": "https://formspree.io/legal/privacy-policy/",
     "booking": "",
     "phone": "",
     "phone_display": "",

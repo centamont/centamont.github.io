@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-rwrfswA42ltqYmLTDp/aDL02dRdTjtlfIu3sJg7OfVU=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-K9y2eS9F2rLOhjVoCITLQ/cEkt9PLQ+q5CxiJx9SVJU=' 'sha256-8AMGjidEMNVopKqJbsL3/3xCVd+idTp65wgera3zG0M='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-rwrfswA42ltqYmLTDp/aDL02dRdTjtlfIu3sJg7OfVU=' 'sha256-NEknCYwGHhwjzeIrW0zj07J/ZbQ3V/cydOFyqFLsc90=' 'sha256-K9y2eS9F2rLOhjVoCITLQ/cEkt9PLQ+q5CxiJx9SVJU=' 'sha256-8AMGjidEMNVopKqJbsL3/3xCVd+idTp65wgera3zG0M='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self' data: https://centamont.goatcounter.com; media-src 'self'; font-src 'self'; connect-src 'self' https://centamont.goatcounter.com https://formspree.io; frame-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="max-image-preview:large">
@@ -489,7 +489,7 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat({es:'es-US','pt-B
     </div>
     <!-- firm:reach --><!-- /firm:reach -->
     <!-- firm:partners --><!-- /firm:partners -->
-    <form class="letter" id="letter" novalidate>
+    <form class="letter" id="letter" data-send="https://formspree.io/f/xgaaaoaj" novalidate>
       <fieldset class="as">
         <legend>Writing as</legend>
         <label><input type="radio" name="as" value="dev" checked><span>A developer</span></label>
@@ -501,16 +501,16 @@ if(c&&c.offsetParent)try{c.textContent=new Intl.DateTimeFormat({es:'es-US','pt-B
         <p class="body" data-for="dev">We are developing a building in <span class="blank" data-l="Neighborhood"><input name="where" aria-label="Neighborhood" aria-required="true" placeholder="e.g. Edgewater" size="11"></span> with about <span class="blank" data-l="Residences"><input name="units" aria-label="Number of residences" aria-required="true" inputmode="numeric" placeholder="e.g. 60" size="3"></span> residences. The project is <span class="nw"><select name="stage" aria-label="Project stage"><option>still a sketch</option><option selected>in schematic design</option><option>permitted</option><option>under construction</option></select>,</span> and we hope to launch sales <span class="nw"><select name="when" aria-label="Launch timing"><option>this year</option><option selected>next year</option><option>the year after next</option></select>.</span><span data-req> We would like to talk about its&nbsp;launch.</span></p>
         <p class="body" data-for="buy" hidden>I am looking for a residence in <span class="nw"><span class="blank" data-l="Area"><input name="area" aria-label="Area you are looking in" aria-required="true" placeholder="e.g. Palm Beach" size="11"></span>,</span> with a budget <span class="nw"><select name="price" aria-label="Budget"><option selected>I will share</option><option>of $2 to 5 million</option><option>of $5 to 10 million</option><option>of $10 to 20 million</option><option>of over $20 million</option></select>,</span> and hope to move <span class="nw"><select name="move" aria-label="When you hope to move"><option>within six months</option><option>within a year</option><option>when the right home appears</option></select>.</span><span data-req> I would like to ask for an&nbsp;invitation.</span></p>
         <p class="body" data-for="adv" hidden>I am an advisor in <span class="blank" data-l="Market"><input name="mkt" aria-label="Your market" aria-required="true" placeholder="e.g. Fort Lauderdale" size="13"></span> and focus on <span class="nw"><span class="blank" data-l="Focus"><input name="niche" aria-label="What you focus on" aria-required="true" placeholder="e.g. new development" size="14"></span></span><span class="opt" data-opt>, and I&nbsp;was referred by <span class="nw"><span class="blank" data-l="Referred by"><input name="ref" aria-label="Referred by (optional)" placeholder="name, optional" size="13"></span>.</span></span><span data-req> I would like to be considered for a&nbsp;seat.</span></p>
-        <p class="sign">With regards,<br><span class="blank" data-l="Name"><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18" required></span> <span class="of" data-for="dev">of <span class="blank" data-l="Company"><input name="company" aria-label="Company" aria-required="true" placeholder="your company" autocomplete="organization" size="14"></span></span><!-- firm:replyto --><!-- /firm:replyto --></p>
+        <p class="sign">With regards,<br><span class="blank" data-l="Name"><input name="name" aria-label="Your name" placeholder="Your name" autocomplete="name" size="18" required></span> <span class="of" data-for="dev">of <span class="blank" data-l="Company"><input name="company" aria-label="Company" aria-required="true" placeholder="your company" autocomplete="organization" size="14"></span></span><!-- firm:replyto --><br><span class="blank" data-l="Email"><input type="email" name="email" aria-label="Your email" aria-required="true" placeholder="your email" autocomplete="email" size="20"></span><!-- /firm:replyto --></p>
       </div>
       <div class="send">
-        <button type="submit" class="btn solid" data-to="mail">Open in your email<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
+        <button type="submit" class="btn solid" data-to="send">Send the letter<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></button>
         <a class="btn solid alt" href="mailto:office@centamont.com">Write by email<svg viewBox="0 0 18 8" aria-hidden="true"><path d="M0 4h17M13 .5 17 4l-4 3.5" fill="none" stroke="currentColor"/></svg></a>
         <!-- firm:book --><!-- /firm:book -->
       </div>
       <p class="note" id="letterNote" role="status" aria-live="polite"></p>
       <div class="fallback" id="letterCopy" hidden><label for="letterText">Your letter, ready to copy</label><textarea id="letterText" readonly rows="9"></textarea></div>
-      <p class="fine">Nothing is sent from this page. The letter opens in your own email, and you send it yourself.</p>
+      <p class="fine">The letter goes straight to the partners. If it cannot be sent from here, it opens in your own email instead.</p>
     </form>
   </div>
 </section>
