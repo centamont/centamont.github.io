@@ -366,6 +366,9 @@
 }
 /* (and names its districts on the water under their towers, a step quieter than the water's own name) */
 .mk-el .ds text{text-anchor:middle;font-size:16px;letter-spacing:.18em}
+/* (and a name set beside a key number shows only where the drawing pans, on a phone, so the landmark it opens on is named
+   without opening the fold) */
+.mk-el .pn{display:none;text-anchor:end;letter-spacing:.1em}
 /* its key: the numbers in ink, the names in the caption's voice, the towers still going up marked in words */
 .mk-el-fig .cap{grid-template-columns:minmax(0,1fr)}
 /* in a skyline's caption the fold holds what the drawing shows, its scale and its key; open, it reads as the caption always did */
@@ -389,6 +392,7 @@
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
+  .mk-el-pan .mk-el .pn{font-size:15px}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
