@@ -746,10 +746,6 @@ html:not(.js) :is(.seam,.vein){display:none}
 .hero{position:relative;background:rgb(var(--hero-rgb));color:var(--ivory);overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:var(--ivory);--sold:var(--bronze-500);--sold-line:var(--bronze-500);isolation:isolate}
 .hero.loupe{cursor:none}
 
-/* The veil under the copy: the hero's ink, full behind the headline and thinning evenly across the width, with no
-   curve of its own (an ellipse here drew a blob over the island's western palms at every width, and a band at 1440 x
-   1100); the photograph fades in on its own edge inside the veil's last third, and the tower's lit lobby and its
-   ground stand clear of it. */
 /* The scroll cue: one bronze hairline at the column's left edge, under the buttons, with the word beside its foot; a
    short stroke runs down it three times as the page opens, then it stands still, and it goes as the page scrolls (--p).
    Only where the hero has room under the copy. */
@@ -764,18 +760,46 @@ html:not(.js) :is(.seam,.vein){display:none}
 @media (prefers-reduced-motion:reduce){.hero.lit .cue i::after{animation:none}}
 html[data-motion=off] .hero.lit .cue i::after{animation:none}
 @media print{.hero .cue{display:none}}
-/* The hour's light on the drawing (home.js sets data-hour from the Miami sun): a pale, cool morning from the east, a
-   high white noon, a low bronze sun from the west and, after dark, only the lit rooms. It lies under the drawing, on
-   the tower's side of the sheet, never behind the copy. */
-.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out)}
-.hero[data-hour]::before{opacity:1}
-.hero[data-hour=morning]::before{background:radial-gradient(60% 75% at 60% 22%,rgba(196,210,222,.11),transparent 70%)}
-.hero[data-hour=day]::before{background:radial-gradient(60% 80% at 76% 8%,rgba(244,240,232,.11),transparent 72%)}
-.hero[data-hour=gold]::before{background:radial-gradient(70% 75% at 96% 72%,rgba(var(--bronze-rgb),.32),transparent 72%),linear-gradient(0deg,rgba(var(--bronze-rgb),.1),transparent 32%)}
-@media (max-width:820px){.hero[data-hour=gold]::before{background:radial-gradient(90% 40% at 90% 36%,rgba(var(--bronze-rgb),.2),transparent 72%)}.hero[data-hour=day]::before{background:radial-gradient(90% 40% at 70% 10%,rgba(244,240,232,.07),transparent 70%)}.hero[data-hour=morning]::before{background:radial-gradient(90% 40% at 20% 14%,rgba(196,210,222,.075),transparent 70%)}}
-@media (prefers-reduced-motion:reduce){.hero::before{transition:none}}
-@media (forced-colors:active),print{.hero::before{display:none}}
+/* The veil under the copy: the hero's ink, full behind the headline and thinning evenly across the width, with no
+   curve of its own (an ellipse here drew a blob over the island's western palms at every width, and a band at 1440 x
+   1100); the photograph fades in on its own edge inside the veil's last third, and the tower's lit lobby and its
+   ground stand clear of it. */
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0%,rgba(var(--hero-rgb),.97) 26%,rgba(var(--hero-rgb),.84) 38%,rgba(var(--hero-rgb),.46) 48%,rgba(var(--hero-rgb),.14) 56%,rgba(var(--hero-rgb),0) 64%)}
+/* While the photograph stands (the canvas carries data-still), the hero rises over the page's sheet (site.css: z-index 5),
+   so the paper's grain lies on the copy's ink and never on the photograph: the hero lays its own grain, the same tile,
+   over the veil's ink alone, thinning with it. A browser without :has() keeps the sheet over the whole hero. */
+.hero:has(#heroModel[data-still]){z-index:6}
+.hero:has(#heroModel[data-still])::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url(grain.png);background-image:image-set(url(grain.avif) type("image/avif"),url(grain.png) type("image/png"));opacity:.55;-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%);mask-image:linear-gradient(90deg,#000 0%,#000 26%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 48%,rgba(0,0,0,.1) 56%,transparent 64%)}
+@media (max-width:820px){.hero:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px));mask-image:linear-gradient(0deg,#000 0%,#000 calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) - 32px),transparent calc(100% - clamp(46svh,100svh - 416px,56svh) + var(--rise,0px) + 16px))}}
+/* The photograph full bleed (home.js, framePhoto): beside the copy the veil is solid ink to the still's left edge (--va)
+   and thins to nothing across its soft edge (--vb), well short of the shaft, so the photograph comes out of the ink
+   with no seam and no wash on the tower, and the grain thins with it. The canvas fades in under the header, which so
+   stands on ink and never on the sky (--m0 to --m1), and, stacked, into the copy's ink below the podium (--m2 to --m3).
+   It carries one house grade at every hour: the sky's blue taken down, a little warmth, deeper shadows, so morning,
+   noon, the gold hour and the night read as one sheet with the ink, the ivory and the bronze. */
+.hero.plated::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0,rgb(var(--hero-rgb)) var(--va,40%),rgba(var(--hero-rgb),.72) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .3),rgba(var(--hero-rgb),.3) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .62),rgba(var(--hero-rgb),0) var(--vb,60%))}
+.hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%));mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%))}
+.hero.plated canvas{-webkit-mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%));mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%))}
+.hero.plated #heroModel[data-still]{filter:saturate(.62) sepia(.18) contrast(1.06) brightness(.94)}
+/* (noon a touch lighter: at full day the same grade made a grey, overcast sky of a clear one; home.js grades the air
+   beside it from this filter, whatever it is) */
+.hero.plated #heroModel[data-still=day]{filter:saturate(.68) sepia(.16) contrast(1.05) brightness(.98)}
+/* Beside the photograph, on a wide screen, the air (home.js, airPaint): the still's own sky, haze and bay run on under the
+   copy, its ink deepening toward the words, so the photograph opens into its own light and not into a black panel. Once
+   the photograph stands whole (.aired) the air comes in and the veil, and the ink under the buttons, go, since the air
+   carries its own ink; the paper's grain stays over it, lighter, so the copy still stands on the same sheet. The air
+   leaves with the photograph the same way. */
+.hero-air{pointer-events:none;opacity:0;transition:opacity .9s var(--ease-out)}
+.hero.aired .hero-air{opacity:1}
+.hero.plated::after,.hero.plated .row::before,.hero.plated:has(#heroModel[data-still])::before{transition:opacity .9s var(--ease-out)}
+.hero.aired::after,.hero.aired .row::before{opacity:0}
+.hero.aired:has(#heroModel[data-still])::before{opacity:.25}
+@media (prefers-reduced-motion:reduce){.hero-air,.hero.plated::after,.hero.plated .row::before,.hero.plated:has(#heroModel[data-still])::before{transition:none}}
+@media print{.hero-air{display:none}}
+@media (max-width:820px){
+  .hero.plated::after{background:none}
+  .hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(180deg,transparent calc(var(--plate-foot,50svh) - 48px),#000 var(--plate-foot,50svh));mask-image:linear-gradient(180deg,transparent calc(var(--plate-foot,50svh) - 48px),#000 var(--plate-foot,50svh))}
+}
 .hero .lede{font-size:var(--t-intro);color:var(--hero-lede);max-width:26.4em;margin-top:clamp(24px,3vw,34px)}
 .hero .coords{position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));top:calc(64px + clamp(28px,5vh,52px));display:flex;flex-wrap:wrap;gap:6px 26px;text-align:left;z-index:2;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);font-variant-numeric:tabular-nums}
 
@@ -1229,6 +1253,9 @@ html:not(.js) .step{min-height:auto}
    height-bound size, so the buttons stay above the fold with the longer lede */
 @media (min-width:821px) and (max-width:1180px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(calc(var(--t-hero) * .88),9.4vh)}}
 @media (min-width:821px) and (max-width:1180px) and (max-height:800px){:is(:lang(es),:lang(pt)) .hero h1{font-size:min(calc(var(--t-hero) * .88),8.6vh)}}
+/* the hero's canvas, standing finished, waits unseen for its photograph, then fades in whole (home.js, unveil) */
+#heroModel{transition:opacity .6s ease}
+#heroModel.wait{opacity:0;transition:none}
 
 /* The record band (tools/firm.py), when it is given, rides over the opening as the practices do */
 .firm-record{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}

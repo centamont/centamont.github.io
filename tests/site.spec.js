@@ -323,33 +323,100 @@ test('first visit plays the intro, then reveals the page', async ({ page }, info
   await expect(page.locator('#heroModel')).toHaveAttribute('data-built', '34');
 });
 
-// The hero is the drawing, start to finish: no photograph and no rendered tower is sent for, the bronze stands
-// unnamed by any count, and the hour's light lies on the sheet (morning, day, gold or night, from the Miami sun). On a
-// desktop the drawing rests as the still's camera frames it, with no loupe over it.
-test('the hero rests on the drawing, lit by the hour', async ({ page }, info) => {
+// The hero's tower is rendered in WebGL2 (tower3d.js) under one of its photographed stills where a real GPU can afford it
+// (tools/plates.mjs asks for one still by name); the test browser's GPU is emulated in software, which the renderer
+// declines, so the test asks for it outright. It takes over from the drawing without an error, and the drawing alone
+// stands where it is not asked for. (In a window narrower than the desktop hero, so the render stays in view.)
+test('hero tower renders in 3D under a still when asked, and is drawn otherwise', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'one engine is enough');
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.setViewportSize({ width: 1100, height: 720 });
+  await page.addInitScript(() => { window.__cmForce3D = true; window.__cmStill = 'day'; });
+  await page.goto('/');
+  await expect(page.locator('#heroModel')).toHaveAttribute('data-render', '3d', { timeout: 20000 });
+  // once it has faded in, the sky stands behind it as the canvas's background, or is laid on the canvas under the
+  // photograph if that has taken over already (without the intro the tower stands finished at once, so it soon does)
+  await expect.poll(() => page.locator('#heroModel').evaluate((c) => (c.dataset.still ? 'still' : c.style.backgroundImage)), { timeout: 10000 }).toMatch(/linear-gradient|still/);
+  expect(errors).toEqual([]);
+  const plain = await page.context().newPage();
+  await plain.setViewportSize({ width: 1100, height: 720 });
+  await plain.goto('/');
+  await expect(plain.locator('#heroModel')).toHaveAttribute('data-built', '34');
+  await plain.waitForTimeout(3000);
+  await expect(plain.locator('#heroModel')).not.toHaveAttribute('data-render', '3d');
+  expect(await plain.locator('#heroModel').evaluate((c) => c.style.backgroundImage)).toBe('');
+  await plain.close();
+});
+
+// Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
+// fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
+// screen. The developer story below stays drawn, with no photograph. Beside it on a desktop the still's own light runs
+// under the copy (the air); a phone has none. No count of sales stands over it: the tower is not a real project.
+test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }, info) => {
   const wide = info.project.name === 'desktop';
   const asked = [];
-  page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$|tower3d\.js/.test(r.url()) && asked.push(r.url()));
+  page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
+  await page.clock.install({ time: new Date('2026-10-24T05:41:00Z') });
   await page.goto('/');
   const hero = page.locator('#heroModel');
   await expect(hero).toHaveAttribute('data-built', '34');
-  await expect(page.locator('#top')).toHaveAttribute('data-hour', 'day');
-  await page.waitForTimeout(1500);
-  await expect(hero).not.toHaveAttribute('data-still', /./);
-  await expect(hero).not.toHaveAttribute('data-render', /./);
-  await expect(page.locator('.key-sold')).toHaveCount(0);
+  await expect(hero).toHaveAttribute('data-still', 'night', { timeout: 20000 });
   if (wide) {
-    await page.mouse.move(1280 * 0.75, 720 * 0.4);
-    await expect(page.locator('.hero')).not.toHaveClass(/loupe/);
+    await expect(page.locator('#top')).toHaveClass(/\baired\b/);
+    await expect(page.locator('.hero-air')).toBeVisible();
+  } else {
+    // a phone shows the photograph whole above the copy: no air
+    await expect(page.locator('#top')).not.toHaveClass(/\baired\b/);
   }
-  expect(asked).toEqual([]);
-  const night = await page.context().newPage();
-  await night.clock.install({ time: new Date('2026-10-24T05:41:00Z') });
-  await night.goto('/es/');
-  await expect(night.locator('#top')).toHaveAttribute('data-hour', 'night');
-  await night.close();
+  await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
+  await page.waitForTimeout(1500);
+  await expect(page.locator('.rise .elev img')).toHaveCount(0);
+  expect(asked).toHaveLength(1);
+  const day = await page.context().newPage();
+  const dayAsked = [];
+  day.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && dayAsked.push(r.url()));
+  await day.emulateMedia({ reducedMotion: 'reduce' });
+  await day.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
+  await day.goto('/');
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+  if (wide) await expect(day.locator('#top')).toHaveClass(/\baired\b/);
+  expect(dayAsked).toHaveLength(1);
+  expect(dayAsked[0]).toMatch(/\/hero\/day-[12]x\.webp$/);
+  await day.close();
+});
+
+// The photograph stands full bleed: on a phone it runs the screen's width under the caption line, the crown below the
+// caption and the copy under the podium (the plate's old square cut once came out empty there), and on a desktop no
+// loupe opens over it (it has no structure behind its glass to show).
+test('the hero photograph fills the phone\'s width and takes no loupe', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'each window size is opened here');
+  for (const [width, height] of [[390, 844], [390, 664], [768, 1024], [1363, 628]]) {
+    const phone = width <= 820;
+    const ctx = await browser.newContext({ viewport: { width, height }, isMobile: phone, hasTouch: phone, reducedMotion: 'reduce', baseURL: info.project.use.baseURL });
+    const page = await ctx.newPage();
+    await page.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
+    await page.goto('/');
+    const hero = page.locator('#heroModel');
+    await expect(hero).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+    const m = await page.evaluate(() => {
+      const c = document.getElementById('heroModel'), v = (k) => parseFloat(c.style.getPropertyValue(k)), h = document.getElementById('top');
+      return { plated: h.classList.contains('plated'), clip: c.style.clipPath, m1: v('--m1'), m2: v('--m2'), w: c.clientWidth, foot: parseFloat(h.style.getPropertyValue('--plate-foot')), note: document.querySelector('.hero .coords').getBoundingClientRect().bottom, h1: document.querySelector('.hero h1').getBoundingClientRect().top };
+    });
+    expect(m.plated, `${width}x${height}`).toBe(true);
+    expect(m.clip, `${width}x${height}`).toBe('');
+    expect(m.m2 - m.m1, `${width}x${height}: the photograph's open band`).toBeGreaterThan(phone ? 180 : 300);
+    if (phone) {
+      expect(m.foot, `${width}x${height}: the podium under the caption`).toBeGreaterThan(m.note + 150);
+      expect(m.h1, `${width}x${height}: the headline under the podium`).toBeGreaterThanOrEqual(m.foot - 25);
+    } else {
+      await page.mouse.move(width * 0.75, height * 0.3);
+      await expect(page.locator('.hero')).not.toHaveClass(/loupe/);
+    }
+    await ctx.close();
+  }
 });
 
 // The motion switch is a setting, not a section: on a wide screen it stands in the footer's legal line, written out,
@@ -358,6 +425,7 @@ test('the motion switch stands in the footer on a wide screen', async ({ page },
   test.skip(info.project.name !== 'desktop', 'phones keep it in the menu');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pt/');
+  await expect(page.locator('.key-sold')).toHaveCount(0);
   await expect(page.locator('header #motionBtn')).toHaveCount(0);
   await expect(page.locator('footer .legal #motionBtn')).toHaveAttribute('aria-label', 'Pausar animação');
   await page.setViewportSize({ width: 1000, height: 900 });

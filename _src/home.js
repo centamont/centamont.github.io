@@ -39,8 +39,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // The sun the drawing is lit by, in the words above. A phone shows it too, beside the caption,
   // so it is set before the drawing is framed under the note (and kept up to date with or without the clock).
   // (While a visitor holds the sun at another hour, the note states that hour and its sun.)
-  // (and the hour's light is laid on the drawing as a wash: home.css, .hero[data-hour])
-  const sunNote=d=>{const M=window.CentamontModel;if(M&&M.still)hero.dataset.hour=M.still(d);if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+sunLv[s.el>=45?2:s.el>=20?1:0]+', '+pts[Math.round(s.az/45)%8]:sunDown}};
+  const sunNote=d=>{if(window.CentamontSun&&sunline){const s=CentamontSun(d);sunline.textContent=s.el>0?sunUp+sunLv[s.el>=45?2:s.el>=20?1:0]+', '+pts[Math.round(s.az/45)%8]:sunDown}};
   sunNote();
   const tick=()=>{const d=heroM&&heroM.sunT!=null?new Date(heroM.sunT):new Date();sunNote(d);if(!clock||!clock.parentNode.offsetParent)return;try{clock.textContent=new Intl.DateTimeFormat(locale,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(d)}catch(e){}};
   setInterval(tick,30000);
@@ -58,15 +57,15 @@ document.addEventListener('DOMContentLoaded',function(){
   // tower above, the copy under it (home.css, .hero.stack). At the set size this never applies.
   let stack=false;
   const stacked=()=>{const s=!narrow&&!side()&&parseFloat(getComputedStyle(document.body).fontSize)>=27;if(s!==stack){stack=s;hero.classList.toggle('stack',s)}return narrow||stack};
-  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}:{phi:.13,dist:100,ty:mid&&!stillCam?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
+  const heroView=()=>{const mid=matchMedia('(max-width:1180px)').matches,wide=innerWidth>1600;return stacked()&&!side()?(photo?{phi:.13,dist:100,ty:19.7,scale:2,offsetX:.08}:{phi:.1,dist:92,ty:17.5,scale:2,offsetX:.08}):{phi:.13,dist:100,ty:mid&&!photo?21.3:19.7,scale:wide?2.2:2.0,offsetX:wide?.25:mid?.28:.22}};
   let heroTy=0,framed=false;
-  // The hero is the drawing, start to finish: the tower builds itself in line, its residences under contract in bronze,
-  // its levels named on a ruler, and it rests drawn, lit by this hour's sun. Beside the copy it is seen from where the
-  // still for this hour was made (model.js, STILLS: the bearing, the eye's height and the framing chosen for the sun at
-  // morning, day, gold or night), so it rests as the drawing the first second showed: no orbit and no tilt after the
-  // pointer. On a phone (and a phone held on its side) it is framed by the drawing's own measure, above the copy.
-  // (The still's camera is all that is read: the photograph itself is no longer shown on the home.)
-  const stillCam=Model&&Model.still&&!side()&&!mq.matches?Model.still():null;
+  // Once built, the finished tower is a photograph: the path-traced still for this hour of the Miami sun (morning, day,
+  // gold or night), made from the desktop hero's own camera (model.js, STILLS), on a phone as on a desktop. The drawing
+  // (labels, ruler, the residences under contract in bronze) stands only while it builds. With the photograph the
+  // camera stands where the still was made from (its bearing, height and distance; only the size and the framing follow
+  // the screen): no orbit, no tilt after the pointer, no ride up the façade. A phone held on its side keeps the drawing.
+  // (A test asks for one still by name.)
+  const photo=Model&&Model.stills&&Model.stills[window.__cmStill]?window.__cmStill:Model&&Model.still&&!side()?Model.still():null;
   // The hero is lit by this hour's sun, so it is seen from where the sun models it: by day the camera starts 35 degrees off
   // the sun's bearing and turns away from it as it builds and orbits, coming to rest up to 80 degrees off, so a lit face
   // and a shade side both show and the shadow falls in the open. The sun stands on the viewer's left (the shadow falls to
@@ -79,52 +78,132 @@ document.addEventListener('DOMContentLoaded',function(){
   // the first frame still stands 35 degrees off the sun (25 at the narrowest, with the sun just east of south).
   // The shadows' hatch runs along the line of sight at mid-sweep, so it never closes up on the low ground. After dark the
   // camera starts where it always has. (Bearings are compass degrees from the tower to the eye.)
-  const heroCam=(()=>{const o={th:-0.5,orbit:0.0009,idle:0.0003},s=window.CentamontSun&&CentamontSun();if(stillCam){const th=Model.stills[stillCam].th;return{th,orbit:0,idle:null,hatch:th*180/Math.PI+180}}if(!s||!(s.night<0.6))return o;
+  const heroCam=(()=>{const o={th:-0.5,orbit:0.0009,idle:0.0003},s=window.CentamontSun&&CentamontSun();if(photo){const th=Model.stills[photo].th;return{th,orbit:0,idle:null,hatch:th*180/Math.PI+180}}if(!s||!(s.night<0.6))return o;
     const A=s.az,lo=124,hi=236,left=A-lo>=50,off=Math.min(79.5,left?A-lo:hi-A),idle=Math.max(0.55,Math.min(2,(off-35-17)/14.3))/1e4,S=17+14.3e4*idle;
     let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
     const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
     o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
   // (on a wide screen the ruler's names grow with it, from 13px up to 16px at 2560)
-  // Beside the copy the drawing is framed as the still for this hour was, by the still's own features in its pixels: the
-  // crown's top, the quay and the shaft's axis (66, 784 and 345 down and across the 1x file). The camera stands where
-  // the still was made from, at its bearing and its eye's height; only the size and the shift of the lens follow the
-  // screen (the lens's rise sets where it stands up and down: phi follows, so the eye stays at the still's). The crown
-  // stands a margin under the header and the quay above the foot of the screen, the shaft a column clear of the
-  // headline and never nearer the window's edge than an eighth of it. Then the sheet stands a little left of that and a
-  // little smaller (SET), so the level ruler and the levels' names have the page's margin to stand in rather than the
-  // window's edge.
-  const ST={crown:66,quay:784,axis:345},SET={x:.072,s:.93};
-  const frameStill=v=>{const s=Model.stills[stillCam],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);
-    const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left,
-      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown))),Y=hb+tm-ST.crown*z,
-      textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl)),
-      X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);
+  // The photograph is framed by its own features, in the still's pixels: the crown's top, the podium, the quay and the
+  // shaft's axis (66, 660, 784 and 345 down and across the 1x file), the soft edge on its left (60) and the crown's left end (286). The camera stands
+  // where the still was made from, at its bearing and its eye's height; only the size and the shift of the lens follow
+  // the screen (the lens's rise sets where the still stands up and down: phi follows, so the eye stays at the still's).
+  // Beside the copy the crown stands a margin under the header and the quay above the foot of the screen, the shaft a
+  // column clear of the headline and never nearer the window's edge than an eighth of it; the veil's ink stands solid to
+  // the still's left edge (and the copy's) and thins to nothing across its soft edge, well short of the shaft, so the
+  // photograph comes out of the ink with no seam, no drawn sky beside it and no wash on the tower.
+  // Stacked (a phone, a tablet held upright), the still runs the full width, its soft edge off the screen and the shaft
+  // at a third of it, the crown under the caption line; the copy starts under the podium, the lawn fading into its ink.
+  const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+  // The hero opens on the drawing. While the tower draws itself, the sheet stands a little left of the photograph's
+  // framing and a little smaller (SET), so the level ruler and the levels' names have the page's margin to stand in
+  // rather than the window's edge; once the building is up the camera settles onto the still's own framing over 0.7 s
+  // as the photograph fades in, and the ruler goes with it. The photograph is laid where the tower stands, whatever the
+  // size and the shift of the lens, so it comes in during the move. (Motion off, or a phone, or a visitor who has seen
+  // the drawing before: the camera stands at the photograph's framing from the first frame.)
+  const SET={x:.072,s:.93,ms:700};
+  let settle=1,settleAt=0,phTgt=null;
+  const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
+  const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
+    if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
+    else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
+      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown)));Y=hb+tm-ST.crown*z;
+      const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
+      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
-    Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H)*SET.s,offsetX:(cx-W/2)/W-SET.x});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)))};
+    Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
+    // beside the copy, the drawing stands where the settle has it until the building is up (see SET)
+    phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();
+    // the canvas fades in under the header (so the header stands on the hero's ink, never on the sky) and, stacked,
+    // into the copy's ink between the podium and the quay
+    const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
+    ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
+    airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
+  // The air beside the photograph (wide screens). The still ends a little left of its shaft, so beside the copy there
+  // is no picture, and black there made the photograph a print pasted on a dark slide, noon beside midnight. So the
+  // still's own light runs on under the copy: its sky, the haze on its horizon and, under that, its bay, read row by
+  // row from the scene right of the shaft (the brightest third of each row, so the shaft and the shadows don't darken it)
+  // and laid across. Next to the still the rows keep their detail; toward the window's edge they melt into one soft fall
+  // of light. Under the horizon the bay is laid in at a little over half its light (bayK), since beside the copy the
+  // photograph has its lawn and its quay there, not open water: the hero's foot is one deep ink rather than a bright
+  // band with the picture dark beside it. Nothing is made up: no cloud, tower or wave, only the still's own colours, in its own grade. The air
+  // covers the still's soft left edge and gives way to the photograph over the next 130 of its pixels, short of the
+  // shaft, and the hero's ink deepens over it toward the copy, so every line of it reads as it did on ink (4.5:1 at
+  // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
+  // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
+  // A phone shows the photograph whole above the copy and needs none.
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,head:[.66,.52,200],lede:[.8,.7,240],note:[.62,.52,160]};
+  let air=null,airAt=null,airRows=null,airKey='';
+  // (the house grade, as the stylesheet's filter has it on the photograph at this hour, read off the canvas: home.css,
+  // saturate sepia contrast brightness, the first two as one matrix)
+  const gradeOf=c=>{const f=getComputedStyle(c).filter||'',n=(k,d)=>{const m=f.match(new RegExp(k+'\\(([\\d.]+)'));return m?+m[1]:d},s=n('saturate',1),q=1-n('sepia',0),ct=n('contrast',1),br=n('brightness',1),
+    S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
+    P=[.393+.607*q,.769-.769*q,.189-.189*q,.349-.349*q,.686+.314*q,.168-.168*q,.272-.272*q,.534-.534*q,.131+.869*q],M=[];
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++)M.push(P[i*3]*S[j]+P[i*3+1]*S[3+j]+P[i*3+2]*S[6+j]);
+    return(r,g,b)=>[0,1,2].map(i=>{const v=Math.min(255,M[i*3]*r+M[i*3+1]*g+M[i*3+2]*b);return Math.min(255,Math.max(0,Math.min(255,((v/255-.5)*ct+.5)*255))*br)})};
+  // the light right of the shaft, row by row, read off the hero's canvas once the photograph stands whole there (so over
+  // the drawn sky its soft top fades into), at a quarter of the screen's size: the sky and the haze, then, from just
+  // above the horizon, the bay's own tone; each row softened a little (near) and a lot (far)
+  const airRead=a=>{const c=heroM.c,k=c.width/a.W,x0=a.X+AIR.from*a.z,x1=Math.min(a.W,a.X+AIR.to*a.z),w=Math.round((x1-x0)/4),h=Math.ceil(a.H/4);if(w<4)return null;
+    const t=document.createElement('canvas');t.width=w;t.height=h;const q=t.getContext('2d',{willReadFrequently:true});q.drawImage(c,x0*k,0,(x1-x0)*k,a.H*k,0,0,w,h);
+    const grade=gradeOf(c),d=q.getImageData(0,0,w,h).data,row=new Float32Array(h*3),lum=new Float32Array(w),idx=[...Array(w).keys()],keep=Math.max(1,Math.round(w*.3));
+    for(let y=0;y<h;y++){for(let i=0;i<w;i++){const o=(y*w+i)*4;lum[i]=.2126*d[o]+.7152*d[o+1]+.0722*d[o+2]}
+      idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
+      row.set(grade(r/keep,gg/keep,b/keep),y*3)}
+    const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
+    for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
+    const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
+      for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
+    return{h,near:blur(6*a.z),far:blur(14*a.z)}};
+  // laid across, at the same quarter size: the near rows by the still, the far ones toward the window's edge, the ink
+  // deepening toward the copy (from AIR.ink's first at the window's edge to its second at the copy's right edge, and
+  // to none just past the still's soft edge); opaque over that soft edge, then giving way to the photograph
+  const airPaint=()=>{const a=airAt;
+    if(!a){if(air)air.hidden=true;return}if(!airRows)return;
+    if(!air){air=document.createElement('canvas');air.className='hero-air';air.setAttribute('aria-hidden','true');heroM.c.after(air)}
+    air.hidden=false;air.style.setProperty('--m0',a.m0+'px');air.style.setProperty('--m1',a.m1+'px');
+    const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
+    const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
+      x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
+    // (the ink at x: from l at the window's edge to r at the copy's right edge R, then easing to none 240px past it, or by the
+    // still's soft edge; over the lede and the buttons, and over the survey note, it runs deeper, to their own right edges)
+    const ramp=(x,l,r,R)=>{const U=Math.max(R+240,x0);if(x<R)return l+(r-l)*x/R;const q=Math.min(1,Math.max(0,(U-x)/(U-R)));return r*q*q*(3-2*q)};
+    for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
+      for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),Math.max(vt,R),bl,br])}
+      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),o=(j*w+i)*4;let t=ramp(x,tl,tr,vt);
+        for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
+        // (and nowhere in the air less than a little ink, until the photograph takes over: its haze stays a tone of the
+        // ink rather than a pale cloud between the copy and the picture)
+        t=Math.max(t,AIR.veil*(1-u*u*(3-2*u)));
+        for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
+    g.putImageData(im,0,0)};
   const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
-    Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
+    // the drawing is named while it builds, beside the copy; under the photograph on a phone, where it runs the full
+    // width, there is no margin for a ruler, so the tower there draws unnamed as it always has
+    heroM.o.labels=heroM.o.guides=!(photo&&narrow);Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;
     // on a phone the crown stays below the survey note and the tower stands clear of the headline
     const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offsetParent)t+=e.offsetTop;return t};
     if(narrow){const up=!side(),note=document.querySelector('.hero .coords'),c=heroM.c.getBoundingClientRect(),nb=note&&note.offsetParent?note.getBoundingClientRect().bottom-c.top:64;
       // on a short phone held upright the fold never cuts through the first button: if a little closing up (24px at most)
       // shows it whole, the copy closes up under the drawing; if not, the copy steps down so the button starts under the fold
-      hero.style.removeProperty('--rise');
+      // (the photograph is framed first: the copy starts under its podium)
+      hero.style.removeProperty('--rise');if(photo)framePhoto(v,true,nb);
       const btn=up&&wrap.querySelector('.row .btn');if(btn){const t=hero.offsetTop+at(btn),need=Math.ceil(t+btn.offsetHeight-(innerHeight-14));if(t<innerHeight&&need>0)hero.style.setProperty('--rise',(need<=24?need:-Math.ceil(innerHeight-t))+'px')}
-      // and the drawing's ground stays 52px above the headline (its grid runs on past the ground line), so the podium and its hatch never touch the type; the crown
+      // and the drawing's ground stays 28px above the headline, so the podium and its hatch never touch the type; the crown
       // stands 14px under the caption, or 10px under the sun line where that closes the note (its line has no descenders)
-      const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-52)):c.height*.22;
+      const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-28)):c.height*.22;
       const top=nb+(sunline&&sunline.offsetParent?10:14);
-      const f=heroM.fit(heroCam.th,v.phi,{margin:[top,0,gb,0],vOnly:true,maxScale:v.scale});heroM.o.ty=f.ty;heroM.o.scale=f.scale;
+      if(!photo){const f=heroM.fit(heroCam.th,v.phi,{margin:[top,0,gb,0],vOnly:true,maxScale:v.scale});heroM.o.ty=f.ty;heroM.o.scale=f.scale}
       // upright, the tower and its ruler stand as one group on the screen's centre line
-      if(up){const b=heroM.fit(heroCam.th,v.phi,{measure:true});heroM.o.offsetX+=(heroM.w/2-(b.x0+b.x1)/2)/heroM.w}}
+      if(up&&!photo){const b=heroM.fit(heroCam.th,v.phi,{measure:true});heroM.o.offsetX+=(heroM.w/2-(b.x0+b.x1)/2)/heroM.w}}
     // and the level ruler's labels end where the page's column does, under the header's last button: the tower moves
     // left as far as the headline allows, then draws smaller, keeping its left edge (a tablet held upright, whose width
     // sizes the tower, needs the most). Where the column leaves a wide margin beside it, the tower gives up no more than
     // a fifth of its size for that, and past it only keeps off the screen's edge. The sun's path ends on the labels' line.
-    const still=stillCam&&!narrow;if(still)frameStill(v);
+    if(photo&&!narrow)framePhoto(v,false);
     const W=heroM.w,col=wrap.offsetLeft+wrap.offsetWidth-parseFloat(getComputedStyle(wrap).paddingRight),box=()=>heroM.fit(heroCam.th,v.phi,{measure:true});
     const textR=narrow&&!side()?-1e9:Math.max(...[...hero.querySelectorAll('h1,.lede,.row .btn,.row .write')].map(e=>e.getBoundingClientRect().right))+64;let b=box();
-    if(!still)for(const [edge,floor] of [[Math.min(W-18,col),W-col>100?.8:.55],[W-18,.55]]){let over=b.x1-edge;if(over<=.5)continue;
+    if(!photo)for(const [edge,floor] of [[Math.min(W-18,col),W-col>100?.8:.55],[W-18,.55]]){let over=b.x1-edge;if(over<=.5)continue;
       const sh=Math.min(over,Math.max(0,b.x0-textR));heroM.o.offsetX-=sh/W;over-=sh;
       for(let i=0;i<8&&over>.5&&heroM.o.scale>v.scale*floor+1e-6;i++){b=box();heroM.o.scale*=Math.max(floor*v.scale/heroM.o.scale,1-over/(b.x1-b.x0));const b2=box();heroM.o.offsetX+=(b.x0-b2.x0)/W;over=box().x1-edge}
       b=box()}
@@ -133,13 +212,18 @@ document.addEventListener('DOMContentLoaded',function(){
     heroM.o.groundLabel=narrow||side();
     // stacked, the group stands on the centre line and the ruler's labels take the corner the sun's path would use
     heroM.o.sunPath=!narrow||side();
-    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce?0:Math.min(1,scrollY/innerHeight)*9);
+    heroTy=heroM.o.ty;heroM.o.ty=heroTy+(reduce||photo?0:Math.min(1,scrollY/innerHeight)*9);
+    // the photograph is sent for once the drawing is first framed, so its size is chosen for the size it is shown at (a
+    // phone's tower is drawn small enough for the lighter file, which is a quarter of the pixels to decode and lay down)
+    if(photo&&!heroM.ph)heroM.photo(photo,'/hero/',true);
     heroM.touch()};
   // A drawing that cannot start (no canvas, an old engine) costs only itself: the rest of the page carries on without it.
   const make=(id,o)=>{try{const m=new Model(document.getElementById(id),o);return m.dead?null:m}catch(e){return null}};
+  // the drawing is seen building only where the curtain parts on it: a first visit, on a wide screen, with motion on
+  if(photo&&!reduce&&window.CentamontIntro&&!matchMedia('(max-width:820px)').matches)settle=0;
   if(Model){
     // (the drawing's resize observer frames it in its first frame, before it draws; an engine without one frames it now)
-    heroM=make('heroModel',{turn:stillCam&&Model.stills[stillCam].turn||0,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
+    heroM=make('heroModel',{turn:photo&&Model.stills[photo].turn||0,real3d:true,order:'top',orbit:heroCam.orbit,orbitIdle:heroCam.idle,hatch:heroCam.hatch,rate:34,slow:2,soldRate:60,cascadeK:4,theta:heroCam.th,labels:true,dimSide:1,palms:false,guides:true,sunPath:true,onResize:()=>{narrow=mq.matches;frameHero()}});
     if(heroM){if(!window.ResizeObserver)try{frameHero()}catch(e){}models.push(heroM);
       // the headline's own type sets where the copy sits, so the framing is taken again once the fonts are in
       // (unless the first framing is still to come: it will see them)
@@ -149,12 +233,12 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   if(heroM){
     // the tilt that follows the pointer is motion too: with motion off the drawing holds still
-    if(!reduce&&!stillCam)addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
+    if(!reduce&&!photo)addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&scrollY<innerHeight)heroM.pointer(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
     // A loupe over the tower on desktop: it shows the structure behind the glass.
     const heroEl=document.querySelector('.hero');
     // (only beside the headline: a window narrowed to the phone layout puts the tower above it, and the loupe goes; and
-    // only where the drawing turns: beside the copy it rests as the still's camera has it)
-    if(heroEl&&!stillCam&&matchMedia('(hover:hover) and (pointer:fine)').matches){
+    // only over the drawing: the photograph has no structure to show behind its glass)
+    if(heroEl&&!photo&&matchMedia('(hover:hover) and (pointer:fine)').matches){
       heroEl.addEventListener('pointermove',e=>{const r=heroEl.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
         const on=!narrow&&!stack&&x>r.width*.52&&!e.target.closest('a,button,.coords,.scrub'),was=!!heroM.lens;heroM.lens=on?{x,y,r:Math.min(96,r.width*.07)}:null;heroEl.classList.toggle('loupe',on);if(on||was)heroM.touch()},{passive:true});
       heroEl.addEventListener('pointerleave',()=>{heroM.lens=null;heroEl.classList.remove('loupe');heroM.touch()});
@@ -183,19 +267,34 @@ document.addEventListener('DOMContentLoaded',function(){
         if(m.sunT!==noteT){noteT=m.sunT;tick()}};
     }
   }
+  // The photograph stands full bleed on the hero's ink (home.css, .hero.plated): the veil and the canvas's own fades,
+  // which framePhoto() places, take its soft edges, so nothing is cut square.
+  if(heroM&&photo)hero.classList.add('plated');
+  // the camera settles onto the photograph's framing once the building stands (see SET), and the drawing's names go out
+  // with the ruler as the photograph comes in
+  if(heroM&&photo&&settle<1){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);
+    if(settle>=1||!phTgt)return;
+    if(!(m.L>=34-1e-6&&m.G>=1&&m.occ>=1))return;
+    const now=performance.now();if(!settleAt)settleAt=now;
+    settle=Math.min(1,(now-settleAt)/SET.ms);settleTo();m.touch()}}
+  // and once it stands whole, the air beside it (see airPaint) comes in as the veil it replaces goes (home.css, .aired)
+  if(heroM&&photo){const was=heroM.o.onFrame;heroM.o.onFrame=m=>{if(was)was(m);const on=m.sa>=1&&!!airAt;if(on&&!airRows){try{airRows=airRead(airAt)}catch(e){airAt=null}airPaint()}hero.classList.toggle('aired',on&&!!airRows)}}
   document.addEventListener('cm-theme',()=>models.forEach(m=>m.colors()));
 
   // Intro: a hundred blows, counted and parted by the curtain's own script (just after its markup), from the first paint.
   // The hero tower then sells as the curve below has it by completion (46 of its 62 residences, about three quarters),
   // its sold residences standing in the sketch before the frame rises into them: the pre-sale threshold is met as ground breaks.
   // It goes up briskly (sales at 60 levels' worth a second, the frame at 34 levels a second, its rooms lit in about
-  // half a second after dark), so the finished tower stands about two seconds after it starts.
+  // half a second after dark), so the finished tower, and its photograph (fetched at once), stand about two seconds after it starts.
   // It starts as the halves part. Until then it is drawn once, under the curtain, and holds still; if they have already
   // parted (a slow connection), it starts now, behind the open page. Without the curtain's script there is no intro.
   // Without an intro (a return visit, a phone, motion off) the build has been seen or is not wanted: the tower stands
-  // finished from the first frame.
+  // finished from the first frame, and its photograph, fetched at once, fades in as soon as it is decoded.
+  // Standing finished, the tower waits unseen for its photograph (or 1.2 s at most), then the canvas fades in whole on the
+  // compositor (home.css, #heroModel.wait): the drawn tower never shows for a moment before the photograph replaces it.
   const intro=window.CentamontIntro;let started=false;
-  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro)heroM.set(34,23,false,true);else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
+  const unveil=()=>{if(!heroM||!photo||reduce)return;const c=heroM.c;c.classList.add('wait');let t=0;const go=()=>{clearTimeout(t);mo.disconnect();c.classList.remove('wait')},mo=new MutationObserver(()=>{if(c.dataset.still)go()});mo.observe(c,{attributes:true,attributeFilter:['data-still']});t=setTimeout(go,1200)};
+  const startHero=()=>{if(started)return;started=true;if(heroM){heroM.hold(false);if(!intro){unveil();heroM.set(34,23,false,true)}else{heroM.sketch();setTimeout(()=>heroM.set(0,14,false),reduce?0:100);setTimeout(()=>heroM.set(34,23,false),reduce?0:300)}}hero.classList.add('lit')};
   if(!intro)root.classList.remove('intro-on');
   if(intro&&!intro.open&&root.classList.contains('intro-on')){if(heroM)heroM.hold(true);intro.go=startHero}else startHero();
   // The open menu covers the page below the header, so its drawings run no frames until it closes (the hero only once
@@ -207,7 +306,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // carries them past the hero's foot and under the next sheet. A short or zoomed window, whose copy runs well below the
   // fold, keeps the copy still.
   if(heroM&&!reduce){let q=0,lp=-1,sink=true;const row=hero.querySelector('.wrap .row'),fits=()=>{let rb=row?row.offsetHeight:0;for(let e=row;e&&e!==hero;e=e.offsetParent)rb+=e.offsetTop;sink=!row||.42*Math.max(0,hero.offsetTop+rb-innerHeight)<=.58*(hero.offsetHeight-rb);lp=-1;onScroll()};
-    const onScroll=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);if(p===lp)return;lp=p;heroM.o.ty=heroTy+p*9;heroM.touch();hero.style.setProperty('--p',sink?p.toFixed(4):'0')})};
+    const onScroll=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;const p=Math.min(1,scrollY/innerHeight);if(p===lp)return;lp=p;if(!photo){heroM.o.ty=heroTy+p*9;heroM.touch()}hero.style.setProperty('--p',sink?p.toFixed(4):'0')})};
     addEventListener('scroll',onScroll,{passive:true});let fw=innerWidth;addEventListener('resize',()=>{if(innerWidth!==fw){fw=innerWidth;fits()}});
     // (the observer measures the copy in the first frame, where the page is laid out anyway)
     if(window.ResizeObserver){new ResizeObserver(fits).observe(hero);onScroll()}else fits()}
