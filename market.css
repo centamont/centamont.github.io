@@ -271,6 +271,9 @@
 .mk-el.cy .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
 .mk-el.cy .tn.r2{fill-opacity:.065}.mk-el.cy .tn.r3{fill-opacity:.035}
 .mk-el.cy .isl{stroke:none}
+.mk-el.hp .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el.hp .ob.far{stroke-width:calc(var(--lw-object) * var(--fu) * .7)}
+.mk-el.hp :is(.hatch,.dt.q){stroke-width:calc(var(--lw-hatch) * var(--fu) * .7)}
 :root[data-theme="dark"] .mk-el.np .tn.sand{fill-opacity:.12}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mk-el.np .tn.sand{fill-opacity:.12}}
 .mk-el.hd.cy[data-crop]{aspect-ratio:var(--pd,var(--pa))}
