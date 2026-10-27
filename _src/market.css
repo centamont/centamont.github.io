@@ -313,6 +313,8 @@
    cropped: it keeps its full width and pans sideways in its frame, with its labels, so every tower can be reached. */
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
 .mk-el .pn{display:none}
+/* a second key to the two lines, over the phone's first view of a skyline that opens far from its own key (Miami) */
+.mk-el .lgp{display:none}
 /* (Houston's numbers stand over a dense cluster, so each keeps a margin of paper) */
 .mk-el.hx .nk text{stroke:var(--sheet);stroke-width:6px;stroke-linejoin:round;paint-order:stroke}
 /* (the towers it does not name keep their outline but quieten their floor lines, so the named ones lead) */
@@ -325,6 +327,8 @@
    not yet standing keeps its whole facade, paler, inside its dashed outline; the towers behind are lighter still. The key in
    the top corner (.lg) says what the dash means. */
 .mk-el.hd{aspect-ratio:2/1}
+/* (Miami's frame leaves out the empty sky above its tallest tower) */
+.mk-el.hd.mi{aspect-ratio:1200/504}
 .mk-el.hd .md{stroke-width:calc(var(--lw-object) * var(--fu));opacity:.8}
 .mk-el.hd .fut .dt{opacity:.42}.mk-el.hd .fut .dt.q{opacity:.24}.mk-el.hd .fut .dt.md{opacity:.6}.mk-el.hd .fut .ob{opacity:.75}
 .mk-el.hd .bk{opacity:.42}
@@ -334,6 +338,10 @@
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 /* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
 .mk-el.mi .fut .wb{stroke-opacity:.5}
+/* (its planned towers' dashed outlines a step lighter again, so the standing city leads) */
+.mk-el.mi .fut .ob{opacity:.6}
+/* (and each planned tower as a whole a step back in tone, so the built city reads first and the planned one as a layer) */
+.mk-el.mi .fut{opacity:.78}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
    (glass dark toward the street, stone a breath darker at its foot) and by its reflection in the river; the city behind in
    hairline and in three planes of tone, palest furthest off, so the towers stand clear of it */
@@ -348,6 +356,11 @@
 .mk-el.cy .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
 .mk-el.cy .tn.r2{fill-opacity:.065}.mk-el.cy .tn.r3{fill-opacity:.035}
 .mk-el.cy .isl{stroke:none}
+/* the Hamptons in three weights: its landmarks heaviest, the edges of its ground lighter, its grass, fences and surf the
+   lightest, so the buildings read first */
+.mk-el.hp .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el.hp .ob.far{stroke-width:calc(var(--lw-object) * var(--fu) * .7)}
+.mk-el.hp :is(.hatch,.dt.q){stroke-width:calc(var(--lw-hatch) * var(--fu) * .7)}
 /* (Naples' beach keeps a little moonlight at night, so the band between the sea grape and the water reads as sand, not as a
    road; by day it stays paper) */
 :root[data-theme="dark"] .mk-el.np .tn.sand{fill-opacity:.12}
@@ -391,6 +404,7 @@
   .mk-el-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el.hd{width:1100px;aspect-ratio:2/1}
+  .mk-el-pan .mk-el.hd.mi{aspect-ratio:1200/504}
   /* the other cities' skylines pan a little narrower and give up the empty sky above their highest mark (--pa, written
      with each drawing), so a city page stays within its sixteen screens */
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
@@ -399,6 +413,7 @@
   /* (a village name set in the ground, too small to read at a phone's width, gives way to the key) */
   .mk-el-pan .mk-el .dsk text{display:none}
   /* (a skyline whose key folds under its caption names the towers it opens on beside their numbers, here only) */
+  .mk-el-pan .mk-el .lgp{display:inline}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
