@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded',function(){
   // A phone shows the photograph whole above the copy and needs none.
   const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,head:[.66,.52,200],lede:[.8,.7,240],note:[.62,.52,160]};
   let air=null,airAt=null,airRows=null,airKey='';
-  // (the house grade, as the stylesheet's filter has it on the photograph at this hour, read off the canvas: home.css,
-  // saturate sepia contrast brightness, the first two as one matrix)
+  // (any filter the stylesheet lays on the photograph, read off the canvas, whose pixels come unfiltered: saturate sepia
+  // contrast brightness, the first two as one matrix; none today, since the stills carry their own grade)
   const gradeOf=c=>{const f=getComputedStyle(c).filter||'',n=(k,d)=>{const m=f.match(new RegExp(k+'\\(([\\d.]+)'));return m?+m[1]:d},s=n('saturate',1),q=1-n('sepia',0),ct=n('contrast',1),br=n('brightness',1),
     S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
     P=[.393+.607*q,.769-.769*q,.189-.189*q,.349-.349*q,.686+.314*q,.168-.168*q,.272-.272*q,.534-.534*q,.131+.869*q],M=[];
