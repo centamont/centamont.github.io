@@ -105,14 +105,11 @@ document.addEventListener('DOMContentLoaded',function(){
   let settle=1,settleAt=0,phTgt=null;
   const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
   const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
-    if(narrow){const kp=hero.querySelector('.key-sold');if(kp)kp.classList.remove('on');z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
+    if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
     else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
       z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown)));Y=hb+tm-ST.crown*z;
       const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
-      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot');
-      // the bronze's count, which the drawing names over its ruler, stands with the photograph too: by the crown, on its
-      // left, in the still's own sky (or nowhere, if the copy leaves it no room)
-      const kp=hero.querySelector('.key-sold');if(kp){kp.classList.add('ph','on');const kw=kp.offsetWidth,kr=Math.round(X+ST.crown2*z-24),ky=Math.round(Y+ST.crown*z+8),on=kr-kw>textR+32&&ky>hb+12;kp.classList.toggle('on',on);if(on){kp.style.left=c.offsetLeft+kr-kw+'px';kp.style.top=c.offsetTop+ky+'px';const nb=lb.find(b=>b[0]<0);if(nb){nb[1]=Math.max(nb[1],ky+kp.offsetHeight);nb[2]=Math.max(nb[2],kr)}}}}
+      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
     Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
     // beside the copy, the drawing stands where the settle has it until the building is up (see SET)
@@ -135,7 +132,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
   // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
   // A phone shows the photograph whole above the copy and needs none.
-  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:250,ink:[.56,.24],head:[.46,.3,160],lede:[.68,.58,220],note:[.62,.52,160]};
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,head:[.66,.52,200],lede:[.8,.7,240],note:[.62,.52,160]};
   let air=null,airAt=null,airRows=null,airKey='';
   // (the house grade, as the stylesheet's filter has it on the photograph at this hour, read off the canvas: home.css,
   // saturate sepia contrast brightness, the first two as one matrix)
@@ -157,7 +154,7 @@ document.addEventListener('DOMContentLoaded',function(){
     for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
     const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
       for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
-    return{h,near:blur(2.5*a.z),far:blur(11*a.z)}};
+    return{h,near:blur(6*a.z),far:blur(14*a.z)}};
   // laid across, at the same quarter size: the near rows by the still, the far ones toward the window's edge, the ink
   // deepening toward the copy (from AIR.ink's first at the window's edge to its second at the copy's right edge, and
   // to none just past the still's soft edge); opaque over that soft edge, then giving way to the photograph
@@ -168,13 +165,16 @@ document.addEventListener('DOMContentLoaded',function(){
     const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
     const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
       x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
-    // (the ink at x: from l at the window's edge to r at the copy's right edge R, then to none 60px past it, or by the
+    // (the ink at x: from l at the window's edge to r at the copy's right edge R, then easing to none 240px past it, or by the
     // still's soft edge; over the lede and the buttons, and over the survey note, it runs deeper, to their own right edges)
-    const ramp=(x,l,r,R)=>{const U=Math.max(R+60,x0);return x<R?l+(r-l)*x/R:r*Math.min(1,Math.max(0,(U-x)/(U-R)))};
+    const ramp=(x,l,r,R)=>{const U=Math.max(R+240,x0);if(x<R)return l+(r-l)*x/R;const q=Math.min(1,Math.max(0,(U-x)/(U-R)));return r*q*q*(3-2*q)};
     for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
       for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),Math.max(vt,R),bl,br])}
       for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),o=(j*w+i)*4;let t=ramp(x,tl,tr,vt);
         for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
+        // (and nowhere in the air less than a little ink, until the photograph takes over: its haze stays a tone of the
+        // ink rather than a pale cloud between the copy and the picture)
+        t=Math.max(t,AIR.veil*(1-u*u*(3-2*u)));
         for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
     g.putImageData(im,0,0)};
   const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
@@ -267,13 +267,6 @@ document.addEventListener('DOMContentLoaded',function(){
         if(m.sunT!==noteT){noteT=m.sunT;tick()}};
     }
   }
-  // Where the hero is the drawing (by day, or on a phone held on its side), its bronze is named over its level ruler, in
-  // the names' column above the roof: the residences under contract, as the hero stands once built, read as the story's
-  // gauge reads them (home.css, .key-sold). It heads the ruler, its right edge on the names' own, inside the window;
-  // it goes where it would meet the header or where the tower stands above the copy, either of which leaves it no room.
-  // The photograph has no bronze to name.
-  const keyEl=hero.querySelector('.key-sold');
-  if(heroM&&keyEl&&!photo){const was=heroM.o.onFrame;let kk='';heroM.o.onFrame=m=>{if(was)was(m);const r=m.rb,c=m.c,y=r?Math.round(c.offsetTop+r.y0-(keyEl.offsetHeight||50)-14):0,on=!!r&&!stacked()&&m.L>33.5&&y>=(header?header.offsetHeight:64)+12,k=on?Math.round(r.x0)+','+y:'';if(k===kk)return;kk=k;keyEl.classList.toggle('on',on);if(on){keyEl.style.left=Math.round(Math.min(c.offsetLeft+r.x1-6,innerWidth-16)-keyEl.offsetWidth)+'px';keyEl.style.top=y+'px'}}}
   // The photograph stands full bleed on the hero's ink (home.css, .hero.plated): the veil and the canvas's own fades,
   // which framePhoto() places, take its soft edges, so nothing is cut square.
   if(heroM&&photo)hero.classList.add('plated');
