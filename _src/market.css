@@ -348,6 +348,11 @@
 .mk-el.cy .rf{stroke-width:calc(var(--lw-hatch) * var(--fu) * .8)}
 .mk-el.cy .tn.r2{fill-opacity:.065}.mk-el.cy .tn.r3{fill-opacity:.035}
 .mk-el.cy .isl{stroke:none}
+/* the Hamptons in three weights: its landmarks heaviest, the edges of its ground lighter, its grass, fences and surf the
+   lightest, so the buildings read first */
+.mk-el.hp .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
+.mk-el.hp .ob.far{stroke-width:calc(var(--lw-object) * var(--fu) * .7)}
+.mk-el.hp :is(.hatch,.dt.q){stroke-width:calc(var(--lw-hatch) * var(--fu) * .7)}
 /* (Naples' beach keeps a little moonlight at night, so the band between the sea grape and the water reads as sand, not as a
    road; by day it stays paper) */
 :root[data-theme="dark"] .mk-el.np .tn.sand{fill-opacity:.12}
