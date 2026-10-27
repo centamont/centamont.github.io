@@ -425,3 +425,4 @@ main.page > .wrap > .cover + .standfirst{margin-top:clamp(36px,4.4vw,56px)}
   .ms,main.page:not(.wide):not(.lot) > .wrap > .ms{max-width:min(100%,880px - var(--gl) - var(--gr))}
 }
 @media (max-width:1139px){.prose .side{display:none}}
+.prose .side.long b{font-size:50px;line-height:.95}

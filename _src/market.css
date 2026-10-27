@@ -555,3 +555,5 @@ main.page > .wrap > .cover + .standfirst{margin-top:clamp(36px,4.4vw,56px)}
    margin beside their section. Narrower, the paragraph beside each already gives its number, so the column keeps its
    full measure and a phone its length */
 @media (max-width:1139px){.prose .side{display:none}}
+/* a figure written out in full, a sum in thousands, is set smaller so it keeps inside the side's measure */
+.prose .side.long b{font-size:50px;line-height:.95}
