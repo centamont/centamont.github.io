@@ -462,21 +462,6 @@ html.js .rise .steps{grid-column:8/-1}
 .gauge .fill,.gauge .lim::before{background:CanvasText}
 }
 @media (min-width:821px) and (max-width:1180px){.gauge{align-items:end}}
-/* the hero's key to its bronze, over the level ruler (home.js places it): the gauge's own reading, the bronze swatch and
-   "Under contract" in the ruler's 13px caps over the count in display numerals */
-.key-sold{position:absolute;z-index:2;display:none;flex-direction:column;align-items:flex-end;gap:2px;margin:0;color:var(--hero-lede);white-space:nowrap;pointer-events:none}
-.key-sold .k{display:inline-flex;align-items:center;gap:8px;font:500 13px/1.3 var(--body);letter-spacing:.12em;text-transform:uppercase}
-.key-sold i{flex:none;width:14px;height:10px;background:rgba(var(--bronze-rgb),.45);border-bottom:1px solid var(--accent)}
-.key-sold .n{font:400 15px/1 var(--body);letter-spacing:.06em;color:var(--hero-lede)}
-.key-sold b{font:300 30px/1 var(--display);font-variant-numeric:lining-nums tabular-nums;letter-spacing:0;color:var(--accent)}
-.js .key-sold.on{display:flex}
-/* with the photograph (home.js, framePhoto) it stands by the crown, in the air, and comes in with it; the swatch and the
-   bronze go, as the photograph's floors are not bronze */
-.key-sold.ph{opacity:0;transition:opacity .9s var(--ease-out) .3s}
-.key-sold.ph i{display:none}
-.key-sold.ph b{color:var(--ivory)}
-.hero.aired .key-sold.ph{opacity:1}
-@media (prefers-reduced-motion:reduce){.key-sold.ph{transition:none}}
 /* The home reads in one sitting: it carries the hero, the building that draws itself, the instrument, the private door,
    the markets and the letter, and nothing twice. What the sections gave up in length they keep in pace, so the sheets
    stand closer together here than on a page that is read rather than scrolled. */
@@ -761,6 +746,20 @@ html:not(.js) :is(.seam,.vein){display:none}
 .hero{position:relative;background:rgb(var(--hero-rgb));color:var(--ivory);overflow:hidden;min-height:100svh;display:grid;align-items:end;--line:var(--ivory);--sold:var(--bronze-500);--sold-line:var(--bronze-500);isolation:isolate}
 .hero.loupe{cursor:none}
 
+/* The scroll cue: one bronze hairline at the column's left edge, under the buttons, with the word beside its foot; a
+   short stroke runs down it three times as the page opens, then it stands still, and it goes as the page scrolls (--p).
+   Only where the hero has room under the copy. */
+.hero .cue{display:none}
+@media (min-width:821px) and (min-height:760px){
+  .hero .cue{display:flex;align-items:flex-end;gap:12px;position:absolute;left:max(var(--gutter),calc((100% - var(--max)) / 2 + var(--gutter)));bottom:clamp(18px,3vh,32px);z-index:2;pointer-events:none;font:500 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.6);opacity:calc(1 - var(--p,0) * 5)}
+  .hero .cue i{position:relative;display:block;width:1px;height:44px;background:rgba(var(--bronze-rgb),.4);overflow:hidden}
+  .hero .cue i::after{content:"";position:absolute;left:0;top:0;width:1px;height:100%;background:var(--bronze-300);transform:translateY(-100%)}
+  .hero.lit .cue i::after{animation:cue 2.4s var(--ease-out) 1.2s 3 forwards}
+}
+@keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){.hero.lit .cue i::after{animation:none}}
+html[data-motion=off] .hero.lit .cue i::after{animation:none}
+@media print{.hero .cue{display:none}}
 /* The veil under the copy: the hero's ink, full behind the headline and thinning evenly across the width, with no
    curve of its own (an ellipse here drew a blob over the island's western palms at every width, and a band at 1440 x
    1100); the photograph fades in on its own edge inside the veil's last third, and the tower's lit lobby and its

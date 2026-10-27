@@ -224,6 +224,21 @@
       if (moved || u.href === location.href) location.reload(); else location.replace(u.href);
     });
   }
+  // Where the header shows its whole nav (a wide screen), the switch stands in the footer's legal line, after "Back to top",
+  // rather than among the sections and the languages: it is a setting, not a place to go. Narrower, it stays in the
+  // header, where the open menu shows it at its foot. (It is the same button, moved, so its name, state and focus hold.)
+  const legal = document.querySelector('footer .legal > span:last-child');
+  if (motionBtn && legal) {
+    const home = motionBtn.parentNode, next = motionBtn.nextSibling, wide = matchMedia('(min-width:1280px) and (min-width:80em)');
+    const slot = document.createElement('span'), sep = document.createElement('i');
+    slot.className = 'nw mo'; sep.className = 'sep'; sep.textContent = ' · '; slot.appendChild(sep);
+    const langs = legal.lastElementChild && legal.lastElementChild.querySelector('[hreflang]') ? legal.lastElementChild : null;
+    const place = () => {
+      if (wide.matches) { slot.appendChild(motionBtn); if (!slot.parentNode) legal.insertBefore(slot, langs); }
+      else if (motionBtn.parentNode !== home) { home.insertBefore(motionBtn, next); slot.remove(); }
+    };
+    place(); (wide.addEventListener ? wide.addEventListener('change', place) : wide.addListener(place));
+  }
   // Back from the motion switch's reload, the page stands where the reader left it (and the switch has the focus, if the
   // keyboard pressed it); the entry then lets both go.
   try {
