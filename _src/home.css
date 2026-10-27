@@ -775,15 +775,12 @@ html[data-motion=off] .hero.lit .cue i::after{animation:none}
    and thins to nothing across its soft edge (--vb), well short of the shaft, so the photograph comes out of the ink
    with no seam and no wash on the tower, and the grain thins with it. The canvas fades in under the header, which so
    stands on ink and never on the sky (--m0 to --m1), and, stacked, into the copy's ink below the podium (--m2 to --m3).
-   It carries one house grade at every hour: the sky's blue taken down, a little warmth, deeper shadows, so morning,
-   noon, the gold hour and the night read as one sheet with the ink, the ivory and the bronze. */
+   It takes no filter: each still carries the site's one photograph grade in its own pixels (tools/grade.py, the grade
+   of the market pages' city photographs), so morning, noon, the gold hour and the night read as photographs taken in
+   their own light, and as one set with the city photographs further on. */
 .hero.plated::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0,rgb(var(--hero-rgb)) var(--va,40%),rgba(var(--hero-rgb),.72) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .3),rgba(var(--hero-rgb),.3) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .62),rgba(var(--hero-rgb),0) var(--vb,60%))}
 .hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%));mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%))}
 .hero.plated canvas{-webkit-mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%));mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%))}
-.hero.plated #heroModel[data-still]{filter:saturate(.62) sepia(.18) contrast(1.06) brightness(.94)}
-/* (noon a touch lighter: at full day the same grade made a grey, overcast sky of a clear one; home.js grades the air
-   beside it from this filter, whatever it is) */
-.hero.plated #heroModel[data-still=day]{filter:saturate(.68) sepia(.16) contrast(1.05) brightness(.98)}
 /* Beside the photograph, on a wide screen, the air (home.js, airPaint): the still's own sky, haze and bay run on under the
    copy, its ink deepening toward the words, so the photograph opens into its own light and not into a black panel. Once
    the photograph stands whole (.aired) the air comes in and the veil, and the ink under the buttons, go, since the air

@@ -508,8 +508,6 @@ html[data-motion=off] .hero.lit .cue i::after{animation:none}
 .hero.plated::after{background:linear-gradient(90deg,rgb(var(--hero-rgb)) 0,rgb(var(--hero-rgb)) var(--va,40%),rgba(var(--hero-rgb),.72) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .3),rgba(var(--hero-rgb),.3) calc(var(--va,40%) + (var(--vb,60%) - var(--va,40%)) * .62),rgba(var(--hero-rgb),0) var(--vb,60%))}
 .hero.plated:has(#heroModel[data-still])::before{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%));mask-image:linear-gradient(90deg,#000 0,#000 var(--va,40%),transparent var(--vb,60%))}
 .hero.plated canvas{-webkit-mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%));mask-image:linear-gradient(180deg,transparent var(--m0,0px),#000 var(--m1,0px),#000 var(--m2,100%),transparent var(--m3,100%))}
-.hero.plated #heroModel[data-still]{filter:saturate(.62) sepia(.18) contrast(1.06) brightness(.94)}
-.hero.plated #heroModel[data-still=day]{filter:saturate(.68) sepia(.16) contrast(1.05) brightness(.98)}
 .hero-air{pointer-events:none;opacity:0;transition:opacity .9s var(--ease-out)}
 .hero.aired .hero-air{opacity:1}
 .hero.plated::after,.hero.plated .row::before,.hero.plated:has(#heroModel[data-still])::before{transition:opacity .9s var(--ease-out)}
