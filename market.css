@@ -253,12 +253,14 @@
 .mk-el .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
 .mk-el .isl{fill:var(--sheet);opacity:1}
 .mk-el.hd{aspect-ratio:2/1}
+.mk-el.hd.mi{aspect-ratio:1200/504}
 .mk-el.hd .md{stroke-width:calc(var(--lw-object) * var(--fu));opacity:.8}
 .mk-el.hd .fut .dt{opacity:.42}.mk-el.hd .fut .dt.q{opacity:.24}.mk-el.hd .fut .dt.md{opacity:.6}.mk-el.hd .fut .ob{opacity:.75}
 .mk-el.hd .bk{opacity:.42}
 .mk-el.mi .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.35)}
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.mi .fut .wb{stroke-opacity:.5}
+.mk-el.mi .fut .ob{opacity:.6}
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
 .mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}
 .mk-el.ny .tn.r1{fill-opacity:.085}.mk-el.ny .tn.r2{fill-opacity:.055}.mk-el.ny .tn.r3{fill-opacity:.035}
@@ -298,6 +300,7 @@
   .mk-el-pan:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .mk-el-pan .mk-el{--fu:1.5;width:880px;max-width:none;aspect-ratio:3/1}
   .mk-el-pan .mk-el.hd{width:1100px;aspect-ratio:2/1}
+  .mk-el-pan .mk-el.hd.mi{aspect-ratio:1200/504}
   .mk-el-pan .mk-el.hd.cy{width:1000px;aspect-ratio:var(--pa,2/1)}
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
