@@ -156,6 +156,18 @@ try { history.replaceState(Object.assign({}, typeof history.state === 'object' ?
 if (moved || u.href === location.href) location.reload(); else location.replace(u.href);
 });
 }
+const legal = document.querySelector('footer .legal > span:last-child');
+if (motionBtn && legal) {
+const home = motionBtn.parentNode, next = motionBtn.nextSibling, wide = matchMedia('(min-width:1280px) and (min-width:80em)');
+const slot = document.createElement('span'), sep = document.createElement('i');
+slot.className = 'nw mo'; sep.className = 'sep'; sep.textContent = ' · '; slot.appendChild(sep);
+const langs = legal.lastElementChild && legal.lastElementChild.querySelector('[hreflang]') ? legal.lastElementChild : null;
+const place = () => {
+if (wide.matches) { slot.appendChild(motionBtn); if (!slot.parentNode) legal.insertBefore(slot, langs); }
+else if (motionBtn.parentNode !== home) { home.insertBefore(motionBtn, next); slot.remove(); }
+};
+place(); (wide.addEventListener ? wide.addEventListener('change', place) : wide.addListener(place));
+}
 try {
 const hs = history.state && typeof history.state === 'object' ? history.state : null, k = hs && hs.cmY;
 if (hs && ('cmY' in hs || 'cmFocus' in hs)) {

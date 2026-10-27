@@ -352,7 +352,7 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
 // Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
 // fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
 // screen. The developer story below stays drawn, with no photograph. Beside it on a desktop the still's own light runs
-// under the copy (the air), and the count under contract stands by the crown, clear of the copy; a phone has neither.
+// under the copy (the air); a phone has none. No count of sales stands over it: the tower is not a real project.
 test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }, info) => {
   const wide = info.project.name === 'desktop';
   const asked = [];
@@ -366,13 +366,9 @@ test('the hero shows this hour\'s photograph of the tower, by night and by day',
   if (wide) {
     await expect(page.locator('#top')).toHaveClass(/\baired\b/);
     await expect(page.locator('.hero-air')).toBeVisible();
-    await expect(page.locator('.key-sold')).toBeVisible();
-    const [key, copy] = await page.evaluate(() => [document.querySelector('.key-sold'), document.querySelector('#top .wrap h1')].map((e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; }));
-    expect(key.l > copy.r || key.b < copy.t).toBe(true);
   } else {
-    // a phone shows the photograph whole above the copy: no air, and no count over it
+    // a phone shows the photograph whole above the copy: no air
     await expect(page.locator('#top')).not.toHaveClass(/\baired\b/);
-    await expect(page.locator('.key-sold')).toBeHidden();
   }
   await page.evaluate(() => { const s = document.querySelector('#steps .step:last-child'); scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.3); });
   await page.waitForTimeout(1500);
@@ -421,6 +417,19 @@ test('the hero photograph fills the phone\'s width and takes no loupe', async ({
     }
     await ctx.close();
   }
+});
+
+// The motion switch is a setting, not a section: on a wide screen it stands in the footer's legal line, written out,
+// and the header keeps only the sections, the languages and night mode.
+test('the motion switch stands in the footer on a wide screen', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'phones keep it in the menu');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/pt/');
+  await expect(page.locator('.key-sold')).toHaveCount(0);
+  await expect(page.locator('header #motionBtn')).toHaveCount(0);
+  await expect(page.locator('footer .legal #motionBtn')).toHaveAttribute('aria-label', 'Pausar animação');
+  await page.setViewportSize({ width: 1000, height: 900 });
+  await expect(page.locator('header #motionBtn')).toHaveCount(1);
 });
 
 test('day and night toggle remembers the choice', async ({ page }) => {
