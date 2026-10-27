@@ -313,6 +313,8 @@
    cropped: it keeps its full width and pans sideways in its frame, with its labels, so every tower can be reached. */
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
 .mk-el .pn{display:none}
+/* a second key to the two lines, over the phone's first view of a skyline that opens far from its own key (Miami) */
+.mk-el .lgp{display:none}
 /* (Houston's numbers stand over a dense cluster, so each keeps a margin of paper) */
 .mk-el.hx .nk text{stroke:var(--sheet);stroke-width:6px;stroke-linejoin:round;paint-order:stroke}
 /* (the towers it does not name keep their outline but quieten their floor lines, so the named ones lead) */
@@ -338,6 +340,8 @@
 .mk-el.mi .fut .wb{stroke-opacity:.5}
 /* (its planned towers' dashed outlines a step lighter again, so the standing city leads) */
 .mk-el.mi .fut .ob{opacity:.6}
+/* (and each planned tower as a whole a step back in tone, so the built city reads first and the planned one as a layer) */
+.mk-el.mi .fut{opacity:.78}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
    (glass dark toward the street, stone a breath darker at its foot) and by its reflection in the river; the city behind in
    hairline and in three planes of tone, palest furthest off, so the towers stand clear of it */
@@ -404,6 +408,7 @@
   /* (a village name set in the ground, too small to read at a phone's width, gives way to the key) */
   .mk-el-pan .mk-el .dsk text{display:none}
   /* (a skyline whose key folds under its caption names the towers it opens on beside their numbers, here only) */
+  .mk-el-pan .mk-el .lgp{display:inline}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}

@@ -248,6 +248,7 @@
 @media (max-width:600px){.mk-el{--fu:1.9;aspect-ratio:3/2}.mk-el text{display:none}}
 .mk-el .nk text{text-anchor:middle;letter-spacing:0;fill:var(--fg);font-variant-numeric:tabular-nums}
 .mk-el .pn{display:none}
+.mk-el .lgp{display:none}
 .mk-el.hx .nk text{stroke:var(--sheet);stroke-width:6px;stroke-linejoin:round;paint-order:stroke}
 .mk-el .dt.q{opacity:.3}.mk-el .dt.q.far{opacity:.2}
 .mk-el .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu))}
@@ -261,6 +262,7 @@
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.mi .fut .wb{stroke-opacity:.5}
 .mk-el.mi .fut .ob{opacity:.6}
+.mk-el.mi .fut{opacity:.78}
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
 .mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}
 .mk-el.ny .tn.r1{fill-opacity:.085}.mk-el.ny .tn.r2{fill-opacity:.055}.mk-el.ny .tn.r3{fill-opacity:.035}
@@ -305,6 +307,7 @@
   .mk-el-pan .mk-el text{display:inline;font-size:20px}
   .mk-el-pan .mk-el .ds text{font-size:17px}
   .mk-el-pan .mk-el .dsk text{display:none}
+  .mk-el-pan .mk-el .lgp{display:inline}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   .mk-el-pan[data-end]{direction:rtl}
   .mk-el-pan[data-end] .mk-el{direction:ltr}
