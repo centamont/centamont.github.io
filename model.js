@@ -727,7 +727,7 @@ this.scene();
 const L = this.lens;
 if (L && this.L >= 1) this.loupe(L);
 this.spG = null;
-if (this.o.sunPath && this.drawnAt && this.w >= 820) this.sunPath(performance.now(), this.dark);
+if (this.o.sunPath && this.drawnAt && this.w >= 820 && this.sa < 1) { this.ctx.save(); this.ctx.globalAlpha = 1 - this.sa; this.sunPath(performance.now(), this.dark); this.ctx.restore(); }
 }
 loupe(L) {
 const g = this.ctx, [br, bgg, bb] = this.bg, [sr, sg, sb] = this.sold, C0 = this.C, mag = 1.7;

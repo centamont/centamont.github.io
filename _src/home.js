@@ -84,17 +84,23 @@ document.addEventListener('DOMContentLoaded',function(){
     const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
     o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
   // (on a wide screen the ruler's names grow with it, from 13px up to 16px at 2560)
-  // The photograph is framed by its own features, in the still's pixels: the crown's top, the podium, the quay and the
-  // shaft's axis (66, 660, 784 and 345 down and across the 1x file), the soft edge on its left (60) and the crown's left end (286). The camera stands
+  // The photograph is framed by its own features, in the still's pixels: the crown's top, the podium, the quay, the near
+  // bay's foot and the shaft's axis (66, 660, 784, 968 and 345 down and across the 1x file), the soft edge on its left (60)
+  // and the crown's left end (286). The camera stands
   // where the still was made from, at its bearing and its eye's height; only the size and the shift of the lens follow
   // the screen (the lens's rise sets where the still stands up and down: phi follows, so the eye stays at the still's).
-  // Beside the copy the crown stands a margin under the header and the quay above the foot of the screen, the shaft a
-  // column clear of the headline and never nearer the window's edge than an eighth of it; the veil's ink stands solid to
-  // the still's left edge (and the copy's) and thins to nothing across its soft edge, well short of the shaft, so the
-  // photograph comes out of the ink with no seam, no drawn sky beside it and no wash on the tower.
+  // Beside the copy the crown stands a margin under the header and the near bay runs to the foot of the screen (the
+  // water in front of the island, where the tower and its lit rooms are mirrored, is part of the picture), the shaft a
+  // column clear of the headline and never nearer the window's edge than an eighth of it (the still's soft left edge
+  // tucks under the copy's ink, so the evening sun, right of the shaft, stays in a 1440 window, though never so far that
+  // the still falls short of the window's right edge); the veil's ink
+  // stands solid to the copy's right edge and thins to nothing across the still's soft edge, well short of the shaft, so
+  // the photograph comes out of the ink with no seam, no drawn sky beside it and no wash on the tower.
   // Stacked (a phone, a tablet held upright), the still runs the full width, its soft edge off the screen and the shaft
-  // at a third of it, the crown under the caption line; the copy starts under the podium, the lawn fading into its ink.
-  const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+  // at a third of it, the crown under the caption line; the copy starts under the podium, and the photograph runs on
+  // under the podium, over the quay and the near bay, as far as the room above the headline allows, fading into its ink.
+  const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286};
+  let plateAt=null;
   // The hero opens on the drawing. While the tower draws itself, the sheet stands a little left of the photograph's
   // framing and a little smaller (SET), so the level ruler and the levels' names have the page's margin to stand in
   // rather than the window's edge; once the building is up the camera settles onto the still's own framing over 0.7 s
@@ -104,18 +110,18 @@ document.addEventListener('DOMContentLoaded',function(){
   const SET={x:.072,s:.93,ms:700};
   let settle=1,settleAt=0,phTgt=null;
   const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
-  const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
+  const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];plateAt=null;
     if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
-    else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
-      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown)));Y=hb+tm-ST.crown*z;
+    else{const tm=Math.max(28,H*.045),cl=c.getBoundingClientRect().left;
+      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm-ST.crown*z;
       const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
-      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
+      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-110,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
     Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
     // beside the copy, the drawing stands where the settle has it until the building is up (see SET)
-    phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();
+    phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();if(narrow)plateAt={Y,z};
     // the canvas fades in under the header (so the header stands on the hero's ink, never on the sky) and, stacked,
-    // into the copy's ink between the podium and the quay
+    // into the copy's ink under the podium (until the copy is placed: frameHero runs it on to the headline)
     const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
     ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
     airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
@@ -189,6 +195,11 @@ document.addEventListener('DOMContentLoaded',function(){
       // (the photograph is framed first: the copy starts under its podium)
       hero.style.removeProperty('--rise');if(photo)framePhoto(v,true,nb);
       const btn=up&&wrap.querySelector('.row .btn');if(btn){const t=hero.offsetTop+at(btn),need=Math.ceil(t+btn.offsetHeight-(innerHeight-14));if(t<innerHeight&&need>0)hero.style.setProperty('--rise',(need<=24?need:-Math.ceil(innerHeight-t))+'px')}
+      // the copy placed, the photograph runs on past the podium as far as the headline allows (the near bay, on a taller
+      // phone), fading into the ink over its last 48px, just above the headline's first line; the paper's grain lies
+      // under that fade, never on the picture
+      if(plateAt){const{Y,z}=plateAt,ht=at(wrap.querySelector('h1'))-at(heroM.c),m2=Math.round(Math.max(Y+ST.podium*z,Math.min(Y+ST.foot*z,ht+8)-48));
+        heroM.c.style.setProperty('--m2',m2+'px');heroM.c.style.setProperty('--m3',m2+48+'px');hero.style.setProperty('--plate-show',Math.round(at(heroM.c)+m2+48)+'px')}
       // and the drawing's ground stays 28px above the headline, so the podium and its hatch never touch the type; the crown
       // stands 14px under the caption, or 10px under the sun line where that closes the note (its line has no descenders)
       const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-28)):c.height*.22;
