@@ -232,6 +232,7 @@
 .js .mk-el.in :is(.tn,.sh){opacity:1}
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
 .mk-el .wl{stroke:var(--sheet);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
+.mk-el.mi .wl{font-family:var(--display);font-style:italic;font-weight:400;font-size:22px;letter-spacing:.06em}
 @media (min-width:1320px){.mk-el text{font-size:17.6px}}
 @media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
 @media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
@@ -258,11 +259,14 @@
 .mk-el.hd .md{stroke-width:calc(var(--lw-object) * var(--fu));opacity:.8}
 .mk-el.hd .fut .dt{opacity:.42}.mk-el.hd .fut .dt.q{opacity:.24}.mk-el.hd .fut .dt.md{opacity:.6}.mk-el.hd .fut .ob{opacity:.75}
 .mk-el.hd .bk{opacity:.42}
-.mk-el.mi .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.35)}
+.mk-el.mi .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.25)}
+.mk-el.mi .ob.k.k1{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.05)}.mk-el.mi .ob.k.k2{stroke-width:calc(var(--lw-profile) * var(--fu) * .85)}
+.mk-el.mi .ob.c2{stroke-width:calc(var(--lw-detail) * var(--fu) * 1.2)}.mk-el.mi .wall{opacity:.66}
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.mi .fut .wb{stroke-opacity:.5}
 .mk-el.mi .fut .ob{opacity:.6}
-.mk-el.mi .fut{opacity:.78}
+.mk-el.mi .fut{opacity:.68}
+.mk-el.mi .nk text{font-weight:400;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
 .mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}
 .mk-el.ny .tn.r1{fill-opacity:.085}.mk-el.ny .tn.r2{fill-opacity:.055}.mk-el.ny .tn.r3{fill-opacity:.035}
