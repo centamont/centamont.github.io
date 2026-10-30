@@ -4,7 +4,8 @@
 // on unbroken, or its flat ink), and the new words are set in the same faces, sizes, colours and places, with the
 // drawing, the photograph and the wordmark left exactly as they are. Run it from the repo root after changing an
 // English card or a translation here, then raise the ?v= on the pages' og:image and twitter:image. (The South Florida and
-// New York market cards are not made here: tools/og-markets.mjs draws them from the es/ and pt/ pages themselves.)
+// New York market cards are not made here: tools/og-markets.mjs draws them from the es/ and pt/ pages themselves; nor
+// is the home's card: tools/og-home.mjs draws it in all three languages.)
 //   node tools/og.mjs             writes es/og*.png|jpg and pt/og*.png|jpg
 //   node tools/og.mjs --en DIR    sets the English words over the same patches into DIR, to check the setting against
 //                                 the English cards (they should match to the pixel, give or take antialiasing)
@@ -51,34 +52,6 @@ const GUIDE = { es: 'Notas · Guía para compradores', pt: 'Notas · Guia para c
 const noteTop = (w = 830) => strips(60, 72, w, 233, 2, 66);
 
 const CARDS = [
-  {
-    base: 'og.png', out: { es: 'es/og.png', pt: 'pt/og.png' },
-    patches: [[70, 200, 885, 300, INK], [70, 532, 880, 34, INK], [70, 598, 540, 24, INK]],
-    words: {
-      en: { head: ['The finest new buildings,', 'sold <em>with intent.</em>'], sub: 'New development and private client advisory', foot: 'Sheet 01 · Index' },
-      es: { head: ['Los mejores', 'edificios nuevos,', 'vendidos <em>con propósito.</em>'], sub: 'Asesoría en nuevos desarrollos y a clientes privados', foot: 'Lámina 01 · Índice' },
-      pt: { head: ['Os melhores', 'edifícios novos,', 'vendidos <em>com propósito.</em>'], sub: 'Assessoria em lançamentos e a clientes privados', foot: 'Prancha 01 · Índice' },
-    },
-    lines: (w) => [
-      ...w.head.map((t, i, a) => ({ t, x: 77, base: 492 - 94 * (a.length - 1 - i), size: 92, face: 'display', weight: 300, color: IVORY, em: BRONZE, ls: '-.02em', emw: 400, emls: '.015em', emml: '7px' })),
-      { t: w.sub, x: 80, base: 559, size: 22, face: 'body', weight: 400, color: '#CFC8BA', ls: '.14em', upper: true },
-      { t: w.foot, x: 80, base: 617, size: 18, face: 'body', weight: 500, color: '#9E9D99', ls: '.14em', upper: true },
-    ],
-  },
-  {
-    // the card the developer and markets pages share: the index card without its sheet line
-    base: 'og-site.png', out: { es: 'es/og-site.png', pt: 'pt/og-site.png' },
-    patches: [[70, 200, 885, 300, INK], [70, 532, 880, 34, INK]],
-    words: {
-      en: { head: ['The finest new buildings,', 'sold <em>with intent.</em>'], sub: 'New development and private client advisory' },
-      es: { head: ['Los mejores', 'edificios nuevos,', 'vendidos <em>con propósito.</em>'], sub: 'Asesoría en nuevos desarrollos y a clientes privados' },
-      pt: { head: ['Os melhores', 'edifícios novos,', 'vendidos <em>com propósito.</em>'], sub: 'Assessoria em lançamentos e a clientes privados' },
-    },
-    lines: (w) => [
-      ...w.head.map((t, i, a) => ({ t, x: 77, base: 492 - 94 * (a.length - 1 - i), size: 92, face: 'display', weight: 300, color: IVORY, em: BRONZE, ls: '-.02em', emw: 400, emls: '.015em', emml: '7px' })),
-      { t: w.sub, x: 80, base: 559, size: 22, face: 'body', weight: 400, color: '#CFC8BA', ls: '.14em', upper: true },
-    ],
-  },
   {
     base: 'og-clients.jpg', out: { es: 'es/og-clientes-privados.jpg', pt: 'pt/og-clientes-privados.jpg' },
     patches: [[70, 180, 715, 316, INK], [70, 532, 715, 34, INK], [70, 598, 540, 24, INK]],
