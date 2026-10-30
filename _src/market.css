@@ -317,6 +317,8 @@
 .mk-el .pn{display:none}
 /* a second key to the two lines, over the phone's first view of a skyline that opens far from its own key (Miami) */
 .mk-el .lgp{display:none}
+/* (Miami's river name has a copy for the phone, set at its opening view's left edge) */
+.mk-el .rvp{display:none}
 /* (Houston's numbers stand over a dense cluster, so each keeps a margin of paper) */
 .mk-el.hx .nk text{stroke:var(--sheet);stroke-width:6px;stroke-linejoin:round;paint-order:stroke}
 /* (the towers it does not name keep their outline but quieten their floor lines, so the named ones lead) */
@@ -340,7 +342,9 @@
 /* (every standing named tower keeps the key's solid line, a step finer a street back and finer again inland; the
    wall behind the arena in a fine line under a lighter tone) */
 .mk-el.mi .ob.k.k1{stroke-width:calc(var(--lw-profile) * var(--fu) * 1.05)}.mk-el.mi .ob.k.k2{stroke-width:calc(var(--lw-profile) * var(--fu) * .85)}
-.mk-el.mi .ob.c2{stroke-width:calc(var(--lw-detail) * var(--fu) * 1.2)}.mk-el.mi .wall{opacity:.66}
+.mk-el.mi .ob.c2{stroke-width:calc(var(--lw-detail) * var(--fu) * 1.2)}.mk-el.mi .wall{opacity:.52}
+/* (a standing tower that is not a landmark keeps its solid outline, but its facade a step quieter, so the landmarks lead) */
+.mk-el.mi .soft .dt{opacity:.34}.mk-el.mi .soft .dt.q{opacity:.2}.mk-el.mi .soft .wn{opacity:.62}.mk-el.mi .soft .ob:not(.k){opacity:.6}
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 /* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
 .mk-el.mi .fut .wb{stroke-opacity:.5}
@@ -422,6 +426,7 @@
   .mk-el-pan .mk-el .dsk text{display:none}
   /* (a skyline whose key folds under its caption names the towers it opens on beside their numbers, here only) */
   .mk-el-pan .mk-el .lgp{display:inline}
+  .mk-el-pan .mk-el .ds .rvp{display:inline}.mk-el-pan .mk-el .ds .rvd{display:none}
   .mk-el-pan .mk-el .pn{display:inline;font-size:15px;letter-spacing:.04em;fill:var(--fg);stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
   /* a skyline whose towers stand at its right-hand end (Newport Center) opens there, with the harbor a swipe away */
   .mk-el-pan[data-end]{direction:rtl}
