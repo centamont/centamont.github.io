@@ -91,7 +91,7 @@ test('home renders cleanly', async ({ page }, info) => {
   expect(hidden).toBe(0);
 
   // Link previews have a title, description and image.
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.png(\?v=\d+)?$/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.jpg(\?v=\d+)?$/);
 
   // The drawing says it is an illustration.
   await expect(page.locator('.elev figcaption')).toContainText('Illustration, not a real project');
@@ -1486,7 +1486,8 @@ test('share cards, descriptions and the first image stay within their limits', a
 });
 
 // Every sheet of the set carries a share card of its own, drawn by tools/og-pages.mjs (or og-markets.mjs, og.mjs), in its
-// own language; the general card (og-site.png) is kept for the general sheets (privacy, terms) and the vacant lot.
+// own language; the home's card (og.jpg, by tools/og-home.mjs) is also the general card, kept for the general sheets
+// (privacy, terms) and the vacant lot.
 test('every sheet of the set has a share card of its own', async ({}, info) => {
   test.skip(info.project.name !== 'desktop', 'file check, once');
   const pages = ['', 'journal/', 'es/', 'pt/'].flatMap((d) => readdirSync(d || '.').filter((f) => f.endsWith('.html')).map((f) => d + f));
@@ -1495,7 +1496,7 @@ test('every sheet of the set has a share card of its own', async ({}, info) => {
     const html = readFileSync(p, 'utf8');
     const img = (html.match(/<meta property="og:image" content="https:\/\/centamont\.com\/([^"?]*)/) || [])[1];
     expect(img, `${p}: og:image`).toBeTruthy();
-    expect(img, `${p}: uses the general card`).not.toMatch(/og-site\.png$/);
+    if (!/(^|\/)index\.html$/.test(p) || p.startsWith('journal/')) expect(img, `${p}: uses the general card`).not.toMatch(/(^|\/)og\.jpg$/);
     if (/^(es|pt)\//.test(p)) expect(img.startsWith(p.slice(0, 3)), `${p}: ${img} is not in its language`).toBe(true);
   }
 });
