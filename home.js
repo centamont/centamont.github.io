@@ -37,19 +37,20 @@ const A=s.az,lo=124,hi=236,left=A-lo>=50,off=Math.min(79.5,left?A-lo:hi-A),idle=
 let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
 const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
 o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
-const ST={crown:66,podium:660,quay:784,axis:345,soft:60,crown2:286};
+const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286};
+let plateAt=null;
 const SET={x:.072,s:.93,ms:700};
 let settle=1,settleAt=0,phTgt=null;
 const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.offsetX=phTgt.offsetX-SET.x*(1-e);heroM.o.scale=phTgt.scale*(SET.s+(1-SET.s)*e)};
-const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];
+const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];plateAt=null;
 if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
-else{const tm=Math.max(40,H*.075),bm=Math.max(20,H*.035),cl=c.getBoundingClientRect().left;
-z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-bm-hb-tm)/(ST.quay-ST.crown)));Y=hb+tm-ST.crown*z;
+else{const tm=Math.max(28,H*.045),cl=c.getBoundingClientRect().left;
+z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm-ST.crown*z;
 const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
-tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.min(textR+40,W-Math.max(96,W/8)-ST.axis*z);va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
+tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-110,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
 const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
 Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
-phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();
+phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();if(narrow)plateAt={Y,z};
 const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
 ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
 airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
@@ -92,6 +93,8 @@ const wrap=hero.querySelector('.wrap'),at=e=>{let t=0;for(;e&&e!==hero;e=e.offse
 if(narrow){const up=!side(),note=document.querySelector('.hero .coords'),c=heroM.c.getBoundingClientRect(),nb=note&&note.offsetParent?note.getBoundingClientRect().bottom-c.top:64;
 hero.style.removeProperty('--rise');if(photo)framePhoto(v,true,nb);
 const btn=up&&wrap.querySelector('.row .btn');if(btn){const t=hero.offsetTop+at(btn),need=Math.ceil(t+btn.offsetHeight-(innerHeight-14));if(t<innerHeight&&need>0)hero.style.setProperty('--rise',(need<=24?need:-Math.ceil(innerHeight-t))+'px')}
+if(plateAt){const{Y,z}=plateAt,ht=at(wrap.querySelector('h1'))-at(heroM.c),m2=Math.round(Math.max(Y+ST.podium*z,Math.min(Y+ST.foot*z,ht+8)-48));
+heroM.c.style.setProperty('--m2',m2+'px');heroM.c.style.setProperty('--m3',m2+48+'px');hero.style.setProperty('--plate-show',Math.round(at(heroM.c)+m2+48)+'px')}
 const h1=up&&wrap.querySelector('h1'),gb=h1?Math.max(c.height*.22,c.height-(at(h1)-28)):c.height*.22;
 const top=nb+(sunline&&sunline.offsetParent?10:14);
 if(!photo){const f=heroM.fit(heroCam.th,v.phi,{margin:[top,0,gb,0],vOnly:true,maxScale:v.scale});heroM.o.ty=f.ty;heroM.o.scale=f.scale}

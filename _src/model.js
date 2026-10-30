@@ -1049,9 +1049,10 @@
       const L = this.lens;
       if (L && this.L >= 1) this.loupe(L);
       // Today's path of the sun over Miami, an arc laid over the drawing like a sundial: solid where it has been, dotted
-      // where it is going (laid over the loupe, which never covers it)
+      // where it is going (laid over the loupe, which never covers it). It belongs to the drawing: it fades as the
+      // photograph comes in and is gone (nor taken hold of) while the photograph stands
       this.spG = null;
-      if (this.o.sunPath && this.drawnAt && this.w >= 820) this.sunPath(performance.now(), this.dark);
+      if (this.o.sunPath && this.drawnAt && this.w >= 820 && this.sa < 1) { this.ctx.save(); this.ctx.globalAlpha = 1 - this.sa; this.sunPath(performance.now(), this.dark); this.ctx.restore(); }
     }
 
     loupe(L) {
