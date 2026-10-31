@@ -293,8 +293,8 @@
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
 /* (the water's name keeps a margin of paper, so the water lines stop short of it) */
 .mk-el .wl{stroke:var(--sheet);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
-/* (Miami's bay named as water is on a chart: in the serif's italic, apart from the district names) */
-.mk-el.mi .wl{font-family:var(--display);font-style:italic;font-weight:400;font-size:22px;letter-spacing:.06em}
+/* (Miami's bay and Manhattan's river named as water is on a chart: in the serif's italic, apart from the district names) */
+.mk-el:is(.mi,.ny) .wl{font-family:var(--display);font-style:italic;font-weight:400;font-size:22px;letter-spacing:.06em}
 @media (min-width:1320px){.mk-el text{font-size:17.6px}}
 @media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
 @media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
