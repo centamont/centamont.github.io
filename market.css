@@ -267,8 +267,8 @@
 .mk-el.mi .soft .dt{opacity:.34}.mk-el.mi .soft .dt.q{opacity:.2}.mk-el.mi .soft .wn{opacity:.62}.mk-el.mi .soft .ob:not(.k){opacity:.6}
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 .mk-el.mi .fut .wb{stroke-opacity:.5}
-.mk-el.mi .fut .ob{opacity:.6}
-.mk-el.mi .fut{opacity:.44}.mk-el.mi .fut .wn{opacity:.45}
+.mk-el.mi .fut .ob{opacity:.86}
+.mk-el.mi .fut{opacity:.34}.mk-el.mi .fut .wn{fill-opacity:.4}.mk-el.mi .fut .dt{opacity:.3}.mk-el.mi .fut .dt.q{opacity:.16}
 .mk-el.mi .nk text{font-weight:400;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 .mk-el.ny .ob.k{stroke-width:calc(var(--lw-profile) * var(--fu) * .72)}
 .mk-el.ny .ob.far{stroke-width:calc(var(--lw-detail) * var(--fu) * .8)}

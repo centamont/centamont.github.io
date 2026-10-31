@@ -350,11 +350,12 @@
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 /* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
 .mk-el.mi .fut .wb{stroke-opacity:.5}
-/* (its planned towers' dashed outlines a step lighter again, so the standing city leads) */
-.mk-el.mi .fut .ob{opacity:.6}
-/* (and each planned tower as a whole a full tone back, its glass barely tinted, so the built city reads first and the
-   planned one as a layer over it) */
-.mk-el.mi .fut{opacity:.44}.mk-el.mi .fut .wn{opacity:.45}
+/* (its planned towers' dashed outlines kept clear, so each still reads as a tower on the key's dashed line) */
+.mk-el.mi .fut .ob{opacity:.86}
+/* (and each planned tower as a whole two full tones back, its glass a faint tint and its floor lines a whisper, so the
+   built landmarks are the darkest things in the frame and the planned city a light layer over them; the glass is thinned
+   by its fill, since the panes' fade-in owns their opacity) */
+.mk-el.mi .fut{opacity:.34}.mk-el.mi .fut .wn{fill-opacity:.4}.mk-el.mi .fut .dt{opacity:.3}.mk-el.mi .fut .dt.q{opacity:.16}
 /* (its key numerals in the text's own weight, set over the drawing, not stamped on it) */
 .mk-el.mi .nk text{font-weight:400;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
