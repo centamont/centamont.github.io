@@ -819,3 +819,9 @@ html:not(.js) .step{min-height:auto}
 #heroModel{transition:opacity .6s ease}
 #heroModel.wait{opacity:0;transition:none}
 .firm-record{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}
+.hero .plate-cap{display:none}
+@media (min-width:821px) and (min-height:501px){
+  .hero .plate-cap{display:block;position:absolute;right:var(--gutter);bottom:clamp(18px,3vh,32px);z-index:2;margin:0;pointer-events:none;font:500 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);text-shadow:0 0 10px rgba(var(--hero-rgb),.7);opacity:calc(1 - var(--p,0) * 5)}
+  .hero .coords .cap{display:none}
+}
+@media print{.hero .plate-cap{display:none}}

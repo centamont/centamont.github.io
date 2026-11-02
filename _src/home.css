@@ -1256,3 +1256,14 @@ html:not(.js) .step{min-height:auto}
 
 /* The record band (tools/firm.py), when it is given, rides over the opening as the practices do */
 .firm-record{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}
+
+/* The disclaimer on the picture, not over the headline: on a desktop the line that says the tower is illustrative is a
+   plate caption in the still's lower right corner, level with the scroll cue, as a rendering is credited in a magazine,
+   so the first words a visitor reads are the firm's. Phones and short landscape screens keep it in the meta line, where
+   the copy leaves no free corner. */
+.hero .plate-cap{display:none}
+@media (min-width:821px) and (min-height:501px){
+  .hero .plate-cap{display:block;position:absolute;right:var(--gutter);bottom:clamp(18px,3vh,32px);z-index:2;margin:0;pointer-events:none;font:500 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);text-shadow:0 0 10px rgba(var(--hero-rgb),.7);opacity:calc(1 - var(--p,0) * 5)}
+  .hero .coords .cap{display:none}
+}
+@media print{.hero .plate-cap{display:none}}
