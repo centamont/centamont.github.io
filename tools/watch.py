@@ -12,11 +12,13 @@ SITE, REF = 'https://centamont.com', os.environ.get('WATCH_REF', 'origin/main')
 # 'cloudflare' is the zone at Cloudflare, with the site proxied behind it, which adds the headers checked below.
 # While the move from one to the other is under way, HOSTS names both: either is accepted, the one seen is named in the
 # log, and DNSSEC (off by design during a move) is noted rather than failed. Once the move is confirmed, set HOSTS to the
-# one in use, so a change back, or to anything else, is caught.
-HOSTS = ('namecheap', 'cloudflare')
+# one in use, so a change back, or to anything else, is caught. Cloudflare publishes CAA rows of its own for the
+# authorities behind its edge certificates (DigiCert, and Sectigo as comodoca.com) beside the three set by hand.
+HOSTS = ('cloudflare',)
 EXPECT = {
     'namecheap': dict(ns='registrar-servers.com.', issuers={'letsencrypt.org'}, logs=("Let's Encrypt",), headers=False),
-    'cloudflare': dict(ns='ns.cloudflare.com.', issuers={'letsencrypt.org', 'pki.goog', 'ssl.com'}, logs=("Let's Encrypt", 'Google Trust Services', 'SSL Corp'), headers=True),
+    'cloudflare': dict(ns='ns.cloudflare.com.', issuers={'letsencrypt.org', 'pki.goog', 'ssl.com', 'digicert.com', 'comodoca.com'},
+                       logs=("Let's Encrypt", 'Google Trust Services', 'SSL Corp', 'DigiCert', 'Sectigo'), headers=True),
 }
 GITHUB_A = {'185.199.108.153', '185.199.109.153', '185.199.110.153', '185.199.111.153'}
 GITHUB_AAAA = {'2606:50c0:8000::153', '2606:50c0:8001::153', '2606:50c0:8002::153', '2606:50c0:8003::153'}
