@@ -1943,7 +1943,7 @@ this.beacon(J(JIB, top, 0), performance.now(), true, nt * this.crane * 0.6, 1, 0
 }
 }
 }
-Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? (s.az < 180 ? 'morning' : 'gold') : 'day'; };
+Model.still = (t) => (miamiSun(t).night >= 0.6 ? 'night' : 'gold');
 Model.stills = STILLS;
 Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
 window.CentamontModel = Model;
