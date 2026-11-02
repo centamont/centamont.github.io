@@ -234,7 +234,7 @@ def block(page,lang,key,part,title,revs,letter):
     langs=('<span class="nw"><i class="sep"> · </i>'+' · '.join('<a href="%s" hreflang="%s" lang="%s">%s</a>'%(u,W[l]['hl'],W[l]['hl'],W[l]['name']) for l,u in sib)+'</span>') if sib else ''
     return f'''
   <div class="wrap">
-    <svg class="sig" viewBox="0 0 1000 130" aria-hidden="true"><use href="/media/sig.svg#sig"/></svg>
+    <svg class="sig" viewBox="0 -1054 12306 1092" aria-hidden="true"><use href="/media/sig.svg#sig"/></svg>
     <dl class="tb">
       <div class="t-pr"><dt>{w['pr']}</dt><dd>{w['prd']}</dd></div>
       <div class="t-of"><dt>{w['of']}</dt><dd>{w['ofd']}<br><a href="mailto:office@centamont.com">office@<wbr>centamont.com</a>{TEL}</dd></div>
