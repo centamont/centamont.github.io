@@ -293,8 +293,8 @@
 .mk-el text{font:500 20.8px var(--body);letter-spacing:.16em;fill:var(--faint)}
 /* (the water's name keeps a margin of paper, so the water lines stop short of it) */
 .mk-el .wl{stroke:var(--sheet);stroke-width:7px;stroke-linejoin:round;paint-order:stroke}
-/* (Miami's bay named as water is on a chart: in the serif's italic, apart from the district names) */
-.mk-el.mi .wl{font-family:var(--display);font-style:italic;font-weight:400;font-size:22px;letter-spacing:.06em}
+/* (Miami's bay and Manhattan's river named as water is on a chart: in the serif's italic, apart from the district names) */
+.mk-el:is(.mi,.ny) .wl{font-family:var(--display);font-style:italic;font-weight:400;font-size:22px;letter-spacing:.06em}
 @media (min-width:1320px){.mk-el text{font-size:17.6px}}
 @media (min-width:701px) and (max-width:900px){.mk-el text{font-size:16.6px}}
 @media (min-width:601px) and (max-width:700px){.mk-el text{font-size:19.3px}}
@@ -350,11 +350,12 @@
 .mk-el.mi .dt.q{stroke-width:calc(var(--lw-detail) * var(--fu) * .7)}
 /* (and a tower not yet built keeps its white slabs and frames, but their edges drawn lighter, so it reads as planned) */
 .mk-el.mi .fut .wb{stroke-opacity:.5}
-/* (its planned towers' dashed outlines a step lighter again, so the standing city leads) */
-.mk-el.mi .fut .ob{opacity:.6}
-/* (and each planned tower as a whole a full tone back, its glass barely tinted, so the built city reads first and the
-   planned one as a layer over it) */
-.mk-el.mi .fut{opacity:.44}.mk-el.mi .fut .wn{opacity:.45}
+/* (its planned towers' dashed outlines kept clear, so each still reads as a tower on the key's dashed line) */
+.mk-el.mi .fut .ob{opacity:.86}
+/* (and each planned tower as a whole two full tones back, its glass a faint tint and its floor lines a whisper, so the
+   built landmarks are the darkest things in the frame and the planned city a light layer over them; the glass is thinned
+   by its fill, since the panes' fade-in owns their opacity) */
+.mk-el.mi .fut{opacity:.34}.mk-el.mi .fut .wn{fill-opacity:.4}.mk-el.mi .fut .dt{opacity:.3}.mk-el.mi .fut .dt.q{opacity:.16}
 /* (its key numerals in the text's own weight, set over the drawing, not stamped on it) */
 .mk-el.mi .nk text{font-weight:400;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
