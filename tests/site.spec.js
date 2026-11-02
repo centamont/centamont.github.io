@@ -349,11 +349,12 @@ test('hero tower renders in 3D under a still when asked, and is drawn otherwise'
   await plain.close();
 });
 
-// Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, hero/day-*.webp by day),
+// Once built, the finished tower is a photograph of this hour (hero/night-*.webp after dark, the golden hour's
+// hero/gold-*.webp through the day),
 // fetched once the page has loaded (at once where there is no intro), on a phone as on a desktop: one file, whichever the
 // screen. The developer story below stays drawn, with no photograph. Beside it on a desktop the still's own light runs
 // under the copy (the air); a phone has none. No count of sales stands over it: the tower is not a real project.
-test('the hero shows this hour\'s photograph of the tower, by night and by day', async ({ page }, info) => {
+test('the hero shows this hour\'s photograph of the tower: night after dark, gold by day', async ({ page }, info) => {
   const wide = info.project.name === 'desktop';
   const asked = [];
   page.on('request', (r) => /\/hero\/[a-z0-9-]+\.webp$/.test(r.url()) && asked.push(r.url()));
@@ -381,10 +382,10 @@ test('the hero shows this hour\'s photograph of the tower, by night and by day',
   await day.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
   await day.goto('/');
   await expect(day.locator('#heroModel')).toHaveAttribute('data-built', '34');
-  await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+  await expect(day.locator('#heroModel')).toHaveAttribute('data-still', 'gold', { timeout: 20000 });
   if (wide) await expect(day.locator('#top')).toHaveClass(/\baired\b/);
   expect(dayAsked).toHaveLength(1);
-  expect(dayAsked[0]).toMatch(/\/hero\/day-[12]x\.webp$/);
+  expect(dayAsked[0]).toMatch(/\/hero\/gold-[12]x\.webp$/);
   await day.close();
 });
 
@@ -400,7 +401,7 @@ test('the hero photograph fills the phone\'s width and takes no loupe', async ({
     await page.clock.install({ time: new Date('2026-10-24T17:00:00Z') });
     await page.goto('/');
     const hero = page.locator('#heroModel');
-    await expect(hero).toHaveAttribute('data-still', 'day', { timeout: 20000 });
+    await expect(hero).toHaveAttribute('data-still', 'gold', { timeout: 20000 });
     const m = await page.evaluate(() => {
       const c = document.getElementById('heroModel'), v = (k) => parseFloat(c.style.getPropertyValue(k)), h = document.getElementById('top');
       return { plated: h.classList.contains('plated'), clip: c.style.clipPath, m1: v('--m1'), m2: v('--m2'), w: c.clientWidth, foot: parseFloat(h.style.getPropertyValue('--plate-foot')), note: document.querySelector('.hero .coords').getBoundingClientRect().bottom, h1: document.querySelector('.hero h1').getBoundingClientRect().top };

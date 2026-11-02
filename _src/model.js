@@ -2674,9 +2674,10 @@
   // What the rendered tower (tower3d.js) and the sales curve's small elevation (instrument.js) are built from: the same
   // plans, structure, site and stacking plan as the drawing.
   // Which photograph suits the hour (see STILLS): the night's once the sun is below the horizon (as the hero's camera
-  // judges it), the early morning's or golden hour's while it stands under 15 degrees (east or west of south), the day's
-  // above that; and their bearings.
-  Model.still = (t) => { const s = miamiSun(t); return s.night >= 0.6 ? 'night' : s.el < 15 ? (s.az < 180 ? 'morning' : 'gold') : 'day'; };
+  // judges it), the golden hour's while it is up. (The day and morning stills are kept in STILLS and hero/ but no longer
+  // shown: judged against the best first screens anywhere, the noon render read as a render and the evening as a
+  // photograph, so the evening stands for the whole day.) And their bearings.
+  Model.still = (t) => (miamiSun(t).night >= 0.6 ? 'night' : 'gold');
   Model.stills = STILLS;
   Model.geo = { FLOORS, SLAB, PODIUM, CROWN, RES0, RES1, RAIL_H, SCREEN_H, CREST, BEACON, PORTE, CANOPY, CORE, COLS, PALMS, LAMP, GOLD, MODEL_ROOM, RANK, MEZZ, hash, craneAt, plan: floorPlan, set: (na) => SETS[na] || (SETS[na] = buildSet(na)) };
   window.CentamontModel = Model;

@@ -1111,14 +1111,6 @@ html:not(.js) .step{min-height:auto}
 .doorway .room::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(var(--ink-rgb),.08),rgba(var(--ink-rgb),.3) 24%,rgba(var(--ink-rgb),.9) var(--floor-at,46%),rgba(var(--ink-rgb),.96))}
 @media (min-width:821px){.head.statement.turn .intro{grid-column:1/span 5}}
 
-/* A quiet way to the partners at the foot of the places a reader decides: under the hero's buttons (wide screens), the
-   markets and the questions. */
-.hero .row .write{align-self:center;margin:0 0 0 10px;padding-block:6px 3px;color:inherit;opacity:.86}
-@media (hover:hover) and (pointer:fine){.hero .row .write:hover{opacity:1}}
-/* Below 1400px the link would run onto the tower's ground: in Spanish and Portuguese the longer buttons already reach the
-   drawing's side by 821px, and in English the photograph's palms and island start under it up to about 1366px. The close,
-   the letter and the menu all lead to the partners, so it is left out there and returns from 1400px, clear of the still */
-@media (max-width:1399px){.hero .row .write{display:none}}
 /* The buttons and the quiet link always stand on clean ink: under the row lies a veil of the hero's own ink, from the
    window's edge to 140px past the link's end, feathered over that last 140px and over 36px above and below, so neither
    the drawn tower's podium and ground grid (to 1180px) nor the photograph's site plan and landscape (wider) ever runs
@@ -1258,12 +1250,30 @@ html:not(.js) .step{min-height:auto}
 .firm-record{position:relative;z-index:1;background:var(--bg);box-shadow:0 -1px 0 rgba(var(--bronze-rgb),.55)}
 
 /* The disclaimer on the picture, not over the headline: on a desktop the line that says the tower is illustrative is a
-   plate caption in the still's lower right corner, level with the scroll cue, as a rendering is credited in a magazine,
-   so the first words a visitor reads are the firm's. Phones and short landscape screens keep it in the meta line, where
+   plate caption in the still's upper right corner, on the line of the place's name opposite it, on the calm sky (the
+   bay's lower corner carries the sun's glitter and a boat's wake; narrower windows keep that lower corner), as a rendering is credited in a magazine, so the
+   first words a visitor reads are the firm's. Phones and short landscape screens keep it in the meta line, where
    the copy leaves no free corner. */
 .hero .plate-cap{display:none}
 @media (min-width:821px) and (min-height:501px){
   .hero .plate-cap{display:block;position:absolute;right:var(--gutter);bottom:clamp(18px,3vh,32px);z-index:2;margin:0;pointer-events:none;font:500 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--ivory-rgb),.62);text-shadow:0 0 10px rgba(var(--hero-rgb),.7);opacity:calc(1 - var(--p,0) * 5)}
   .hero .coords .cap{display:none}
 }
+/* Below 1200px wide, or 721px tall, the tower's crown stands too far right for the upper corner to stay clear of it:
+   the caption keeps the lower corner there. */
+@media (min-width:1200px) and (min-height:721px){.hero .plate-cap{bottom:auto;top:calc(64px + clamp(28px,5vh,52px) + 6px)}}
 @media print{.hero .plate-cap{display:none}}
+
+/* One quiet line over the picture: the place. The hour and the sun stay set by the scripts (the drawing still follows
+   them where it shows), but are not printed: the still is the evening's or the night's, not the visitor's exact hour. */
+.hero .coords > :is(#clock,#sunline){display:none!important}
+/* One button; the private clients' door is a quiet link beside it. */
+.hero .row .aside{align-self:center;margin:0 0 0 18px;padding-block:6px 3px;color:inherit;opacity:.86}
+@media (hover:hover) and (pointer:fine){.hero .row .aside:hover{opacity:1}}
+/* On a phone the button takes the full width and the link wraps under it, flush with the copy's edge. */
+@media (max-width:820px){.hero .row .aside{margin-left:0}}
+/* The headline about a sixth smaller on a desktop, so the picture takes the room (the still is placed from the copy's
+   right edge) and the line reads as said, not announced. */
+@media (min-width:821px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,10.5vh),98px)}}
+@media (min-width:821px) and (max-height:720px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,calc(14.9vh - 31px)),98px)}}
+@media (min-width:821px) and (min-height:501px) and (max-height:580px){.hero{--t-hero:clamp(40px,min(6.6vw,8.5vh),98px)}}

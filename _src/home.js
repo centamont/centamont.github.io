@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded',function(){
     // a fifth of its size for that, and past it only keeps off the screen's edge. The sun's path ends on the labels' line.
     if(photo&&!narrow)framePhoto(v,false);
     const W=heroM.w,col=wrap.offsetLeft+wrap.offsetWidth-parseFloat(getComputedStyle(wrap).paddingRight),box=()=>heroM.fit(heroCam.th,v.phi,{measure:true});
-    const textR=narrow&&!side()?-1e9:Math.max(...[...hero.querySelectorAll('h1,.lede,.row .btn,.row .write')].map(e=>e.getBoundingClientRect().right))+64;let b=box();
+    const textR=narrow&&!side()?-1e9:Math.max(...[...hero.querySelectorAll('h1,.lede,.row .btn,.row .aside')].map(e=>e.getBoundingClientRect().right))+64;let b=box();
     if(!photo)for(const [edge,floor] of [[Math.min(W-18,col),W-col>100?.8:.55],[W-18,.55]]){let over=b.x1-edge;if(over<=.5)continue;
       const sh=Math.min(over,Math.max(0,b.x0-textR));heroM.o.offsetX-=sh/W;over-=sh;
       for(let i=0;i<8&&over>.5&&heroM.o.scale>v.scale*floor+1e-6;i++){b=box();heroM.o.scale*=Math.max(floor*v.scale/heroM.o.scale,1-over/(b.x1-b.x0));const b2=box();heroM.o.offsetX+=(b.x0-b2.x0)/W;over=box().x1-edge}
