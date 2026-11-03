@@ -1198,7 +1198,10 @@
       // at every level (where two sold homes meet, only the edge that shows), the party wall as one stepped line (the
       // plates turn from floor to floor), the edges firm where the block meets the sketch, and one line round the whole
       // block. Each drops the last few feet into place as it sells.
-      const fOff = dark ? 0.36 : 0.33, fShade = dark ? 0.78 : 1.25, offAt = (k) => k >= RES0 && k < RES1 && k >= L - 0.001;
+      // Once ground breaks (o.soldOutline), the sold floors above the frame are drawn as their outline over a faint wash
+      // until the frame reaches them, so they never read as solid bronze floating over a bare frame; they fill as it does.
+      const wash = this.o.soldOutline ? 1 - 0.6 * clamp(L / 1.5, 0, 1) : 1;
+      const fOff = (dark ? 0.36 : 0.33) * wash, fShade = dark ? 0.78 : 1.25, offAt = (k) => k >= RES0 && k < RES1 && k >= L - 0.001;
       const shape = (pl, hx, y0, y1) => { const up = chain(this.ring(pl, y1), hx, true), lo = chain(this.ring(pl, y0), hx, false); for (let i = lo.length - 1; i >= 0; i--) up.push(lo[i]); return up; };
       const front = (r0, r1, j, n) => { const j2 = (j + 1) % n, a = r0[j], b = r0[j2], c = r1[j2]; return (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]) < 0; };
       const offplan = (ks, outlined) => {
@@ -1345,7 +1348,7 @@
           g.globalAlpha = gA;
           // north point, only where the view looks down enough to read it
           // (on the story's plan it goes with the plan's names as the view lifts off it)
-          const pn = this.o.planNotes ? clamp((-this.phi - 0.3) / 0.3, 0, 1) : 1;
+          const pn = this.o.planNotes ? clamp((-this.phi - 0.3) / 0.3, 0, 1) * (1 - this.E) : 1;
           if (this.o.north && pn > 0.01) {
           g.globalAlpha = gA * pn;
           const nc = [12.5, 9.5];
@@ -1359,9 +1362,10 @@
         g.setLineDash([4, 5]); g.strokeStyle = bronze(Math.min(0.9, 0.55 * bo));
         poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
         // The story's plan is lettered as a site plan is (o.planNotes): the site, the tower on its footprint, the street.
-        // The names lie flat on the sheet and go as the view lifts off the plan.
+        // The names lie flat on the sheet and go as the view lifts off the plan, and as the envelope and its level ruler
+        // are drawn in (on a phone the ruler comes in while the view is still tilting up, and they would cross it).
         if (this.o.planNotes && this.o.labels && this.o.site !== false) {
-          const f = clamp((-this.phi - 0.3) / 0.3, 0, 1);
+          const f = clamp((-this.phi - 0.3) / 0.3, 0, 1) * (1 - this.E);
           if (f > 0.01) {
             g.save(); g.globalAlpha = gA * f; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
             if ('letterSpacing' in g) g.letterSpacing = '0.14em';

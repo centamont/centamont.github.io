@@ -171,9 +171,9 @@ const RES=+document.getElementById('gR').textContent.replace('/',''),LIM=.5;
 const data=steps.map((s,n)=>({e:n>0,b:+s.dataset.built,s:+s.dataset.sold/2,c:+s.dataset.built>0&&n<steps.length-1}));
 data.forEach((d,n)=>{d.rel=n===1||n===2?data[2].s:0});
 const VIEWS=[[-0.7,-1.3],[-0.9,0.24],[-0.6,0.19],[-0.38,0.16],[-0.15,0.2],[0.1,0.23]];
-const view=n=>{const [th,ph]=VIEWS[n],d=data[n],tight=narrow||towerM.h<360,bl=Math.max(0,gauge.getBoundingClientRect().left-towerM.c.getBoundingClientRect().left);
+const view=(n,cut=0)=>{const [th,ph]=VIEWS[n],d=data[n],tight=narrow||towerM.h<360,bl=Math.max(0,gauge.getBoundingClientRect().left-towerM.c.getBoundingClientRect().left);
 if(!n)return towerM.fit(th,ph,{plan:true,margin:tight?[12,24,12,24+bl]:[40,40,40,40+bl]});
-const m=tight?[14,12,10,12]:[30,22,22,22],v=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:m});
+const m=tight?[14+cut,12,10,12]:[30+cut,22,22,22],v=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:m});
 const b=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,measure:true,ty:v.ty,scale:v.scale,offsetX:v.offsetX}),need=bl-64-b.x0,room=towerM.w-m[1]-b.x1;
 if(need>room)return towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:[m[0],m[1],m[2],bl-64]});
 if(need>0)v.offsetX+=need/towerM.w;
@@ -184,7 +184,7 @@ const put=d=>{Object.assign(st,d);if(!towerM)return;
 towerM.o.soldRate=Math.max(6,Math.abs(st.s-towerM.S)/.1);towerM.o.rate=Math.max(11,(Math.abs(st.b-towerM.L)+1.1)/.15);
 towerM.release(st.rel);towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c)};
 const story=()=>{if(towerM||!Model)return;
-towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
+towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true,soldOutline:true});
 if(!towerM)return;models.push(towerM);
 let lb=-1,ls=-1,lf=-1,lm=null,ps=0;
 towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S*2+.02),f=Math.min(1,m.S*2/RES),met=m.S*2>=RES*LIM-.001;
@@ -202,9 +202,11 @@ const at=()=>{const y=innerHeight*(narrow?.63:.5);let k=0;steps.forEach((s,i)=>{
 if(k>=steps.length-1)return[steps.length-1,0];
 const r=steps[k].getBoundingClientRect(),[a,b]=k===riseN?[.12,.92]:[.8,1],p=c01(((y-r.top)/r.height-a)/(b-a));return[k,p*p*(3-2*p)]};
 const views=k=>vs[k]||(vs[k]=[view(k),view(k+1)]);
+const elev=document.querySelector('.rise .elev');let lc=0;
+const cut=()=>{const t=parseFloat(getComputedStyle(elev).top)||0,r=towerM.c.getBoundingClientRect();return Math.round(Math.min(Math.max(0,t-r.top),r.height*(narrow?.25:.55))/4)*4};
 const rise=force=>{if(riseN<0)return;const live=!motionOff();if(!live&&cur!==riseN)return;
 let[k,e]=at();if(!live&&k!==riseN){k=riseN;e=cur>riseN?1:0}
-if(k>=steps.length-1){if(force||lk!==k){lk=k;lr=-1;if(towerM){towerM.camTo(view(k),true);put(data[k])}else state(data[k])}return}
+if(k>=steps.length-1){const c=live&&towerM?cut():0;if(force||lk!==k||c!==lc){const was=lk;lk=k;lr=-1;lc=c;if(towerM){towerM.camTo(c?(vs['c'+c]||(vs['c'+c]=view(k,c))):view(k),true);if(force||was!==k)put(data[k])}else state(data[k])}return}
 if(!force&&k===lk&&Math.abs(e-lr)<.002)return;lr=e;lk=k;
 const a=data[k],b=data[k+1],up=!a.b&&b.b;
 const es=up?c01(e/.6):e,eb=up?c01((e-.6)/.4):e;
