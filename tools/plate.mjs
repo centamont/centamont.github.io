@@ -70,22 +70,28 @@ for (const [f, lang] of Object.entries(BRIEFS)) {
 const i = process.argv.indexOf('--social');
 if (i > 0) {
   const DIR = resolve(process.argv[i + 1]); if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
-  // name, size, the plate's box [x, y, w, h] (it runs off the right edge: the climb goes on), stroke scale, the label's
-  // size, the line's [x, first baseline, size]. No lockup: the avatar beside each banner is already the mark and the
-  // profile name sits under it. The line leads; the curve sits lower and quieter, bare of the grid and the schedule, with
-  // one word at the patina dot (the month the threshold is met) and the note that the curve is illustrative.
+  // name, size, the plate's box [x, y, w, h], stroke scale, the label's size, the line's [x, first baseline, size].
+  // No lockup: the avatar beside each banner is already the mark. The line leads; the curve is drawn whole inside the
+  // frame, on a ground line, ending on a point, bare of the grid and the schedule. One label, in bronze, at the month the
+  // threshold is met, large enough to read on a phone; the note that the curve is illustrative rides the threshold line.
   const SOCIAL = [
-    ['x-header-1500x500', 1500, 500, [660, 150, 1000, 260, 2.6, 42], [110, 222, 74]],       // the line above X's avatar (bottom left)
-    ['linkedin-banner-1584x396', 1584, 396, [700, 110, 1000, 210, 2.4, 38], [110, 165, 64]], // the line above LinkedIn's avatar
-    ['youtube-banner-2560x1440', 2560, 1440, [1240, 590, 1100, 290, 3, 40], [560, 700, 84]],  // all inside the 1546 × 423 safe area
+    ['x-header-1500x500', 1500, 500, [680, 150, 700, 260, 2.6, 46], [110, 222, 74]],       // the line above X's avatar (bottom left)
+    ['linkedin-banner-1584x396', 1584, 396, [740, 100, 720, 220, 2.4, 42], [110, 165, 64]], // the line above LinkedIn's avatar
+    ['youtube-banner-2560x1440', 2560, 1440, [1260, 590, 720, 290, 3, 44], [580, 700, 84]],  // all inside the 1546 × 423 safe area
   ];
-  const line = (lx, ly, size) => `<g font-family="'Cormorant Garamond', serif" font-size="${size}" fill="${IVORY}">` +
-    `<text x="${lx}" y="${ly}">New buildings,</text>` +
-    `<text x="${lx}" y="${(ly + size * 1.1).toFixed(1)}">sold <tspan fill="${BRONZE_300}" font-style="italic">with intent.</tspan></text></g>`;
-  const label = (px, py, pw, ph, size) => { // under the threshold, right of the dot: the month, then the note
-    const hx = px + (HIT / M) * pw + size * 0.55, hy = py + ph - (eased(HIT) / 100) * ph;
-    return `<text x="${hx.toFixed(1)}" y="${(hy + size * 1.25).toFixed(1)}" fill="${PATINA}" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="${size}">Month 14</text>` +
-      `<text x="${(hx + 2).toFixed(1)}" y="${(hy + size * 1.25 + size * 0.75).toFixed(1)}" fill="${IVORY}" fill-opacity=".5" font-family="Jost, sans-serif" font-size="${(size * 0.5).toFixed(1)}" letter-spacing="${(size * 0.08).toFixed(1)}">ILLUSTRATIVE</text>`;
+  // the line, two rows, *italic* in bronze: node tools/plate.mjs --social DIR --line 'First row,|second *row.*'
+  const li = process.argv.indexOf('--line');
+  const ROWS = (li > 0 ? process.argv[li + 1] : 'The sale of a building,|read *in advance.*').split('|');
+  const fit = Math.min(1, 18 / Math.max(...ROWS.map((r) => r.replace(/\*/g, '').length))); // longer rows set smaller
+  const row = (t) => t.replace(/\*([^*]+)\*/g, `<tspan fill="${BRONZE_300}" font-style="italic">$1</tspan>`);
+  const line = (lx, ly, size) => { size *= fit; return `<g font-family="'Cormorant Garamond', serif" font-size="${size.toFixed(1)}" fill="${IVORY}">` +
+    ROWS.map((t, k) => `<text x="${lx}" y="${(ly + k * size * 1.1).toFixed(1)}">${row(t)}</text>`).join('') + '</g>'; };
+  const label = (px, py, pw, ph, st, size) => { // the month under the threshold, right of the point; the note at the line's end
+    const hx = px + (HIT / M) * pw, hy = py + ph - (eased(HIT) / 100) * ph, ey = py + ph - (eased(M) / 100) * ph;
+    return `<path d="M${px} ${py + ph}H${px + pw}" stroke="${IVORY}" stroke-opacity=".28" stroke-width="${(0.6 * st).toFixed(2)}"/>` +
+      `<circle cx="${px + pw}" cy="${ey.toFixed(1)}" r="${(1.9 * st).toFixed(2)}" fill="${BRONZE}"/>` +
+      `<text x="${(hx + size * 0.45).toFixed(1)}" y="${(hy + size * 1.15).toFixed(1)}" fill="${BRONZE_300}" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="${size}">Month 14</text>` +
+      `<text x="${px + pw}" y="${(hy - size * 0.35).toFixed(1)}" text-anchor="end" fill="${IVORY}" fill-opacity=".42" font-family="Jost, sans-serif" font-size="${(size * 0.36).toFixed(1)}" letter-spacing="${(size * 0.06).toFixed(1)}">ILLUSTRATIVE</text>`;
   };
   // the plate's words in our own faces, from fonts/ (the PNGs carry them; the SVGs fall back to the viewer's)
   const face = (fam, style, file) => `@font-face{font-family:'${fam}';font-style:${style};src:url(data:font/woff2;base64,${readFileSync(resolve(ROOT, 'fonts', file)).toString('base64')})}`;
@@ -96,7 +102,7 @@ if (i > 0) {
   const page = await browser.newPage();
   for (const [name, W, H, [px, py, pw, ph, st, font], [lx, ly, size]] of SOCIAL) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="${INK}"/>` +
-      `<g transform="translate(${px} ${py})">${plate(pw, ph, { stroke: st, curve: eased, bare: true, fill: '0', fade: true })}</g>${label(px, py, pw, ph, font)}${line(lx, ly, size)}</svg>\n`;
+      `<g transform="translate(${px} ${py})">${plate(pw, ph, { stroke: st, curve: eased, bare: true, fill: '0', dot: BRONZE_300, limOpacity: '.5' })}</g>${label(px, py, pw, ph, st, font)}${line(lx, ly, size)}</svg>\n`;
     writeFileSync(resolve(DIR, name + '.svg'), svg);
     await page.setViewportSize({ width: W, height: H });
     await page.setContent(`<style>${FACES}html,body{margin:0}svg{display:block}</style>${svg}`);
