@@ -12,11 +12,14 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
-const INK = '#14161A', IVORY = '#F4F0E8', BRONZE = '#B8976A', PATINA = '#8AA69B'; // patina-300, its shade on ink
+const INK = '#14161A', IVORY = '#F4F0E8', BRONZE = '#B8976A', BRONZE_300 = '#D5B382', PATINA = '#8AA69B'; // patina-300, its shade on ink
 
 // contracts signed, in percent, at month m: a quick first release to 28% by month 3, then the slow climb the
 // instrument draws at par (the threshold met in month 14, 81% sold at completion in month 38, 84% at month 42)
 const signed = (m) => m <= 3 ? 28 * Math.pow(m / 3, 0.9) : 28 + 87.2 * (1 - Math.exp(-(m - 3) / 38));
+// for the banners, one clean arc through the same threshold month (50% at month 14, 83% at month 42): at banner size the
+// quick first release reads as a corner, so the banner draws the shape of the climb, not its detail
+const eased = (m) => 92.4 * (1 - Math.exp(-m / 18));
 const M = 42, HIT = 14, LIM = 50, SCHED = [[12, 'planned'], [14, 'ground'], [32, 'top'], [38, 'done']];
 const WORDS = {
   en: { lim: 'Pre-sale threshold', hit: 'Month 14', note: 'Illustrative' },
@@ -24,21 +27,24 @@ const WORDS = {
   pt: { lim: 'Patamar de pré-venda', hit: 'Mês 14', note: 'Ilustrativa' },
 };
 
-// the plate in a w × h box; words: false for the social banners (no labels at those sizes), or a language
-export function plate(w, h, { lang = false, stroke = 1, font = 7 } = {}) {
+// the plate in a w × h box; lang: its words in that language (the briefs), or none; bare: no grid, schedule or ground line
+export function plate(w, h, { lang = false, stroke = 1, font = 7, curve = signed, bare = false, fill = '.13', fade = false, dot = PATINA, limOpacity = '.7' } = {}) {
   const x = (m) => (m / M) * w, y = (p) => h - (p / 100) * h;
-  const pts = []; for (let m = 0; m <= M; m += 0.5) pts.push([x(m), y(signed(m))]);
+  const pts = []; for (let m = 0; m <= M; m += 0.5) pts.push([x(m), y(curve(m))]);
   const line = pts.map(([a, b], i) => (i ? 'L' : 'M') + a.toFixed(1) + ' ' + b.toFixed(1)).join('');
   const s = (v) => (v * stroke).toFixed(2);
   let g = '';
-  for (const p of [25, 50, 75, 100]) if (p !== LIM) g += `<path d="M0 ${y(p).toFixed(1)}H${w}" stroke="${IVORY}" stroke-opacity=".09" stroke-width="${s(0.6)}"/>`;
-  for (const [m, k] of SCHED) g += `<path d="M${x(m).toFixed(1)} 0V${h}" stroke="${IVORY}" stroke-opacity="${k === 'planned' ? .16 : .12}" stroke-width="${s(0.6)}"${k === 'planned' ? ` stroke-dasharray="${s(2)} ${s(2)}"` : ''}/>`;
-  g += `<path d="M0 ${h}H${w}" stroke="${IVORY}" stroke-opacity=".35" stroke-width="${s(0.6)}"/>`;
-  g += `<path d="${line}L${w} ${h}L0 ${h}Z" fill="${BRONZE}" fill-opacity=".13"/>`;
-  g += `<path d="${line}" fill="none" stroke="${BRONZE}" stroke-width="${s(1.4)}" stroke-linecap="round"/>`;
-  g += `<path d="M0 ${y(LIM)}H${w}" stroke="${IVORY}" stroke-opacity=".7" stroke-width="${s(0.7)}" stroke-dasharray="${s(5)} ${s(2.2)} ${s(1)} ${s(2.2)}"/>`;
-  const hx = x(HIT).toFixed(1), hy = y(signed(HIT)).toFixed(1);
-  g += `<circle cx="${hx}" cy="${hy}" r="${s(5.5)}" fill="${PATINA}" fill-opacity=".22"/><circle cx="${hx}" cy="${hy}" r="${s(2.4)}" fill="${PATINA}"/>`;
+  if (!bare) for (const p of [25, 50, 75, 100]) if (p !== LIM) g += `<path d="M0 ${y(p).toFixed(1)}H${w}" stroke="${IVORY}" stroke-opacity=".09" stroke-width="${s(0.6)}"/>`;
+  if (!bare) for (const [m, k] of SCHED) g += `<path d="M${x(m).toFixed(1)} 0V${h}" stroke="${IVORY}" stroke-opacity="${k === 'planned' ? .16 : .12}" stroke-width="${s(0.6)}"${k === 'planned' ? ` stroke-dasharray="${s(2)} ${s(2)}"` : ''}/>`;
+  if (!bare) g += `<path d="M0 ${h}H${w}" stroke="${IVORY}" stroke-opacity=".35" stroke-width="${s(0.6)}"/>`;
+  g += `<path d="${line}L${w} ${h}L0 ${h}Z" fill="${BRONZE}" fill-opacity="${fill}"/>`;
+  // fade: the curve and the threshold rise out of the ink at the left instead of starting on a hard end
+  if (fade) g += `<defs><linearGradient id="cm-in" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${(w * 0.22).toFixed(1)}" y2="0"><stop offset="0" stop-color="${BRONZE}" stop-opacity="0"/><stop offset="1" stop-color="${BRONZE}"/></linearGradient>` +
+    `<linearGradient id="cm-in-lim" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${(w * 0.22).toFixed(1)}" y2="0"><stop offset="0" stop-color="${IVORY}" stop-opacity="0"/><stop offset="1" stop-color="${IVORY}"/></linearGradient></defs>`;
+  g += `<path d="${line}" fill="none" stroke="${fade ? 'url(#cm-in)' : BRONZE}" stroke-width="${s(1.4)}" stroke-linecap="round"/>`;
+  g += `<path d="M0 ${y(LIM)}H${w}" stroke="${fade ? 'url(#cm-in-lim)' : IVORY}" stroke-opacity="${limOpacity}" stroke-width="${s(0.7)}" stroke-dasharray="${s(5)} ${s(2.2)} ${s(1)} ${s(2.2)}"/>`;
+  const hx = x(HIT).toFixed(1), hy = y(curve(HIT)).toFixed(1);
+  g += `<circle cx="${hx}" cy="${hy}" r="${s(5.5)}" fill="${dot}" fill-opacity=".22"/><circle cx="${hx}" cy="${hy}" r="${s(2.4)}" fill="${dot}"/>`;
   if (lang) {
     const t = WORDS[lang], f = `font-family="Jost, sans-serif" font-size="${font}" letter-spacing="${(font * 0.18).toFixed(2)}"`;
     g += `<text x="${w}" y="${(y(LIM) + font * 1.55).toFixed(1)}" text-anchor="end" fill="${IVORY}" fill-opacity=".72" ${f}>${t.lim.toUpperCase()}</text>`;
@@ -64,30 +70,43 @@ for (const [f, lang] of Object.entries(BRIEFS)) {
 const i = process.argv.indexOf('--social');
 if (i > 0) {
   const DIR = resolve(process.argv[i + 1]); if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
-  const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8');
-  const WM = html.match(/id="cm-wm"[^>]*d="([^"]+)"/)[1];
-  const MARK = 'M50 0l-100 0l42.9-60.06l4.85 48.06l4.5 0l7.56-44.27z';
-  const lockup = (lx, ly, cap) => { // the header's proportions: mark 22/13 of the cap height, gap 7/13, on the baseline
-    const mh = cap * 22 / 13, ms = mh / 60.06, mw = 100 * ms, gap = cap * 7 / 13;
-    return `<path fill="${BRONZE}" transform="translate(${(lx + mw / 2).toFixed(2)} ${ly}) scale(${ms.toFixed(4)})" d="${MARK}"/>` +
-      `<path fill="${IVORY}" fill-rule="evenodd" transform="translate(${(lx + mw + gap).toFixed(2)} ${ly}) scale(${(cap / 1000).toFixed(5)})" d="${WM}"/>`;
-  };
-  // name, size, the plate's box [x, y, w, h] and stroke scale, the lockup [x, baseline, cap height]
+  // name, size, the plate's box [x, y, w, h], stroke scale, the label's size, the line's [x, first baseline, size].
+  // No lockup: the avatar beside each banner is already the mark. The line leads; the curve is drawn whole inside the
+  // frame, on a ground line, ending on a point, bare of the grid and the schedule. One label, in bronze, at the month the
+  // threshold is met, large enough to read on a phone; the note that the curve is illustrative rides the threshold line.
   const SOCIAL = [
-    ['x-header-1500x500', 1500, 500, [860, 150, 520, 200, 2.2], [140, 262, 26]],      // the lockup clear above X's avatar, bottom left
-    ['linkedin-banner-1584x396', 1584, 396, [940, 108, 520, 180, 2.2], [170, 212, 24]],  // the lockup clear of LinkedIn's avatar, low on the left
-    ['youtube-banner-2560x1440', 2560, 1440, [1300, 600, 660, 240, 2.4], [600, 740, 30]], // the 1546 × 423 safe area, centred
+    ['x-header-1500x500', 1500, 500, [680, 150, 700, 260, 2.6, 46], [110, 222, 74]],       // the line above X's avatar (bottom left)
+    ['linkedin-banner-1584x396', 1584, 396, [740, 100, 720, 220, 2.4, 42], [110, 165, 64]], // the line above LinkedIn's avatar
+    ['youtube-banner-2560x1440', 2560, 1440, [1260, 590, 720, 290, 3, 44], [580, 700, 84]],  // all inside the 1546 × 423 safe area
   ];
+  // the line, two rows, *italic* in bronze: node tools/plate.mjs --social DIR --line 'First row,|second *row.*'
+  const li = process.argv.indexOf('--line');
+  const ROWS = (li > 0 ? process.argv[li + 1] : 'The sale of a building,|read *in advance.*').split('|');
+  const fit = Math.min(1, 18 / Math.max(...ROWS.map((r) => r.replace(/\*/g, '').length))); // longer rows set smaller
+  const row = (t) => t.replace(/\*([^*]+)\*/g, `<tspan fill="${BRONZE_300}" font-style="italic">$1</tspan>`);
+  const line = (lx, ly, size) => { size *= fit; return `<g font-family="'Cormorant Garamond', serif" font-size="${size.toFixed(1)}" fill="${IVORY}">` +
+    ROWS.map((t, k) => `<text x="${lx}" y="${(ly + k * size * 1.1).toFixed(1)}">${row(t)}</text>`).join('') + '</g>'; };
+  const label = (px, py, pw, ph, st, size) => { // the month under the threshold, right of the point; the note at the line's end
+    const hx = px + (HIT / M) * pw, hy = py + ph - (eased(HIT) / 100) * ph, ey = py + ph - (eased(M) / 100) * ph;
+    return `<path d="M${px} ${py + ph}H${px + pw}" stroke="${IVORY}" stroke-opacity=".28" stroke-width="${(0.6 * st).toFixed(2)}"/>` +
+      `<circle cx="${px + pw}" cy="${ey.toFixed(1)}" r="${(1.9 * st).toFixed(2)}" fill="${BRONZE}"/>` +
+      `<text x="${(hx + size * 0.45).toFixed(1)}" y="${(hy + size * 1.15).toFixed(1)}" fill="${BRONZE_300}" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="${size}">Month 14</text>` +
+      `<text x="${px + pw}" y="${(hy - size * 0.35).toFixed(1)}" text-anchor="end" fill="${IVORY}" fill-opacity=".42" font-family="Jost, sans-serif" font-size="${(size * 0.36).toFixed(1)}" letter-spacing="${(size * 0.06).toFixed(1)}">ILLUSTRATIVE</text>`;
+  };
+  // the plate's words in our own faces, from fonts/ (the PNGs carry them; the SVGs fall back to the viewer's)
+  const face = (fam, style, file) => `@font-face{font-family:'${fam}';font-style:${style};src:url(data:font/woff2;base64,${readFileSync(resolve(ROOT, 'fonts', file)).toString('base64')})}`;
+  const FACES = face('Jost', 'normal', 'jost-latin-400-normal.woff2') + face('Cormorant Garamond', 'italic', 'cormorant-garamond-latin-400-italic.woff2') + face('Cormorant Garamond', 'normal', 'cormorant-garamond-latin-400-normal.woff2');
   const { chromium } = await import('@playwright/test');
   const local = '/opt/pw-browsers/chromium';
   const browser = await chromium.launch(existsSync(local) ? { executablePath: local } : {});
   const page = await browser.newPage();
-  for (const [name, W, H, [px, py, pw, ph, st], [lx, ly, cap]] of SOCIAL) {
+  for (const [name, W, H, [px, py, pw, ph, st, font], [lx, ly, size]] of SOCIAL) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="${INK}"/>` +
-      `<g transform="translate(${px} ${py})">${plate(pw, ph, { stroke: st })}</g>${lockup(lx, ly, cap)}</svg>\n`;
+      `<g transform="translate(${px} ${py})">${plate(pw, ph, { stroke: st, curve: eased, bare: true, fill: '0', dot: BRONZE_300, limOpacity: '.5' })}</g>${label(px, py, pw, ph, st, font)}${line(lx, ly, size)}</svg>\n`;
     writeFileSync(resolve(DIR, name + '.svg'), svg);
     await page.setViewportSize({ width: W, height: H });
-    await page.setContent(`<style>html,body{margin:0}svg{display:block}</style>${svg}`);
+    await page.setContent(`<style>${FACES}html,body{margin:0}svg{display:block}</style>${svg}`);
+    await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: resolve(DIR, name + '.png') });
     console.log(name);
   }

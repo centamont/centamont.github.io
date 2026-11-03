@@ -70,7 +70,7 @@ test('home renders cleanly', async ({ page }, info) => {
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
   await page.goto('/');
-  await expect(page.locator('h1')).toContainText('The finest new buildings');
+  await expect(page.locator('h1')).toContainText('New buildings, sold with intent');
   await expect(page.locator('h1')).toHaveCount(1);
   for (const [id, heading] of sections) {
     await expect(page.locator(`#${id} h2`).first()).toContainText(heading);
