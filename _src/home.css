@@ -198,7 +198,7 @@
 @media (hover:hover) and (pointer:fine){.handle:hover svg{transform:translateX(.12em)}}
 html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) h1 .ln > span{transform:translateY(112%)}
 /* The rest of the hero is already painted under the curtain (it counts for first paint); it only settles. */
-html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.coords){transform:translateY(14px)}
+html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transform:translateY(14px)}
 /* The whole parting runs on the stylesheet's clock from the moment the stone splits: the halves part 0.08 s later, the
    two halves of the count fade by 0.32 s, and only then, while the halves are still parting, does the headline rise line
    by line from 0.32 s, so it rises in the open and never beside a half of the count; the lede, buttons and survey note
@@ -207,11 +207,11 @@ html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.coo
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln > span{transition:transform .72s var(--ease-display) .32s}
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.365s}
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.41s}
-html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition:transform .9s var(--ease-display) .44s}
+html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transition:transform .9s var(--ease-display) .44s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln > span{transition-delay:.1s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.19s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.28s}
-html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition-delay:.4s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transition-delay:.4s}
 
 .hero .coords b{font-weight:500;color:var(--bronze-300)}
 .hero .coords span:empty{display:none}
@@ -364,7 +364,7 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
 }
 @media print{
   /* printed while the first-visit intro plays, the page prints as it stands once the curtain has parted */
-  html.intro-on .hero :is(.lede,.row){transform:none!important}
+  html.intro-on .hero :is(.lede,.row,.proof){transform:none!important}
   
   .js .facade :is(.w,.k,.b){animation:none!important}.js .facade .b{opacity:var(--b-rest)!important}.js .facade :is(.w,.k){opacity:1!important}
   .js .spec .sp-plan g,.js .spec :is(.sp-dot,.sp-act-n,.sp-plan-n){opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}
@@ -1272,6 +1272,13 @@ html:not(.js) .step{min-height:auto}
 @media (hover:hover) and (pointer:fine){.hero .row .aside:hover{opacity:1}}
 /* On a phone the button takes the full width and the link wraps under it, flush with the copy's edge. */
 @media (max-width:820px){.hero .row .aside{margin-left:0}}
+/* Under the buttons, one line a developer can check in five seconds: what arrives every Monday, and the specimen itself.
+   A fact of the method, not a claim about us; quieter than the lede, set off by a short bronze rule. */
+.hero .proof{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:clamp(22px,3vh,32px);font-size:14px;line-height:1.5;letter-spacing:.01em;color:rgba(var(--ivory-rgb),.7)}
+.hero .proof::before{content:"";flex:0 0 22px;height:1px;align-self:center;background:var(--bronze-300);opacity:.8}
+.hero .proof a{color:var(--ivory)}
+@media (min-width:821px) and (max-height:720px){.hero .proof{margin-top:16px}}
+@media (max-width:820px){.hero .proof{font-size:13.5px}}
 /* The headline about a sixth smaller on a desktop, so the picture takes the room (the still is placed from the copy's
    right edge) and the line reads as said, not announced. */
 @media (min-width:821px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,10.5vh),98px)}}

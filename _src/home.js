@@ -137,9 +137,11 @@ document.addEventListener('DOMContentLoaded',function(){
   // shaft, and the hero's ink deepens over it toward the copy, so every line of it reads as it did on ink (4.5:1 at
   // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
   // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
+  // The sky gives way to the bay over AIR.seam px, eased, so the horizon carries on under the copy as a soft fall of
+  // light rather than a shelf.
   // A phone shows the photograph whole above the copy and needs none. The still's left edge stands AIR.gap px left of the
   // copy's right edge, so the air has room to brighten into the photograph before the shaft.
-  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280],lede:[.8,.7,240],note:[.62,.52,160]};
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280,.62,360],lede:[.8,.7,240,1,240],note:[.62,.52,160,.62,360],seam:300};
   let air=null,airAt=null,airRows=null,airKey='';
   // (any filter the stylesheet lays on the photograph, read off the canvas, whose pixels come unfiltered: saturate sepia
   // contrast brightness, the first two as one matrix; none today, since the stills carry their own grade)
@@ -158,7 +160,7 @@ document.addEventListener('DOMContentLoaded',function(){
       idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=(y*w+idx[j])*4;r+=d[o];gg+=d[o+1];b+=d[o+2]}
       row.set(grade(r/keep,gg/keep,b/keep),y*3)}
     const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
-    for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-10))/50));for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v)+bay[ch]*v}
+    for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-AIR.seam*.4))/AIR.seam)),v2=v*v*(3-2*v);for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v2)+bay[ch]*v2}
     const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
       for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
     return{h,near:blur(6*a.z),far:blur(14*a.z)}};
@@ -172,19 +174,21 @@ document.addEventListener('DOMContentLoaded',function(){
     const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
     const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
       x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
-    // (the ink over the copy at x: from l at the window's edge to r at the copy's right edge R, then easing to none 240px
-    // past it, or by the still's soft edge; over the headline, over the lede and the buttons, and over the place's name,
-    // it runs to their own right edges)
-    const ramp=(x,l,r,R)=>{const U=Math.max(R+240,x0);if(x<R)return l+(r-l)*x/R;const q=Math.min(1,Math.max(0,(U-x)/(U-R)));return r*q*q*(3-2*q)};
+    // (the ink over the copy at x: from l at the window's edge to r at a share k of the copy's right edge R, then easing
+    // to none sp px past R, or by the still's soft edge; over the headline, over the lede and the buttons, and over the
+    // place's name, it runs to their own right edges. The lede and the buttons keep their ink to their edge (k 1) for
+    // 4.5:1; over the headline and the name it starts to ease from well inside the column (k .62) and over a longer
+    // reach, so the sky brightens toward the photograph in one even slope, with no knee where flat ink met the ramp)
+    const ramp=(x,l,r,R,k,s)=>{const K=R*k,U=Math.max(R+s,x0);if(x<K)return l+(r-l)*x/K;const q=Math.min(1,Math.max(0,(U-x)/(U-K)));return r*q*q*(3-2*q)};
     // (and where no line of copy stands, the open sky over the headline and the water under the buttons, the ink thins
     // from well inside the copy's column, AIR.fall of the still's pixels before its soft edge, to none halfway across the
     // hand-over: the air brightens toward the photograph across the width of the column instead of meeting it at a
     // dark edge a hand's breadth from the tower. The veil below thins over the same span.)
     const fs=Math.min(vt,Math.max(vt*.5,xk-AIR.fall*a.z)),fe=xk+(xg-xk)*.5,sky=x=>{if(x<fs)return tl+(tr-tl)*x/fs;const q=Math.min(1,Math.max(0,(fe-x)/(fe-fs)));return tr*q*q*(3-2*q)};
     for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
-      for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br])}
+      for(const [b0,b1,R,bl,br,F,k,sp] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br,k,sp])}
       for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
-        for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
+        for(const [e,R,bl,br,k,sp] of bands)t=Math.max(t,e*ramp(x,bl,br,R,k,sp));
         // (and nowhere in the air less than a little ink, until the photograph takes over: its haze stays a tone of the
         // ink rather than a pale cloud between the copy and the picture)
         t=Math.max(t,AIR.veil*(1-uv*uv*(3-2*uv)));
