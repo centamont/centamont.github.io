@@ -514,7 +514,7 @@ soldOf(k, s, S = this.S) { return clamp(S * 2 - this.rank[k * 2 + s], 0, 1); }
 set(built, sold, crane, instant) {
 if (this.dead) return;
 if (built && !this.B && !this.drawnAt) this.drawnAt = performance.now();
-this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
+this.B = built; this.Sold = sold; this.craneT = typeof crane === 'number' ? clamp(crane, 0, 1) : crane ? 1 : 0;
 this.c.dataset.built = built; this.c.dataset.sold = Math.round(sold * 2);
 if (instant || reduce) this.snap();
 this.wake();
