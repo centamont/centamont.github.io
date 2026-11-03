@@ -825,7 +825,8 @@ g.lineWidth = 0.8;
 const as = new Set(edges.map((e) => (e[0] = Math.round(e[0] * 20) / 20)));
 for (const a of as) { g.beginPath(); g.strokeStyle = bronze(a); for (const e of edges) if (e[0] === a) seg(e[1], e[2]); g.stroke(); }
 };
-const fOff = dark ? 0.36 : 0.33, fShade = dark ? 0.78 : 1.25, offAt = (k) => k >= RES0 && k < RES1 && k >= L - 0.001;
+const wash = this.o.soldOutline ? 1 - 0.6 * clamp(L / 1.5, 0, 1) : 1;
+const fOff = (dark ? 0.36 : 0.33) * wash, fShade = dark ? 0.78 : 1.25, offAt = (k) => k >= RES0 && k < RES1 && k >= L - 0.001;
 const shape = (pl, hx, y0, y1) => { const up = chain(this.ring(pl, y1), hx, true), lo = chain(this.ring(pl, y0), hx, false); for (let i = lo.length - 1; i >= 0; i--) up.push(lo[i]); return up; };
 const front = (r0, r1, j, n) => { const j2 = (j + 1) % n, a = r0[j], b = r0[j2], c = r1[j2]; return (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]) < 0; };
 const offplan = (ks, outlined) => {
@@ -934,7 +935,7 @@ if (f <= 0) continue;
 g.globalAlpha = f * gA; g.beginPath(); q.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.stroke();
 }
 g.globalAlpha = gA;
-const pn = this.o.planNotes ? clamp((-this.phi - 0.3) / 0.3, 0, 1) : 1;
+const pn = this.o.planNotes ? clamp((-this.phi - 0.3) / 0.3, 0, 1) * (1 - this.E) : 1;
 if (this.o.north && pn > 0.01) {
 g.globalAlpha = gA * pn;
 const nc = [12.5, 9.5];
@@ -948,7 +949,7 @@ g.globalAlpha = gA;
 g.setLineDash([4, 5]); g.strokeStyle = bronze(Math.min(0.9, 0.55 * bo));
 poly([[-9.5, -7.5], [9.5, -7.5], [9.5, 7.5], [-9.5, 7.5]].map(([x, z]) => this.P(x, 0, z))); g.stroke(); g.setLineDash([]);
 if (this.o.planNotes && this.o.labels && this.o.site !== false) {
-const f = clamp((-this.phi - 0.3) / 0.3, 0, 1);
+const f = clamp((-this.phi - 0.3) / 0.3, 0, 1) * (1 - this.E);
 if (f > 0.01) {
 g.save(); g.globalAlpha = gA * f; g.font = '500 ' + this.o.labelSize + 'px Jost, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
 if ('letterSpacing' in g) g.letterSpacing = '0.14em';

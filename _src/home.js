@@ -350,10 +350,12 @@ document.addEventListener('DOMContentLoaded',function(){
   // (and on a very wide screen the elevation, level ruler and all, comes no further than 64px past that column into the
   // margin, so the ruler stays with the gauge and caption it belongs to: it slides right, and where the column is too
   // narrow for that, it is drawn smaller inside the column)
-  const view=n=>{const [th,ph]=VIEWS[n],d=data[n],tight=narrow||towerM.h<360,bl=Math.max(0,gauge.getBoundingClientRect().left-towerM.c.getBoundingClientRect().left);
+  // (cut: how much of the canvas's top has gone past the top of the window, as the finished drawing scrolls away: the
+  // view is framed in what is left, so the tower stands whole to its crown while Last closing is read)
+  const view=(n,cut=0)=>{const [th,ph]=VIEWS[n],d=data[n],tight=narrow||towerM.h<360,bl=Math.max(0,gauge.getBoundingClientRect().left-towerM.c.getBoundingClientRect().left);
     if(!n)return towerM.fit(th,ph,{plan:true,margin:tight?[12,24,12,24+bl]:[40,40,40,40+bl]});
     // (the first release's name, where it is set over its bracket, is kept inside too)
-    const m=tight?[14,12,10,12]:[30,22,22,22],v=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:m});
+    const m=tight?[14+cut,12,10,12]:[30+cut,22,22,22],v=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:m});
     const b=towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,measure:true,ty:v.ty,scale:v.scale,offsetX:v.offsetX}),need=bl-64-b.x0,room=towerM.w-m[1]-b.x1;
     if(need>room)return towerM.fit(th,ph,{built:d.b,crane:d.c,release:d.rel,margin:[m[0],m[1],m[2],bl-64]});
     if(need>0)v.offsetX+=need/towerM.w;
@@ -375,7 +377,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const story=()=>{if(towerM||!Model)return;
     // by day the story keeps the draughtsman's light (from the south-west, high over the left shoulder), since its views
     // turn toward the south; after dark its homes are lit only once the building is finished (Last closing)
-    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true});
+    towerM=make('tower',{theta:-0.7,phi:-0.62,dist:40,ty:2.5,scale:1.5,labels:true,palms:false,footprint:true,north:true,planNotes:true,envelope:false,rate:11,slow:1.5,facadeLag:6,restGuides:true,draft:true,soldOutline:true});
     if(!towerM)return;models.push(towerM);
     let lb=-1,ls=-1,lf=-1,lm=null,ps=0;
     towerM.o.onFrame=m=>{const b=Math.floor(m.L+.02),s=Math.floor(m.S*2+.02),f=Math.min(1,m.S*2/RES),met=m.S*2>=RES*LIM-.001;
@@ -403,9 +405,13 @@ document.addEventListener('DOMContentLoaded',function(){
     const r=steps[k].getBoundingClientRect(),[a,b]=k===riseN?[.12,.92]:[.8,1],p=c01(((y-r.top)/r.height-a)/(b-a));return[k,p*p*(3-2*p)]};
   // (the two views a hand-over turns between are framed once a size, not each frame)
   const views=k=>vs[k]||(vs[k]=[view(k),view(k+1)]);
+  // (Last closing: as the story's foot carries the pinned figure up and away, the part of its canvas still in the window,
+  // in steps of 4px, down to under half the canvas beside the words on a wide screen, and to three quarters on a phone, where Last closing has been read by the time the drawing goes (any smaller and it reads as a thumbnail); past that the drawing simply goes with the page)
+  const elev=document.querySelector('.rise .elev');let lc=0;
+  const cut=()=>{const t=parseFloat(getComputedStyle(elev).top)||0,r=towerM.c.getBoundingClientRect();return Math.round(Math.min(Math.max(0,t-r.top),r.height*(narrow?.25:.55))/4)*4};
   const rise=force=>{if(riseN<0)return;const live=!motionOff();if(!live&&cur!==riseN)return;
     let[k,e]=at();if(!live&&k!==riseN){k=riseN;e=cur>riseN?1:0}
-    if(k>=steps.length-1){if(force||lk!==k){lk=k;lr=-1;if(towerM){towerM.camTo(view(k),true);put(data[k])}else state(data[k])}return}
+    if(k>=steps.length-1){const c=live&&towerM?cut():0;if(force||lk!==k||c!==lc){const was=lk;lk=k;lr=-1;lc=c;if(towerM){towerM.camTo(c?(vs['c'+c]||(vs['c'+c]=view(k,c))):view(k),true);if(force||was!==k)put(data[k])}else state(data[k])}return}
     if(!force&&k===lk&&Math.abs(e-lr)<.002)return;lr=e;lk=k;
     const a=data[k],b=data[k+1],up=!a.b&&b.b;
     // (sales lead construction: where ground breaks, the residences sell up to the threshold before the frame starts;
