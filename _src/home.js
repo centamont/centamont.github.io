@@ -385,29 +385,40 @@ document.addEventListener('DOMContentLoaded',function(){
         // crossing the threshold while reading forward marks it once
         if(met&&reading&&ps*2<RES*LIM&&lm!==null){gauge.classList.remove('pulse');void gauge.offsetWidth;gauge.classList.add('pulse')}lm=met}
       ps=m.S};
-    towerM.o.onResize=()=>{narrow=mq.matches;vs=null;if(cur===riseN)rise(true);else if(cur>=0)towerM.camTo(view(cur),true)};
-    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true);if(cur===riseN){vs=null;rise(true)}};
+    towerM.o.onResize=()=>{narrow=mq.matches;vs={};if(cur===riseN||!motionOff())rise(true);else if(cur>=0)towerM.camTo(view(cur),true)};
+    towerM.o.envelope=st.e;towerM.set(st.b,st.s,st.c,true);towerM.release(st.rel||0,true);towerM.camTo(view(Math.max(cur,0)),true);if(cur===riseN||!motionOff()){vs={};rise(true)}};
   // without a drawing the gauge states the figures directly
   const state=d=>{Object.assign(st,d);gB.textContent=pad(d.b);gS.textContent=pad(d.s*2);gM.style.transform='scaleX('+Math.min(1,d.s*2/RES).toFixed(4)+')';gauge.classList.toggle('met',d.s*2>=RES*LIM)};
-  // Ground broken, the building goes up as the reader reads on. Across the step marked data-rise (Ground broken), from its
-  // heading on the reading line to its foot, the frame climbs a floor at a time from that step's levels to the next
-  // step's, the sales count on with it and the camera turns toward the next step's view, so at the step's foot the
-  // drawing stands exactly as the next step has it and nothing jumps. Reading back up takes it down again.
-  const riseN=steps.findIndex(s=>s.hasAttribute('data-rise'));let lr=-1,vs=null;
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  // (how far through the step the reading line is, eased in and out, 0 to 1; it starts once the heading is past)
-  const riseAt=()=>{const r=steps[riseN].getBoundingClientRect(),p=Math.min(1,Math.max(0,((innerHeight*(narrow?.63:.5)-r.top)/r.height-.12)/.8));return p*p*(3-2*p)};
-  const rise=force=>{if(riseN<0||cur!==riseN)return;const e=riseAt();if(!force&&Math.abs(e-lr)<.002)return;lr=e;
-    const a=data[riseN],b=data[riseN+1],d={e:true,b:Math.round(lerp(a.b,b.b,e)),s:Math.round(lerp(a.s*2,b.s*2,e))/2,c:a.c,rel:0};
+  // The story is one drawing under the reader's hand. With motion on, every step hands on to the next as it is read:
+  // from the last fifth of the step to its foot, once its words have been read (and for Ground broken, the step marked data-rise, from just past its heading to
+  // its foot, as the frame climbs a floor at a time), the drawing goes the whole way to the next step's state, its
+  // camera turning, its sales counting on, its frame rising and its crane fading out, so the next heading arrives on the
+  // drawing it describes and nothing jumps. Reading back up takes it all back. With motion off only Ground broken
+  // climbs with the reader; the other steps simply stand, each in its own state.
+  const riseN=steps.findIndex(s=>s.hasAttribute('data-rise'));let lr=-1,lk=-1,vs={};
+  const lerp=(a,b,t)=>a+(b-a)*t,c01=v=>Math.min(1,Math.max(0,v));
+  // (the step the reading line is in, and how far through its hand-over it is, eased in and out, 0 to 1)
+  const at=()=>{const y=innerHeight*(narrow?.63:.5);let k=0;steps.forEach((s,i)=>{if(s.getBoundingClientRect().top<=y)k=i});
+    if(k>=steps.length-1)return[steps.length-1,0];
+    const r=steps[k].getBoundingClientRect(),[a,b]=k===riseN?[.12,.92]:[.8,1],p=c01(((y-r.top)/r.height-a)/(b-a));return[k,p*p*(3-2*p)]};
+  // (the two views a hand-over turns between are framed once a size, not each frame)
+  const views=k=>vs[k]||(vs[k]=[view(k),view(k+1)]);
+  const rise=force=>{if(riseN<0)return;const live=!motionOff();if(!live&&cur!==riseN)return;
+    let[k,e]=at();if(!live&&k!==riseN){k=riseN;e=cur>riseN?1:0}
+    if(k>=steps.length-1){if(force||lk!==k){lk=k;lr=-1;if(towerM){towerM.camTo(view(k),true);put(data[k])}else state(data[k])}return}
+    if(!force&&k===lk&&Math.abs(e-lr)<.002)return;lr=e;lk=k;
+    const a=data[k],b=data[k+1],up=!a.b&&b.b;
+    // (sales lead construction: where ground breaks, the residences sell up to the threshold before the frame starts;
+    // the envelope is drawn as the plan lifts into a view of the tower, and the first release's bracket takes its turn)
+    const es=up?c01(e/.6):e,eb=up?c01((e-.6)/.4):e;
+    const d={e:e>.15?b.e:a.e,b:Math.round(lerp(a.b,b.b,eb)),s:Math.round(lerp(a.s*2,b.s*2,es))/2,c:a.c&&!b.c?c01(1-e/.6):(up?(eb>0?1:0):+a.c),rel:e<.5?a.rel:b.rel};
     if(!towerM){state(d);return}
-    // (the two views it turns between are framed once a size, not each frame)
-    if(!vs)vs=[view(riseN),view(riseN+1)];
-    const[va,vb]=vs;towerM.camTo({theta:lerp(va.theta,vb.theta,e),phi:lerp(va.phi,vb.phi,e),ty:lerp(va.ty,vb.ty,e),scale:lerp(va.scale,vb.scale,e),offsetX:lerp(va.offsetX,vb.offsetX,e)});put(d)};
+    const[va,vb]=views(k);towerM.camTo({theta:lerp(va.theta,vb.theta,e),phi:lerp(va.phi,vb.phi,e),ty:lerp(va.ty,vb.ty,e),scale:lerp(va.scale,vb.scale,e),offsetX:lerp(va.offsetX,vb.offsetX,e)},true);put(d)};
   function stage(n){
     if(n===cur)return;
     const now=performance.now(),fwd=n===cur+1,skim=now-last<450;last=now;cur=n;
     reading=fwd&&!skim&&!motionOff();
-    if(n===riseN)rise(true);
+    if(n===riseN||!motionOff())rise(true);
     else if(towerM){towerM.camTo(view(n));put(data[n])}
     else state(data[n]);
     steps.forEach((x,i)=>x.classList.toggle('on',i===n));

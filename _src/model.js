@@ -745,10 +745,11 @@
     // residences to a level), so 2S is the number of residences under contract.
     soldOf(k, s, S = this.S) { return clamp(S * 2 - this.rank[k * 2 + s], 0, 1); }
 
+    // (crane: true or false, or how far it stands, 0 to 1, for a drawing scrubbed by the reader's scroll)
     set(built, sold, crane, instant) {
       if (this.dead) return;
       if (built && !this.B && !this.drawnAt) this.drawnAt = performance.now();
-      this.B = built; this.Sold = sold; this.craneT = crane ? 1 : 0;
+      this.B = built; this.Sold = sold; this.craneT = typeof crane === 'number' ? clamp(crane, 0, 1) : crane ? 1 : 0;
       this.c.dataset.built = built; this.c.dataset.sold = Math.round(sold * 2); // (residences)
       if (instant || reduce) this.snap();
       this.wake();
