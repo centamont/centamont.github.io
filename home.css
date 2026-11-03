@@ -120,15 +120,15 @@
 .handle:focus-visible svg{transform:translateX(.12em)}
 @media (hover:hover) and (pointer:fine){.handle:hover svg{transform:translateX(.12em)}}
 html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) h1 .ln > span{transform:translateY(112%)}
-html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.coords){transform:translateY(14px)}
+html.intro-on .curtain:not(.split-on) ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transform:translateY(14px)}
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln > span{transition:transform .72s var(--ease-display) .32s}
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.365s}
 html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.41s}
-html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition:transform .9s var(--ease-display) .44s}
+html.intro-on .curtain.split-on:not(.fast) ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transition:transform .9s var(--ease-display) .44s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln > span{transition-delay:.1s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(2) > span{transition-delay:.19s}
 html.intro-on .curtain.fast ~ main .hero:not(.lit) h1 .ln:nth-child(3) > span{transition-delay:.28s}
-html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.coords){transition-delay:.4s}
+html.intro-on .curtain.fast ~ main .hero:not(.lit) :is(.lede,.row,.proof,.coords){transition-delay:.4s}
 .hero .coords b{font-weight:500;color:var(--bronze-300)}
 .hero .coords span:empty{display:none}
 .hero .coords .cap{display:block;border:0;padding:0;font-size:inherit;color:inherit}
@@ -234,7 +234,7 @@ html.js .cut.in .ln:nth-child(3) > span{transition-delay:.24s}
   .gauge b{margin-left:0}.gauge em{margin-right:6px}
 }
 @media print{
-  html.intro-on .hero :is(.lede,.row){transform:none!important}
+  html.intro-on .hero :is(.lede,.row,.proof){transform:none!important}
   .js .facade :is(.w,.k,.b){animation:none!important}.js .facade .b{opacity:var(--b-rest)!important}.js .facade :is(.w,.k){opacity:1!important}
   .js .spec .sp-plan g,.js .spec :is(.sp-dot,.sp-act-n,.sp-plan-n){opacity:1!important}.js .spec .sp-plan .sold{fill-opacity:1!important}
   .rise .elev{display:none!important}
@@ -827,6 +827,11 @@ html:not(.js) .step{min-height:auto}
 .hero .row .aside{align-self:center;margin:0 0 0 18px;padding-block:6px 3px;color:inherit;opacity:.86}
 @media (hover:hover) and (pointer:fine){.hero .row .aside:hover{opacity:1}}
 @media (max-width:820px){.hero .row .aside{margin-left:0}}
+.hero .proof{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:clamp(22px,3vh,32px);font-size:14px;line-height:1.5;letter-spacing:.01em;color:rgba(var(--ivory-rgb),.7)}
+.hero .proof::before{content:"";flex:0 0 22px;height:1px;align-self:center;background:var(--bronze-300);opacity:.8}
+.hero .proof a{color:var(--ivory)}
+@media (min-width:821px) and (max-height:720px){.hero .proof{margin-top:16px}}
+@media (max-width:820px){.hero .proof{font-size:13.5px}}
 @media (min-width:821px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,10.5vh),98px)}}
 @media (min-width:821px) and (max-height:720px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,calc(14.9vh - 31px)),98px)}}
 @media (min-width:821px) and (min-height:501px) and (max-height:580px){.hero{--t-hero:clamp(40px,min(6.6vw,8.5vh),98px)}}
