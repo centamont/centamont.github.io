@@ -64,30 +64,27 @@ for (const [f, lang] of Object.entries(BRIEFS)) {
 const i = process.argv.indexOf('--social');
 if (i > 0) {
   const DIR = resolve(process.argv[i + 1]); if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
-  const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8');
-  const WM = html.match(/id="cm-wm"[^>]*d="([^"]+)"/)[1];
-  const MARK = 'M50 0l-100 0l42.9-60.06l4.85 48.06l4.5 0l7.56-44.27z';
-  const lockup = (lx, ly, cap) => { // the header's proportions: mark 22/13 of the cap height, gap 7/13, on the baseline
-    const mh = cap * 22 / 13, ms = mh / 60.06, mw = 100 * ms, gap = cap * 7 / 13;
-    return `<path fill="${BRONZE}" transform="translate(${(lx + mw / 2).toFixed(2)} ${ly}) scale(${ms.toFixed(4)})" d="${MARK}"/>` +
-      `<path fill="${IVORY}" fill-rule="evenodd" transform="translate(${(lx + mw + gap).toFixed(2)} ${ly}) scale(${(cap / 1000).toFixed(5)})" d="${WM}"/>`;
-  };
-  // name, size, the plate's box [x, y, w, h] and stroke scale, the lockup [x, baseline, cap height]
+  // name, size, the plate's box [x, y, w, h], stroke scale and label size. No lockup: the avatar beside each banner is
+  // already the mark and the profile name sits under it, so the curve is the banner's one subject, with its own words.
   const SOCIAL = [
-    ['x-header-1500x500', 1500, 500, [860, 150, 520, 200, 2.2], [140, 262, 26]],      // the lockup clear above X's avatar, bottom left
-    ['linkedin-banner-1584x396', 1584, 396, [940, 108, 520, 180, 2.2], [170, 212, 24]],  // the lockup clear of LinkedIn's avatar, low on the left
-    ['youtube-banner-2560x1440', 2560, 1440, [1300, 600, 660, 240, 2.4], [600, 740, 30]], // the 1546 × 423 safe area, centred
+    ['x-header-1500x500', 1500, 500, [470, 140, 900, 250, 2.6, 22]],      // clear of X's avatar (bottom left) and the phone's crop
+    ['linkedin-banner-1584x396', 1584, 396, [560, 110, 880, 200, 2.4, 20]],  // clear of LinkedIn's avatar, low on the left
+    ['youtube-banner-2560x1440', 2560, 1440, [640, 600, 1280, 270, 3, 24]], // inside the 1546 × 423 safe area, centred
   ];
+  // the plate's words in our own faces, from fonts/ (the PNGs carry them; the SVGs fall back to the viewer's)
+  const face = (fam, style, file) => `@font-face{font-family:'${fam}';font-style:${style};src:url(data:font/woff2;base64,${readFileSync(resolve(ROOT, 'fonts', file)).toString('base64')})}`;
+  const FACES = face('Jost', 'normal', 'jost-latin-400-normal.woff2') + face('Cormorant Garamond', 'italic', 'cormorant-garamond-latin-400-italic.woff2');
   const { chromium } = await import('@playwright/test');
   const local = '/opt/pw-browsers/chromium';
   const browser = await chromium.launch(existsSync(local) ? { executablePath: local } : {});
   const page = await browser.newPage();
-  for (const [name, W, H, [px, py, pw, ph, st], [lx, ly, cap]] of SOCIAL) {
+  for (const [name, W, H, [px, py, pw, ph, st, font]] of SOCIAL) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="${INK}"/>` +
-      `<g transform="translate(${px} ${py})">${plate(pw, ph, { stroke: st })}</g>${lockup(lx, ly, cap)}</svg>\n`;
+      `<g transform="translate(${px} ${py})">${plate(pw, ph, { lang: 'en', stroke: st, font })}</g></svg>\n`;
     writeFileSync(resolve(DIR, name + '.svg'), svg);
     await page.setViewportSize({ width: W, height: H });
-    await page.setContent(`<style>html,body{margin:0}svg{display:block}</style>${svg}`);
+    await page.setContent(`<style>${FACES}html,body{margin:0}svg{display:block}</style>${svg}`);
+    await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: resolve(DIR, name + '.png') });
     console.log(name);
   }
