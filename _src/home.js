@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded',function(){
     else{const tm=Math.max(28,H*.045),cl=c.getBoundingClientRect().left;
       z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm-ST.crown*z;
       const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
-      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(lr.right,rr?rr.right:0)-cl,...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-110,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
+      tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(textR,lr.right-cl,rr?rr.right-cl:0),...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-AIR.gap,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
     Object.assign(heroM.o,{dist:v.dist,ty,scale:f/Math.min(W*1.15,H),offsetX:(cx-W/2)/W});heroM.phi=Math.asin(Math.max(-1,Math.min(1,(ty-ey)/v.dist)));
     // beside the copy, the drawing stands where the settle has it until the building is up (see SET)
@@ -137,8 +137,9 @@ document.addEventListener('DOMContentLoaded',function(){
   // shaft, and the hero's ink deepens over it toward the copy, so every line of it reads as it did on ink (4.5:1 at
   // least for the lede). It is drawn at a quarter of the screen's size (it holds only gradients; the hero's grain lies
   // over it), and it fades in and out with the photograph, frame for frame, as the veil it replaces fades the other way.
-  // A phone shows the photograph whole above the copy and needs none.
-  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,head:[.66,.52,200],lede:[.8,.7,240],note:[.62,.52,160]};
+  // A phone shows the photograph whole above the copy and needs none. The still's left edge stands AIR.gap px left of the
+  // copy's right edge, so the air has room to brighten into the photograph before the shaft.
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280],lede:[.8,.7,240],note:[.62,.52,160]};
   let air=null,airAt=null,airRows=null,airKey='';
   // (any filter the stylesheet lays on the photograph, read off the canvas, whose pixels come unfiltered: saturate sepia
   // contrast brightness, the first two as one matrix; none today, since the stills carry their own grade)
@@ -171,16 +172,22 @@ document.addEventListener('DOMContentLoaded',function(){
     const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
     const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
       x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
-    // (the ink at x: from l at the window's edge to r at the copy's right edge R, then easing to none 240px past it, or by the
-    // still's soft edge; over the lede and the buttons, and over the survey note, it runs deeper, to their own right edges)
+    // (the ink over the copy at x: from l at the window's edge to r at the copy's right edge R, then easing to none 240px
+    // past it, or by the still's soft edge; over the headline, over the lede and the buttons, and over the place's name,
+    // it runs to their own right edges)
     const ramp=(x,l,r,R)=>{const U=Math.max(R+240,x0);if(x<R)return l+(r-l)*x/R;const q=Math.min(1,Math.max(0,(U-x)/(U-R)));return r*q*q*(3-2*q)};
+    // (and where no line of copy stands, the open sky over the headline and the water under the buttons, the ink thins
+    // from well inside the copy's column, AIR.fall of the still's pixels before its soft edge, to none halfway across the
+    // hand-over: the air brightens toward the photograph across the width of the column instead of meeting it at a
+    // dark edge a hand's breadth from the tower. The veil below thins over the same span.)
+    const fs=Math.min(vt,Math.max(vt*.5,xk-AIR.fall*a.z)),fe=xk+(xg-xk)*.5,sky=x=>{if(x<fs)return tl+(tr-tl)*x/fs;const q=Math.min(1,Math.max(0,(fe-x)/(fe-fs)));return tr*q*q*(3-2*q)};
     for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
-      for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),Math.max(vt,R),bl,br])}
-      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),o=(j*w+i)*4;let t=ramp(x,tl,tr,vt);
+      for(const [b0,b1,R,bl,br,F] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br])}
+      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
         for(const [e,R,bl,br] of bands)t=Math.max(t,e*ramp(x,bl,br,R));
         // (and nowhere in the air less than a little ink, until the photograph takes over: its haze stays a tone of the
         // ink rather than a pale cloud between the copy and the picture)
-        t=Math.max(t,AIR.veil*(1-u*u*(3-2*u)));
+        t=Math.max(t,AIR.veil*(1-uv*uv*(3-2*uv)));
         for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
     g.putImageData(im,0,0)};
   const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
