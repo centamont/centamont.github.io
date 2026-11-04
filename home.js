@@ -37,7 +37,7 @@ const A=s.az,lo=124,hi=236,left=A-lo>=50,off=Math.min(79.5,left?A-lo:hi-A),idle=
 let eR=left?A-off:A+off,e0=left?eR+S:eR-S;
 const sh=Math.max(lo-Math.min(e0,eR),Math.min(0,hi-Math.max(e0,eR)));eR+=sh;e0+=sh;
 o.th=((reduce?eR:e0)-180)*Math.PI/180;o.orbit=left?-0.0009:0.0009;o.idle=left?-idle:idle;o.hatch=(e0+eR)/2;return o})();
-const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286};
+const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286,drop:.078};
 let plateAt=null;
 const SET={x:.072,s:.93,ms:700};
 let settle=1,settleAt=0,phTgt=null;
@@ -45,7 +45,7 @@ const settleTo=()=>{if(!phTgt)return;const e=settle*settle*(3-2*settle);heroM.o.
 const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];plateAt=null;
 if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
 else{const tm=Math.max(28,H*.045),cl=c.getBoundingClientRect().left;
-z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm-ST.crown*z;
+z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm+Math.round(H*ST.drop)-ST.crown*z;
 const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
 tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(textR,lr.right-cl,rr?rr.right-cl:0),...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-AIR.gap,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
 const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
@@ -54,7 +54,7 @@ phTgt=narrow?null:{scale:heroM.o.scale,offsetX:heroM.o.offsetX};settleTo();if(na
 const m=[Math.round(hb*.5),Math.round(hb+Math.max(14,(Y+ST.crown*z-hb)*.55)),narrow?Math.round(Y+ST.podium*z):H,narrow?Math.round(Y+ST.podium*z+48):H];
 ['--m0','--m1','--m2','--m3'].forEach((k,i)=>c.style.setProperty(k,m[i]+'px'));hero.style.setProperty('--va',va+'px');hero.style.setProperty('--vb',vb+'px');
 airAt=narrow?null:{X,Y,z,W,H,textR:tr,lb,m0:m[0],m1:m[1]};airRows=null;airPaint()};
-const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280,.62,360],lede:[.8,.7,240,1,240],note:[.62,.52,160,.62,360],seam:300};
+const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280,.62,360],lede:[.8,.7,240,1,240],note:[.62,.52,160,.62,360],seam:300,edge:90,reach:420,low:[70,380],lowSp:.5};
 let air=null,airAt=null,airRows=null,airKey='';
 const gradeOf=c=>{const f=getComputedStyle(c).filter||'',n=(k,d)=>{const m=f.match(new RegExp(k+'\\(([\\d.]+)'));return m?+m[1]:d},s=n('saturate',1),q=1-n('sepia',0),ct=n('contrast',1),br=n('brightness',1),
 S=[.213+.787*s,.715-.715*s,.072-.072*s,.213-.213*s,.715+.285*s,.072-.072*s,.213-.213*s,.715-.715*s,.072+.928*s],
@@ -69,24 +69,29 @@ idx.sort((a,b)=>lum[b]-lum[a]);let r=0,gg=0,b=0;for(let j=0;j<keep;j++){const o=
 row.set(grade(r/keep,gg/keep,b/keep),y*3)}
 const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
 for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-AIR.seam*.4))/AIR.seam)),v2=v*v*(3-2*v);for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v2)+bay[ch]*v2}
-const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
-for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
-return{h,near:blur(6*a.z),far:blur(14*a.z)}};
+const blur=(sg,src=row)=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
+for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*src[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
+const e0=a.X+AIR.keep*a.z,e1=Math.min(a.W,e0+AIR.edge*a.z),ew=Math.max(1,Math.round((e1-e0)/4));q.clearRect(0,0,w,h);q.drawImage(c,e0*k,0,(e1-e0)*k,a.H*k,0,0,ew,h);
+const ed=q.getImageData(0,0,ew,h).data,edge=new Float32Array(h*3);
+for(let y=0;y<h;y++){let r=0,gg=0,b=0;for(let i=0;i<ew;i++){const o=(y*ew+i)*4;r+=ed[o];gg+=ed[o+1];b+=ed[o+2]}edge.set(grade(r/ew,gg/ew,b/ew),y*3)}
+return{h,near:blur(6*a.z),far:blur(14*a.z),edge:blur(10*a.z,edge)}};
 const airPaint=()=>{const a=airAt;
 if(!a){if(air)air.hidden=true;return}if(!airRows)return;
 if(!air){air=document.createElement('canvas');air.className='hero-air';air.setAttribute('aria-hidden','true');heroM.c.after(air)}
 air.hidden=false;air.style.setProperty('--m0',a.m0+'px');air.style.setProperty('--m1',a.m1+'px');
-const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
+const w=Math.ceil(a.W/4),{near,far,edge,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
 const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
 x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
 const ramp=(x,l,r,R,k,s)=>{const K=R*k,U=Math.max(R+s,x0);if(x<K)return l+(r-l)*x/K;const q=Math.min(1,Math.max(0,(U-x)/(U-K)));return r*q*q*(3-2*q)};
 const fs=Math.min(vt,Math.max(vt*.5,xk-AIR.fall*a.z)),fe=xk+(xg-xk)*.5,sky=x=>{if(x<fs)return tl+(tr-tl)*x/fs;const q=Math.min(1,Math.max(0,(fe-x)/(fe-fs)));return tr*q*q*(3-2*q)};
-for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
-for(const [b0,b1,R,bl,br,F,k,sp] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br,k,sp])}
-for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
+const hz=a.Y+AIR.horizon*a.z-AIR.seam*.4,xr=xk-AIR.reach*a.z,xl=a.X+AIR.low[1]*a.z,xkl=a.X+AIR.low[0]*a.z;
+for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[],lv=Math.min(1,Math.max(0,(y-hz)/AIR.seam)),lo=lv*lv*(3-2*lv),xu=xg+(xl-xg)*lo,xv=xk+(xkl-xk)*lo;
+for(const [b0,b1,R,bl,br,F,k,sp] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br,k,sp*(1-AIR.lowSp*lo)])}
+for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xv)/(xu-xv))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
 for(const [e,R,bl,br,k,sp] of bands)t=Math.max(t,e*ramp(x,bl,br,R,k,sp));
 t=Math.max(t,AIR.veil*(1-uv*uv*(3-2*uv)));
-for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
+const ev=Math.min(1,Math.max(0,(x-xr)/(xk-xr))),em=lo*ev*ev*(3-2*ev);
+for(let ch=0;ch<3;ch++){const n=ink[ch]||0;D[o+ch]=((near[r+ch]*(1-m)+far[r+ch]*m)*(1-em)+edge[r+ch]*em)*(1-t)+(n-Math.max(0,n-edge[r+ch])*em)*t}D[o+3]=(1-u*u*(3-2*u))*255}}
 g.putImageData(im,0,0)};
 const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
 heroM.o.labels=heroM.o.guides=!(photo&&narrow);Object.assign(heroM.o,{dist:v.dist,ty:v.ty,scale:v.scale,offsetX:v.offsetX});heroM.phi=v.phi;

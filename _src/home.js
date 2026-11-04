@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Stacked (a phone, a tablet held upright), the still runs the full width, its soft edge off the screen and the shaft
   // at a third of it, the crown under the caption line; the copy starts under the podium, and the photograph runs on
   // under the podium, over the quay and the near bay, as far as the room above the headline allows, fading into its ink.
-  const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286};
+  const ST={crown:66,podium:660,quay:784,foot:968,axis:345,soft:60,crown2:286,drop:.078};
   let plateAt=null;
   // The hero opens on the drawing. While the tower draws itself, the sheet stands a little left of the photograph's
   // framing and a little smaller (SET), so the level ruler and the levels' names have the page's margin to stand in
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded',function(){
   const framePhoto=(v,narrow,nb)=>{const s=Model.stills[photo],W=heroM.w,H=heroM.h,c=heroM.c,ct=c.getBoundingClientRect().top+scrollY,hb=header?header.offsetTop+header.offsetHeight-ct:64,ey=v.ty-v.dist*Math.sin(v.phi);let z,X,Y,va=0,vb=0,tr=0,lb=[];plateAt=null;
     if(narrow){z=W/(s.w-ST.soft);X=W-s.w*z;Y=nb+12-ST.crown*z;hero.style.setProperty('--plate-foot',Math.round(ct-(hero.getBoundingClientRect().top+scrollY)+Y+ST.podium*z+18)+'px')}
     else{const tm=Math.max(28,H*.045),cl=c.getBoundingClientRect().left;
-      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm-ST.crown*z;
+      z=Math.max(.3,Math.min(Math.min(W*1.15,H)*v.scale/s.f,(H-hb-tm)/(ST.foot-ST.crown)));Y=hb+tm+Math.round(H*ST.drop)-ST.crown*z;
       const textR=Math.max(0,...[...hero.querySelectorAll('h1 .ln > span,.lede,.row > *')].map(e=>e.getBoundingClientRect().right-cl));
       tr=textR;const ct0=c.getBoundingClientRect().top,bx=q=>{const e=hero.querySelector(q);return e?e.getBoundingClientRect():null},lr=bx('.lede'),rr=bx('.row'),nr=bx('.coords'),hr=bx('h1');lb=[hr&&[hr.top-ct0,hr.bottom-ct0,textR,...AIR.head],lr&&[lr.top-ct0,1e5,Math.max(textR,lr.right-cl,rr?rr.right-cl:0),...AIR.lede],nr&&nr.height&&[-1e5,nr.bottom-ct0,nr.right-cl,...AIR.note]].filter(Boolean);X=Math.max(W+2-s.w*z,Math.min(textR-AIR.gap,W-Math.max(96,W/8)-ST.axis*z));va=Math.round(Math.max(textR+8,X));vb=Math.round(Math.max(va+80,X+(ST.axis-150)*z));hero.style.removeProperty('--plate-foot')}
     const f=z*s.f,cx=X-(s.x-s.cx)*z,cy=Y-(s.y-s.cy)*z,ty=ey+(cy-H/2)*v.dist/f;
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // light rather than a shelf.
   // A phone shows the photograph whole above the copy and needs none. The still's left edge stands AIR.gap px left of the
   // copy's right edge, so the air has room to brighten into the photograph before the shaft.
-  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280,.62,360],lede:[.8,.7,240,1,240],note:[.62,.52,160,.62,360],seam:300};
+  const AIR={from:440,to:600,horizon:612,bay:800,bayK:.56,keep:120,give:300,ink:[.8,.52],veil:.4,fall:380,gap:50,head:[.66,.52,280,.62,360],lede:[.8,.7,240,1,240],note:[.62,.52,160,.62,360],seam:300,edge:90,reach:420,low:[70,380],lowSp:.5};
   let air=null,airAt=null,airRows=null,airKey='';
   // (any filter the stylesheet lays on the photograph, read off the canvas, whose pixels come unfiltered: saturate sepia
   // contrast brightness, the first two as one matrix; none today, since the stills carry their own grade)
@@ -161,9 +161,12 @@ document.addEventListener('DOMContentLoaded',function(){
       row.set(grade(r/keep,gg/keep,b/keep),y*3)}
     const b0=Math.max(0,Math.min(h-10,Math.round((a.Y+AIR.bay*a.z)/4))),bay=[0,1,2].map(ch=>{let t=0;for(let y=b0;y<h;y++)t+=row[y*3+ch];return t/(h-b0)*AIR.bayK});
     for(let y=0;y<h;y++){const v=Math.min(1,Math.max(0,(y*4-(a.Y+AIR.horizon*a.z-AIR.seam*.4))/AIR.seam)),v2=v*v*(3-2*v);for(let ch=0;ch<3;ch++)row[y*3+ch]=row[y*3+ch]*(1-v2)+bay[ch]*v2}
-    const blur=sg=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
-      for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*row[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
-    return{h,near:blur(6*a.z),far:blur(14*a.z)}};
+    const blur=(sg,src=row)=>{const R=Math.ceil(sg*3),ker=[],out=new Float32Array(h*3);let t=0;for(let i=-R;i<=R;i++){const e=Math.exp(-.5*(i/sg)**2);ker.push(e);t+=e}
+      for(let y=0;y<h;y++)for(let ch=0;ch<3;ch++){let v=0;for(let i=-R;i<=R;i++)v+=ker[i+R]*src[Math.min(h-1,Math.max(0,y+i))*3+ch];out[y*3+ch]=v/t}return out};
+    const e0=a.X+AIR.keep*a.z,e1=Math.min(a.W,e0+AIR.edge*a.z),ew=Math.max(1,Math.round((e1-e0)/4));q.clearRect(0,0,w,h);q.drawImage(c,e0*k,0,(e1-e0)*k,a.H*k,0,0,ew,h);
+    const ed=q.getImageData(0,0,ew,h).data,edge=new Float32Array(h*3);
+    for(let y=0;y<h;y++){let r=0,gg=0,b=0;for(let i=0;i<ew;i++){const o=(y*ew+i)*4;r+=ed[o];gg+=ed[o+1];b+=ed[o+2]}edge.set(grade(r/ew,gg/ew,b/ew),y*3)}
+    return{h,near:blur(6*a.z),far:blur(14*a.z),edge:blur(10*a.z,edge)}};
   // laid across, at the same quarter size: the near rows by the still, the far ones toward the window's edge, the ink
   // deepening toward the copy (from AIR.ink's first at the window's edge to its second at the copy's right edge, and
   // to none just past the still's soft edge); opaque over that soft edge, then giving way to the photograph
@@ -171,7 +174,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!a){if(air)air.hidden=true;return}if(!airRows)return;
     if(!air){air=document.createElement('canvas');air.className='hero-air';air.setAttribute('aria-hidden','true');heroM.c.after(air)}
     air.hidden=false;air.style.setProperty('--m0',a.m0+'px');air.style.setProperty('--m1',a.m1+'px');
-    const w=Math.ceil(a.W/4),{near,far,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
+    const w=Math.ceil(a.W/4),{near,far,edge,h}=airRows,key=[w,h,a.X,a.Y,a.z*1e3,a.textR,...a.lb.flat()].map(Math.round).join();if(key===airKey)return;airKey=key;air.width=w;air.height=h;
     const g=air.getContext('2d'),im=g.createImageData(w,h),D=im.data,[tl,tr]=AIR.ink,ink=getComputedStyle(hero).getPropertyValue('--hero-rgb').split(',').map(Number),
       x0=a.X+95*a.z,xk=a.X+AIR.keep*a.z,xg=a.X+AIR.give*a.z,vt=Math.max(1,a.textR);
     // (the ink over the copy at x: from l at the window's edge to r at a share k of the copy's right edge R, then easing
@@ -185,14 +188,16 @@ document.addEventListener('DOMContentLoaded',function(){
     // hand-over: the air brightens toward the photograph across the width of the column instead of meeting it at a
     // dark edge a hand's breadth from the tower. The veil below thins over the same span.)
     const fs=Math.min(vt,Math.max(vt*.5,xk-AIR.fall*a.z)),fe=xk+(xg-xk)*.5,sky=x=>{if(x<fs)return tl+(tr-tl)*x/fs;const q=Math.min(1,Math.max(0,(fe-x)/(fe-fs)));return tr*q*q*(3-2*q)};
-    for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[];
-      for(const [b0,b1,R,bl,br,F,k,sp] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br,k,sp])}
-      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xk)/(xg-xk))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
+    const hz=a.Y+AIR.horizon*a.z-AIR.seam*.4,xr=xk-AIR.reach*a.z,xl=a.X+AIR.low[1]*a.z,xkl=a.X+AIR.low[0]*a.z;
+    for(let j=0;j<h;j++){const r=j*3,y=(j+.5)*4,bands=[],lv=Math.min(1,Math.max(0,(y-hz)/AIR.seam)),lo=lv*lv*(3-2*lv),xu=xg+(xl-xg)*lo,xv=xk+(xkl-xk)*lo;
+      for(const [b0,b1,R,bl,br,F,k,sp] of a.lb){let e=Math.min(1,Math.max(0,1-Math.max(b0-y,y-b1)/F));if(e>0)bands.push([e*e*(3-2*e),R,bl,br,k,sp*(1-AIR.lowSp*lo)])}
+      for(let i=0;i<w;i++){const x=(i+.5)*4,m=Math.min(1,Math.max(0,(x0-x)/(x0*.55))),u=Math.min(1,Math.max(0,(x-xv)/(xu-xv))),uv=Math.min(1,Math.max(0,(x-fs)/(xg-fs))),o=(j*w+i)*4;let t=sky(x);
         for(const [e,R,bl,br,k,sp] of bands)t=Math.max(t,e*ramp(x,bl,br,R,k,sp));
         // (and nowhere in the air less than a little ink, until the photograph takes over: its haze stays a tone of the
         // ink rather than a pale cloud between the copy and the picture)
         t=Math.max(t,AIR.veil*(1-uv*uv*(3-2*uv)));
-        for(let ch=0;ch<3;ch++)D[o+ch]=(near[r+ch]*(1-m)+far[r+ch]*m)*(1-t)+(ink[ch]||0)*t;D[o+3]=(1-u*u*(3-2*u))*255}}
+        const ev=Math.min(1,Math.max(0,(x-xr)/(xk-xr))),em=lo*ev*ev*(3-2*ev);
+        for(let ch=0;ch<3;ch++){const n=ink[ch]||0;D[o+ch]=((near[r+ch]*(1-m)+far[r+ch]*m)*(1-em)+edge[r+ch]*em)*(1-t)+(n-Math.max(0,n-edge[r+ch])*em)*t}D[o+3]=(1-u*u*(3-2*u))*255}}
     g.putImageData(im,0,0)};
   const frameHero=()=>{framed=true;const v=heroView(),narrow=stacked();heroM.o.labelSize=Math.round(Math.min(16,Math.max(13,innerWidth/160)));
     // the drawing is named while it builds, beside the copy; under the photograph on a phone, where it runs the full

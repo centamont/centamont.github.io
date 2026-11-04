@@ -1272,13 +1272,25 @@ html:not(.js) .step{min-height:auto}
 @media (hover:hover) and (pointer:fine){.hero .row .aside:hover{opacity:1}}
 /* On a phone the button takes the full width and the link wraps under it, flush with the copy's edge. */
 @media (max-width:820px){.hero .row .aside{margin-left:0}}
-/* Under the buttons, one line a developer can check in five seconds: what arrives every Monday, and the specimen itself.
-   A fact of the method, not a claim about us; quieter than the lede, set off by a short bronze rule. */
-.hero .proof{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:clamp(22px,3vh,32px);font-size:14px;line-height:1.5;letter-spacing:.01em;color:rgba(var(--ivory-rgb),.7)}
-.hero .proof::before{content:"";flex:0 0 22px;height:1px;align-self:center;background:var(--bronze-300);opacity:.8}
-.hero .proof a{color:var(--ivory)}
-@media (min-width:821px) and (max-height:720px){.hero .proof{margin-top:16px}}
-@media (max-width:820px){.hero .proof{font-size:13.5px}}
+/* Under the buttons, the thing itself rather than a line about it: a small print of the Monday sheet (the plan, the
+   threshold, the contracts against them, this week's dot in bronze), set in the place-name's own small capitals, the
+   whole of it one link to the specimen report. Two text sizes on the first screen, then: the copy's and the labels'. */
+.hero .proof{display:inline-flex;align-items:center;gap:16px;margin-top:clamp(24px,3.4vh,36px);color:rgba(var(--ivory-rgb),.62);font-size:12px;line-height:1.55;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+.hero .proof .sheet{flex:0 0 auto;width:90px;height:60px;box-shadow:0 1px 0 rgba(0,0,0,.25),0 8px 22px -10px rgba(0,0,0,.6);transition:transform .5s var(--ease-display,ease)}
+.hero .proof .pp{fill:var(--ivory);fill-opacity:.9}
+.hero .proof .tk{fill:none;stroke:var(--bronze);stroke-width:1.2}
+.hero .proof .hl{fill:none;stroke:rgba(var(--ink-rgb),.28);stroke-width:.8}
+.hero .proof .th{fill:none;stroke:rgba(var(--ink-rgb),.35);stroke-width:.8;stroke-dasharray:2 2}
+.hero .proof .pl{fill:none;stroke:rgba(var(--ink-rgb),.4);stroke-width:1}
+.hero .proof .ac{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
+.hero .proof .dt{fill:var(--bronze)}
+.hero .proof .pk{display:flex;flex-direction:column}
+.hero .proof b{font-weight:500;color:rgba(var(--ivory-rgb),.9)}
+.hero .proof .pk > span:not(.vh){font-size:11px;letter-spacing:.12em}
+@media (hover:hover) and (pointer:fine){.hero .proof:hover .sheet{transform:translateY(-2px)}.hero .proof:hover b{color:var(--ivory)}}
+.hero .proof:focus-visible{outline:1px solid var(--bronze-300);outline-offset:6px}
+@media (min-width:821px) and (max-height:720px){.hero .proof{margin-top:16px}.hero .proof .sheet{width:66px;height:44px}}
+@media (max-width:820px){.hero .proof{gap:14px}.hero .proof .sheet{width:72px;height:48px}}
 /* The headline about a sixth smaller on a desktop, so the picture takes the room (the still is placed from the copy's
    right edge) and the line reads as said, not announced. */
 @media (min-width:821px) and (min-height:501px){.hero{--t-hero:clamp(44px,min(6.6vw,10.5vh),98px)}}
