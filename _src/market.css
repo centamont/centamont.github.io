@@ -355,7 +355,7 @@
 /* (and each planned tower as a whole two full tones back, its glass a faint tint and its floor lines a whisper, so the
    built landmarks are the darkest things in the frame and the planned city a light layer over them; the glass is thinned
    by its fill, since the panes' fade-in owns their opacity) */
-.mk-el.mi .fut{opacity:.34}.mk-el.mi .fut .wn{fill-opacity:.4}.mk-el.mi .fut .dt{opacity:.3}.mk-el.mi .fut .dt.q{opacity:.16}
+.mk-el.mi .fut{opacity:.3}.mk-el.mi .fut .wn{fill-opacity:.4}.mk-el.mi .fut .dt{opacity:.3}.mk-el.mi .fut .dt.q{opacity:.16}
 /* (its key numerals in the text's own weight, set over the drawing, not stamped on it) */
 .mk-el.mi .nk text{font-weight:400;stroke:var(--sheet);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 /* New York's drawing (.ny) is a rendered elevation: each tower's outline as fine as a cornice line, its form carried by tone
